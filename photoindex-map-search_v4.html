@@ -780,6 +780,7 @@ async function loadLocations(){
       });
     });
     document.getElementById('docCount').textContent = locations.filter(l=>l.documented).length + ' location' + (locations.filter(l=>l.documented).length===1?'':'s') + ' documented';
+    loadArchiveDate();
   } catch(e){
     console.error('Failed to load locations:', e);
     document.getElementById('docCount').textContent = '— locations documented';
@@ -787,18 +788,22 @@ async function loadLocations(){
   initMap();
 }
 
-/* Archive date from GitHub */
-async function loadArchiveDate(){
-  try {
-    const res = await fetch('https://api.github.com/repos/sproutssorbets/bne-urban-index/commits?path=locations.csv&per_page=1');
-    if(!res.ok) return;
-    const data = await res.json();
-    if(data[0]&&data[0].commit){
-      const d = new Date(data[0].commit.committer.date);
-      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-      document.getElementById('archiveDate').textContent = 'Last updated ' + months[d.getMonth()] + ' ' + d.getFullYear();
-    }
-  } catch(e){ /* silent */ }
+/* Archive date — computed from the loaded locations, no API call */
+function loadArchiveDate(){
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  let latest = null;
+  locations.forEach(l => {
+    if(!l.date) return;
+    const m = l.date.match(/([A-Za-z]+)\s+(\d{4})/);
+    if(!m) return;
+    const mi = months.indexOf(m[1]);
+    if(mi < 0) return;
+    const d = new Date(parseInt(m[2]), mi, 1);
+    if(!latest || d > latest) latest = d;
+  });
+  if(latest){
+    document.getElementById('archiveDate').textContent = 'Last updated ' + months[latest.getMonth()] + ' ' + latest.getFullYear();
+  }
 }
 
 mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
@@ -998,7 +1003,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if(!document.getElementById('search-top').contains(e.target)) closeDropdown();
   });
 
-  loadArchiveDate();
   loadLocations();
 });
 </script>
