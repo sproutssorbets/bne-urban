@@ -31,7 +31,7 @@ a{color:inherit;text-decoration:none}
 .dd-item:hover{background:#EBEBEA}
 .dd-item-left{display:flex;align-items:center;gap:8px;min-width:0}
 .dd-item-text{font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dd-item-sub{font-size:11px;color:var(--muted)}
+.dd-item-sub{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dd-badge{font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#9B9890;border:1px solid var(--rule);padding:2px 6px;flex-shrink:0;white-space:nowrap}
 
 /* Active terms */
@@ -527,67 +527,87 @@ function buildAddrList(suggestions){
   const ddAddrList = document.getElementById('dd-addr-list');
   if(!suggestions||suggestions.length===0){ ddAddr.style.display='none'; return; }
   ddAddr.style.display='';
-  ddAddrList.innerHTML = suggestions.slice(0,4).map((s,i) =>
-    `<div class="dd-item" onclick="pickAddress(${i})">
+  ddAddrList.innerHTML = suggestions.slice(0,6).map((s,i) => {
+    const name = s.name || '';
+    const sub = s.place_formatted || '';
+    const badge = s.kind === 'alias' ? 'Place' : (s.feature_type === 'poi' ? 'Place' : 'Map');
+    return `<div class="dd-item" onclick="pickAddress(${i})">
       <div class="dd-item-left">
         <svg style="width:12px;height:12px;flex-shrink:0;opacity:0.35" viewBox="0 0 12 12"><path d="M6 1C4.34 1 3 2.34 3 4c0 2.5 3 7 3 7s3-4.5 3-7c0-1.66-1.34-3-3-3z" stroke="#111" stroke-width="1.1" fill="none"/><circle cx="6" cy="4" r="1" fill="#111"/></svg>
-        <div>
-          <div class="dd-item-text">${s.place_name.split(',')[0]}</div>
-          <div class="dd-item-sub">${s.place_name.split(',').slice(1).join(',').trim()}</div>
+        <div style="min-width:0;flex:1">
+          <div class="dd-item-text">${name}</div>
+          <div class="dd-item-sub">${sub}</div>
         </div>
       </div>
-      <span class="dd-badge">Map</span>
-    </div>`
-  ).join('');
+      <span class="dd-badge">${badge}</span>
+    </div>`;
+  }).join('');
 }
 
 function pickKeyword(key, label){
   toggleTerm(key);
 }
 
-function pickAddress(idx){
+async function pickAddress(idx){
   const s = geocoderSuggestions[idx];
   if(!s||!mapInstance) return;
 
-  /* Keep address in field, close dropdown */
-  document.getElementById('smartInput').value = s.place_name;
+  let center, title, sub;
+
+  if(s.kind === 'alias'){
+    center = s.center;
+    title = s.name;
+    sub = s.place_formatted;
+  } else {
+    /* Search Box: retrieve coordinates for the chosen suggestion.
+       This retrieve closes the billing session. */
+    try {
+      const token = sbSessionToken();
+      const url = `https://api.mapbox.com/search/searchbox/v1/retrieve/${s.mapbox_id}`
+        + `?access_token=${mapboxgl.accessToken}&session_token=${token}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      const feat = (data.features||[])[0];
+      if(!feat) { sbSessionEnd(); return; }
+      center = feat.geometry.coordinates;
+      title = feat.properties.name || s.name;
+      sub = feat.properties.place_formatted || s.place_formatted || '';
+    } catch(e){ sbSessionEnd(); return; }
+  }
+  sbSessionEnd();
+
+  document.getElementById('smartInput').value = title;
   closeDropdown();
 
-  /* Fly map to address */
-  mapInstance.flyTo({center:s.center, zoom:17, duration:800});
+  mapInstance.flyTo({center:center, zoom:16, duration:800});
 
-  /* Remove previous marker and popup */
   if(window._searchMarker) { window._searchMarker.remove(); window._searchMarker = null; }
   if(window._searchPopup) { window._searchPopup.remove(); window._searchPopup = null; }
 
-  /* Add marker at location */
   const el = document.createElement('div');
   el.style.cssText = 'width:16px;height:16px;border-radius:50%;border:2px dashed #6B6B6B;background:rgba(247,247,245,0.8);cursor:pointer;';
-  window._searchMarker = new mapboxgl.Marker({element:el}).setLngLat(s.center).addTo(mapInstance);
+  window._searchMarker = new mapboxgl.Marker({element:el}).setLngLat(center).addTo(mapInstance);
 
-  /* Build popup */
   const buildPopup = () => {
-    const coords = s.center;
     const nearby = locations.filter(l => {
       if(!l.documented || isNaN(l.coords[0])) return false;
-      const dx = (l.coords[0] - coords[0]) * 111320 * Math.cos(coords[1] * Math.PI / 180);
-      const dy = (l.coords[1] - coords[1]) * 110540;
+      const dx = (l.coords[0] - center[0]) * 111320 * Math.cos(center[1] * Math.PI / 180);
+      const dy = (l.coords[1] - center[1]) * 110540;
       return Math.sqrt(dx * dx + dy * dy) < 400;
     });
     const nearbyHtml = nearby.length > 0
       ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid #DADADA;font-size:10px;color:#6B6B6B;font-family:Inter,sans-serif;">${nearby.length} documented location${nearby.length > 1 ? 's' : ''} nearby</div>`
       : `<div style="margin-top:8px;padding-top:8px;border-top:1px solid #DADADA;font-size:10px;color:#AAAAAA;font-family:Inter,sans-serif;">No photos at this location yet</div>`;
     return new mapboxgl.Popup({closeButton:true, maxWidth:'240px', offset:16})
-      .setLngLat(coords)
+      .setLngLat(center)
       .setHTML(`<div style="padding:10px 12px 12px;font-family:Inter,sans-serif;">
         <div style="font-size:9px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#6B6B6B;margin-bottom:4px;">Search result</div>
-        <div style="font-size:13px;color:#111;line-height:1.4;">${s.place_name.split(',')[0]}</div>
-        <div style="font-size:11px;color:#6B6B6B;margin-top:1px;">${s.place_name.split(',').slice(1,3).join(',').trim()}</div>
+        <div style="font-size:13px;color:#111;line-height:1.4;">${title}</div>
+        <div style="font-size:11px;color:#6B6B6B;margin-top:1px;">${sub}</div>
         ${nearbyHtml}
       </div>`);
   };
 
-  /* Open popup automatically after map flies, and on marker click */
   setTimeout(() => {
     if(window._searchPopup) { window._searchPopup.remove(); }
     window._searchPopup = buildPopup().addTo(mapInstance);
@@ -599,6 +619,37 @@ function pickAddress(idx){
   });
 }
 
+/* Local place aliases — names Mapbox does not index (e.g. Indigenous names).
+   Checked before Mapbox, no API call, no cost. */
+const PLACE_ALIASES = [
+  {
+    match: ['barrambin','victoria park barrambin','victoria park / barrambin'],
+    name: 'Victoria Park / Barrambin',
+    context: 'Herston, Brisbane',
+    center: [153.02936, -27.45651]
+  }
+];
+
+function aliasMatches(q){
+  const qq = q.toLowerCase().trim();
+  return PLACE_ALIASES.filter(a => a.match.some(m => m.includes(qq) || qq.includes(m)));
+}
+
+/* Search Box session — one token per search, reset after a pick or 3 min idle.
+   Keeping one token per search (not per keystroke) is what keeps this within
+   the free session tier. */
+let sbSession = null;
+let sbSessionTimer = null;
+function sbSessionToken(){
+  if(!sbSession){
+    sbSession = 'pi-' + Date.now() + '-' + Math.random().toString(36).slice(2,8);
+  }
+  clearTimeout(sbSessionTimer);
+  sbSessionTimer = setTimeout(()=>{ sbSession = null; }, 180000);
+  return sbSession;
+}
+function sbSessionEnd(){ sbSession = null; clearTimeout(sbSessionTimer); }
+
 let ddTimer;
 function onSmartInput(){
   const q = document.getElementById('smartInput').value.trim();
@@ -608,10 +659,28 @@ function onSmartInput(){
     buildKwList(q);
     if(q.length >= 2 && mapboxgl.accessToken){
       try {
-        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(q)}.json?access_token=${mapboxgl.accessToken}&country=au&bbox=138.0,-29.2,153.6,-10.7&proximity=153.0251,-27.4698&language=en&limit=4`;
+        const token = sbSessionToken();
+        const url = `https://api.mapbox.com/search/searchbox/v1/suggest?q=${encodeURIComponent(q)}`
+          + `&access_token=${mapboxgl.accessToken}`
+          + `&session_token=${token}`
+          + `&language=en&country=au`
+          + `&proximity=153.0251,-27.4698`
+          + `&bbox=152.95,-27.7,153.25,-27.30`
+          + `&limit=6`;
         const res = await fetch(url);
         const data = await res.json();
-        geocoderSuggestions = data.features||[];
+        const remote = (data.suggestions||[]).map(s => ({
+          kind: 'sb',
+          mapbox_id: s.mapbox_id,
+          name: s.name,
+          place_formatted: s.place_formatted || s.full_address || '',
+          feature_type: s.feature_type
+        }));
+        /* local aliases first, then Mapbox */
+        const local = aliasMatches(q).map(a => ({
+          kind: 'alias', name: a.name, place_formatted: a.context, center: a.center
+        }));
+        geocoderSuggestions = [...local, ...remote];
         buildAddrList(geocoderSuggestions);
       } catch(e){ document.getElementById('dd-addr').style.display='none'; }
     } else {
