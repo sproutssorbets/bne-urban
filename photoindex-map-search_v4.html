@@ -861,17 +861,22 @@ async function loadLocations(){
 function loadArchiveDate(){
   const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   let latest = null;
+  let latestHasDay = false;
   locations.forEach(l => {
     if(!l.date) return;
-    const m = l.date.match(/([A-Za-z]+)\s+(\d{4})/);
+    const m = l.date.match(/^(?:(\d{1,2})\s+)?([A-Za-z]+)\s+(\d{4})$/);
     if(!m) return;
-    const mi = months.indexOf(m[1]);
+    const mi = months.indexOf(m[2]);
     if(mi < 0) return;
-    const d = new Date(parseInt(m[2]), mi, 1);
-    if(!latest || d > latest) latest = d;
+    const day = m[1] ? parseInt(m[1]) : 1;
+    const d = new Date(parseInt(m[3]), mi, day);
+    if(!latest || d > latest){ latest = d; latestHasDay = !!m[1]; }
   });
   if(latest){
-    document.getElementById('archiveDate').textContent = 'Last updated ' + months[latest.getMonth()] + ' ' + latest.getFullYear();
+    const text = latestHasDay
+      ? 'Last updated ' + latest.getDate() + ' ' + months[latest.getMonth()] + ' ' + latest.getFullYear()
+      : 'Last updated ' + months[latest.getMonth()] + ' ' + latest.getFullYear();
+    document.getElementById('archiveDate').textContent = text;
   }
 }
 
