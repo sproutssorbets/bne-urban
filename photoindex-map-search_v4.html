@@ -86,11 +86,8 @@ a{color:inherit;text-decoration:none}
 .pi-popup-street{font-size:14px;font-weight:400;color:var(--text);margin-bottom:1px}
 .pi-popup-address{font-size:12px;color:var(--text);margin-bottom:1px}
 .pi-popup-suburb{font-size:11px;color:var(--muted);margin-bottom:10px}
-.pi-popup-add{display:block;width:100%;height:36px;background:var(--text);color:var(--bg);border:none;font-family:Inter,sans-serif;font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;margin-bottom:6px;transition:background 0.15s}
+.pi-popup-add{display:block;width:100%;height:36px;line-height:36px;text-align:center;background:var(--text);color:var(--bg);border:none;font-family:Inter,sans-serif;font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;text-decoration:none;cursor:pointer;margin-bottom:0;transition:background 0.15s}
 .pi-popup-add:hover{background:#333}
-.pi-popup-add.added{background:var(--muted)}
-.pi-popup-view{display:block;text-align:center;font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);padding:4px 0;cursor:pointer;transition:color 0.15s}
-.pi-popup-view:hover{color:var(--text)}
 
 /* Legend */
 #legend{position:absolute;bottom:16px;left:16px;background:var(--bg);border:1px solid var(--rule);padding:10px 12px;z-index:2}
@@ -964,10 +961,10 @@ function initMap(){
       map.addSource('dev-'+status,{type:'geojson',data:{type:'FeatureCollection',features:[]}});
       map.addLayer({id:'dev-'+status,type:'fill',source:'dev-'+status,paint:{
         'fill-color':statusColors[status],'fill-opacity':0.30
-      }});
+      }}, 'doc-clusters');
       map.addLayer({id:'dev-'+status+'-line',type:'line',source:'dev-'+status,paint:{
         'line-color':statusColors[status],'line-opacity':0.55,'line-width':1
-      }});
+      }}, 'doc-clusters');
     });
 
     loadKMLData(map, statusColors);
@@ -1027,13 +1024,10 @@ function initMap(){
     map.on('click','doc-pins',e=>{
       const p = e.features[0].properties;
       if(activePopup) activePopup.remove();
-      const isAdded = getTerms().includes(p.suburbKey);
       const html = `<div class="pi-popup-body">
-        <div class="pi-popup-ref">${p.ref||''}</div>
         <div class="pi-popup-street">${p.address||p.street}</div>
         <div class="pi-popup-suburb">${p.suburb}${p.count?' · '+p.count+' photo'+(p.count>1?'s':''):''}</div>
-        <button class="pi-popup-add${isAdded?' added':''}" onclick="addSuburbFromPin('${p.suburbKey}','${p.suburb}',this)">${isAdded?'Added to filters':'Add to filters'}</button>
-        <a class="pi-popup-view" href="${p.archiveUrl}" target="_top">View photos →</a>
+        <a class="pi-popup-add" href="${p.archiveUrl}" target="_top">View photos</a>
       </div>`;
       activePopup = new mapboxgl.Popup({closeButton:true,maxWidth:'240px'})
         .setLngLat(e.lngLat).setHTML(html).addTo(map);
