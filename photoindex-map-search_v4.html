@@ -9,18 +9,6 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#F7F7F5;--text:#111111;--muted:#6B6B6B;--rule:#DADADA}
-  <script>
-(function(){
-  function sendHeight(){
-    var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-    parent.postMessage({ piMapFrameHeight: h }, '*');
-  }
-  window.addEventListener('load', sendHeight);
-  window.addEventListener('resize', sendHeight);
-  document.addEventListener('click', function(){ setTimeout(sendHeight, 50); });
-  new MutationObserver(sendHeight).observe(document.body, { childList: true, subtree: true, attributes: true });
-})();
-</script>
 body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);font-size:13px;-webkit-font-smoothing:antialiased}
 a{color:inherit;text-decoration:none}
 
@@ -1192,6 +1180,19 @@ const streetsBySuburb = {
   "woolloongabba": [{label:"Annerley Road",key:"annerley-road",active:false},{label:"Boggo Road",key:"boggo-road",active:false},{label:"Boundary Street",key:"boundary-street",active:false},{label:"Cornwall Street",key:"cornwall-street",active:false},{label:"Ipswich Road",key:"ipswich-road",active:false},{label:"Leopard Street",key:"leopard-street",active:false},{label:"Logan Road",key:"logan-road",active:false},{label:"Main Street",key:"main-street",active:false},{label:"Mater Street",key:"mater-street",active:false},{label:"O'Keefe Street",key:"o-keefe-street",active:false},{label:"Stanley Street",key:"stanley-street",active:false},{label:"Trafalgar Street",key:"trafalgar-street",active:false},{label:"Vulture Street",key:"vulture-street",active:false},{label:"Wellington Road",key:"wellington-road",active:false}],
 };
 
+</script>
+
+<script>
+(function(){
+  function sendHeight(){
+    var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+    parent.postMessage({ piMapFrameHeight: h }, '*');
+  }
+  window.addEventListener('load', sendHeight);
+  window.addEventListener('resize', sendHeight);
+  document.addEventListener('click', function(){ setTimeout(sendHeight, 50); });
+  new MutationObserver(sendHeight).observe(document.body, { childList: true, subtree: true, attributes: true });
+})();
 </script>
 </body>
 </html>
