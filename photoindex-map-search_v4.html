@@ -36,7 +36,8 @@ a{color:inherit;text-decoration:none}
 /* ── FULL-WIDTH REFINE & FILTER BAR (below the map) ── */
 #refine-section{border-top:1px solid var(--rule);padding:24px 0 40px}
 #filters-label{margin-bottom:14px}
-#refine-top{margin-top:28px;padding-top:24px;border-top:1px solid var(--text)}
+#refine-top{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--text);z-index:200;padding:16px 40px 20px}
+#refine-spacer{height:180px}
 #refine-row{display:flex;gap:12px}
 #searchForm{flex:1;display:flex}
 #refineBarWrap{flex:1}
@@ -68,22 +69,23 @@ a{color:inherit;text-decoration:none}
 .acc.open .acc-icon{transform:rotate(180deg)}
 .acc-body{display:none;padding-bottom:20px}
 .acc.open .acc-body{display:block}
-.term-list{list-style:none;display:flex;flex-wrap:wrap;gap:8px}
-.term-list li a{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--rule);padding:6px 12px;font-size:12px;color:var(--text);cursor:pointer;transition:background 0.1s,border-color 0.1s}
-.term-list li a:hover{background:#F0EFE8}
-.term-list li a.is-selected{background:var(--text);border-color:var(--text);color:var(--bg)}
-.term-list li a.is-selected .ind{color:var(--bg)}
-.term-list li a.term-missing{color:#AAAAAA;border-color:var(--rule);cursor:default;pointer-events:none}
-.term-list li a.term-missing .ind{color:#AAAAAA}
-.ind{font-size:12px;color:var(--rule);flex-shrink:0}
-.term-col-title{display:block;width:100%;font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);padding:4px 0 2px}
+.term-list{list-style:none;columns:220px 5;column-gap:32px}
+.term-list li{border-bottom:1px solid var(--rule);break-inside:avoid}
+.term-list li a{display:block;padding:10px 0;font-size:13px;color:var(--text);cursor:pointer;transition:color 0.1s}
+.term-list li a:hover{color:var(--muted)}
+.term-list li a.is-selected{font-weight:500}
+.term-list li a.term-missing{color:#AAAAAA;cursor:default;pointer-events:none}
+.ind{display:none}
+.term-col-title{display:block;width:100%;font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);padding:4px 0 6px;column-span:all}
 .term-col-title:empty{display:none}
-.back-btn{background:none;border:none;font-family:Inter,sans-serif;font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);cursor:pointer;padding:4px 0 2px;display:block;width:100%;text-align:left}
+.back-btn{background:none;border:none;font-family:Inter,sans-serif;font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);cursor:pointer;padding:4px 0 2px;display:block;width:100%;text-align:left;column-span:all}
 .back-btn:hover{color:var(--text)}
 
 @media(max-width:900px){
   #refine-section{padding:20px 0 32px}
   #refine-row{flex-direction:column}
+  #refine-top{padding:14px 20px 16px}
+  #refine-spacer{height:240px}
 }
 
 /* ── MAP ── */
@@ -300,6 +302,8 @@ a{color:inherit;text-decoration:none}
       </div>
     </div>
   </div>
+
+  <div id="refine-spacer"></div>
 
   <div id="refine-top">
     <div class="search-label">Your search</div>
