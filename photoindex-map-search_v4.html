@@ -41,7 +41,7 @@ a{color:inherit;text-decoration:none}
 #refine-row{display:flex;gap:12px}
 #searchForm{flex:1;display:flex}
 #refineBarWrap{flex:1}
-#refineInput{width:100%;border:none;background:transparent;font-family:Inter,sans-serif;font-size:13px;color:var(--text);outline:none;padding:0 14px;height:100%}
+#refineInput{width:100%;border:none;background:transparent;font-family:Inter,sans-serif;font-size:13px;color:var(--text);outline:none;padding:0 14px;height:100%;cursor:default}
 #refineInput::placeholder{color:var(--muted)}
 .refine-hint{font-size:10px;color:var(--muted);margin-top:10px;line-height:1.4}
 .refine-hint a{color:var(--text);text-decoration:underline;text-underline-offset:2px}
@@ -313,8 +313,9 @@ a{color:inherit;text-decoration:none}
     <div id="refine-row">
       <form id="searchForm" action="https://photoindex.photodeck.com/" method="get" target="_top">
         <input type="hidden" id="vocabState">
+        <input type="hidden" id="searchSubmitValue" name="search">
         <div class="search-bar" id="refineBarWrap">
-          <input type="text" id="refineInput" name="search" autocomplete="off" placeholder="Pick an address above or a category below..." spellcheck="false">
+          <input type="text" id="refineInput" autocomplete="off" placeholder="Pick an address above or a category below..." spellcheck="false" readonly>
         </div>
       </form>
       <button class="btn-search-archive" onclick="doSearch()">Search archive →</button>
@@ -456,10 +457,12 @@ function getTerms(){ return document.getElementById('vocabState').value.trim().s
 let currentAddressTerm = '';
 
 function syncRefineField(){
-  const parts = [];
-  if(currentAddressTerm) parts.push(currentAddressTerm);
-  parts.push(...getTerms());
-  document.getElementById('refineInput').value = parts.join(' ');
+  const rawParts = [];
+  const prettyParts = [];
+  if(currentAddressTerm){ rawParts.push(currentAddressTerm); prettyParts.push(currentAddressTerm); }
+  getTerms().forEach(t => { rawParts.push(t); prettyParts.push(fmtLabel(t)); });
+  document.getElementById('refineInput').value = prettyParts.join(' · ');
+  document.getElementById('searchSubmitValue').value = rawParts.join(' ');
 }
 
 function setSearch(terms){
@@ -521,17 +524,24 @@ function clearAll(){
 
 
 function doSearch(){
-  const q = document.getElementById('refineInput').value.trim();
+  const q = document.getElementById('searchSubmitValue').value.trim();
   if(q.length === 0) return;
   document.getElementById('searchForm').submit();
 }
 
 /* Called from a documented-pin popup: adds that location's suburb to the
    active filters and scrolls the visitor to the filter section to refine further. */
-function addLocationToSearch(suburbKey){
+function addLocationToSearch(suburbKey, addressText){
+  if(addressText){
+    currentAddressTerm = addressText;
+    document.getElementById('smartInput').value = addressText;
+  }
   if(suburbKey){
     const terms = getTerms();
     if(!terms.includes(suburbKey)) setSearch([...terms, suburbKey]);
+  } else {
+    renderTags();
+    syncRefineField();
   }
   if(window._activePopup) window._activePopup.remove();
   const target = document.getElementById('filters-label');
@@ -1095,7 +1105,7 @@ function initMap(){
         <div class="pi-popup-street">${p.address||p.street}</div>
         <div class="pi-popup-suburb">${p.suburb}${p.count?' · '+p.count+' photo'+(p.count>1?'s':''):''}</div>
         <a class="pi-popup-add" href="${p.archiveUrl}" target="_top">View photos</a>
-        <button type="button" class="pi-popup-refine" onclick="addLocationToSearch('${p.suburbKey||''}')">Add to search &amp; filter further</button>
+        <button type="button" class="pi-popup-refine" onclick="addLocationToSearch('${p.suburbKey||''}','${(p.address||p.street||'').replace(/'/g,"\\'")}')">Add to search &amp; filter further</button>
       </div>`;
       window._activePopup = new mapboxgl.Popup({closeButton:true,maxWidth:'240px'})
         .setLngLat(e.lngLat).setHTML(html).addTo(map);
