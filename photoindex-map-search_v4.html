@@ -89,7 +89,7 @@ a{color:inherit;text-decoration:none}
 }
 
 /* ── MAP ── */
-#map-area{position:relative;display:flex;flex-direction:column;height:calc(100vh - 220px);min-height:480px}
+#map-area{position:relative;display:flex;flex-direction:column;height:calc(100vh - 380px);min-height:420px}
 #map{flex:1;width:100%}
 .mapboxgl-canvas-container{isolation:isolate}
 
@@ -105,6 +105,8 @@ a{color:inherit;text-decoration:none}
 .pi-popup-suburb{font-size:11px;color:var(--muted);margin-bottom:10px}
 .pi-popup-add{display:block;width:100%;height:36px;line-height:36px;text-align:center;background:var(--text);color:var(--bg);border:none;font-family:Inter,sans-serif;font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;text-decoration:none;cursor:pointer;margin-bottom:0;transition:background 0.15s}
 .pi-popup-add:hover{background:#333}
+.pi-popup-refine{display:block;width:100%;text-align:center;background:none;border:none;border-top:1px solid var(--rule);margin-top:8px;padding-top:8px;font-family:Inter,sans-serif;font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);cursor:pointer}
+.pi-popup-refine:hover{color:var(--text)}
 
 /* Legend */
 #legend{position:absolute;bottom:16px;left:16px;background:var(--bg);border:1px solid var(--rule);padding:10px 12px;z-index:2}
@@ -133,7 +135,7 @@ a{color:inherit;text-decoration:none}
 /* Mobile */
 @media(max-width:768px){
   #search-top{padding:16px 0}
-  #map-area{height:calc(100vh - 200px);min-height:380px}
+  #map-area{height:calc(100vh - 320px);min-height:340px}
 }
 </style>
 </head>
@@ -522,6 +524,18 @@ function doSearch(){
   const q = document.getElementById('refineInput').value.trim();
   if(q.length === 0) return;
   document.getElementById('searchForm').submit();
+}
+
+/* Called from a documented-pin popup: adds that location's suburb to the
+   active filters and scrolls the visitor to the filter section to refine further. */
+function addLocationToSearch(suburbKey){
+  if(suburbKey){
+    const terms = getTerms();
+    if(!terms.includes(suburbKey)) setSearch([...terms, suburbKey]);
+  }
+  if(window._activePopup) window._activePopup.remove();
+  const target = document.getElementById('filters-label');
+  if(target) target.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 function toggleAcc(id){
@@ -1073,16 +1087,17 @@ function initMap(){
     }
 
     /* Click on documented pin */
-    let activePopup = null;
+    window._activePopup = null;
     map.on('click','doc-pins',e=>{
       const p = e.features[0].properties;
-      if(activePopup) activePopup.remove();
+      if(window._activePopup) window._activePopup.remove();
       const html = `<div class="pi-popup-body">
         <div class="pi-popup-street">${p.address||p.street}</div>
         <div class="pi-popup-suburb">${p.suburb}${p.count?' · '+p.count+' photo'+(p.count>1?'s':''):''}</div>
         <a class="pi-popup-add" href="${p.archiveUrl}" target="_top">View photos</a>
+        <button type="button" class="pi-popup-refine" onclick="addLocationToSearch('${p.suburbKey||''}')">Add to search &amp; filter further</button>
       </div>`;
-      activePopup = new mapboxgl.Popup({closeButton:true,maxWidth:'240px'})
+      window._activePopup = new mapboxgl.Popup({closeButton:true,maxWidth:'240px'})
         .setLngLat(e.lngLat).setHTML(html).addTo(map);
     });
     map.on('mouseenter','doc-pins',()=>{map.getCanvas().style.cursor='pointer'});
