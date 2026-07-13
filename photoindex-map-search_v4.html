@@ -13,7 +13,7 @@ body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);font-si
 a{color:inherit;text-decoration:none}
 
 /* ── LAYOUT ── */
-#shell{display:flex;flex-direction:column;padding:0 40px}
+#shell{display:flex;flex-direction:column}
 
 /* ── LEFT PANEL ── */
 #panel{background:var(--bg)}
@@ -34,10 +34,11 @@ a{color:inherit;text-decoration:none}
 .dd-badge{font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#9B9890;border:1px solid var(--rule);padding:2px 6px;flex-shrink:0;white-space:nowrap}
 
 /* ── FULL-WIDTH REFINE & FILTER BAR (below the map) ── */
-#refine-section{border-top:1px solid var(--rule);padding:24px 40px 40px}
+#refine-section{border-top:1px solid var(--rule);padding:24px 0 40px}
 #filters-label{margin-bottom:14px}
 #refine-top{margin-top:28px;padding-top:24px;border-top:1px solid var(--text)}
 #refine-row{display:flex;gap:12px}
+#searchForm{flex:1;display:flex}
 #refineBarWrap{flex:1}
 #refineInput{width:100%;border:none;background:transparent;font-family:Inter,sans-serif;font-size:13px;color:var(--text);outline:none;padding:0 14px;height:100%}
 #refineInput::placeholder{color:var(--muted)}
@@ -76,11 +77,12 @@ a{color:inherit;text-decoration:none}
 .term-list li a.term-missing .ind{color:#AAAAAA}
 .ind{font-size:12px;color:var(--rule);flex-shrink:0}
 .term-col-title{display:block;width:100%;font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);padding:4px 0 2px}
+.term-col-title:empty{display:none}
 .back-btn{background:none;border:none;font-family:Inter,sans-serif;font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);cursor:pointer;padding:4px 0 2px;display:block;width:100%;text-align:left}
 .back-btn:hover{color:var(--text)}
 
 @media(max-width:900px){
-  #refine-section{padding:20px 20px 32px}
+  #refine-section{padding:20px 0 32px}
   #refine-row{flex-direction:column}
 }
 
@@ -128,7 +130,6 @@ a{color:inherit;text-decoration:none}
 
 /* Mobile */
 @media(max-width:768px){
-  #shell{padding:0 20px}
   #search-top{padding:16px 0}
   #map-area{height:calc(100vh - 200px);min-height:380px}
 }
@@ -620,11 +621,6 @@ async function pickAddress(idx){
       </div>`);
   };
 
-  setTimeout(() => {
-    if(window._searchPopup) { window._searchPopup.remove(); }
-    window._searchPopup = buildPopup().addTo(mapInstance);
-  }, 900);
-
   el.addEventListener('click', () => {
     if(window._searchPopup) window._searchPopup.remove();
     window._searchPopup = buildPopup().addTo(mapInstance);
@@ -719,7 +715,7 @@ const suburbLabels = {
 function renderSuburbList(terms){
   const list = document.getElementById('list-suburb');
   const titleEl = document.getElementById('suburb-col-title');
-  if(titleEl) titleEl.innerHTML = 'Suburb';
+  if(titleEl) titleEl.innerHTML = '';
   activeSuburb = null;
   list.innerHTML = Object.keys(suburbLabels)
     .sort((a,b) => suburbLabels[a].localeCompare(suburbLabels[b]))
