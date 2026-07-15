@@ -665,7 +665,13 @@ mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxM
 function initMap(){
   const map = new mapboxgl.Map({
     container:'map', style:'mapbox://styles/mapbox/light-v11',
-    center:[153.0307,-27.4598], zoom:14, minZoom:11, maxZoom:19
+    center:[153.0307,-27.4598], zoom:14, minZoom:11, maxZoom:19,
+    /* Mobile equivalent of the wheel handler below: a one-finger touch on the
+       map would otherwise pan it, trapping anyone trying to scroll the page.
+       cooperativeGestures lets a single finger pass through to the page and
+       requires two fingers to pan/zoom the map, with Mapbox's own on-screen
+       hint explaining why. */
+    cooperativeGestures: true
   });
   mapInstance = map;
   window._mapInstance = map;
