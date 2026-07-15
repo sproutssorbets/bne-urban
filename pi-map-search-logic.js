@@ -788,7 +788,16 @@ function initMap(){
       tooltip.style.top = (point.y - 28) + 'px';
       tooltip.style.opacity = '1';
     }
-    function hideTooltip(){ tooltip.style.opacity = '0'; }
+    function hideTooltip(){
+      tooltip.style.opacity = '0';
+      clearTimeout(tooltipHideTimer);
+    }
+
+    /* The tooltip is positioned once, at tap/hover time, in screen pixels.
+       It does not track the map underneath it, so as soon as the map starts
+       moving (drag, pinch, programmatic fly), hide it immediately instead of
+       letting it sit frozen over content that has since scrolled away. */
+    map.on('movestart', hideTooltip);
 
     if(!isTouchDevice){
       DEV_SHOWN.forEach(status => {
