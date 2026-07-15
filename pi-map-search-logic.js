@@ -771,31 +771,60 @@ function initMap(){
 
     loadKMLData(map, statusColors);
 
-    /* Hover tooltip for development polygons */
+    /* Hover / tap indicator for development polygons.
+       Desktop keeps true hover. Touch devices have no real hover state, so
+       mouseenter/mousemove/mouseleave fire unreliably there and can freeze
+       on stale content — tap gets its own simple, self-clearing handler. */
     const tooltip = document.createElement('div');
     tooltip.style.cssText = 'position:absolute;background:#111;color:#F7F7F5;padding:5px 10px;font-family:Inter,sans-serif;font-size:11px;font-weight:500;letter-spacing:0.06em;pointer-events:none;opacity:0;transition:opacity 0.15s;z-index:10;white-space:nowrap;';
     document.getElementById('map').appendChild(tooltip);
 
-    DEV_SHOWN.forEach(status => {
-      map.on('mouseenter', 'dev-'+status, e => {
-        if(window._activePopup) return; /* FIX: don't show the polygon tooltip while a pin popup is open */
-        map.getCanvas().style.cursor = 'pointer';
-        const name = e.features[0].properties.name;
-        if(!name) return;
-        tooltip.textContent = name;
-        tooltip.style.opacity = '1';
+    const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+    let tooltipHideTimer = null;
+
+    function showTooltipAtPoint(name, point){
+      tooltip.textContent = name;
+      tooltip.style.left = (point.x + 12) + 'px';
+      tooltip.style.top = (point.y - 28) + 'px';
+      tooltip.style.opacity = '1';
+    }
+    function hideTooltip(){ tooltip.style.opacity = '0'; }
+
+    if(!isTouchDevice){
+      DEV_SHOWN.forEach(status => {
+        map.on('mouseenter', 'dev-'+status, e => {
+          if(window._activePopup) return;
+          map.getCanvas().style.cursor = 'pointer';
+          const name = e.features[0].properties.name;
+          if(!name) return;
+          showTooltipAtPoint(name, e.point);
+        });
+        map.on('mousemove', 'dev-'+status, e => {
+          if(window._activePopup) return;
+          const name = e.features[0].properties.name;
+          if(!name) return;
+          showTooltipAtPoint(name, e.point);
+        });
+        map.on('mouseleave', 'dev-'+status, () => {
+          map.getCanvas().style.cursor = '';
+          hideTooltip();
+        });
       });
-      map.on('mousemove', 'dev-'+status, e => {
-        if(window._activePopup) return; /* FIX: keep it hidden/still while a pin popup is open */
-        const rect = document.getElementById('map').getBoundingClientRect();
-        tooltip.style.left = (e.originalEvent.clientX - rect.left + 12) + 'px';
-        tooltip.style.top = (e.originalEvent.clientY - rect.top - 28) + 'px';
+    } else {
+      DEV_SHOWN.forEach(status => {
+        map.on('click', 'dev-'+status, e => {
+          /* A tap that also lands on a documented pin belongs to that pin's
+             popup, not to the polygon indicator — skip so they never fight. */
+          const pinHit = map.queryRenderedFeatures(e.point, {layers:['doc-pins','doc-clusters']});
+          if(pinHit.length > 0) return;
+          const name = e.features[0].properties.name;
+          if(!name) return;
+          clearTimeout(tooltipHideTimer);
+          showTooltipAtPoint(name, e.point);
+          tooltipHideTimer = setTimeout(hideTooltip, 2200);
+        });
       });
-      map.on('mouseleave', 'dev-'+status, () => {
-        map.getCanvas().style.cursor = '';
-        tooltip.style.opacity = '0';
-      });
-    });
+    }
 
     async function loadKMLData(map, statusColors) {
       try {
