@@ -18,18 +18,18 @@ const vocab = {
   ],
   'list-viewtype': [
     {key:'building-exterior',active:false},{key:'building-facade',active:false},{key:'building-interior',active:false},
-    {key:'streetscape',active:false},{key:'street-level',active:false},{key:'intersection',active:false},
+    {key:'streetscape',active:true},{key:'street-level',active:false},{key:'intersection',active:false},
     {key:'laneway',active:false},{key:'shopfront',active:false},{key:'bridge',active:false},
     {key:'river',active:false},{key:'park',active:false},{key:'public-space',active:false},
-    {key:'aerial',active:false},{key:'cityscape',active:false},{key:'skyline',active:false},
-    {key:'urban-detail',active:false},{key:'construction-site',active:false},{key:'demolition-site',active:false}
+    {key:'aerial',active:false},{key:'cityscape',active:true},{key:'skyline',active:true},
+    {key:'urban-detail',active:false},{key:'construction-site',active:true},{key:'demolition-site',active:true}
   ],
   'list-buildingtype': [
-    {key:'residential-building',active:false},{key:'residential-tower',active:false},{key:'apartment-building',active:false},
-    {key:'mixed-use-building',active:false},{key:'commercial-building',active:false},{key:'office-building',active:false},
+    {key:'residential-building',active:false},{key:'residential-tower',active:true},{key:'apartment-building',active:false},
+    {key:'mixed-use-building',active:false},{key:'commercial-building',active:false},{key:'office-building',active:true},
     {key:'retail-building',active:false},{key:'hospitality-building',active:false},{key:'heritage-building',active:false},
     {key:'public-building',active:false},{key:'civic-building',active:false},{key:'industrial-building',active:false},
-    {key:'warehouse',active:false},{key:'parking-structure',active:false},{key:'development-site',active:false}
+    {key:'warehouse',active:false},{key:'parking-structure',active:false},{key:'development-site',active:true}
   ],
   'list-housing': [
     {key:'queenslander',active:false},{key:'highset-house',active:false},{key:'lowset-house',active:false},
@@ -38,15 +38,15 @@ const vocab = {
   ],
   'list-publicrealm': [
     {key:'footpath',active:false},{key:'pavement',active:false},{key:'crossing',active:false},
-    {key:'bike-lane',active:false},{key:'kerb',active:false},{key:'median',active:false},
-    {key:'street-light',active:false},{key:'traffic-light',active:false},{key:'signage',active:false},
-    {key:'wayfinding',active:false},{key:'bollard',active:false},{key:'fence',active:false},
-    {key:'wall',active:false},{key:'awning',active:false},{key:'veranda',active:false},
+    {key:'bike-lane',active:true},{key:'kerb',active:false},{key:'median',active:true},
+    {key:'street-light',active:true},{key:'traffic-light',active:true},{key:'signage',active:true},
+    {key:'wayfinding',active:false},{key:'bollard',active:false},{key:'fence',active:true},
+    {key:'wall',active:true},{key:'awning',active:false},{key:'veranda',active:false},
     {key:'balcony',active:false},{key:'arcade',active:false},{key:'canopy',active:false},
-    {key:'stairs',active:false},{key:'ramp',active:false},{key:'tree',active:false},
+    {key:'stairs',active:false},{key:'ramp',active:false},{key:'tree',active:true},
     {key:'planting',active:false},{key:'lawn',active:false},{key:'garden-bed',active:false},
     {key:'public-art',active:false},{key:'mural',active:false},{key:'monument',active:false},
-    {key:'bus-stop',active:false},{key:'rail-infrastructure',active:false},{key:'outdoor-dining',active:false},
+    {key:'bus-stop',active:false},{key:'rail-infrastructure',active:true},{key:'outdoor-dining',active:false},
     {key:'street-trading',active:false},{key:'pedestrian-zone',active:false},{key:'shared-zone',active:false},
     {key:'shade-structure',active:false},{key:'gate',active:false},{key:'door',active:false},
     {key:'window',active:false},{key:'roof',active:false},{key:'entry',active:false},
@@ -55,25 +55,25 @@ const vocab = {
     {key:'playground',active:false},{key:'sports-court',active:false},{key:'amenity-deck',active:false}
   ],
   'list-arch': [
-    {key:'high-rise',active:false},{key:'mid-rise',active:false},{key:'low-rise',active:false},
-    {key:'tower',active:false},{key:'podium',active:false},{key:'corner-building',active:false},
-    {key:'corner-tower',active:false},{key:'curved-facade',active:false},{key:'glass-facade',active:false},
+    {key:'high-rise',active:true},{key:'mid-rise',active:false},{key:'low-rise',active:false},
+    {key:'tower',active:true},{key:'podium',active:false},{key:'corner-building',active:false},
+    {key:'corner-tower',active:false},{key:'curved-facade',active:false},{key:'glass-facade',active:true},
     {key:'concrete-facade',active:false},{key:'brick-facade',active:false},{key:'face-brick',active:false},
     {key:'painted-brick',active:false},{key:'metal-facade',active:false},{key:'stone-facade',active:false},
     {key:'screen-facade',active:false},{key:'grid-facade',active:false},{key:'timber-facade',active:false},
     {key:'corrugated-iron',active:false},{key:'render',active:false},{key:'modern-architecture',active:false},
-    {key:'contemporary-architecture',active:false},{key:'heritage-architecture',active:false},
+    {key:'contemporary-architecture',active:false},{key:'heritage-architecture',active:true},
     {key:'postwar-architecture',active:false},{key:'industrial-architecture',active:false},{key:'adaptive-reuse',active:false}
   ],
   'list-context': [
     {key:'heritage',active:false},{key:'demolition',active:false},{key:'scheduled-demolition',active:false},
-    {key:'threatened-building',active:false},{key:'pre-construction',active:false},{key:'under-construction',active:false},
+    {key:'threatened-building',active:false},{key:'pre-construction',active:false},{key:'under-construction',active:true},
     {key:'construction-impact',active:false},{key:'site-hoarding',active:false},{key:'temporary-fencing',active:false},
-    {key:'post-demolition',active:false},{key:'completed-development',active:false},{key:'development-site',active:false},
-    {key:'vacant-site',active:false},{key:'urban-renewal',active:false},{key:'urban-intensification',active:false},
+    {key:'post-demolition',active:false},{key:'completed-development',active:false},{key:'development-site',active:true},
+    {key:'vacant-site',active:true},{key:'urban-renewal',active:false},{key:'urban-intensification',active:false},
     {key:'urban-consolidation',active:false},{key:'waterfront',active:false},{key:'riverfront',active:false},
     {key:'transport-corridor',active:false},{key:'commercial-strip',active:false},{key:'night-economy',active:false},
-    {key:'street-activation',active:false},{key:'flood-resilience',active:false},{key:'infrastructure',active:false},
+    {key:'street-activation',active:false},{key:'flood-resilience',active:false},{key:'infrastructure',active:true},
     {key:'public-realm',active:false},{key:'hoarding-art',active:false}
   ],
   'list-use': [
@@ -102,14 +102,14 @@ const vocab = {
     {key:'artificial-light',active:false},{key:'reflection',active:false},{key:'shadow',active:false}
   ],
   'list-comp': [
-    {key:'wide-view',active:false},{key:'close-view',active:false},{key:'detail-view',active:false},
+    {key:'wide-view',active:true},{key:'close-view',active:false},{key:'detail-view',active:false},
     {key:'street-view',active:false},{key:'elevated-view',active:false},{key:'upward-perspective',active:false},
     {key:'frontal-view',active:false},{key:'oblique-view',active:false},{key:'architectural-elevation',active:false},
     {key:'context-view',active:false}
   ],
   'list-status': [
-    {key:'existing-condition',active:false},{key:'under-construction',active:false},{key:'post-demolition',active:false},
-    {key:'completed-development',active:false},{key:'vacant-site',active:false},
+    {key:'existing-condition',active:false},{key:'under-construction',active:true},{key:'post-demolition',active:false},
+    {key:'completed-development',active:false},{key:'vacant-site',active:true},
     {key:'scheduled-demolition',active:false},{key:'threatened-building',active:false}
   ],
   'list-olympic': [
