@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhotoIndex — Licensing</title>
+
+<!-- Standalone mirror of the Webflow Licensing page (photoindex-bdef60.webflow.io/licensing),
+     built for PhotoDeck's iframe embed, following the finder/accordion/table patterns
+     documented in the photoindex-www skill. Content is copied from the live Webflow page
+     via the API on 16 July 2026 — if pricing or copy changes on Webflow, this file needs
+     updating separately, since it's plain HTML/CSS/JS with no shared data source. -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFFFFF; /* pure white here, matching the map embed, not the off-white
+                       #F7F7F5 used on Webflow — same PhotoDeck-only choice as before */
+    --text: #111111;
+    --muted: #6B6B6B;
+    --rule: #DADADA;
+    --rule-strong: #111111;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+    font-weight: 400;
+    padding: 0;
+  }
+  @media (max-width: 680px) {
+    body { padding: 0; }
+  }
+
+  .about-header { margin-bottom: 48px; }
+  .about-h1 {
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    margin: 0 0 10px;
+  }
+  .about-intro { font-size: 14px; color: var(--muted); max-width: 520px; margin: 0 0 20px; }
+  .lic-note { font-size: 13px; color: var(--muted); max-width: 520px; margin: 0; padding-top: 16px; border-top: 1px solid var(--rule); }
+
+  /* Finder */
+  .finder { border-top: 1px solid var(--rule-strong); margin-bottom: 48px; }
+  .finder-header {
+    display: grid; grid-template-columns: 220px 1fr 28px;
+    border-bottom: 1px solid var(--rule); padding: 10px 0;
+  }
+  .finder-hcell {
+    font-size: 11px; font-weight: 500; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted); padding: 0 4px;
+  }
+  .finder-row {
+    display: grid; grid-template-columns: 220px 1fr 28px;
+    border-bottom: 1px solid var(--rule);
+    cursor: pointer; transition: background 0.12s; align-items: center;
+  }
+  .finder-row:hover { background: none; }
+  .finder-row.active { background: none; }
+  .finder-client { padding: 12px 4px 12px 0; font-size: 13px; font-weight: 500; }
+  .finder-tags { padding: 12px 8px; display: flex; flex-wrap: wrap; gap: 4px; }
+  .ftag {
+    font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text); border: 1px solid var(--rule); padding: 2px 8px; white-space: nowrap;
+  }
+  .finder-arrow { font-size: 13px; color: var(--muted); text-align: right; }
+
+  @media (max-width: 680px) {
+    .finder-header { display: none; }
+    .finder-row { grid-template-columns: 1fr auto; }
+    .finder-tags { display: none; }
+    .finder-client { padding: 14px 0; font-size: 13px; }
+    .finder-arrow { padding: 14px 0; }
+  }
+
+  /* Accordion */
+  .acc-section { border-top: 1px solid var(--rule-strong); margin-bottom: 2px; }
+  .acc-header {
+    display: grid; grid-template-columns: 1fr auto;
+    align-items: center; padding: 14px 0;
+    cursor: pointer; user-select: none;
+  }
+  .acc-header:hover .acc-title { color: var(--muted); }
+  .acc-title { font-size: 11px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; }
+  .acc-meta { display: flex; align-items: center; gap: 20px; }
+  .acc-preview { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
+  .acc-chevron { font-size: 13px; color: var(--muted); transition: transform 0.2s; display: inline-block; }
+  .acc-section.open .acc-chevron { transform: rotate(180deg); }
+  .acc-body { display: none; padding-bottom: 32px; }
+  .acc-section.open .acc-body { display: block; }
+  @media (max-width: 680px) {
+    .acc-header { padding: 12px 0; }
+    .acc-body { padding-bottom: 20px; }
+  }
+
+  /* Tables */
+  .lic-table { border-top: 1px solid var(--rule); margin-bottom: 20px; }
+  .lic-row { display: grid; border-bottom: 1px solid var(--rule); align-items: start; }
+  .lic-row-cols3 { grid-template-columns: 200px 1fr 100px; }
+  .lic-row-cols2 { grid-template-columns: 200px 1fr; }
+  .lic-cell { padding: 12px 16px 12px 0; font-size: 13px; }
+  .lic-cell:first-child { padding-left: 0; }
+  .lic-cell-label {
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); padding-top: 8px; padding-bottom: 8px;
+  }
+  .lic-cell-title { font-weight: 500; }
+  .lic-cell-meta { color: var(--muted); }
+  .lic-cell-price { text-align: right; white-space: nowrap; font-weight: 500; }
+  .cond-label {
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); padding: 12px 16px 12px 0;
+  }
+  .cond-text { color: var(--muted); font-size: 13px; padding: 12px 0; }
+
+  @media (max-width: 680px) {
+    .lic-row-cols3 { grid-template-columns: 1fr 80px; }
+    .lic-row-cols2 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="about-header">
+  <h1 class="about-h1">Licensing</h1>
+  <p class="about-intro">All photographs in the archive are available for licensing. Select your situation below to see the right options.</p>
+  <p class="lic-note">All prices include GST.</p>
+</div>
+
+<div class="finder">
+  <div class="finder-header">
+    <div class="finder-hcell">I am a…</div>
+    <div class="finder-hcell">Recommended licence</div>
+    <div class="finder-hcell"></div>
+  </div>
+  <div class="finder-row" data-target="real-estate">
+    <div class="finder-client">Real Estate Agent</div>
+    <div class="finder-tags"><span class="ftag">Single Property Listing</span><span class="ftag">Building Licence</span><span class="ftag">Neighbourhood Licence</span></div>
+    <div class="finder-arrow">↓</div>
+  </div>
+  <div class="finder-row" data-target="property-marketing">
+    <div class="finder-client">Property Developer</div>
+    <div class="finder-tags"><span class="ftag">Property Marketing</span></div>
+    <div class="finder-arrow">↓</div>
+  </div>
+  <div class="finder-row" data-target="editorial">
+    <div class="finder-client">Journalist / Online Media</div>
+    <div class="finder-tags"><span class="ftag">Editorial Online</span></div>
+    <div class="finder-arrow">↓</div>
+  </div>
+  <div class="finder-row" data-target="editorial">
+    <div class="finder-client">Magazine / Newspaper</div>
+    <div class="finder-tags"><span class="ftag">Editorial Print</span></div>
+    <div class="finder-arrow">↓</div>
+  </div>
+  <div class="finder-row" data-target="editorial">
+    <div class="finder-client">TV / Video Production</div>
+    <div class="finder-tags"><span class="ftag">Editorial Broadcast</span><span class="ftag">Commercial / Broadcast</span></div>
+    <div class="finder-arrow">↓</div>
+  </div>
+  <div class="finder-row" data-target="institutional-planning">
+    <div class="finder-client">Architect / Urban Planner</div>
+    <div class="finder-tags"><span class="ftag">Institutional</span><span class="ftag">Urban Planning</span></div>
+    <div class="finder-arrow">↓</div>
+  </div>
+  <div class="finder-row" data-target="institutional-planning">
+    <div class="finder-client">Council / Government Body</div>
+    <div class="finder-tags"><span class="ftag">Institutional</span><span class="ftag">Urban Planning</span></div>
+    <div class="finder-arrow">↓</div>
+  </div>
+  <div class="finder-row" data-target="institutional-planning">
+    <div class="finder-client">University / Researcher</div>
+    <div class="finder-tags"><span class="ftag">Institutional</span></div>
+    <div class="finder-arrow">↓</div>
+  </div>
+  <div class="finder-row" data-target="other">
+    <div class="finder-client">Advertising Agency</div>
+    <div class="finder-tags"><span class="ftag">Commercial / Broadcast</span></div>
+    <div class="finder-arrow">↓</div>
+  </div>
+  <div class="finder-row" data-target="volume-packages">
+    <div class="finder-client">Buying Multiple Images</div>
+    <div class="finder-tags"><span class="ftag">Volume Package</span></div>
+    <div class="finder-arrow">↓</div>
+  </div>
+</div>
+
+<div class="acc-section" id="real-estate">
+  <div class="acc-header">
+    <span class="acc-title">Real Estate</span>
+    <div class="acc-meta">
+      <span class="acc-preview">AU$90 – AU$450</span>
+      <span class="acc-chevron">↓</span>
+    </div>
+  </div>
+  <div class="acc-body">
+    <div class="lic-table">
+      <div class="lic-row lic-row-cols3">
+        <div class="lic-cell lic-cell-label">Licence</div>
+        <div class="lic-cell lic-cell-label">Use</div>
+        <div class="lic-cell lic-cell-label lic-cell-price">Price</div>
+      </div>
+      <div class="lic-row lic-row-cols3">
+        <div class="lic-cell lic-cell-title">Single Property Listing</div>
+        <div class="lic-cell lic-cell-meta">One image used in a single property listing. Property portals, agency website.</div>
+        <div class="lic-cell lic-cell-price">AU$90</div>
+      </div>
+      <div class="lic-row lic-row-cols3">
+        <div class="lic-cell lic-cell-title">Building Licence</div>
+        <div class="lic-cell lic-cell-meta">One image across multiple listings for the same building. Assigned to a named agent. Requires the building address at purchase.</div>
+        <div class="lic-cell lic-cell-price">AU$350</div>
+      </div>
+      <div class="lic-row lic-row-cols3">
+        <div class="lic-cell lic-cell-title">Neighbourhood Licence</div>
+        <div class="lic-cell lic-cell-meta">20 downloads of context photographs from one suburb, parks, streets, cafes, local amenities. AU$25 per additional image. Requires the suburb at purchase.</div>
+        <div class="lic-cell lic-cell-price">AU$450</div>
+      </div>
+    </div>
+    <div class="lic-table">
+      <div class="lic-row lic-row-cols2">
+        <div class="cond-label">Building Licence</div>
+        <div class="cond-text">Assigned to a named agent at time of purchase. Does not transfer to another agent or to the agency. A new licence is required if the agency wants to keep using the image after the agent leaves.</div>
+      </div>
+      <div class="lic-row lic-row-cols2">
+        <div class="cond-label">Neighbourhood Licence</div>
+        <div class="cond-text">Assigned to a named agent, covers 20 downloads from one suburb. Does not transfer between agents or to the agency.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="acc-section" id="property-marketing">
+  <div class="acc-header">
+    <span class="acc-title">Property Marketing</span>
+    <div class="acc-meta">
+      <span class="acc-preview">AU$200</span>
+      <span class="acc-chevron">↓</span>
+    </div>
+  </div>
+  <div class="acc-body">
+    <div class="lic-table">
+      <div class="lic-row lic-row-cols3">
+        <div class="lic-cell lic-cell-label">Licence</div>
+        <div class="lic-cell lic-cell-label">Use</div>
+        <div class="lic-cell lic-cell-label lic-cell-price">Price</div>
+      </div>
+      <div class="lic-row lic-row-cols3">
+        <div class="lic-cell lic-cell-title">Property Marketing</div>
+        <div class="lic-cell lic-cell-meta">One image used in sales brochures, developer websites, or investor materials for a specific project. Client: developers, PR agencies.</div>
+        <div class="lic-cell lic-cell-price">AU$200</div>
+      </div>
+    </div>
+    <div class="lic-table">
+      <div class="lic-row lic-row-cols2">
+        <div class="cond-label">Print runs</div>
+        <div class="cond-text">Runs completed within the licence period remain in circulation. New print runs after expiry require a new licence. Digital use expires 3 years from purchase.</div>
+      </div>
+      <div class="lic-row lic-row-cols2">
+        <div class="cond-label">Sublicensing</div>
+        <div class="cond-text">Not permitted unless agreed in writing.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="acc-section" id="editorial">
+  <div class="acc-header">
+    <span class="acc-title">Editorial</span>
+    <div class="acc-meta">
+      <span class="acc-preview">AU$75 – AU$250</span>
+      <span class="acc-chevron">↓</span>
+    </div>
+  </div>
+  <div class="acc-body">
+    <div class="lic-table">
+      <div class="lic-row lic-row-cols3">
+        <div class="lic-cell lic-cell-label">Licence</div>
+        <div class="lic-cell lic-cell-label">Use</div>
+        <div class="lic-cell lic-cell-label lic-cell-price">Price</div>
+      </div>
+      <div class="lic-row lic-row-cols3">
+        <div class="lic-cell lic-cell-title">Editorial Online</div>
+        <div class="lic-cell lic-cell-meta">One image, single publication in an online news article, blog, or digital publication. Not for advertising.</div>
+        <div class="lic-cell lic-cell-price">AU$75</div>
+      </div>
+      <div class="lic-row lic-row-cols3">
+        <div class="lic-cell lic-cell-title">Editorial Print</div>
+        <div class="lic-cell lic-cell-meta">One image, single print run in a magazine, newspaper, or printed journal. Not for advertising.</div>
+        <div class="lic-cell lic-cell-price">AU$180</div>
+      </div>
+      <div class="lic-row lic-row-cols3">
+        <div class="lic-cell lic-cell-title">Editorial Broadcast</div>
+        <div class="lic-cell lic-cell-meta">One image, single broadcast or release in a TV segment, documentary, or online video. Not for advertising or campaigns.</div>
+        <div class="lic-cell lic-cell-price">AU$250</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="acc-section" id="institutional-planning">
+  <div class="acc-header">
+    <span class="acc-title">Institutional &amp; Planning</span>
+    <div class="acc-meta">
+      <span class="acc-preview">AU$250 – AU$350</span>
+      <span class="acc-chevron">↓</span>
+    </div>
+  </div>
+  <div class="acc-body">
+    <div class="lic-table">
+      <div class="lic-row lic-row-cols3">
+        <div class="lic-cell lic-cell-label">Licence</div>
+        <div class="lic-cell lic-cell-label">Use</div>
+        <div class="lic-cell lic-cell-label lic-cell-price">Price</div>
+      </div>
+      <div class="lic-row lic-row-cols3">
+        <div class="lic-cell lic-cell-title">Institutional</div>
+        <div class="lic-cell lic-cell-meta">One image used in a Development Application, research publication, institutional archive, or internal report. Perpetual.</div>
+        <div class="lic-cell lic-cell-price">AU$250</div>
+      </div>
+      <div class="lic-row lic-row-cols3">
+        <div class="lic-cell lic-cell-title">Urban Planning &amp; Annual Reports</div>
+        <div class="lic-cell lic-cell-meta">One image used in planning reports, annual reports, or public-facing documents with wider distribution. Perpetual.</div>
+        <div class="lic-cell lic-cell-price">AU$350</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="acc-section" id="other">
+  <div class="acc-header">
+    <span class="acc-title">Other</span>
+    <div class="acc-meta">
+      <span class="acc-preview">Single image · Commercial</span>
+      <span class="acc-chevron">↓</span>
+    </div>
+  </div>
+  <div class="acc-body">
+    <div class="lic-table">
+      <div class="lic-row lic-row-cols3">
+        <div class="lic-cell lic-cell-label">Licence</div>
+        <div class="lic-cell lic-cell-label">Use</div>
+        <div class="lic-cell lic-cell-label lic-cell-price">Price</div>
+      </div>
+      <div class="lic-row lic-row-cols3">
+        <div class="lic-cell lic-cell-title">Single Image Licence</div>
+        <div class="lic-cell lic-cell-meta">One image, any use not covered by the tiers above. Perpetual.</div>
+        <div class="lic-cell lic-cell-price">AU$450</div>
+      </div>
+      <div class="lic-row lic-row-cols3">
+        <div class="lic-cell lic-cell-title">Commercial / Broadcast</div>
+        <div class="lic-cell lic-cell-meta">Advertising campaigns, commercial TV, film, or national distribution. Contact us with project details and intended use.</div>
+        <div class="lic-cell lic-cell-price">On request</div>
+      </div>
+    </div>
+    <div class="lic-table">
+      <div class="lic-row lic-row-cols2">
+        <div class="cond-label">Copyright enforcement</div>
+        <div class="cond-text">Unlicensed use is monitored through Pixsy. The Single Image Licence rate of AU$450 is the reference price for all copyright claims and infringement settlements, regardless of use type or the identity of the party responsible.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="acc-section" id="volume-packages">
+  <div class="acc-header">
+    <span class="acc-title">Volume Packages</span>
+    <div class="acc-meta">
+      <span class="acc-preview">–15% to –30%</span>
+      <span class="acc-chevron">↓</span>
+    </div>
+  </div>
+  <div class="acc-body">
+    <div class="lic-table">
+      <div class="lic-row lic-row-cols3">
+        <div class="lic-cell lic-cell-label">Images</div>
+        <div class="lic-cell lic-cell-label">Applies to</div>
+        <div class="lic-cell lic-cell-label lic-cell-price">Discount</div>
+      </div>
+      <div class="lic-row lic-row-cols3">
+        <div class="lic-cell lic-cell-title">5 images</div>
+        <div class="lic-cell lic-cell-meta">Any licence tier except Single Image Licence and Commercial / Broadcast</div>
+        <div class="lic-cell lic-cell-price">–15%</div>
+      </div>
+      <div class="lic-row lic-row-cols3">
+        <div class="lic-cell lic-cell-title">10 images</div>
+        <div class="lic-cell lic-cell-meta">Any licence tier except Single Image Licence and Commercial / Broadcast</div>
+        <div class="lic-cell lic-cell-price">–20%</div>
+      </div>
+      <div class="lic-row lic-row-cols3">
+        <div class="lic-cell lic-cell-title">15 images</div>
+        <div class="lic-cell lic-cell-meta">Any licence tier except Single Image Licence and Commercial / Broadcast</div>
+        <div class="lic-cell lic-cell-price">–25%</div>
+      </div>
+      <div class="lic-row lic-row-cols3">
+        <div class="lic-cell lic-cell-title">20 images</div>
+        <div class="lic-cell lic-cell-meta">Any licence tier except Single Image Licence and Commercial / Broadcast</div>
+        <div class="lic-cell lic-cell-price">–30%</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="acc-section" id="key-conditions">
+  <div class="acc-header">
+    <span class="acc-title">Key Conditions</span>
+    <div class="acc-meta">
+      <span class="acc-chevron">↓</span>
+    </div>
+  </div>
+  <div class="acc-body">
+    <div class="lic-table">
+      <div class="lic-row lic-row-cols2">
+        <div class="cond-label">Updated photographs</div>
+        <div class="cond-text">If a building or location is re-photographed at a later date, new photographs are issued under a new licence. Existing licences cover only the images purchased at the time.</div>
+      </div>
+      <div class="lic-row lic-row-cols2">
+        <div class="cond-label">Sublicensing</div>
+        <div class="cond-text">No licence permits sublicensing unless agreed in writing. All licences are issued to the purchasing entity or named individual only.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.acc-header').forEach(function(header) {
+    header.addEventListener('click', function() {
+      this.closest('.acc-section').classList.toggle('open');
+    });
+  });
+
+  document.querySelectorAll('.finder-row').forEach(function(row) {
+    row.addEventListener('click', function() {
+      var targetId = this.getAttribute('data-target');
+      var target = document.getElementById(targetId);
+      if (!target) return;
+
+      document.querySelectorAll('.finder-row').forEach(function(r) {
+        r.classList.remove('active');
+      });
+      this.classList.add('active');
+
+      document.querySelectorAll('.acc-section').forEach(function(s) {
+        s.classList.remove('open');
+      });
+      target.classList.add('open');
+
+      /* window.scrollTo, not target.scrollIntoView — same reasoning as the
+         map page: scrollIntoView can walk up into the parent PhotoDeck page
+         across the iframe boundary, window.scrollTo stays inside this
+         document only. */
+      setTimeout(function() {
+        window.scrollTo({top: target.offsetTop, behavior: 'smooth'});
+      }, 50);
+    });
+  });
+</script>
+</body>
+</html>
