@@ -730,25 +730,29 @@ function initMap(){
 
   map.addControl(new mapboxgl.NavigationControl({showCompass:false}),'bottom-right');
 
-  /* cooperativeGestures correctly blocks the map from zooming on a plain
-     scroll and shows its own message — but in Safari specifically, whatever
-     it does internally to block the zoom also blocks the page's native
-     scroll, even though the same code works fine in Chromium browsers.
-     This is a known upstream quirk, not something fixable from config
-     alone. Listening on #map-area (an ancestor of the map's own container)
-     means this fires after Mapbox's own handling has already decided
-     whether to preventDefault — checking e.defaultPrevented tells us
-     whether the browser's native scroll was blocked, and if so, without
-     Ctrl/Cmd held, we replay that scroll manually. Harmless in browsers
-     where native scroll already worked, since defaultPrevented would be
-     false there and this never fires. */
+  /* Previous attempt read e.defaultPrevented on an ancestor in the bubble
+     phase, assuming the event would still reach us after Mapbox handled it.
+     Didn't fix Safari — likely because Mapbox's own handler also calls
+     stopPropagation(), which stops the event from ever reaching an ancestor
+     listener at all, making that flag impossible to check from here.
+
+     This version doesn't wait to find out what Mapbox does: registered with
+     capture:true on #map-area, it runs BEFORE the event reaches the map's
+     own container, no matter what Mapbox does afterward. Without Ctrl/Cmd
+     held, it takes the scroll away from the browser's native handling
+     entirely (preventDefault) and replays it manually on the page — so the
+     result no longer depends on native scroll-chaining working the same
+     way in every browser, which is exactly the part that was inconsistent
+     between Safari and Chromium. With Ctrl/Cmd held, this does nothing and
+     the event proceeds to Mapbox normally, so zoom still works as before. */
   const mapAreaEl = document.getElementById('map-area');
   if(mapAreaEl){
     mapAreaEl.addEventListener('wheel', function(e){
-      if(!(e.ctrlKey || e.metaKey) && e.defaultPrevented){
+      if(!(e.ctrlKey || e.metaKey)){
+        e.preventDefault();
         window.scrollBy({top: e.deltaY, left: e.deltaX, behavior: 'auto'});
       }
-    }, {passive:true});
+    }, {capture:true, passive:false});
   }
 
   map.on('load', () => {
