@@ -669,7 +669,7 @@ async function loadLocations(){
     loadArchiveDate();
   } catch(e){
     console.error('Failed to load locations:', e);
-    document.getElementById('docCount').textContent = '— locations documented';
+    document.getElementById('docCount').textContent = 'Locations documented unavailable';
   }
   initMap();
 }
