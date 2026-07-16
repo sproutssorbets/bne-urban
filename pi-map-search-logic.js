@@ -671,7 +671,13 @@ async function loadLocations(){
     console.error('Failed to load locations:', e);
     document.getElementById('docCount').textContent = 'Locations documented unavailable';
   }
-  initMap();
+  /* No longer calls initMap() — the map now starts loading independently,
+     in parallel with this fetch, instead of waiting for it. This just
+     signals that location data is ready; if the map already finished
+     loading first, render the data layers now, otherwise map.on('load')
+     will do it the moment it finishes. */
+  locationsReadyFlag = true;
+  if(mapReadyFlag) renderDataLayers(mapForDataLayers);
 }
 
 /* Archive date — computed from the loaded locations, no API call */
@@ -783,7 +789,29 @@ function initMap(){
     map.addSource('suburbs',{type:'geojson',data:suburbData});
     map.addLayer({id:'suburbs-fill',type:'fill',source:'suburbs',paint:{'fill-color':'#F0F0F0','fill-opacity':0.15}});
     map.addLayer({id:'suburbs-line',type:'line',source:'suburbs',paint:{'line-color':'#D0D0D0','line-width':1}});
+    /* Documented pins, development-status polygons, tooltips and their
+       click handlers all read from the locations/data layers below, and
+       the dev-status layers explicitly insert themselves "before" the
+       doc-clusters layer for correct stacking — so all of this has to run
+       as one block, in order, not just the small pin-adding part alone.
+       Previously this whole block ran unconditionally right here, which
+       is what forced initMap() to wait for loadLocations() to finish
+       before the map could start loading its own style/tiles at all.
+       Now: the map begins loading immediately regardless of whether the
+       location data has arrived yet, and this block only runs once BOTH
+       the map's own 'load' event AND the locations fetch have completed,
+       whichever finishes second. */
+    mapForDataLayers = map;
+    mapReadyFlag = true;
+    if(locationsReadyFlag) renderDataLayers(map);
+  });
+}
 
+let mapReadyFlag = false;
+let locationsReadyFlag = false;
+let mapForDataLayers = null;
+
+function renderDataLayers(map){
     /* Documented pins */
     const docFeatures = locations.filter(l=>l.documented&&!isNaN(l.coords[0])).map(l=>({
       type:'Feature', geometry:{type:'Point',coordinates:l.coords},
@@ -961,8 +989,8 @@ function initMap(){
     });
     map.on('mouseenter','doc-pins',()=>{map.getCanvas().style.cursor='pointer'});
     map.on('mouseleave','doc-pins',()=>{map.getCanvas().style.cursor=''});
-  });
 }
+
 
 function addSuburbFromPin(suburbKey, suburbLabel, btn){
   if(!suburbKey) return;
@@ -1061,5 +1089,9 @@ document.addEventListener('DOMContentLoaded', () => {
     refineWidthTimer = setTimeout(fixRefineSectionWidth, 150);
   });
 
+  /* Started together, not one nested inside the other — the map begins
+     fetching its own style/tiles immediately, at the same time as the
+     location data fetch, instead of waiting for it to finish first. */
+  initMap();
   loadLocations();
 });
