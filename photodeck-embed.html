@@ -48,6 +48,17 @@
      to one line by default instead of the twelve-row list. Subtracting
      less here lets the map claim most of the iframe's height instead. */
   .pi-map-search-widget #map-area{height:calc(100vh - 160px)}
+  /* PhotoDeck-only: the shared CSS sets overscroll-behavior-y:none on
+     html/body to stop rubber-band bounce revealing content under the
+     fixed mobile map on Webflow. Inside this iframe, that same rule has
+     a different, unwanted effect — it blocks scroll from ever chaining
+     through to the parent PhotoDeck page once this document's own
+     content is fully scrolled, trapping the visitor inside the frame
+     instead of continuing on to the photos below it. Restoring the
+     default here (auto) lets the scroll hand off naturally at the
+     boundary, exactly the native browser behaviour for nested scroll
+     containers. */
+  html, body{overscroll-behavior-y:auto}
 </style>
 <script>setTimeout(function(){ var w = document.getElementById('pi-map-search-widget'); if(w) w.style.visibility = 'visible'; }, 4000);</script>
 </head>
