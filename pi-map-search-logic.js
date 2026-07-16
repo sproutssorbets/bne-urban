@@ -730,6 +730,27 @@ function initMap(){
 
   map.addControl(new mapboxgl.NavigationControl({showCompass:false}),'bottom-right');
 
+  /* cooperativeGestures correctly blocks the map from zooming on a plain
+     scroll and shows its own message — but in Safari specifically, whatever
+     it does internally to block the zoom also blocks the page's native
+     scroll, even though the same code works fine in Chromium browsers.
+     This is a known upstream quirk, not something fixable from config
+     alone. Listening on #map-area (an ancestor of the map's own container)
+     means this fires after Mapbox's own handling has already decided
+     whether to preventDefault — checking e.defaultPrevented tells us
+     whether the browser's native scroll was blocked, and if so, without
+     Ctrl/Cmd held, we replay that scroll manually. Harmless in browsers
+     where native scroll already worked, since defaultPrevented would be
+     false there and this never fires. */
+  const mapAreaEl = document.getElementById('map-area');
+  if(mapAreaEl){
+    mapAreaEl.addEventListener('wheel', function(e){
+      if(!(e.ctrlKey || e.metaKey) && e.defaultPrevented){
+        window.scrollBy({top: e.deltaY, left: e.deltaX, behavior: 'auto'});
+      }
+    }, {passive:true});
+  }
+
   map.on('load', () => {
     /* Map style and initial tiles are ready — the placeholder that covered
        the blank white area while everything loaded is no longer needed. */
