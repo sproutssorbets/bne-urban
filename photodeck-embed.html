@@ -37,7 +37,8 @@
   .pi-map-search-widget #filters-wide{display:none}
   .pi-map-search-widget #filters-wide.all-open{display:block}
   .pi-map-search-widget #filters-wide.all-open .acc-body{display:block}
-  .pi-map-search-widget #filters-toggle-all{display:flex;justify-content:space-between;align-items:center;width:100%;padding:14px 0;background:var(--bg);border:none;border-top:1px solid var(--text);border-bottom:1px solid var(--rule);cursor:pointer;font-family:Inter,sans-serif;font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--text);position:sticky;top:0;z-index:4}
+  .pi-map-search-widget #filters-toggle-all{display:flex;justify-content:space-between;align-items:center;width:100%;padding:14px 20px;background:var(--bg);border:none;border-top:1px solid var(--text);border-bottom:1px solid var(--rule);cursor:pointer;font-family:Inter,sans-serif;font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--text);position:fixed;left:0;right:0;bottom:0;z-index:4;box-sizing:border-box}
+  .pi-map-search-widget #filters-toggle-all-spacer{height:52px}
   .pi-map-search-widget #filters-toggle-all-arrow{font-size:13px;color:var(--muted);transition:transform 0.2s}
   .pi-map-search-widget #filters-toggle-all.is-open #filters-toggle-all-arrow{transform:rotate(180deg)}
 
@@ -271,6 +272,7 @@
   </div>
 </div>
 
+<div id="filters-toggle-all-spacer"></div>
 
 </div>
 
@@ -312,8 +314,9 @@
          position — with nothing left to scroll to, the browser just
          clamps the position instantly, which reads as a jarring jump
          rather than the same smooth motion opening has. Since the
-         button is sticky (position:sticky, top:0), scrolling to its own
-         offsetTop always brings it (and this view) to the very top. */
+         button is fixed to the bottom of the viewport regardless of
+         scroll position, scrolling to its own offsetTop always brings
+         it (and this view) to the very top. */
       window.scrollTo({top: toggleBtn.offsetTop, behavior:'smooth'});
       setTimeout(function(){
         wide.classList.remove('all-open');
