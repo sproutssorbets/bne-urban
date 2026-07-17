@@ -4,134 +4,302 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PhotoIndex — Licensing</title>
-
-<!-- Standalone mirror of the Webflow Licensing page (photoindex-bdef60.webflow.io/licensing),
-     built for PhotoDeck's iframe embed, following the finder/accordion/table patterns
-     documented in the photoindex-www skill. Content is copied from the live Webflow page
-     via the API on 16 July 2026 — if pricing or copy changes on Webflow, this file needs
-     updating separately, since it's plain HTML/CSS/JS with no shared data source. -->
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #FFFFFF; /* pure white here, matching the map embed, not the off-white
-                       #F7F7F5 used on Webflow — same PhotoDeck-only choice as before */
-    --text: #111111;
-    --muted: #6B6B6B;
-    --rule: #DADADA;
-    --rule-strong: #111111;
+    --bg: #FFFFFF;
+    --text: #000000;          /* Absolutna czerń zamiast szarości */
+    --muted: #000000;         /* U Vignelliego hierarchię buduje się wielkością i grubością, nie szarym kolorem */
+    --accent: #FF3300;        /* Kultowa czerwień Vignelli (Pantone 032) */
+    --rule: #000000;          /* Mocne, czarne linie tworzące rygorystyczną siatkę */
+    --rule-light: #E0E0E0;    /* Subtelniejsza linia pomocnicza tylko tam, gdzie to konieczne */
   }
+  
   * { box-sizing: border-box; }
-  html, body { margin:0; padding:0; }
+  html, body { margin: 0; padding: 0; }
+  
   body {
-    font-family: 'Inter', sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     background: var(--bg);
     color: var(--text);
-    font-size: 14px;
-    line-height: 1.5;
+    font-size: 13px;
+    line-height: 1.4;
     font-weight: 400;
-    padding: 0;
-    -webkit-font-smoothing: subpixel-antialiased;
+    letter-spacing: -0.01em; /* Helvetica najlepiej wygląda przy ciasnym trackingu */
+    -webkit-font-smoothing: antialiased;
+    padding: 40px;
   }
+  
   @media (max-width: 680px) {
-    body { padding: 0; }
+    body { padding: 20px; }
   }
 
-  .about-header { margin-bottom: 48px; }
+  /* Nagłówek o dramatycznej skali typograficznej */
+  .about-header { 
+    margin-bottom: 64px; 
+    border-bottom: 3px solid var(--rule); /* Bardzo gruba linia oddzielająca sekcję wejściową */
+    padding-bottom: 32px;
+  }
+  
   .about-h1 {
-    font-size: 14px; font-weight: 400;
-    letter-spacing: 0.02em; text-transform: none;
-    margin: 0 0 10px;
+    font-size: 64px;          /* Ogromny, bezkompromisowy tytuł */
+    font-weight: 900;         /* Bardzo gruby (Black/Bold) */
+    line-height: 0.85;
+    letter-spacing: -0.04em;  /* Bardzo ciasno ułożone litery */
+    margin: 0 0 24px 0;
+    text-transform: uppercase;
   }
-  .about-intro { font-size: 14px; color: var(--muted); max-width: 520px; margin: 0 0 20px; }
-  .lic-note { font-size: 13px; color: var(--muted); max-width: 520px; margin: 0; padding-top: 16px; border-top: 1px solid var(--rule); }
+  
+  .about-intro { 
+    font-size: 16px; 
+    line-height: 1.4;
+    max-width: 600px; 
+    margin: 0 0 16px; 
+  }
+  
+  .lic-note { 
+    font-size: 11px; 
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    margin: 0; 
+  }
 
-  /* Finder */
-  .finder { border-top: 1px solid var(--rule-strong); margin-bottom: 48px; }
+  /* Finder - Siatka i struktura */
+  .finder { 
+    border-top: 2px solid var(--rule); 
+    margin-bottom: 64px; 
+  }
+  
   .finder-header {
-    display: grid; grid-template-columns: 220px 1fr 28px;
-    border-bottom: 1px solid var(--rule); padding: 10px 0;
+    display: grid; 
+    grid-template-columns: 240px 1fr 28px;
+    border-bottom: 2px solid var(--rule); 
+    padding: 12px 0;
   }
+  
   .finder-hcell {
-    font-size: 11px; font-weight: 500; letter-spacing: 0.12em;
-    text-transform: uppercase; color: var(--muted); padding: 0 4px;
+    font-size: 10px; 
+    font-weight: 700; 
+    letter-spacing: 0.08em;
+    text-transform: uppercase; 
+    padding: 0;
   }
+  
   .finder-row {
-    display: grid; grid-template-columns: 220px 1fr 28px;
+    display: grid; 
+    grid-template-columns: 240px 1fr 28px;
     border-bottom: 1px solid var(--rule);
-    cursor: pointer; transition: background 0.12s; align-items: center;
+    cursor: pointer; 
+    transition: background 0.1s; 
+    align-items: center;
   }
-  .finder-row:hover { background: none; }
-  .finder-row.active { background: none; }
-  .finder-client { padding: 12px 4px 12px 0; font-size: 13px; font-weight: 500; }
-  .finder-tags { padding: 12px 8px; display: flex; flex-wrap: wrap; gap: 4px; }
+  
+  /* Czyste najechanie bez zbędnych cieni i przejść */
+  .finder-row:hover .finder-client { 
+    color: var(--accent); 
+  }
+  
+  .finder-row.active .finder-client { 
+    color: var(--accent);
+  }
+  
+  .finder-client { 
+    padding: 16px 0; 
+    font-size: 14px; 
+    font-weight: 700; 
+    transition: color 0.1s;
+  }
+  
+  .finder-tags { 
+    padding: 16px 0; 
+    display: flex; 
+    flex-wrap: wrap; 
+    row-gap: 4px;
+  }
+  
+  /* Usunięto ramki wokół tagów - teraz to czysta typografia oddzielona ukośnikami */
   .ftag {
-    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--text); border: 1px solid var(--rule); padding: 2px 8px; white-space: nowrap;
+    font-size: 10px; 
+    font-weight: 700;
+    letter-spacing: 0.05em; 
+    text-transform: uppercase;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
   }
-  .finder-arrow { font-size: 13px; color: var(--muted); text-align: right; }
+  .ftag:not(:last-child)::after {
+    content: "/";
+    color: var(--accent); /* Czerwone ukośniki jako jedyny detal graficzny */
+    margin: 0 8px;
+    font-weight: 400;
+  }
+  
+  .finder-arrow { 
+    font-size: 14px; 
+    font-weight: 700;
+    text-align: right; 
+  }
+  
+  .finder-row.active .finder-arrow {
+    color: var(--accent);
+  }
 
   @media (max-width: 680px) {
     .finder-header { display: none; }
     .finder-row { grid-template-columns: 1fr auto; }
     .finder-tags { display: none; }
-    .finder-client { padding: 14px 0; font-size: 13px; }
-    .finder-arrow { padding: 14px 0; }
+    .finder-client, .finder-arrow { padding: 16px 0; }
   }
 
-  /* Accordion */
-  .acc-section { border-top: 1px solid var(--rule-strong); margin-bottom: 2px; }
+  /* Accordion - Sekcje danych */
+  .acc-section { 
+    border-top: 2px solid var(--rule); 
+    margin-bottom: -1px; /* Nakładanie granic dla czystego styku */
+  }
+  
   .acc-header {
-    display: grid; grid-template-columns: 1fr auto;
-    align-items: center; padding: 14px 0;
-    cursor: pointer; user-select: none;
+    display: grid; 
+    grid-template-columns: 1fr auto;
+    align-items: center; 
+    padding: 20px 0;
+    cursor: pointer; 
+    user-select: none;
   }
-  .acc-header:hover .acc-title { color: var(--muted); }
-  .acc-title { font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; }
-  .acc-meta { display: flex; align-items: center; gap: 20px; }
-  .acc-preview { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
-  .acc-chevron { font-size: 13px; color: var(--muted); transition: transform 0.2s; display: inline-block; }
-  .acc-section.open .acc-chevron { transform: rotate(180deg); }
-  .acc-body { display: none; padding-bottom: 32px; }
-  .acc-section.open .acc-body { display: block; }
-  @media (max-width: 680px) {
-    .acc-header { padding: 12px 0; }
-    .acc-body { padding-bottom: 20px; }
+  
+  .acc-header:hover .acc-title { 
+    color: var(--accent); 
+  }
+  
+  .acc-section.open .acc-title {
+    color: var(--accent);
+  }
+  
+  .acc-title { 
+    font-size: 18px; 
+    font-weight: 700; 
+    letter-spacing: -0.02em; 
+    text-transform: uppercase;
+    transition: color 0.1s;
+  }
+  
+  .acc-meta { 
+    display: flex; 
+    align-items: center; 
+    gap: 24px; 
+  }
+  
+  .acc-preview { 
+    font-size: 12px; 
+    font-weight: 700; 
+    letter-spacing: 0.02em; 
+  }
+  
+  .acc-chevron { 
+    font-size: 14px; 
+    font-weight: 700;
+    transition: transform 0.15s; 
+  }
+  
+  .acc-section.open .acc-chevron { 
+    transform: rotate(180deg); 
+    color: var(--accent);
+  }
+  
+  .acc-body { 
+    display: none; 
+    padding-bottom: 48px; 
+  }
+  
+  .acc-section.open .acc-body { 
+    display: block; 
   }
 
-  /* Tables */
-  .lic-table { border-top: 1px solid var(--rule); margin-bottom: 20px; }
-  .lic-row { display: grid; border-bottom: 1px solid var(--rule); align-items: start; }
-  .lic-row-cols3 { grid-template-columns: 200px 1fr 100px; }
-  .lic-row-cols2 { grid-template-columns: 200px 1fr; }
-  .lic-cell { padding: 12px 16px 12px 0; font-size: 13px; }
+  @media (max-width: 680px) {
+    .acc-header { padding: 16px 0; }
+    .acc-body { padding-bottom: 32px; }
+  }
+
+  /* Tables - Architektura tabeli */
+  .lic-table { 
+    border-top: 1px solid var(--rule); 
+    margin-bottom: 32px; 
+  }
+  
+  .lic-row { 
+    display: grid; 
+    border-bottom: 1px solid var(--rule-light); 
+    align-items: start; 
+  }
+  
+  .lic-row:last-child {
+    border-bottom: 1px solid var(--rule); /* Zamknięcie tabeli mocniejszą linią */
+  }
+  
+  .lic-row-cols3 { grid-template-columns: 240px 1fr 120px; }
+  .lic-row-cols2 { grid-template-columns: 240px 1fr; }
+  
+  .lic-cell { 
+    padding: 14px 16px 14px 0; 
+    font-size: 13px; 
+  }
+  
   .lic-cell:first-child { padding-left: 0; }
+  
   .lic-cell-label {
-    font-size: 11px; font-weight: 500;
-    letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--muted); padding-top: 8px; padding-bottom: 8px;
+    font-size: 10px; 
+    font-weight: 700;
+    letter-spacing: 0.05em; 
+    text-transform: uppercase;
+    padding-top: 10px; 
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--rule); /* Mocniejsza linia pod nagłówkiem tabeli */
   }
-  .lic-cell-title { font-weight: 500; }
-  .lic-cell-meta { color: var(--muted); }
-  .lic-cell-price { text-align: right; white-space: nowrap; font-weight: 500; }
+  
+  .lic-cell-title { 
+    font-weight: 700; 
+    font-size: 14px;
+  }
+  
+  .lic-cell-meta { 
+    line-height: 1.45;
+  }
+  
+  .lic-cell-price { 
+    text-align: right; 
+    white-space: nowrap; 
+    font-weight: 700; 
+    font-size: 14px;
+  }
+  
+  .lic-cell-label.lic-cell-price {
+    font-size: 10px;
+  }
+  
   .cond-label {
-    font-size: 11px; font-weight: 500;
-    letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--muted); padding: 12px 16px 12px 0;
+    font-size: 10px; 
+    font-weight: 700;
+    letter-spacing: 0.05em; 
+    text-transform: uppercase;
+    padding: 16px 16px 16px 0;
   }
-  .cond-text { color: var(--muted); font-size: 13px; padding: 12px 0; }
+  
+  .cond-text { 
+    font-size: 13px; 
+    line-height: 1.45;
+    padding: 16px 0; 
+  }
 
   @media (max-width: 680px) {
-    .lic-row-cols3 { grid-template-columns: 1fr 80px; }
+    .lic-row-cols3 { grid-template-columns: 1fr auto; }
     .lic-row-cols2 { grid-template-columns: 1fr; }
+    .lic-cell-label { display: none; } /* Na mobile chowamy etykiety dla czystości */
   }
 </style>
 </head>
 <body>
 
 <div class="about-header">
-  <h1 class="about-h1">LICENSING</h1>
+  <h1 class="about-h1">Licensing</h1>
   <p class="about-intro">All photographs in the archive are available for licensing. Select your situation below to see the right options.</p>
   <p class="lic-note">All prices include GST.</p>
 </div>
@@ -142,58 +310,94 @@
     <div class="finder-hcell">Recommended licence</div>
     <div class="finder-hcell"></div>
   </div>
+  
   <div class="finder-row" data-target="real-estate">
     <div class="finder-client">Real Estate Agent</div>
-    <div class="finder-tags"><span class="ftag">Single Property Listing</span><span class="ftag">Building Licence</span><span class="ftag">Neighbourhood Licence</span></div>
+    <div class="finder-tags">
+      <span class="ftag">Single Property Listing</span>
+      <span class="ftag">Building Licence</span>
+      <span class="ftag">Neighbourhood Licence</span>
+    </div>
     <div class="finder-arrow">↓</div>
   </div>
+  
   <div class="finder-row" data-target="property-marketing">
     <div class="finder-client">Property Developer</div>
-    <div class="finder-tags"><span class="ftag">Property Marketing</span></div>
+    <div class="finder-tags">
+      <span class="ftag">Property Marketing</span>
+    </div>
     <div class="finder-arrow">↓</div>
   </div>
+  
   <div class="finder-row" data-target="editorial">
     <div class="finder-client">Journalist / Online Media</div>
-    <div class="finder-tags"><span class="ftag">Editorial Online</span></div>
+    <div class="finder-tags">
+      <span class="ftag">Editorial Online</span>
+    </div>
     <div class="finder-arrow">↓</div>
   </div>
+  
   <div class="finder-row" data-target="editorial">
     <div class="finder-client">Magazine / Newspaper</div>
-    <div class="finder-tags"><span class="ftag">Editorial Print</span></div>
+    <div class="finder-tags">
+      <span class="ftag">Editorial Print</span>
+    </div>
     <div class="finder-arrow">↓</div>
   </div>
+  
   <div class="finder-row" data-target="editorial">
     <div class="finder-client">TV / Video Production</div>
-    <div class="finder-tags"><span class="ftag">Editorial Broadcast</span><span class="ftag">Commercial / Broadcast</span></div>
+    <div class="finder-tags">
+      <span class="ftag">Editorial Broadcast</span>
+      <span class="ftag">Commercial / Broadcast</span>
+    </div>
     <div class="finder-arrow">↓</div>
   </div>
+  
   <div class="finder-row" data-target="institutional-planning">
     <div class="finder-client">Architect / Urban Planner</div>
-    <div class="finder-tags"><span class="ftag">Institutional</span><span class="ftag">Urban Planning</span></div>
+    <div class="finder-tags">
+      <span class="ftag">Institutional</span>
+      <span class="ftag">Urban Planning</span>
+    </div>
     <div class="finder-arrow">↓</div>
   </div>
+  
   <div class="finder-row" data-target="institutional-planning">
     <div class="finder-client">Council / Government Body</div>
-    <div class="finder-tags"><span class="ftag">Institutional</span><span class="ftag">Urban Planning</span></div>
+    <div class="finder-tags">
+      <span class="ftag">Institutional</span>
+      <span class="ftag">Urban Planning</span>
+    </div>
     <div class="finder-arrow">↓</div>
   </div>
+  
   <div class="finder-row" data-target="institutional-planning">
     <div class="finder-client">University / Researcher</div>
-    <div class="finder-tags"><span class="ftag">Institutional</span></div>
+    <div class="finder-tags">
+      <span class="ftag">Institutional</span>
+    </div>
     <div class="finder-arrow">↓</div>
   </div>
+  
   <div class="finder-row" data-target="other">
     <div class="finder-client">Advertising Agency</div>
-    <div class="finder-tags"><span class="ftag">Commercial / Broadcast</span></div>
+    <div class="finder-tags">
+      <span class="ftag">Commercial / Broadcast</span>
+    </div>
     <div class="finder-arrow">↓</div>
   </div>
+  
   <div class="finder-row" data-target="volume-packages">
     <div class="finder-client">Buying Multiple Images</div>
-    <div class="finder-tags"><span class="ftag">Volume Package</span></div>
+    <div class="finder-tags">
+      <span class="ftag">Volume Package</span>
+    </div>
     <div class="finder-arrow">↓</div>
   </div>
 </div>
 
+<!-- Sekcje Accordion -->
 <div class="acc-section" id="real-estate">
   <div class="acc-header">
     <span class="acc-title">Real Estate</span>
@@ -436,27 +640,23 @@
       this.closest('.acc-section').classList.toggle('open');
     });
   });
-
+  
   document.querySelectorAll('.finder-row').forEach(function(row) {
     row.addEventListener('click', function() {
       var targetId = this.getAttribute('data-target');
       var target = document.getElementById(targetId);
       if (!target) return;
-
+      
       document.querySelectorAll('.finder-row').forEach(function(r) {
         r.classList.remove('active');
       });
       this.classList.add('active');
-
+      
       document.querySelectorAll('.acc-section').forEach(function(s) {
         s.classList.remove('open');
       });
       target.classList.add('open');
-
-      /* window.scrollTo, not target.scrollIntoView — same reasoning as the
-         map page: scrollIntoView can walk up into the parent PhotoDeck page
-         across the iframe boundary, window.scrollTo stays inside this
-         document only. */
+      
       setTimeout(function() {
         window.scrollTo({top: target.offsetTop, behavior: 'smooth'});
       }, 50);
