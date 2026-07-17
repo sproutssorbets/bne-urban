@@ -251,12 +251,12 @@ function addLocationToSearch(addressText){
   syncRefineField();
   if(window._activePopup) window._activePopup.remove();
   if(window._searchPopup) { window._searchPopup.remove(); window._searchPopup = null; }
-  /* Used to scroll straight to #refine-section here. That hid the search
-     bar at the top of the page, which was disorienting right after picking
-     a location — the visitor loses the very thing they just interacted
-     with. A toast confirms the action without moving the viewport; the
-     visitor can scroll to the filters themselves when ready. */
-  showToast((addressText || 'Location') + ' added to search');
+  /* Used to just hint ("Refine further ↓") instead of scrolling, back when
+     there was no reliable way back to the map from the filter section.
+     Now that "← Back to map" is always present and always visible, that
+     concern is gone — jump straight to the filters, same as the address
+     popup's "Add to search" already does. */
+  document.getElementById('refine-section').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 function toggleAcc(id){
@@ -392,9 +392,7 @@ function confirmAddressSelection(title){
   syncRefineField();
   document.getElementById('btnClear').style.display = 'block';
   if(window._searchPopup) { window._searchPopup.remove(); window._searchPopup = null; }
-  /* Same reasoning as addLocationToSearch — no more scrollIntoView down to
-     #refine-section, since that hid the search bar right after using it. */
-  showToast((title || 'Address') + ' added to search');
+  document.getElementById('refine-section').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 /* Local place aliases — names Mapbox does not index (e.g. Indigenous names).
@@ -682,29 +680,20 @@ async function loadLocations(){
   if(mapReadyFlag) renderDataLayers(mapForDataLayers);
 }
 
-/* Shared date parser — used by both the archive "Last updated" line and
-   the "Recently added" panel, so there's one place that understands the
-   "28 June 2026" / "June 2026" format instead of two. */
-function parseLocationDate(dateStr){
-  if(!dateStr) return null;
-  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  const m = dateStr.match(/^(?:(\d{1,2})\s+)?([A-Za-z]+)\s+(\d{4})$/);
-  if(!m) return null;
-  const mi = months.indexOf(m[2]);
-  if(mi < 0) return null;
-  const day = m[1] ? parseInt(m[1]) : 1;
-  return {date: new Date(parseInt(m[3]), mi, day), hasDay: !!m[1]};
-}
-
 /* Archive date — computed from the loaded locations, no API call */
 function loadArchiveDate(){
   const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   let latest = null;
   let latestHasDay = false;
   locations.forEach(l => {
-    const parsed = parseLocationDate(l.date);
-    if(!parsed) return;
-    if(!latest || parsed.date > latest){ latest = parsed.date; latestHasDay = parsed.hasDay; }
+    if(!l.date) return;
+    const m = l.date.match(/^(?:(\d{1,2})\s+)?([A-Za-z]+)\s+(\d{4})$/);
+    if(!m) return;
+    const mi = months.indexOf(m[2]);
+    if(mi < 0) return;
+    const day = m[1] ? parseInt(m[1]) : 1;
+    const d = new Date(parseInt(m[3]), mi, day);
+    if(!latest || d > latest){ latest = d; latestHasDay = !!m[1]; }
   });
   if(latest){
     const text = latestHasDay
@@ -712,50 +701,6 @@ function loadArchiveDate(){
       : 'Last updated ' + months[latest.getMonth()] + ' ' + latest.getFullYear();
     document.getElementById('archiveDate').textContent = text;
   }
-}
-
-/* "Recently added" panel — top 5 locations by parsed date, next to the
-   map. Reuses the exact same click-a-pin popup markup as doc-pins below,
-   just triggered from a list row instead of a map click. */
-function focusRecentLocation(loc, map){
-  map.easeTo({center: loc.coords, zoom: 16, essential: true});
-  if(window._activePopup) window._activePopup.remove();
-  if(window._searchPopup){ window._searchPopup.remove(); window._searchPopup = null; }
-  const html = `<div class="pi-popup-body">
-    <div class="pi-popup-street">${loc.address || loc.street}</div>
-    <div class="pi-popup-suburb">${loc.suburb}${loc.count ? ' · ' + loc.count + ' photo' + (loc.count > 1 ? 's' : '') : ''}</div>
-    <a class="pi-popup-add" href="${loc.archiveUrl}" target="_top">View photos</a>
-  </div>`;
-  window._activePopup = new mapboxgl.Popup({closeButton:true, maxWidth:'240px'})
-    .setLngLat(loc.coords).setHTML(html).addTo(map)
-    .on('close', () => { window._activePopup = null; });
-}
-
-function renderRecentLocations(map){
-  const listEl = document.getElementById('recent-locations-list');
-  const panelEl = document.getElementById('recent-locations');
-  if(!listEl || !panelEl) return;
-  const dated = locations
-    .filter(l => l.documented && !isNaN(l.coords[0]) && parseLocationDate(l.date))
-    .map(l => ({loc:l, parsed:parseLocationDate(l.date).date}))
-    .sort((a,b) => b.parsed - a.parsed)
-    .slice(0, 5);
-  if(dated.length === 0){ panelEl.style.display = 'none'; return; }
-  listEl.innerHTML = '';
-  dated.forEach(entry => {
-    const row = document.createElement('div');
-    row.className = 'recent-row';
-    const title = document.createElement('div');
-    title.className = 'recent-row-title';
-    title.textContent = entry.loc.address || entry.loc.street;
-    const meta = document.createElement('div');
-    meta.className = 'recent-row-meta';
-    meta.textContent = entry.loc.suburb + ' · ' + entry.loc.date;
-    row.appendChild(title);
-    row.appendChild(meta);
-    row.addEventListener('click', () => focusRecentLocation(entry.loc, map));
-    listEl.appendChild(row);
-  });
 }
 
 mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
@@ -910,9 +855,18 @@ function renderDataLayers(map){
     map.on('mouseenter','doc-clusters',()=>{map.getCanvas().style.cursor='pointer'});
     map.on('mouseleave','doc-clusters',()=>{map.getCanvas().style.cursor=''});
 
-    /* Development projects — polygons loaded from external GeoJSON, 3 statuses */
+    /* Development projects — polygons loaded from external GeoJSON, 3 statuses.
+       Previously used saturated, default-looking colours (#DB4436 / #009D57 /
+       #4186F0) that sat outside the site's entire palette — the only place
+       on the whole site with live, saturated hue. Muted here into the same
+       ink-toned family as the rest of the system, and given each status its
+       own line-dasharray so the three remain distinguishable even in
+       grayscale or for colour-blind visitors, not by hue alone. */
     const statusColors = {
-      proposed:'#DB4436', approved:'#009D57', under_construction:'#4186F0'
+      proposed:'#A8453B', approved:'#4A7856', under_construction:'#3D6491'
+    };
+    const statusDash = {
+      proposed: [1], approved: [3, 2], under_construction: [1, 2]
     };
     const DEV_SHOWN = ['proposed','approved','under_construction'];
 
@@ -920,10 +874,11 @@ function renderDataLayers(map){
     DEV_SHOWN.forEach(status => {
       map.addSource('dev-'+status,{type:'geojson',data:{type:'FeatureCollection',features:[]}});
       map.addLayer({id:'dev-'+status,type:'fill',source:'dev-'+status,paint:{
-        'fill-color':statusColors[status],'fill-opacity':0.30
+        'fill-color':statusColors[status],'fill-opacity':0.22
       }}, 'doc-clusters');
       map.addLayer({id:'dev-'+status+'-line',type:'line',source:'dev-'+status,paint:{
-        'line-color':statusColors[status],'line-opacity':0.55,'line-width':1
+        'line-color':statusColors[status],'line-opacity':0.75,'line-width':1.3,
+        'line-dasharray':statusDash[status]
       }}, 'doc-clusters');
     });
 
@@ -1044,8 +999,6 @@ function renderDataLayers(map){
     });
     map.on('mouseenter','doc-pins',()=>{map.getCanvas().style.cursor='pointer'});
     map.on('mouseleave','doc-pins',()=>{map.getCanvas().style.cursor=''});
-
-    renderRecentLocations(map);
 }
 
 

@@ -60,6 +60,20 @@
      boundary, exactly the native browser behaviour for nested scroll
      containers. */
   html, body{overscroll-behavior-y:auto}
+
+  /* PhotoDeck-only: "recently added" panel, styled to match #legend exactly
+     (same bg/border/padding language) but placed top-right instead of
+     bottom-left, so the two floating panels don't collide. Purely additive
+     — doesn't touch #shell/#map-area layout, so the existing fixed/mobile
+     positioning logic in the shared CSS is untouched. */
+  .pi-map-search-widget #recent-locations{position:absolute;top:16px;right:16px;width:220px;max-width:calc(100vw - 32px);background:var(--bg);border:1px solid var(--rule);padding:10px 12px;z-index:2}
+  .pi-map-search-widget #recent-locations-title{font-family:Inter,sans-serif;font-size:9px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .pi-map-search-widget .recent-row{display:flex;flex-direction:column;gap:1px;padding:6px 0;border-bottom:1px solid var(--rule);cursor:pointer}
+  .pi-map-search-widget .recent-row:last-child{border-bottom:none}
+  .pi-map-search-widget .recent-row:hover .recent-row-title{color:var(--muted)}
+  .pi-map-search-widget .recent-row-title{font-family:Inter,sans-serif;font-size:11px;font-weight:500;color:var(--text)}
+  .pi-map-search-widget .recent-row-meta{font-family:Inter,sans-serif;font-size:10px;color:var(--muted)}
+  @media(max-width:1024px){.pi-map-search-widget #recent-locations{display:none}}
 </style>
 <script>
   /* Two-stage loading, not one. Stage 1: before the widget's own
@@ -109,6 +123,10 @@
   <div id="map-area">
     <div id="map"></div>
     <div id="map-loading"><span>Loading map…</span></div>
+    <div id="recent-locations">
+      <div id="recent-locations-title">Recently added</div>
+      <div id="recent-locations-list"></div>
+    </div>
     <div id="legend">
       <button id="legend-toggle" onclick="toggleLegend()" aria-expanded="false" aria-controls="legend-body">
         <span class="ldot" style="background:#111"></span><span>Legend</span><span id="legend-caret">▾</span>
@@ -118,15 +136,15 @@
       <hr style="border:none;border-top:1px solid var(--rule);margin:5px 0">
       <div style="font-size:9px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Development projects</div>
       <div id="btn-proposed" data-visible="true" onclick="toggleStatus('proposed')" class="legend-filter-row">
-        <div style="display:flex;align-items:center;gap:7px"><div class="ldot" style="background:#DB4436"></div><span>Proposed</span></div>
+        <div style="display:flex;align-items:center;gap:7px"><div style="width:14px;height:0;border-top:2px solid #A8453B"></div><span>Proposed</span></div>
         <span class="legend-ind">−</span>
       </div>
       <div id="btn-approved" data-visible="true" onclick="toggleStatus('approved')" class="legend-filter-row">
-        <div style="display:flex;align-items:center;gap:7px"><div class="ldot" style="background:#009D57"></div><span>Approved</span></div>
+        <div style="display:flex;align-items:center;gap:7px"><div style="width:14px;height:0;border-top:2px dashed #4A7856"></div><span>Approved</span></div>
         <span class="legend-ind">−</span>
       </div>
       <div id="btn-under_construction" data-visible="true" onclick="toggleStatus('under_construction')" class="legend-filter-row">
-        <div style="display:flex;align-items:center;gap:7px"><div class="ldot" style="background:#4186F0"></div><span>Under construction</span></div>
+        <div style="display:flex;align-items:center;gap:7px"><div style="width:14px;height:0;border-top:2px dotted #3D6491"></div><span>Under construction</span></div>
         <span class="legend-ind">−</span>
       </div>
       <div style="font-size:9px;color:var(--muted);margin-top:6px;line-height:1.4">Tap a status to show or hide it on the map</div>
@@ -329,6 +347,73 @@
     var toggleBtn = document.getElementById('filters-toggle-all');
     if(toggleBtn) toggleBtn.addEventListener('click', toggleAllFilters);
   });
+
+  /* PhotoDeck-only: "Recently added" panel. Reads the shared `locations`
+     array and mapReadyFlag/locationsReadyFlag/mapForDataLayers globals from
+     pi-map-search-logic.js rather than duplicating the fetch or the map
+     init — this only runs once both are already true, polling briefly
+     instead of hooking into the shared file's own render sequence, so the
+     shared script stays untouched (it's used by the Webflow embed too). */
+  function parseLocationDate(dateStr){
+    if(!dateStr) return null;
+    var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    var m = dateStr.match(/^(?:(\d{1,2})\s+)?([A-Za-z]+)\s+(\d{4})$/);
+    if(!m) return null;
+    var mi = months.indexOf(m[2]);
+    if(mi < 0) return null;
+    var day = m[1] ? parseInt(m[1]) : 1;
+    return new Date(parseInt(m[3]), mi, day);
+  }
+
+  function focusRecentLocation(loc){
+    var map = mapForDataLayers;
+    if(!map) return;
+    map.easeTo({center: loc.coords, zoom: 16, essential: true});
+    if(window._activePopup) window._activePopup.remove();
+    if(window._searchPopup){ window._searchPopup.remove(); window._searchPopup = null; }
+    var html = '<div class="pi-popup-body">'
+      + '<div class="pi-popup-street">' + (loc.address || loc.street) + '</div>'
+      + '<div class="pi-popup-suburb">' + loc.suburb + (loc.count ? ' · ' + loc.count + ' photo' + (loc.count > 1 ? 's' : '') : '') + '</div>'
+      + '<a class="pi-popup-add" href="' + loc.archiveUrl + '" target="_top">View photos</a>'
+      + '</div>';
+    window._activePopup = new mapboxgl.Popup({closeButton:true, maxWidth:'240px'})
+      .setLngLat(loc.coords).setHTML(html).addTo(map)
+      .on('close', function(){ window._activePopup = null; });
+  }
+
+  function renderRecentLocations(){
+    var listEl = document.getElementById('recent-locations-list');
+    var panelEl = document.getElementById('recent-locations');
+    if(!listEl || !panelEl) return;
+    var dated = locations
+      .filter(function(l){ return l.documented && !isNaN(l.coords[0]) && parseLocationDate(l.date); })
+      .map(function(l){ return {loc:l, parsed:parseLocationDate(l.date)}; })
+      .sort(function(a,b){ return b.parsed - a.parsed; })
+      .slice(0, 5);
+    if(dated.length === 0){ panelEl.style.display = 'none'; return; }
+    listEl.innerHTML = '';
+    dated.forEach(function(entry){
+      var row = document.createElement('div');
+      row.className = 'recent-row';
+      var title = document.createElement('div');
+      title.className = 'recent-row-title';
+      title.textContent = entry.loc.address || entry.loc.street;
+      var meta = document.createElement('div');
+      meta.className = 'recent-row-meta';
+      meta.textContent = entry.loc.suburb + ' · ' + entry.loc.date;
+      row.appendChild(title);
+      row.appendChild(meta);
+      row.addEventListener('click', function(){ focusRecentLocation(entry.loc); });
+      listEl.appendChild(row);
+    });
+  }
+
+  var recentLocationsTimer = setInterval(function(){
+    if(mapReadyFlag && locationsReadyFlag){
+      clearInterval(recentLocationsTimer);
+      renderRecentLocations();
+    }
+  }, 200);
 </script>
 </body>
 </html>
