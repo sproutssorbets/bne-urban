@@ -3,188 +3,525 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PhotoIndex — Licensing</title>
-
-<!-- Standalone iframe embed for PhotoDeck's Licensing page. Index-style layout
-     (numbered nav + sections) following the Vignelli concept Anka provided,
-     rebuilt against PhotoIndex's own type/colour system rather than the
-     concept's generic Arial/grey values. -->
-
+<title>Licensing — PhotoIndex</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #FFFFFF;
-    --text: #111111;
-    --muted: #6B6B6B;
-    --rule: #DADADA;
-    --rule-strong: #111111;
-  }
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  html, body { margin: 0; padding: 0; }
-  html, body {
-    scrollbar-width: none;      /* Firefox */
-    -ms-overflow-style: none;   /* starsze Edge */
-  }
-  html::-webkit-scrollbar, body::-webkit-scrollbar {
-    display: none;              /* Chrome, Safari, nowy Edge */
-  }
-  body {
-    font-family: 'Inter', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    font-size: 13px;
-    line-height: 1.5;
-    font-weight: 400;
-    -webkit-font-smoothing: subpixel-antialiased;
-  }
+html,body{margin:0;padding:0;background:#FFFFFF;}
+.pi-lic,.pi-lic *,.pi-lic *::before,.pi-lic *::after{box-sizing:border-box;margin:0;padding:0}
 
-  h1 {
-    font-size: 14px;
-    font-weight: 400;
-    letter-spacing: 0.02em;
-    margin: 0 0 10px;
-  }
-  .intro { font-size: 13px; color: var(--muted); max-width: 520px; margin: 0 0 20px; }
-  .lic-note { font-size: 13px; color: var(--muted); max-width: 520px; margin: 0 0 48px; padding-top: 16px; border-top: 1px solid var(--rule); }
+.pi-lic{
+  font-family:Inter,sans-serif;
+  color:#111111;
+  background:#FFFFFF;
+  max-width:960px;
+  margin:0 auto;
+  padding:56px 40px 96px;
+}
 
-  nav.index { border-top: 1px solid var(--rule-strong); margin-bottom: 56px; }
-  nav.index a {
-    display: flex; justify-content: space-between; align-items: baseline;
-    padding: 14px 0; color: var(--text); text-decoration: none;
-    border-bottom: 1px solid var(--rule);
-    font-size: 13px; font-weight: 500;
-  }
-  nav.index a:hover { color: var(--muted); }
-  nav.index .idx-num { color: var(--muted); font-weight: 400; margin-right: 12px; }
-  nav.index .idx-price { color: var(--muted); font-weight: 400; white-space: nowrap; }
+.pi-lic-header{
+  padding-bottom:32px;
+  margin-bottom:56px;
+  border-bottom:1px solid #111111;
+}
+.pi-lic-h1{
+  font-size:14px;
+  font-weight:500;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  margin-bottom:16px;
+}
+.pi-lic-intro{
+  font-size:13px;
+  font-weight:400;
+  line-height:1.6;
+  color:#6B6B6B;
+  max-width:480px;
+  margin-bottom:12px;
+}
+.pi-lic-note{
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:#6B6B6B;
+}
 
-  @media (max-width: 680px) {
-    nav.index a { flex-direction: column; align-items: flex-start; gap: 4px; }
-  }
+.pi-finder{
+  border-top:1px solid #111111;
+  margin-bottom:72px;
+}
+.pi-finder-header{
+  display:grid;
+  grid-template-columns:240px 1fr;
+  border-bottom:1px solid #DADADA;
+  padding:12px 0;
+}
+.pi-finder-hcell{
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:#6B6B6B;
+}
+.pi-finder-row{
+  display:grid;
+  grid-template-columns:240px 1fr;
+  gap:16px;
+  align-items:start;
+  padding:16px 0;
+  border-bottom:1px solid #DADADA;
+  text-decoration:none;
+  color:inherit;
+}
+.pi-finder-row:hover{
+  border-bottom:1px solid #111111;
+}
+.pi-finder-client{
+  font-size:13px;
+  font-weight:500;
+  color:#111111;
+}
+.pi-finder-tags{
+  font-size:11px;
+  font-weight:400;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:#6B6B6B;
+}
+.pi-finder-tags span:not(:last-child)::after{
+  content:" / ";
+  color:#DADADA;
+}
 
-  section { border-top: 1px solid var(--rule-strong); padding-top: 20px; margin-top: 48px; }
-  section h2 {
-    font-size: 11px; font-weight: 500; letter-spacing: 0.14em;
-    text-transform: uppercase; margin: 0 0 4px;
-  }
+@media (max-width:900px){
+  .pi-finder-header{display:none}
+  .pi-finder-row{grid-template-columns:1fr}
+  .pi-finder-tags{display:none}
+}
 
-  table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-  th {
-    font-size: 11px; font-weight: 500; letter-spacing: 0.12em;
-    text-transform: uppercase; text-align: left; color: var(--muted);
-    padding: 8px 16px 8px 0; border-bottom: 1px solid var(--rule);
-  }
-  th:last-child, td:last-child { text-align: right; padding-right: 0; }
-  td { font-size: 13px; padding: 12px 16px 12px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
-  td:first-child { font-weight: 500; }
-  td.price { white-space: nowrap; font-weight: 500; }
-  td .desc { color: var(--muted); }
+.pi-acc{
+  border-top:1px solid #DADADA;
+}
+.pi-acc:last-of-type{
+  border-bottom:1px solid #111111;
+}
+.pi-acc summary{
+  display:grid;
+  grid-template-columns:32px 1fr auto auto;
+  align-items:baseline;
+  gap:16px;
+  padding:22px 0;
+  cursor:pointer;
+  list-style:none;
+}
+.pi-acc summary::-webkit-details-marker{display:none}
+.pi-acc-index{
+  font-size:11px;
+  font-weight:400;
+  color:#6B6B6B;
+  letter-spacing:.04em;
+}
+.pi-acc-title{
+  font-size:14px;
+  font-weight:500;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+}
+.pi-acc-preview{
+  font-size:13px;
+  font-weight:500;
+  color:#111111;
+  white-space:nowrap;
+}
+.pi-acc-chevron{
+  font-size:11px;
+  color:#6B6B6B;
+  transition:transform .15s;
+}
+.pi-acc[open] .pi-acc-chevron{
+  transform:rotate(180deg);
+}
+.pi-acc-body{
+  padding-bottom:48px;
+  padding-left:48px;
+}
 
-  .cond-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-  .cond-table td { border-bottom: 1px solid var(--rule); padding: 12px 16px 12px 0; vertical-align: top; }
-  .cond-table td.cond-label {
-    font-size: 11px; font-weight: 500; letter-spacing: 0.12em;
-    text-transform: uppercase; color: var(--muted); width: 200px;
-  }
-  .cond-table td.cond-text { font-size: 13px; color: var(--muted); }
+.pi-lic-table{
+  border-top:1px solid #DADADA;
+  margin-bottom:24px;
+}
+.pi-lic-row{
+  display:grid;
+  border-bottom:1px solid #DADADA;
+  align-items:start;
+}
+.pi-lic-row:last-child{
+  border-bottom:1px solid #111111;
+}
+.pi-lic-row-cols3{grid-template-columns:220px 1fr 100px}
+.pi-lic-row-cols2{grid-template-columns:200px 1fr}
 
-  @media (max-width: 680px) {
-    .cond-table td.cond-label { width: auto; display: block; padding-bottom: 4px; }
-    .cond-table td.cond-text { display: block; padding-top: 0; }
-    .cond-table tr { display: block; }
-  }
+.pi-lic-cell{
+  padding:12px 16px 12px 0;
+  font-size:13px;
+}
+.pi-lic-cell:first-child{padding-left:0}
+.pi-lic-cell-label{
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:#6B6B6B;
+  padding-top:8px;
+  padding-bottom:8px;
+}
+.pi-lic-cell-title{
+  font-weight:500;
+}
+.pi-lic-cell-meta{
+  color:#111111;
+  line-height:1.55;
+}
+.pi-lic-cell-price{
+  text-align:right;
+  white-space:nowrap;
+  font-weight:500;
+}
+.pi-lic-cell-label.pi-lic-cell-price{font-size:11px}
+
+.pi-cond-label{
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:#6B6B6B;
+  padding:14px 16px 14px 0;
+}
+.pi-cond-text{
+  font-size:13px;
+  line-height:1.55;
+  color:#111111;
+  padding:14px 0;
+}
+
+@media (max-width:900px){
+  .pi-lic{padding:36px 20px 72px}
+  .pi-acc-body{padding-left:0}
+  .pi-acc summary{grid-template-columns:24px 1fr auto}
+  .pi-acc-preview{display:none}
+  .pi-lic-row-cols3{grid-template-columns:1fr auto}
+  .pi-lic-row-cols2{grid-template-columns:1fr}
+  .pi-lic-cell-label{display:none}
+}
+
+.pi-acc:target > .pi-acc-body{
+  display:block!important;
+}
+.pi-acc:target .pi-acc-chevron{
+  transform:rotate(180deg);
+}
+
 </style>
 </head>
 <body>
+<div class="pi-lic">
 
-<h1>LICENSING</h1>
-<p class="intro">All photographs in the archive are available for licensing. Select a category below to see the right options.</p>
-<p class="lic-note">All prices include GST.</p>
+  <div class="pi-lic-header">
+    <h1 class="pi-lic-h1">Licensing</h1>
+    <p class="pi-lic-intro">All photographs in the archive are available for licensing. Select your situation below to see the right options.</p>
+    <p class="pi-lic-note">All prices include GST.</p>
+  </div>
 
-<nav class="index">
-  <a href="#real-estate"><span><span class="idx-num">01</span>Real Estate</span><span class="idx-price">AU$90 – AU$450</span></a>
-  <a href="#property-marketing"><span><span class="idx-num">02</span>Property Marketing</span><span class="idx-price">AU$200</span></a>
-  <a href="#editorial"><span><span class="idx-num">03</span>Editorial</span><span class="idx-price">AU$75 – AU$250</span></a>
-  <a href="#institutional-planning"><span><span class="idx-num">04</span>Institutional &amp; Planning</span><span class="idx-price">AU$250 – AU$350</span></a>
-  <a href="#other"><span><span class="idx-num">05</span>Other</span><span class="idx-price">Single image · Commercial</span></a>
-  <a href="#volume-packages"><span><span class="idx-num">06</span>Volume Packages</span><span class="idx-price">–15% to –30%</span></a>
-  <a href="#key-conditions"><span><span class="idx-num">07</span>Key Conditions</span><span class="idx-price"></span></a>
-</nav>
+  <div class="pi-finder">
+    <div class="pi-finder-header">
+      <div class="pi-finder-hcell">I am a…</div>
+      <div class="pi-finder-hcell">Recommended licence</div>
+    </div>
 
-<section id="real-estate">
-  <h2>Real Estate</h2>
-  <table>
-    <tr><th>Licence</th><th>Use</th><th>Price</th></tr>
-    <tr><td>Single Property Listing<div class="desc">One image used in a single property listing. Property portals, agency website.</div></td><td></td><td class="price">AU$90</td></tr>
-    <tr><td>Building Licence<div class="desc">One image across multiple listings for the same building. Assigned to a named agent. Requires the building address at purchase.</div></td><td></td><td class="price">AU$350</td></tr>
-    <tr><td>Neighbourhood Licence<div class="desc">20 downloads of context photographs from one suburb, parks, streets, cafes, local amenities. AU$25 per additional image. Requires the suburb at purchase.</div></td><td></td><td class="price">AU$450</td></tr>
-  </table>
-  <table class="cond-table">
-    <tr><td class="cond-label">Building Licence</td><td class="cond-text">Assigned to a named agent at time of purchase. Does not transfer to another agent or to the agency. A new licence is required if the agency wants to keep using the image after the agent leaves.</td></tr>
-    <tr><td class="cond-label">Neighbourhood Licence</td><td class="cond-text">Assigned to a named agent, covers 20 downloads from one suburb. Does not transfer between agents or to the agency.</td></tr>
-  </table>
-</section>
+    <a class="pi-finder-row" href="#real-estate">
+      <div class="pi-finder-client">Real Estate Agent</div>
+      <div class="pi-finder-tags"><span>Single Property Listing</span><span>Building Licence</span><span>Neighbourhood Licence</span></div>
+    </a>
 
-<section id="property-marketing">
-  <h2>Property Marketing</h2>
-  <table>
-    <tr><th>Licence</th><th>Use</th><th>Price</th></tr>
-    <tr><td>Property Marketing<div class="desc">One image used in sales brochures, developer websites, or investor materials for a specific project. Client: developers, PR agencies.</div></td><td></td><td class="price">AU$200</td></tr>
-  </table>
-  <table class="cond-table">
-    <tr><td class="cond-label">Print runs</td><td class="cond-text">Runs completed within the licence period remain in circulation. New print runs after expiry require a new licence. Digital use expires 3 years from purchase.</td></tr>
-    <tr><td class="cond-label">Sublicensing</td><td class="cond-text">Not permitted unless agreed in writing.</td></tr>
-  </table>
-</section>
+    <a class="pi-finder-row" href="#property-marketing">
+      <div class="pi-finder-client">Property Developer</div>
+      <div class="pi-finder-tags"><span>Property Marketing</span></div>
+    </a>
 
-<section id="editorial">
-  <h2>Editorial</h2>
-  <table>
-    <tr><th>Licence</th><th>Use</th><th>Price</th></tr>
-    <tr><td>Editorial Online<div class="desc">One image, single publication in an online news article, blog, or digital publication. Not for advertising.</div></td><td></td><td class="price">AU$75</td></tr>
-    <tr><td>Editorial Print<div class="desc">One image, single print run in a magazine, newspaper, or printed journal. Not for advertising.</div></td><td></td><td class="price">AU$180</td></tr>
-    <tr><td>Editorial Broadcast<div class="desc">One image, single broadcast or release in a TV segment, documentary, or online video. Not for advertising or campaigns.</div></td><td></td><td class="price">AU$250</td></tr>
-  </table>
-</section>
+    <a class="pi-finder-row" href="#editorial">
+      <div class="pi-finder-client">Journalist / Online Media</div>
+      <div class="pi-finder-tags"><span>Editorial Online</span></div>
+    </a>
 
-<section id="institutional-planning">
-  <h2>Institutional &amp; Planning</h2>
-  <table>
-    <tr><th>Licence</th><th>Use</th><th>Price</th></tr>
-    <tr><td>Institutional<div class="desc">One image used in a Development Application, research publication, institutional archive, or internal report. Perpetual.</div></td><td></td><td class="price">AU$250</td></tr>
-    <tr><td>Urban Planning &amp; Annual Reports<div class="desc">One image used in planning reports, annual reports, or public-facing documents with wider distribution. Perpetual.</div></td><td></td><td class="price">AU$350</td></tr>
-  </table>
-</section>
+    <a class="pi-finder-row" href="#editorial">
+      <div class="pi-finder-client">Magazine / Newspaper</div>
+      <div class="pi-finder-tags"><span>Editorial Print</span></div>
+    </a>
 
-<section id="other">
-  <h2>Other</h2>
-  <table>
-    <tr><th>Licence</th><th>Use</th><th>Price</th></tr>
-    <tr><td>Single Image Licence<div class="desc">One image, any use not covered by the tiers above. Perpetual.</div></td><td></td><td class="price">AU$450</td></tr>
-    <tr><td>Commercial / Broadcast<div class="desc">Advertising campaigns, commercial TV, film, or national distribution. Contact us with project details and intended use.</div></td><td></td><td class="price">On request</td></tr>
-  </table>
-</section>
+    <a class="pi-finder-row" href="#editorial">
+      <div class="pi-finder-client">TV / Video Production</div>
+      <div class="pi-finder-tags"><span>Editorial Broadcast</span><span>Commercial / Broadcast</span></div>
+    </a>
 
-<section id="volume-packages">
-  <h2>Volume Packages</h2>
-  <table>
-    <tr><th>Images</th><th>Applies to</th><th>Discount</th></tr>
-    <tr><td>5 images<div class="desc">Any licence tier except Single Image Licence and Commercial / Broadcast</div></td><td></td><td class="price">–15%</td></tr>
-    <tr><td>10 images<div class="desc">Any licence tier except Single Image Licence and Commercial / Broadcast</div></td><td></td><td class="price">–20%</td></tr>
-    <tr><td>15 images<div class="desc">Any licence tier except Single Image Licence and Commercial / Broadcast</div></td><td></td><td class="price">–25%</td></tr>
-    <tr><td>20 images<div class="desc">Any licence tier except Single Image Licence and Commercial / Broadcast</div></td><td></td><td class="price">–30%</td></tr>
-  </table>
-</section>
+    <a class="pi-finder-row" href="#institutional-planning">
+      <div class="pi-finder-client">Architect / Urban Planner</div>
+      <div class="pi-finder-tags"><span>Institutional</span><span>Urban Planning</span></div>
+    </a>
 
-<section id="key-conditions">
-  <h2>Key Conditions</h2>
-  <table class="cond-table">
-    <tr><td class="cond-label">Updated photographs</td><td class="cond-text">If a building or location is re-photographed at a later date, new photographs are issued under a new licence. Existing licences cover only the images purchased at the time.</td></tr>
-    <tr><td class="cond-label">Sublicensing</td><td class="cond-text">No licence permits sublicensing unless agreed in writing. All licences are issued to the purchasing entity or named individual only.</td></tr>
-  </table>
-</section>
+    <a class="pi-finder-row" href="#institutional-planning">
+      <div class="pi-finder-client">Council / Government Body</div>
+      <div class="pi-finder-tags"><span>Institutional</span><span>Urban Planning</span></div>
+    </a>
+
+    <a class="pi-finder-row" href="#institutional-planning">
+      <div class="pi-finder-client">University / Researcher</div>
+      <div class="pi-finder-tags"><span>Institutional</span></div>
+    </a>
+
+    <a class="pi-finder-row" href="#other">
+      <div class="pi-finder-client">Advertising Agency</div>
+      <div class="pi-finder-tags"><span>Commercial / Broadcast</span></div>
+    </a>
+
+    <a class="pi-finder-row" href="#volume-packages">
+      <div class="pi-finder-client">Buying Multiple Images</div>
+      <div class="pi-finder-tags"><span>Volume Package</span></div>
+    </a>
+  </div>
+
+  <details class="pi-acc" id="real-estate">
+    <summary>
+      <span class="pi-acc-index">01</span>
+      <span class="pi-acc-title">Real Estate</span>
+      <span class="pi-acc-preview">AU$90 – AU$450</span>
+      <span class="pi-acc-chevron">↓</span>
+    </summary>
+    <div class="pi-acc-body">
+      <div class="pi-lic-table">
+        <div class="pi-lic-row pi-lic-row-cols3">
+          <div class="pi-lic-cell pi-lic-cell-label">Licence</div>
+          <div class="pi-lic-cell pi-lic-cell-label">Use</div>
+          <div class="pi-lic-cell pi-lic-cell-label pi-lic-cell-price">Price</div>
+        </div>
+        <div class="pi-lic-row pi-lic-row-cols3">
+          <div class="pi-lic-cell pi-lic-cell-title">Single Property Listing</div>
+          <div class="pi-lic-cell pi-lic-cell-meta">One image used in a single property listing. Property portals, agency website.</div>
+          <div class="pi-lic-cell pi-lic-cell-price">AU$90</div>
+        </div>
+        <div class="pi-lic-row pi-lic-row-cols3">
+          <div class="pi-lic-cell pi-lic-cell-title">Building Licence</div>
+          <div class="pi-lic-cell pi-lic-cell-meta">One image across multiple listings for the same building. Assigned to a named agent. Requires the building address at purchase.</div>
+          <div class="pi-lic-cell pi-lic-cell-price">AU$350</div>
+        </div>
+        <div class="pi-lic-row pi-lic-row-cols3">
+          <div class="pi-lic-cell pi-lic-cell-title">Neighbourhood Licence</div>
+          <div class="pi-lic-cell pi-lic-cell-meta">20 downloads of context photographs from one suburb, parks, streets, cafes, local amenities. AU$25 per additional image. Requires the suburb at purchase.</div>
+          <div class="pi-lic-cell pi-lic-cell-price">AU$450</div>
+        </div>
+      </div>
+      <div class="pi-lic-table">
+        <div class="pi-lic-row pi-lic-row-cols2">
+          <div class="pi-cond-label">Building Licence</div>
+          <div class="pi-cond-text">Assigned to a named agent at time of purchase. Does not transfer to another agent or to the agency. A new licence is required if the agency wants to keep using the image after the agent leaves.</div>
+        </div>
+        <div class="pi-lic-row pi-lic-row-cols2">
+          <div class="pi-cond-label">Neighbourhood Licence</div>
+          <div class="pi-cond-text">Assigned to a named agent, covers 20 downloads from one suburb. Does not transfer between agents or to the agency.</div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="pi-acc" id="property-marketing">
+    <summary>
+      <span class="pi-acc-index">02</span>
+      <span class="pi-acc-title">Property Marketing</span>
+      <span class="pi-acc-preview">AU$200</span>
+      <span class="pi-acc-chevron">↓</span>
+    </summary>
+    <div class="pi-acc-body">
+      <div class="pi-lic-table">
+        <div class="pi-lic-row pi-lic-row-cols3">
+          <div class="pi-lic-cell pi-lic-cell-label">Licence</div>
+          <div class="pi-lic-cell pi-lic-cell-label">Use</div>
+          <div class="pi-lic-cell pi-lic-cell-label pi-lic-cell-price">Price</div>
+        </div>
+        <div class="pi-lic-row pi-lic-row-cols3">
+          <div class="pi-lic-cell pi-lic-cell-title">Property Marketing</div>
+          <div class="pi-lic-cell pi-lic-cell-meta">One image used in sales brochures, developer websites, or investor materials for a specific project. Client: developers, PR agencies.</div>
+          <div class="pi-lic-cell pi-lic-cell-price">AU$200</div>
+        </div>
+      </div>
+      <div class="pi-lic-table">
+        <div class="pi-lic-row pi-lic-row-cols2">
+          <div class="pi-cond-label">Print runs</div>
+          <div class="pi-cond-text">Runs completed within the licence period remain in circulation. New print runs after expiry require a new licence. Digital use expires 3 years from purchase.</div>
+        </div>
+        <div class="pi-lic-row pi-lic-row-cols2">
+          <div class="pi-cond-label">Sublicensing</div>
+          <div class="pi-cond-text">Not permitted unless agreed in writing.</div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="pi-acc" id="editorial">
+    <summary>
+      <span class="pi-acc-index">03</span>
+      <span class="pi-acc-title">Editorial</span>
+      <span class="pi-acc-preview">AU$75 – AU$250</span>
+      <span class="pi-acc-chevron">↓</span>
+    </summary>
+    <div class="pi-acc-body">
+      <div class="pi-lic-table">
+        <div class="pi-lic-row pi-lic-row-cols3">
+          <div class="pi-lic-cell pi-lic-cell-label">Licence</div>
+          <div class="pi-lic-cell pi-lic-cell-label">Use</div>
+          <div class="pi-lic-cell pi-lic-cell-label pi-lic-cell-price">Price</div>
+        </div>
+        <div class="pi-lic-row pi-lic-row-cols3">
+          <div class="pi-lic-cell pi-lic-cell-title">Editorial Online</div>
+          <div class="pi-lic-cell pi-lic-cell-meta">One image, single publication in an online news article, blog, or digital publication. Not for advertising.</div>
+          <div class="pi-lic-cell pi-lic-cell-price">AU$75</div>
+        </div>
+        <div class="pi-lic-row pi-lic-row-cols3">
+          <div class="pi-lic-cell pi-lic-cell-title">Editorial Print</div>
+          <div class="pi-lic-cell pi-lic-cell-meta">One image, single print run in a magazine, newspaper, or printed journal. Not for advertising.</div>
+          <div class="pi-lic-cell pi-lic-cell-price">AU$180</div>
+        </div>
+        <div class="pi-lic-row pi-lic-row-cols3">
+          <div class="pi-lic-cell pi-lic-cell-title">Editorial Broadcast</div>
+          <div class="pi-lic-cell pi-lic-cell-meta">One image, single broadcast or release in a TV segment, documentary, or online video. Not for advertising or campaigns.</div>
+          <div class="pi-lic-cell pi-lic-cell-price">AU$250</div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="pi-acc" id="institutional-planning">
+    <summary>
+      <span class="pi-acc-index">04</span>
+      <span class="pi-acc-title">Institutional &amp; Planning</span>
+      <span class="pi-acc-preview">AU$250 – AU$350</span>
+      <span class="pi-acc-chevron">↓</span>
+    </summary>
+    <div class="pi-acc-body">
+      <div class="pi-lic-table">
+        <div class="pi-lic-row pi-lic-row-cols3">
+          <div class="pi-lic-cell pi-lic-cell-label">Licence</div>
+          <div class="pi-lic-cell pi-lic-cell-label">Use</div>
+          <div class="pi-lic-cell pi-lic-cell-label pi-lic-cell-price">Price</div>
+        </div>
+        <div class="pi-lic-row pi-lic-row-cols3">
+          <div class="pi-lic-cell pi-lic-cell-title">Institutional</div>
+          <div class="pi-lic-cell pi-lic-cell-meta">One image used in a Development Application, research publication, institutional archive, or internal report. Perpetual.</div>
+          <div class="pi-lic-cell pi-lic-cell-price">AU$250</div>
+        </div>
+        <div class="pi-lic-row pi-lic-row-cols3">
+          <div class="pi-lic-cell pi-lic-cell-title">Urban Planning &amp; Annual Reports</div>
+          <div class="pi-lic-cell pi-lic-cell-meta">One image used in planning reports, annual reports, or public-facing documents with wider distribution. Perpetual.</div>
+          <div class="pi-lic-cell pi-lic-cell-price">AU$350</div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="pi-acc" id="other">
+    <summary>
+      <span class="pi-acc-index">05</span>
+      <span class="pi-acc-title">Other</span>
+      <span class="pi-acc-preview">Single image · Commercial</span>
+      <span class="pi-acc-chevron">↓</span>
+    </summary>
+    <div class="pi-acc-body">
+      <div class="pi-lic-table">
+        <div class="pi-lic-row pi-lic-row-cols3">
+          <div class="pi-lic-cell pi-lic-cell-label">Licence</div>
+          <div class="pi-lic-cell pi-lic-cell-label">Use</div>
+          <div class="pi-lic-cell pi-lic-cell-label pi-lic-cell-price">Price</div>
+        </div>
+        <div class="pi-lic-row pi-lic-row-cols3">
+          <div class="pi-lic-cell pi-lic-cell-title">Single Image Licence</div>
+          <div class="pi-lic-cell pi-lic-cell-meta">One image, any use not covered by the tiers above. Perpetual.</div>
+          <div class="pi-lic-cell pi-lic-cell-price">AU$450</div>
+        </div>
+        <div class="pi-lic-row pi-lic-row-cols3">
+          <div class="pi-lic-cell pi-lic-cell-title">Commercial / Broadcast</div>
+          <div class="pi-lic-cell pi-lic-cell-meta">Advertising campaigns, commercial TV, film, or national distribution. Contact us with project details and intended use.</div>
+          <div class="pi-lic-cell pi-lic-cell-price">On request</div>
+        </div>
+      </div>
+      <div class="pi-lic-table">
+        <div class="pi-lic-row pi-lic-row-cols2">
+          <div class="pi-cond-label">Copyright enforcement</div>
+          <div class="pi-cond-text">Unlicensed use is monitored through Pixsy. The Single Image Licence rate of AU$450 is the reference price for all copyright claims and infringement settlements, regardless of use type or the identity of the party responsible.</div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="pi-acc" id="volume-packages">
+    <summary>
+      <span class="pi-acc-index">06</span>
+      <span class="pi-acc-title">Volume Packages</span>
+      <span class="pi-acc-preview">–15% to –30%</span>
+      <span class="pi-acc-chevron">↓</span>
+    </summary>
+    <div class="pi-acc-body">
+      <div class="pi-lic-table">
+        <div class="pi-lic-row pi-lic-row-cols3">
+          <div class="pi-lic-cell pi-lic-cell-label">Images</div>
+          <div class="pi-lic-cell pi-lic-cell-label">Applies to</div>
+          <div class="pi-lic-cell pi-lic-cell-label pi-lic-cell-price">Discount</div>
+        </div>
+        <div class="pi-lic-row pi-lic-row-cols3">
+          <div class="pi-lic-cell pi-lic-cell-title">5 images</div>
+          <div class="pi-lic-cell pi-lic-cell-meta">Any licence tier except Single Image Licence and Commercial / Broadcast</div>
+          <div class="pi-lic-cell pi-lic-cell-price">–15%</div>
+        </div>
+        <div class="pi-lic-row pi-lic-row-cols3">
+          <div class="pi-lic-cell pi-lic-cell-title">10 images</div>
+          <div class="pi-lic-cell pi-lic-cell-meta">Any licence tier except Single Image Licence and Commercial / Broadcast</div>
+          <div class="pi-lic-cell pi-lic-cell-price">–20%</div>
+        </div>
+        <div class="pi-lic-row pi-lic-row-cols3">
+          <div class="pi-lic-cell pi-lic-cell-title">15 images</div>
+          <div class="pi-lic-cell pi-lic-cell-meta">Any licence tier except Single Image Licence and Commercial / Broadcast</div>
+          <div class="pi-lic-cell pi-lic-cell-price">–25%</div>
+        </div>
+        <div class="pi-lic-row pi-lic-row-cols3">
+          <div class="pi-lic-cell pi-lic-cell-title">20 images</div>
+          <div class="pi-lic-cell pi-lic-cell-meta">Any licence tier except Single Image Licence and Commercial / Broadcast</div>
+          <div class="pi-lic-cell pi-lic-cell-price">–30%</div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="pi-acc" id="key-conditions">
+    <summary>
+      <span class="pi-acc-index">07</span>
+      <span class="pi-acc-title">Key Conditions</span>
+      <span class="pi-acc-preview"></span>
+      <span class="pi-acc-chevron">↓</span>
+    </summary>
+    <div class="pi-acc-body">
+      <div class="pi-lic-table">
+        <div class="pi-lic-row pi-lic-row-cols2">
+          <div class="pi-cond-label">Updated photographs</div>
+          <div class="pi-cond-text">If a building or location is re-photographed at a later date, new photographs are issued under a new licence. Existing licences cover only the images purchased at the time.</div>
+        </div>
+        <div class="pi-lic-row pi-lic-row-cols2">
+          <div class="pi-cond-label">Sublicensing</div>
+          <div class="pi-cond-text">No licence permits sublicensing unless agreed in writing. All licences are issued to the purchasing entity or named individual only.</div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+</div>
 
 </body>
 </html>
