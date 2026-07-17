@@ -1,69 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PhotoIndex Licensing Concept</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhotoIndex — Licensing</title>
+
+<!-- Standalone iframe embed for PhotoDeck's Licensing page. Index-style layout
+     (numbered nav + sections) following the Vignelli concept Anka provided,
+     rebuilt against PhotoIndex's own type/colour system rather than the
+     concept's generic Arial/grey values. -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{
---bg:#fff;--text:#111;--muted:#666;--line:#d8d8d8;
-}
-*{box-sizing:border-box}
-body{font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);margin:40px;line-height:1.5}
-.wrapper{max-width:980px;margin:auto}
-h1{font-size:18px;font-weight:400;letter-spacing:.08em}
-.intro{max-width:560px;color:var(--muted);margin-bottom:48px}
-nav{border-top:2px solid #111;border-bottom:1px solid var(--line);margin-bottom:48px}
-nav a{display:flex;justify-content:space-between;padding:16px 0;color:#111;text-decoration:none;border-bottom:1px solid var(--line)}
-nav a:last-child{border-bottom:none}
-section{border-top:2px solid #111;padding-top:24px;margin-top:56px}
-table{width:100%;border-collapse:collapse;margin-top:18px}
-th{font-size:11px;text-transform:uppercase;text-align:left;color:var(--muted);padding:10px 0;border-bottom:1px solid var(--line);font-weight:600}
-td{padding:18px 0;border-bottom:1px solid var(--line);vertical-align:top}
-td:last-child{text-align:right;white-space:nowrap;font-weight:bold}
-.small{font-size:13px;color:var(--muted)}
+  :root {
+    --bg: #FFFFFF;
+    --text: #111111;
+    --muted: #6B6B6B;
+    --rule: #DADADA;
+    --rule-strong: #111111;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.5;
+    font-weight: 400;
+    -webkit-font-smoothing: subpixel-antialiased;
+  }
+
+  h1 {
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    margin: 0 0 10px;
+  }
+  .intro { font-size: 13px; color: var(--muted); max-width: 520px; margin: 0 0 20px; }
+  .lic-note { font-size: 13px; color: var(--muted); max-width: 520px; margin: 0 0 48px; padding-top: 16px; border-top: 1px solid var(--rule); }
+
+  nav.index { border-top: 1px solid var(--rule-strong); margin-bottom: 56px; }
+  nav.index a {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 14px 0; color: var(--text); text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+    font-size: 13px; font-weight: 500;
+  }
+  nav.index a:hover { color: var(--muted); }
+  nav.index .idx-num { color: var(--muted); font-weight: 400; margin-right: 12px; }
+  nav.index .idx-price { color: var(--muted); font-weight: 400; white-space: nowrap; }
+
+  @media (max-width: 680px) {
+    nav.index a { flex-direction: column; align-items: flex-start; gap: 4px; }
+  }
+
+  section { border-top: 1px solid var(--rule-strong); padding-top: 20px; margin-top: 48px; }
+  section h2 {
+    font-size: 11px; font-weight: 500; letter-spacing: 0.14em;
+    text-transform: uppercase; margin: 0 0 4px;
+  }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+  th {
+    font-size: 11px; font-weight: 500; letter-spacing: 0.12em;
+    text-transform: uppercase; text-align: left; color: var(--muted);
+    padding: 8px 16px 8px 0; border-bottom: 1px solid var(--rule);
+  }
+  th:last-child, td:last-child { text-align: right; padding-right: 0; }
+  td { font-size: 13px; padding: 12px 16px 12px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  td:first-child { font-weight: 500; }
+  td.price { white-space: nowrap; font-weight: 500; }
+  td .desc { color: var(--muted); }
+
+  .cond-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+  .cond-table td { border-bottom: 1px solid var(--rule); padding: 12px 16px 12px 0; vertical-align: top; }
+  .cond-table td.cond-label {
+    font-size: 11px; font-weight: 500; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted); width: 200px;
+  }
+  .cond-table td.cond-text { font-size: 13px; color: var(--muted); }
+
+  @media (max-width: 680px) {
+    .cond-table td.cond-label { width: auto; display: block; padding-bottom: 4px; }
+    .cond-table td.cond-text { display: block; padding-top: 0; }
+    .cond-table tr { display: block; }
+  }
 </style>
 </head>
 <body>
-<div class="wrapper">
-<h1>LICENSING</h1>
-<p class="intro">Concept inspired by Massimo Vignelli. Information is organised as a clear index rather than a marketing page.</p>
 
-<nav>
-<a href="#re"><span>01&nbsp;&nbsp;REAL ESTATE</span><span>AU$90–450</span></a>
-<a href="#ed"><span>02&nbsp;&nbsp;EDITORIAL</span><span>AU$75–250</span></a>
-<a href="#in"><span>03&nbsp;&nbsp;INSTITUTIONAL</span><span>AU$250–350</span></a>
+<h1>LICENSING</h1>
+<p class="intro">All photographs in the archive are available for licensing. Select a category below to see the right options.</p>
+<p class="lic-note">All prices include GST.</p>
+
+<nav class="index">
+  <a href="#real-estate"><span><span class="idx-num">01</span>Real Estate</span><span class="idx-price">AU$90 – AU$450</span></a>
+  <a href="#property-marketing"><span><span class="idx-num">02</span>Property Marketing</span><span class="idx-price">AU$200</span></a>
+  <a href="#editorial"><span><span class="idx-num">03</span>Editorial</span><span class="idx-price">AU$75 – AU$250</span></a>
+  <a href="#institutional-planning"><span><span class="idx-num">04</span>Institutional &amp; Planning</span><span class="idx-price">AU$250 – AU$350</span></a>
+  <a href="#other"><span><span class="idx-num">05</span>Other</span><span class="idx-price">Single image · Commercial</span></a>
+  <a href="#volume-packages"><span><span class="idx-num">06</span>Volume Packages</span><span class="idx-price">–15% to –30%</span></a>
+  <a href="#key-conditions"><span><span class="idx-num">07</span>Key Conditions</span><span class="idx-price"></span></a>
 </nav>
 
-<section id="re">
-<h2>REAL ESTATE</h2>
-<table>
-<tr><th>Licence</th><th>Description</th><th>Price</th></tr>
-<tr><td>Single Property Listing</td><td class="small">One image used for one property listing.</td><td>AU$90</td></tr>
-<tr><td>Building Licence</td><td class="small">One image reused across listings within one building.</td><td>AU$350</td></tr>
-<tr><td>Neighbourhood Licence</td><td class="small">Twenty contextual images from one suburb.</td><td>AU$450</td></tr>
-</table>
+<section id="real-estate">
+  <h2>Real Estate</h2>
+  <table>
+    <tr><th>Licence</th><th>Use</th><th>Price</th></tr>
+    <tr><td>Single Property Listing<div class="desc">One image used in a single property listing. Property portals, agency website.</div></td><td></td><td class="price">AU$90</td></tr>
+    <tr><td>Building Licence<div class="desc">One image across multiple listings for the same building. Assigned to a named agent. Requires the building address at purchase.</div></td><td></td><td class="price">AU$350</td></tr>
+    <tr><td>Neighbourhood Licence<div class="desc">20 downloads of context photographs from one suburb, parks, streets, cafes, local amenities. AU$25 per additional image. Requires the suburb at purchase.</div></td><td></td><td class="price">AU$450</td></tr>
+  </table>
+  <table class="cond-table">
+    <tr><td class="cond-label">Building Licence</td><td class="cond-text">Assigned to a named agent at time of purchase. Does not transfer to another agent or to the agency. A new licence is required if the agency wants to keep using the image after the agent leaves.</td></tr>
+    <tr><td class="cond-label">Neighbourhood Licence</td><td class="cond-text">Assigned to a named agent, covers 20 downloads from one suburb. Does not transfer between agents or to the agency.</td></tr>
+  </table>
 </section>
 
-<section id="ed">
-<h2>EDITORIAL</h2>
-<table>
-<tr><th>Licence</th><th>Description</th><th>Price</th></tr>
-<tr><td>Editorial Online</td><td class="small">Single online publication.</td><td>AU$75</td></tr>
-<tr><td>Editorial Print</td><td class="small">Single print publication.</td><td>AU$180</td></tr>
-<tr><td>Editorial Broadcast</td><td class="small">Single broadcast use.</td><td>AU$250</td></tr>
-</table>
+<section id="property-marketing">
+  <h2>Property Marketing</h2>
+  <table>
+    <tr><th>Licence</th><th>Use</th><th>Price</th></tr>
+    <tr><td>Property Marketing<div class="desc">One image used in sales brochures, developer websites, or investor materials for a specific project. Client: developers, PR agencies.</div></td><td></td><td class="price">AU$200</td></tr>
+  </table>
+  <table class="cond-table">
+    <tr><td class="cond-label">Print runs</td><td class="cond-text">Runs completed within the licence period remain in circulation. New print runs after expiry require a new licence. Digital use expires 3 years from purchase.</td></tr>
+    <tr><td class="cond-label">Sublicensing</td><td class="cond-text">Not permitted unless agreed in writing.</td></tr>
+  </table>
 </section>
 
-<section id="in">
-<h2>INSTITUTIONAL</h2>
-<table>
-<tr><th>Licence</th><th>Description</th><th>Price</th></tr>
-<tr><td>Institutional</td><td class="small">Research, reports and archives.</td><td>AU$250</td></tr>
-<tr><td>Urban Planning</td><td class="small">Planning and annual reports.</td><td>AU$350</td></tr>
-</table>
+<section id="editorial">
+  <h2>Editorial</h2>
+  <table>
+    <tr><th>Licence</th><th>Use</th><th>Price</th></tr>
+    <tr><td>Editorial Online<div class="desc">One image, single publication in an online news article, blog, or digital publication. Not for advertising.</div></td><td></td><td class="price">AU$75</td></tr>
+    <tr><td>Editorial Print<div class="desc">One image, single print run in a magazine, newspaper, or printed journal. Not for advertising.</div></td><td></td><td class="price">AU$180</td></tr>
+    <tr><td>Editorial Broadcast<div class="desc">One image, single broadcast or release in a TV segment, documentary, or online video. Not for advertising or campaigns.</div></td><td></td><td class="price">AU$250</td></tr>
+  </table>
 </section>
 
-</div>
+<section id="institutional-planning">
+  <h2>Institutional &amp; Planning</h2>
+  <table>
+    <tr><th>Licence</th><th>Use</th><th>Price</th></tr>
+    <tr><td>Institutional<div class="desc">One image used in a Development Application, research publication, institutional archive, or internal report. Perpetual.</div></td><td></td><td class="price">AU$250</td></tr>
+    <tr><td>Urban Planning &amp; Annual Reports<div class="desc">One image used in planning reports, annual reports, or public-facing documents with wider distribution. Perpetual.</div></td><td></td><td class="price">AU$350</td></tr>
+  </table>
+</section>
+
+<section id="other">
+  <h2>Other</h2>
+  <table>
+    <tr><th>Licence</th><th>Use</th><th>Price</th></tr>
+    <tr><td>Single Image Licence<div class="desc">One image, any use not covered by the tiers above. Perpetual.</div></td><td></td><td class="price">AU$450</td></tr>
+    <tr><td>Commercial / Broadcast<div class="desc">Advertising campaigns, commercial TV, film, or national distribution. Contact us with project details and intended use.</div></td><td></td><td class="price">On request</td></tr>
+  </table>
+  <table class="cond-table">
+    <tr><td class="cond-label">Copyright enforcement</td><td class="cond-text">Unlicensed use is monitored through Pixsy. The Single Image Licence rate of AU$450 is the reference price for all copyright claims and infringement settlements, regardless of use type or the identity of the party responsible.</td></tr>
+  </table>
+</section>
+
+<section id="volume-packages">
+  <h2>Volume Packages</h2>
+  <table>
+    <tr><th>Images</th><th>Applies to</th><th>Discount</th></tr>
+    <tr><td>5 images<div class="desc">Any licence tier except Single Image Licence and Commercial / Broadcast</div></td><td></td><td class="price">–15%</td></tr>
+    <tr><td>10 images<div class="desc">Any licence tier except Single Image Licence and Commercial / Broadcast</div></td><td></td><td class="price">–20%</td></tr>
+    <tr><td>15 images<div class="desc">Any licence tier except Single Image Licence and Commercial / Broadcast</div></td><td></td><td class="price">–25%</td></tr>
+    <tr><td>20 images<div class="desc">Any licence tier except Single Image Licence and Commercial / Broadcast</div></td><td></td><td class="price">–30%</td></tr>
+  </table>
+</section>
+
+<section id="key-conditions">
+  <h2>Key Conditions</h2>
+  <table class="cond-table">
+    <tr><td class="cond-label">Updated photographs</td><td class="cond-text">If a building or location is re-photographed at a later date, new photographs are issued under a new licence. Existing licences cover only the images purchased at the time.</td></tr>
+    <tr><td class="cond-label">Sublicensing</td><td class="cond-text">No licence permits sublicensing unless agreed in writing. All licences are issued to the purchasing entity or named individual only.</td></tr>
+  </table>
+</section>
+
 </body>
 </html>
