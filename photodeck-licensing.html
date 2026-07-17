@@ -9,45 +9,45 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
 html,body{margin:0;padding:0;background:#FFFFFF;}
-.pi-lic,.pi-lic *,.pi-lic *::before,.pi-lic *::after{box-sizing:border-box;margin:0;padding:0}
-
+.pi-lic,.pi-lic *,.pi-lic ::before,.pi-lic *::after{box-sizing:border-box;margin:0;padding:0}
 .pi-lic{
   font-family:Inter,sans-serif;
-  color:#111111;
+  color:#1A1A1A;
   background:#FFFFFF;
-  max-width:960px;
-  margin:0 auto;
-  padding:56px 40px 96px;
+  max-width:none;
+  margin:0;
+  padding:21.333px 0 0;
+  font-size:13.333px;
+  line-height:1.6;
 }
-
 .pi-lic-header{
   padding-bottom:32px;
   margin-bottom:56px;
   border-bottom:1px solid #111111;
 }
 .pi-lic-h1{
-  font-size:14px;
-  font-weight:500;
-  letter-spacing:.18em;
+  font-size:13.333px;
+  font-weight:400;
+  letter-spacing:normal;
   text-transform:uppercase;
+  color:#1A1A1A;
   margin-bottom:16px;
 }
 .pi-lic-intro{
-  font-size:13px;
+  font-size:13.333px;
   font-weight:400;
   line-height:1.6;
-  color:#6B6B6B;
-  max-width:480px;
+  color:#1A1A1A;
+  max-width:none;
   margin-bottom:12px;
 }
 .pi-lic-note{
   font-size:11px;
-  font-weight:500;
+  font-weight:400;
   letter-spacing:.14em;
   text-transform:uppercase;
   color:#6B6B6B;
 }
-
 .pi-finder{
   border-top:1px solid #111111;
   margin-bottom:72px;
@@ -60,7 +60,7 @@ html,body{margin:0;padding:0;background:#FFFFFF;}
 }
 .pi-finder-hcell{
   font-size:11px;
-  font-weight:500;
+  font-weight:400;
   letter-spacing:.14em;
   text-transform:uppercase;
   color:#6B6B6B;
@@ -79,9 +79,9 @@ html,body{margin:0;padding:0;background:#FFFFFF;}
   border-bottom:1px solid #111111;
 }
 .pi-finder-client{
-  font-size:13px;
-  font-weight:500;
-  color:#111111;
+  font-size:13.333px;
+  font-weight:400;
+  color:#1A1A1A;
 }
 .pi-finder-tags{
   font-size:11px;
@@ -94,13 +94,11 @@ html,body{margin:0;padding:0;background:#FFFFFF;}
   content:" / ";
   color:#DADADA;
 }
-
 @media (max-width:900px){
   .pi-finder-header{display:none}
   .pi-finder-row{grid-template-columns:1fr}
   .pi-finder-tags{display:none}
 }
-
 .pi-acc{
   border-top:1px solid #DADADA;
 }
@@ -124,15 +122,16 @@ html,body{margin:0;padding:0;background:#FFFFFF;}
   letter-spacing:.04em;
 }
 .pi-acc-title{
-  font-size:14px;
-  font-weight:500;
-  letter-spacing:.16em;
+  font-size:13.333px;
+  font-weight:400;
+  letter-spacing:normal;
   text-transform:uppercase;
+  color:#1A1A1A;
 }
 .pi-acc-preview{
-  font-size:13px;
-  font-weight:500;
-  color:#111111;
+  font-size:13.333px;
+  font-weight:400;
+  color:#1A1A1A;
   white-space:nowrap;
 }
 .pi-acc-chevron{
@@ -147,7 +146,6 @@ html,body{margin:0;padding:0;background:#FFFFFF;}
   padding-bottom:48px;
   padding-left:48px;
 }
-
 .pi-lic-table{
   border-top:1px solid #DADADA;
   margin-bottom:24px;
@@ -162,15 +160,14 @@ html,body{margin:0;padding:0;background:#FFFFFF;}
 }
 .pi-lic-row-cols3{grid-template-columns:220px 1fr 100px}
 .pi-lic-row-cols2{grid-template-columns:200px 1fr}
-
 .pi-lic-cell{
   padding:12px 16px 12px 0;
-  font-size:13px;
+  font-size:13.333px;
 }
 .pi-lic-cell:first-child{padding-left:0}
 .pi-lic-cell-label{
   font-size:11px;
-  font-weight:500;
+  font-weight:400;
   letter-spacing:.1em;
   text-transform:uppercase;
   color:#6B6B6B;
@@ -178,36 +175,36 @@ html,body{margin:0;padding:0;background:#FFFFFF;}
   padding-bottom:8px;
 }
 .pi-lic-cell-title{
-  font-weight:500;
+  font-weight:400;
+  color:#1A1A1A;
 }
 .pi-lic-cell-meta{
-  color:#111111;
-  line-height:1.55;
+  color:#1A1A1A;
+  line-height:1.6;
 }
 .pi-lic-cell-price{
   text-align:right;
   white-space:nowrap;
-  font-weight:500;
+  font-weight:400;
+  color:#1A1A1A;
 }
 .pi-lic-cell-label.pi-lic-cell-price{font-size:11px}
-
 .pi-cond-label{
   font-size:11px;
-  font-weight:500;
+  font-weight:400;
   letter-spacing:.1em;
   text-transform:uppercase;
   color:#6B6B6B;
   padding:14px 16px 14px 0;
 }
 .pi-cond-text{
-  font-size:13px;
-  line-height:1.55;
-  color:#111111;
+  font-size:13.333px;
+  line-height:1.6;
+  color:#1A1A1A;
   padding:14px 0;
 }
-
 @media (max-width:900px){
-  .pi-lic{padding:36px 20px 72px}
+  .pi-lic{padding:36px 0 72px}
   .pi-acc-body{padding-left:0}
   .pi-acc summary{grid-template-columns:24px 1fr auto}
   .pi-acc-preview{display:none}
@@ -215,126 +212,67 @@ html,body{margin:0;padding:0;background:#FFFFFF;}
   .pi-lic-row-cols2{grid-template-columns:1fr}
   .pi-lic-cell-label{display:none}
 }
-
 .pi-acc:target > .pi-acc-body{
   display:block!important;
 }
 .pi-acc:target .pi-acc-chevron{
   transform:rotate(180deg);
 }
-
-  .pi-lic {
-  color: rgb(26, 26, 26);
-  font-size: 13.333px;
-  line-height: 1.6;
-}
-
-.pi-lic-h1 {
-  font-size: 11px;
-  font-weight: 400;
-  letter-spacing: 0.14em;
-  color: rgb(17, 17, 17);
-}
-
-.pi-lic-intro {
-  font-size: 13.333px;
-  font-weight: 400;
-  line-height: 1.6;
-  color: rgb(26, 26, 26);
-  max-width: none;
-}
-
-.pi-lic-note,
-.pi-finder-hcell,
-.pi-lic-cell-label,
-.pi-cond-label,
-.pi-acc-title {
-  font-weight: 400;
-  letter-spacing: 0.14em;
-}
-
-.pi-finder-client,
-.pi-lic-cell-title,
-.pi-lic-cell-price,
-.pi-acc-preview {
-  font-weight: 400;
-  color: rgb(17, 17, 17);
-}
-
-.pi-lic-cell-meta,
-.pi-cond-text {
-  line-height: 1.6;
-  color: rgb(26, 26, 26);
-}
-
 </style>
 </head>
 <body>
 <div class="pi-lic">
-
   <div class="pi-lic-header">
     <h1 class="pi-lic-h1">Licensing</h1>
     <p class="pi-lic-intro">All photographs in the archive are available for licensing. Select your situation below to see the right options.</p>
     <p class="pi-lic-note">All prices include GST.</p>
   </div>
-
   <div class="pi-finder">
     <div class="pi-finder-header">
       <div class="pi-finder-hcell">I am a…</div>
       <div class="pi-finder-hcell">Recommended licence</div>
     </div>
-
     <a class="pi-finder-row" href="#real-estate">
       <div class="pi-finder-client">Real Estate Agent</div>
       <div class="pi-finder-tags"><span>Single Property Listing</span><span>Building Licence</span><span>Neighbourhood Licence</span></div>
     </a>
-
     <a class="pi-finder-row" href="#property-marketing">
       <div class="pi-finder-client">Property Developer</div>
       <div class="pi-finder-tags"><span>Property Marketing</span></div>
     </a>
-
     <a class="pi-finder-row" href="#editorial">
       <div class="pi-finder-client">Journalist / Online Media</div>
       <div class="pi-finder-tags"><span>Editorial Online</span></div>
     </a>
-
     <a class="pi-finder-row" href="#editorial">
       <div class="pi-finder-client">Magazine / Newspaper</div>
       <div class="pi-finder-tags"><span>Editorial Print</span></div>
     </a>
-
     <a class="pi-finder-row" href="#editorial">
       <div class="pi-finder-client">TV / Video Production</div>
       <div class="pi-finder-tags"><span>Editorial Broadcast</span><span>Commercial / Broadcast</span></div>
     </a>
-
     <a class="pi-finder-row" href="#institutional-planning">
       <div class="pi-finder-client">Architect / Urban Planner</div>
       <div class="pi-finder-tags"><span>Institutional</span><span>Urban Planning</span></div>
     </a>
-
     <a class="pi-finder-row" href="#institutional-planning">
       <div class="pi-finder-client">Council / Government Body</div>
       <div class="pi-finder-tags"><span>Institutional</span><span>Urban Planning</span></div>
     </a>
-
     <a class="pi-finder-row" href="#institutional-planning">
       <div class="pi-finder-client">University / Researcher</div>
       <div class="pi-finder-tags"><span>Institutional</span></div>
     </a>
-
     <a class="pi-finder-row" href="#other">
       <div class="pi-finder-client">Advertising Agency</div>
       <div class="pi-finder-tags"><span>Commercial / Broadcast</span></div>
     </a>
-
     <a class="pi-finder-row" href="#volume-packages">
       <div class="pi-finder-client">Buying Multiple Images</div>
       <div class="pi-finder-tags"><span>Volume Package</span></div>
     </a>
   </div>
-
   <details class="pi-acc" id="real-estate">
     <summary>
       <span class="pi-acc-index">01</span>
@@ -377,7 +315,6 @@ html,body{margin:0;padding:0;background:#FFFFFF;}
       </div>
     </div>
   </details>
-
   <details class="pi-acc" id="property-marketing">
     <summary>
       <span class="pi-acc-index">02</span>
@@ -410,7 +347,6 @@ html,body{margin:0;padding:0;background:#FFFFFF;}
       </div>
     </div>
   </details>
-
   <details class="pi-acc" id="editorial">
     <summary>
       <span class="pi-acc-index">03</span>
@@ -443,7 +379,6 @@ html,body{margin:0;padding:0;background:#FFFFFF;}
       </div>
     </div>
   </details>
-
   <details class="pi-acc" id="institutional-planning">
     <summary>
       <span class="pi-acc-index">04</span>
@@ -471,7 +406,6 @@ html,body{margin:0;padding:0;background:#FFFFFF;}
       </div>
     </div>
   </details>
-
   <details class="pi-acc" id="other">
     <summary>
       <span class="pi-acc-index">05</span>
@@ -505,7 +439,6 @@ html,body{margin:0;padding:0;background:#FFFFFF;}
       </div>
     </div>
   </details>
-
   <details class="pi-acc" id="volume-packages">
     <summary>
       <span class="pi-acc-index">06</span>
@@ -543,7 +476,6 @@ html,body{margin:0;padding:0;background:#FFFFFF;}
       </div>
     </div>
   </details>
-
   <details class="pi-acc" id="key-conditions">
     <summary>
       <span class="pi-acc-index">07</span>
@@ -564,8 +496,6 @@ html,body{margin:0;padding:0;background:#FFFFFF;}
       </div>
     </div>
   </details>
-
 </div>
-
 </body>
 </html>
