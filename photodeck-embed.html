@@ -37,7 +37,7 @@
   .pi-map-search-widget #filters-wide{display:none}
   .pi-map-search-widget #filters-wide.all-open{display:block}
   .pi-map-search-widget #filters-wide.all-open .acc-body{display:block}
-  .pi-map-search-widget #filters-toggle-all{display:flex;justify-content:space-between;align-items:center;width:100%;padding:14px 0;background:none;border:none;border-top:1px solid var(--text);border-bottom:1px solid var(--rule);cursor:pointer;font-family:Inter,sans-serif;font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--text)}
+  .pi-map-search-widget #filters-toggle-all{display:flex;justify-content:space-between;align-items:center;width:100%;padding:14px 0;background:var(--bg);border:none;border-top:1px solid var(--text);border-bottom:1px solid var(--rule);cursor:pointer;font-family:Inter,sans-serif;font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--text);position:sticky;top:0;z-index:4}
   .pi-map-search-widget #filters-toggle-all-arrow{font-size:13px;color:var(--muted);transition:transform 0.2s}
   .pi-map-search-widget #filters-toggle-all.is-open #filters-toggle-all-arrow{transform:rotate(180deg)}
 
@@ -289,18 +289,38 @@
     var wide = document.getElementById('filters-wide');
     var label = document.getElementById('filters-toggle-all-text');
     if(!toggleBtn || !wide) return;
-    var isOpen = wide.classList.toggle('all-open');
-    toggleBtn.classList.toggle('is-open', isOpen);
-    if(label) label.textContent = isOpen ? 'Hide filters' : 'Show all filters';
-    /* Scroll the button itself to the top of the (iframe's own) viewport
-       when opening, so the newly-revealed filters unfold into view below
-       it, instead of staying off-screen under the map above.
-       Deliberately NOT using scrollIntoView() here — per spec, that method
+    var isCurrentlyOpen = wide.classList.contains('all-open');
+
+    /* Deliberately NOT using scrollIntoView() here — per spec, that method
        can walk up through nested browsing contexts and scroll the PARENT
        PhotoDeck page too, not just this iframe's own document.
        window.scrollTo() only ever touches this iframe's own window, so
        the outer page stays exactly where it was. */
-    if(isOpen) window.scrollTo({top: toggleBtn.offsetTop, behavior:'smooth'});
+
+    if(!isCurrentlyOpen){
+      /* Opening: reveal immediately, then scroll the (sticky) button to
+         the top so the newly-unfolded filters appear below it, instead
+         of staying off-screen under the map above. */
+      wide.classList.add('all-open');
+      toggleBtn.classList.add('is-open');
+      if(label) label.textContent = 'Hide filters';
+      window.scrollTo({top: toggleBtn.offsetTop, behavior:'smooth'});
+    } else {
+      /* Closing: scroll to the top FIRST, then collapse the filter list
+         only once that scroll has had time to finish. Collapsing first
+         would shrink the page height out from under the current scroll
+         position — with nothing left to scroll to, the browser just
+         clamps the position instantly, which reads as a jarring jump
+         rather than the same smooth motion opening has. Since the
+         button is sticky (position:sticky, top:0), scrolling to its own
+         offsetTop always brings it (and this view) to the very top. */
+      window.scrollTo({top: toggleBtn.offsetTop, behavior:'smooth'});
+      setTimeout(function(){
+        wide.classList.remove('all-open');
+        toggleBtn.classList.remove('is-open');
+        if(label) label.textContent = 'Show all filters';
+      }, 350);
+    }
   }
   document.addEventListener('DOMContentLoaded', function(){
     var toggleBtn = document.getElementById('filters-toggle-all');
