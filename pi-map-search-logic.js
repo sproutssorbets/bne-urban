@@ -859,14 +859,9 @@ function renderDataLayers(map){
        Previously used saturated, default-looking colours (#DB4436 / #009D57 /
        #4186F0) that sat outside the site's entire palette — the only place
        on the whole site with live, saturated hue. Muted here into the same
-       ink-toned family as the rest of the system, and given each status its
-       own line-dasharray so the three remain distinguishable even in
-       grayscale or for colour-blind visitors, not by hue alone. */
+       ink-toned family as the rest of the system. */
     const statusColors = {
       proposed:'#A8453B', approved:'#4A7856', under_construction:'#3D6491'
-    };
-    const statusDash = {
-      proposed: [1], approved: [3, 2], under_construction: [1, 2]
     };
     const DEV_SHOWN = ['proposed','approved','under_construction'];
 
@@ -877,8 +872,7 @@ function renderDataLayers(map){
         'fill-color':statusColors[status],'fill-opacity':0.22
       }}, 'doc-clusters');
       map.addLayer({id:'dev-'+status+'-line',type:'line',source:'dev-'+status,paint:{
-        'line-color':statusColors[status],'line-opacity':0.75,'line-width':1.3,
-        'line-dasharray':statusDash[status]
+        'line-color':statusColors[status],'line-opacity':0.75,'line-width':1.3
       }}, 'doc-clusters');
     });
 
