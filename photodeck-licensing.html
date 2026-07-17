@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
+html{scroll-behavior:smooth;}
+
 html,body{margin:0;padding:0;background:#FFFFFF;}
 .pi-lic,.pi-lic *,.pi-lic ::before,.pi-lic *::after{box-sizing:border-box;margin:0;padding:0}
 .pi-lic{
@@ -16,7 +18,7 @@ html,body{margin:0;padding:0;background:#FFFFFF;}
   background:#FFFFFF;
   max-width:none;
   margin:0;
-  padding:21.333px 0 0;
+  padding:0;
   font-size:13.333px;
   line-height:1.6;
 }
@@ -497,5 +499,19 @@ html,body{margin:0;padding:0;background:#FFFFFF;}
     </div>
   </details>
 </div>
+<script>
+document.querySelectorAll('.pi-finder-row').forEach(function(row){
+  row.addEventListener('click', function(e){
+    e.preventDefault();
+    var id = this.getAttribute('href').slice(1);
+    var target = document.getElementById(id);
+    if(target){
+      target.open = true;
+      target.scrollIntoView({behavior:'smooth', block:'start'});
+      history.replaceState(null, '', '#' + id);
+    }
+  });
+});
+</script>
 </body>
 </html>
