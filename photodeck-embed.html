@@ -327,11 +327,12 @@
          button is fixed to the bottom of the viewport regardless of
          scroll position, scrolling to its own offsetTop always brings
          it (and this view) to the very top. */
-      window.scrollTo({top: toggleBtn.offsetTop, behavior:'smooth'});
+     window.scrollTo({top: 0, behavior:'smooth'});
       setTimeout(function(){
         wide.classList.remove('all-open');
         toggleBtn.classList.remove('is-open');
         if(label) label.textContent = 'Show all filters';
+        window.scrollTo(0, 0);
       }, 350);
     }
   }
