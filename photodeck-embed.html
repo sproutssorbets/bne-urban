@@ -44,13 +44,14 @@
   .pi-map-search-widget #filters-toggle-all-arrow{font-size:13px;color:var(--muted);transition:transform 0.2s}
   .pi-map-search-widget #filters-toggle-all.is-open #filters-toggle-all-arrow{transform:rotate(180deg)}
 
-  /* PhotoDeck-only: the shared CSS sizes the map against a typical full
-     page (100vh - 380px for the search bar, nav, etc. above it). Inside
-     this fixed 850px iframe that leaves the map too short relative to
-     the space actually available, now that the filter block collapses
-     to one line by default instead of the twelve-row list. Subtracting
-     less here lets the map claim most of the iframe's height instead. */
-  .pi-map-search-widget #map-area{height:calc(100vh - 160px)}
+  /* PhotoDeck-only: wcześniej liczone jako 100vh - 160px, czyli zależnie
+     od wysokości iframe'a. Działało dobrze przy stałym, niskim iframe
+     (np. 850-950px), ale gdy iframe trzeba było powiększyć ręcznie, żeby
+     zmieściły się rozwinięte filtry, mapa rosła razem z nim bez ograniczeń.
+     min(60vh, 640px) daje mapie stały, rozsądny pułap wysokości niezależny
+     od tego, jak wysoki jest cały iframe, a wciąż kurczy się na wąskich/
+     niskich ekranach zamiast sztywno trzymać 640px zawsze. */
+  .pi-map-search-widget #map-area{height:min(60vh, 640px)}
   /* PhotoDeck-only: the shared CSS sets overscroll-behavior-y:none on
      html/body to stop rubber-band bounce revealing content under the
      fixed mobile map on Webflow. Inside this iframe, that same rule has
@@ -184,7 +185,7 @@
     </div>
     <div class="acc" id="acc-viewtype">
       <div class="acc-header" onclick="toggleAcc('acc-viewtype')">
-        <span class="acc-title">Type of shot</span><span class="acc-icon">↓</span>
+        <span class="acc-title">View Type</span><span class="acc-icon">↓</span>
       </div>
       <div class="acc-body">
         <ul class="term-list" id="list-viewtype"></ul>
@@ -192,7 +193,7 @@
     </div>
     <div class="acc" id="acc-buildingtype">
       <div class="acc-header" onclick="toggleAcc('acc-buildingtype')">
-        <span class="acc-title">Type of building</span><span class="acc-icon">↓</span>
+        <span class="acc-title">Building Type</span><span class="acc-icon">↓</span>
       </div>
       <div class="acc-body">
         <ul class="term-list" id="list-buildingtype"></ul>
@@ -200,7 +201,7 @@
     </div>
     <div class="acc" id="acc-publicrealm">
       <div class="acc-header" onclick="toggleAcc('acc-publicrealm')">
-        <span class="acc-title">Street features</span><span class="acc-icon">↓</span>
+        <span class="acc-title">Public Realm Elements</span><span class="acc-icon">↓</span>
       </div>
       <div class="acc-body">
         <ul class="term-list" id="list-publicrealm"></ul>
@@ -208,7 +209,7 @@
     </div>
     <div class="acc" id="acc-arch">
       <div class="acc-header" onclick="toggleAcc('acc-arch')">
-        <span class="acc-title">Architectural style</span><span class="acc-icon">↓</span>
+        <span class="acc-title">Architectural Form</span><span class="acc-icon">↓</span>
       </div>
       <div class="acc-body">
         <ul class="term-list" id="list-arch"></ul>
@@ -216,7 +217,7 @@
     </div>
     <div class="acc" id="acc-context">
       <div class="acc-header" onclick="toggleAcc('acc-context')">
-        <span class="acc-title">Site and surroundings</span><span class="acc-icon">↓</span>
+        <span class="acc-title">Urban Transformation Context</span><span class="acc-icon">↓</span>
       </div>
       <div class="acc-body">
         <ul class="term-list" id="list-context"></ul>
@@ -224,7 +225,7 @@
     </div>
     <div class="acc" id="acc-use">
       <div class="acc-header" onclick="toggleAcc('acc-use')">
-        <span class="acc-title">What it's used for</span><span class="acc-icon">↓</span>
+        <span class="acc-title">Use / Program</span><span class="acc-icon">↓</span>
       </div>
       <div class="acc-body">
         <ul class="term-list" id="list-use"></ul>
@@ -232,7 +233,7 @@
     </div>
     <div class="acc" id="acc-light">
       <div class="acc-header" onclick="toggleAcc('acc-light')">
-        <span class="acc-title">Time of day</span><span class="acc-icon">↓</span>
+        <span class="acc-title">Light / Conditions</span><span class="acc-icon">↓</span>
       </div>
       <div class="acc-body">
         <ul class="term-list" id="list-light"></ul>
@@ -240,7 +241,7 @@
     </div>
     <div class="acc" id="acc-comp">
       <div class="acc-header" onclick="toggleAcc('acc-comp')">
-        <span class="acc-title">Camera angle</span><span class="acc-icon">↓</span>
+        <span class="acc-title">Composition</span><span class="acc-icon">↓</span>
       </div>
       <div class="acc-body">
         <ul class="term-list" id="list-comp"></ul>
@@ -248,7 +249,7 @@
     </div>
     <div class="acc" id="acc-status">
       <div class="acc-header" onclick="toggleAcc('acc-status')">
-        <span class="acc-title">Construction status</span><span class="acc-icon">↓</span>
+        <span class="acc-title">Physical Status</span><span class="acc-icon">↓</span>
       </div>
       <div class="acc-body">
         <ul class="term-list" id="list-status"></ul>
@@ -256,7 +257,7 @@
     </div>
     <div class="acc" id="acc-olympic">
       <div class="acc-header" onclick="toggleAcc('acc-olympic')">
-        <span class="acc-title">Olympic-related</span><span class="acc-icon">↓</span>
+        <span class="acc-title">Brisbane 2032</span><span class="acc-icon">↓</span>
       </div>
       <div class="acc-body">
         <ul class="term-list" id="list-olympic"></ul>
