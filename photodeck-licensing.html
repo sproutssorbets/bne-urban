@@ -8,6 +8,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
+.pi-acc{
+  scroll-margin-top: 100px;
+}
+
 html{scroll-behavior:smooth;}
 
 html,body{margin:0;padding:0;background:#FFFFFF;}
@@ -103,6 +107,7 @@ html,body{margin:0;padding:0;background:#FFFFFF;}
 }
 .pi-acc{
   border-top:1px solid #DADADA;
+  scroll-margin-top:100px;
 }
 .pi-acc:last-of-type{
   border-bottom:1px solid #111111;
@@ -507,11 +512,15 @@ document.querySelectorAll('.pi-finder-row').forEach(function(row){
     var target = document.getElementById(id);
     if(target){
       target.open = true;
-      target.scrollIntoView({behavior:'smooth', block:'start'});
-      history.replaceState(null, '', '#' + id);
+requestAnimationFrame(function(){
+  requestAnimationFrame(function(){
+    target.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+});
+history.replaceState(null, '', '#' + id);
     }
   });
 });
 </script>
 </body>
-</html>
+</html>  
