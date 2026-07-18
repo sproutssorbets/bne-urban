@@ -634,7 +634,7 @@ const locations = [];
 
 async function loadLocations(){
   try {
-    const res = await fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/locations.csv?t=' + Date.now());
+    const res = await fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/locations.csv');
     const text = await res.text();
     const lines = text.trim().split('\n');
     const headers = lines[0].split(',');
