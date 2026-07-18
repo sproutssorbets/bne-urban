@@ -985,7 +985,7 @@ function renderDataLayers(map){
       const html = `<div class="pi-popup-body">
         <div class="pi-popup-street">${p.address||p.street}</div>
         <div class="pi-popup-suburb">${p.suburb}${p.count?' · '+p.count+' photo'+(p.count>1?'s':''):''}</div>
-        <a class="pi-popup-add" href="${p.archiveUrl}" target="_top">View photos</a>
+        <a class="pi-popup-add" href="${p.archiveUrl}" target="_blank">View photos</a>
         <button type="button" class="pi-popup-refine" onclick="addLocationToSearch('${(p.address||p.street||'').replace(/'/g,"\\'")}')">Add to search &amp; filter further</button>
       </div>`;
       window._activePopup = new mapboxgl.Popup({closeButton:true,maxWidth:'240px'})

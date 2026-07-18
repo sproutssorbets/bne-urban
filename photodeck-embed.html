@@ -279,7 +279,7 @@
   <div id="refine-top">
     <div id="active-terms"></div>
     <div id="refine-row">
-      <form id="searchForm" action="https://photoindex.photodeck.com/" method="get" target="_top">
+      <form id="searchForm" action="https://photoindex.photodeck.com/" method="get" target="_blank">
         <input type="hidden" id="vocabState">
         <input type="hidden" id="searchSubmitValue" name="search">
         <div class="search-bar" id="refineBarWrap">
@@ -379,7 +379,7 @@
     var html = '<div class="pi-popup-body">'
       + '<div class="pi-popup-street">' + (loc.address || loc.street) + '</div>'
       + '<div class="pi-popup-suburb">' + loc.suburb + (loc.count ? ' · ' + loc.count + ' photo' + (loc.count > 1 ? 's' : '') : '') + '</div>'
-      + '<a class="pi-popup-add" href="' + loc.archiveUrl + '" target="_top">View photos</a>'
+      + '<a class="pi-popup-add" href="' + loc.archiveUrl + '" target="_blank">View photos</a>'
       + '</div>';
     window._activePopup = new mapboxgl.Popup({closeButton:true, maxWidth:'240px'})
       .setLngLat(loc.coords).setHTML(html).addTo(map)
