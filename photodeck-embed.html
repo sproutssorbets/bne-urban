@@ -64,6 +64,15 @@
      containers. */
   html, body{overscroll-behavior-y:auto}
 
+  /* PhotoDeck-only: shared CSS ustawia .term-list na columns:220px 5,
+     czyli układ wypełnia najpierw szerokość (do 5 kolumn), a dopiero
+     potem wysokość. Przy 55 terminach w jednej sekcji (Public Realm
+     Elements) panel robi się bardzo szeroki zamiast po prostu wyższy.
+     Zawężenie do 2 kolumn odwraca priorytet: lista rośnie w dół, nie
+     w bok, a strona sama przewija się niżej zamiast wymuszać szerszy
+     kontener. */
+  .pi-map-search-widget .term-list{columns:220px 2}
+
   /* PhotoDeck-only: "recently added" panel, styled to match #legend exactly
      (same bg/border/padding language) but placed top-right instead of
      bottom-left, so the two floating panels don't collide. Purely additive
