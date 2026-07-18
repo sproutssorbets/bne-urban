@@ -415,5 +415,16 @@
     }
   }, 200);
 </script>
+     <script>
+function pi__sendHeight(){
+  var h = document.getElementById('pi-map-search-widget').scrollHeight;
+  window.parent.postMessage({type:'pi-embed-height', height:h}, '*');
+}
+window.addEventListener('load', pi__sendHeight);
+window.addEventListener('resize', pi__sendHeight);
+if (window.ResizeObserver) {
+  new ResizeObserver(pi__sendHeight).observe(document.getElementById('pi-map-search-widget'));
+}
+</script>
 </body>
 </html>
