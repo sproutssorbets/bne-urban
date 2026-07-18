@@ -14,7 +14,8 @@ const ACTIVE = {
 
 const vocab = {
   'list-year': [
-    {key:'2026',active:true}
+    {key:'2026',active:true},{key:'2027',active:false},{key:'2028',active:false},{key:'2029',active:false},
+    {key:'2030',active:false},{key:'2031',active:false},{key:'2032',active:false},{key:'2033',active:false}
   ],
   'list-viewtype': [
     {key:'building-exterior',active:false},{key:'building-facade',active:false},{key:'building-interior',active:false},
@@ -40,42 +41,63 @@ const vocab = {
     {key:'street-light',active:true},{key:'traffic-light',active:true},{key:'signage',active:true},
     {key:'wayfinding',active:false},{key:'bollard',active:false},{key:'fence',active:true},
     {key:'site-hoarding',active:false},{key:'hoarding-art',active:false},{key:'temporary-fencing',active:false},
-    {key:'scaffolding',active:false},{key:'crane',active:false},{key:'wall',active:true},{key:'gate',active:false},
-    {key:'awning',active:false},{key:'veranda',active:false},{key:'balcony',active:false},{key:'arcade',active:false},
-    {key:'canopy',active:false},{key:'stairs',active:false},{key:'ramp',active:false},{key:'handrail',active:false},
-    {key:'door',active:false},{key:'window',active:false},{key:'roof',active:false},{key:'entry',active:false},
-    {key:'tree',active:true},{key:'planting',active:false},{key:'lawn',active:false},{key:'garden-bed',active:false},
+    {key:'scaffolding',active:false},{key:'crane',active:false},
+    {key:'wall',active:true},{key:'gate',active:false},{key:'awning',active:false},{key:'veranda',active:false},
+    {key:'balcony',active:false},{key:'arcade',active:false},{key:'canopy',active:false},
+    {key:'stairs',active:false},{key:'ramp',active:false},{key:'handrail',active:false},{key:'door',active:false},
+    {key:'window',active:false},{key:'roof',active:false},{key:'entry',active:false},{key:'tree',active:true},
+    {key:'planting',active:false},{key:'lawn',active:false},{key:'garden-bed',active:false},
     {key:'public-art',active:false},{key:'mural',active:false},{key:'graffiti',active:false},{key:'monument',active:false},
     {key:'fountain',active:false},{key:'pool',active:false},{key:'bus-stop',active:false},
-    {key:'rail-infrastructure',active:true},{key:'outdoor-dining',active:false},{key:'street-trading',active:false},
-    {key:'pedestrian-zone',active:false},{key:'shared-zone',active:false},{key:'shade-structure',active:false},
-    {key:'bench',active:false},{key:'seat',active:false},{key:'table',active:false},
+    {key:'rail-infrastructure',active:true},{key:'outdoor-dining',active:false},
+    {key:'street-trading',active:false},{key:'pedestrian-zone',active:false},{key:'shared-zone',active:false},
+    {key:'shade-structure',active:false},{key:'bench',active:false},{key:'seat',active:false},{key:'table',active:false},
     {key:'playground',active:false},{key:'sports-court',active:false},{key:'amenity-deck',active:false}
   ],
   'list-arch': [
     {key:'high-rise',active:true},{key:'mid-rise',active:false},{key:'low-rise',active:false},
-    {key:'tower',active:true},{key:'podium',active:false},{key:'corner-building',active:false},
-    {key:'corner-tower',active:false},{key:'curved-facade',active:false},{key:'glass-facade',active:true},
-    {key:'concrete-facade',active:false},{key:'brick-facade',active:false},{key:'face-brick-facade',active:false},
-    {key:'painted-brick-facade',active:false},{key:'metal-facade',active:false},{key:'stone-facade',active:false},
-    {key:'screen-facade',active:false},{key:'grid-facade',active:false},{key:'timber-facade',active:false},
-    {key:'corrugated-iron-facade',active:false},{key:'rendered-facade',active:false},
-    {key:'modern-architecture',active:false},{key:'contemporary-architecture',active:false},
-    {key:'heritage-architecture',active:true},{key:'postwar-architecture',active:false},
-    {key:'industrial-architecture',active:false},{key:'adaptive-reuse',active:false}
+    {key:'tower',active:true},{key:'podium',active:false},{key:'corner-building',active:false},{key:'corner-tower',active:false},
+    {key:'curved-facade',active:false},{key:'glass-facade',active:true},{key:'concrete-facade',active:false},
+    {key:'brick-facade',active:false},{key:'face-brick-facade',active:false},{key:'painted-brick-facade',active:false},
+    {key:'metal-facade',active:false},{key:'stone-facade',active:false},{key:'screen-facade',active:false},
+    {key:'grid-facade',active:false},{key:'timber-facade',active:false},{key:'corrugated-iron-facade',active:false},
+    {key:'rendered-facade',active:false},{key:'modern-architecture',active:false},{key:'contemporary-architecture',active:false},
+    {key:'heritage-architecture',active:true},{key:'postwar-architecture',active:false},{key:'industrial-architecture',active:false},
+    {key:'adaptive-reuse',active:false}
   ],
   'list-context': [
     {key:'urban-renewal',active:false},{key:'urban-development',active:false},{key:'urban-intensification',active:false},
-    {key:'urban-consolidation',active:false},{key:'high-density',active:false},{key:'waterfront',active:false},
-    {key:'riverfront',active:false},{key:'transport-corridor',active:false},{key:'commercial-strip',active:false},
-    {key:'night-economy',active:false},{key:'street-activation',active:false},{key:'flood-resilience',active:false},
-    {key:'construction-impact',active:false},{key:'infrastructure',active:true},{key:'public-realm',active:false}
+    {key:'urban-consolidation',active:false},{key:'high-density',active:false},
+    {key:'waterfront',active:false},{key:'riverfront',active:false},{key:'transport-corridor',active:false},
+    {key:'commercial-strip',active:false},{key:'night-economy',active:false},{key:'street-activation',active:false},
+    {key:'flood-resilience',active:false},{key:'construction-impact',active:false},{key:'infrastructure',active:true},
+    {key:'public-realm',active:false}
+  ],
+  'list-use': [
+    {key:'retail',active:false},{key:'shopping-centre',active:false},{key:'market',active:false},{key:'supermarket',active:false},
+    {key:'showroom',active:false},{key:'cafe',active:false},{key:'restaurant',active:false},{key:'bar',active:false},
+    {key:'pub',active:false},{key:'hotel',active:false},{key:'hospitality',active:false},{key:'nightclub',active:false},
+    {key:'food-hall',active:false},{key:'cinema',active:false},{key:'theatre',active:false},{key:'gallery',active:false},
+    {key:'museum',active:false},{key:'library',active:false},{key:'performance-venue',active:false},{key:'concert-hall',active:false},
+    {key:'exhibition-space',active:false},{key:'education',active:false},{key:'university',active:false},{key:'school',active:false},
+    {key:'health',active:false},{key:'hospital',active:false},{key:'clinic',active:false},{key:'government',active:false},
+    {key:'courthouse',active:false},{key:'place-of-worship',active:false},{key:'community-centre',active:false},{key:'community-use',active:false},
+    {key:'stadium',active:false},{key:'arena',active:false},{key:'sports-facility',active:false},{key:'aquatic-centre',active:false},
+    {key:'recreation',active:false},{key:'transport',active:false},{key:'train-station',active:false},{key:'bus-station',active:false},
+    {key:'ferry-terminal',active:false},{key:'parking',active:false},{key:'residential',active:false},{key:'office',active:false},
+    {key:'commercial',active:false},{key:'mixed-use',active:false},{key:'public-use',active:false}
+  ],
+  'list-light': [
+    {key:'morning',active:false},{key:'midday',active:false},{key:'afternoon',active:false},{key:'evening',active:false},
+    {key:'night',active:false},{key:'golden-hour',active:false},{key:'blue-hour',active:false},{key:'sunset-light',active:false},
+    {key:'city-lights',active:false},{key:'daylight',active:false},{key:'overcast',active:false},{key:'clear-sky',active:false},
+    {key:'wet-weather',active:false},{key:'after-rain',active:false},{key:'neon-signage',active:false},{key:'artificial-light',active:false},
+    {key:'reflection',active:false},{key:'shadow',active:false}
   ],
   'list-comp': [
-    {key:'wide-view',active:true},{key:'close-view',active:false},{key:'detail-view',active:false},
-    {key:'street-view',active:false},{key:'elevated-view',active:false},{key:'upward-perspective',active:false},
-    {key:'frontal-view',active:false},{key:'oblique-view',active:false},{key:'architectural-elevation',active:false},
-    {key:'context-view',active:false}
+    {key:'wide-view',active:true},{key:'close-view',active:false},{key:'detail-view',active:false},{key:'street-view',active:false},
+    {key:'elevated-view',active:false},{key:'upward-perspective',active:false},{key:'frontal-view',active:false},
+    {key:'oblique-view',active:false},{key:'architectural-elevation',active:false},{key:'context-view',active:false}
   ],
   'list-status': [
     {key:'existing-condition',active:false},{key:'pre-construction',active:false},{key:'threatened-building',active:false},
@@ -83,31 +105,6 @@ const vocab = {
     {key:'post-demolition',active:false},{key:'completed-development',active:false},{key:'vacant-site',active:true},
     {key:'development-site',active:true},{key:'before-change',active:false},{key:'after-change',active:false},
     {key:'ongoing-change',active:false}
-  ],
-  'list-use': [
-    {key:'retail',active:false},{key:'shopping-centre',active:false},{key:'market',active:false},
-    {key:'supermarket',active:false},{key:'showroom',active:false},{key:'cafe',active:false},
-    {key:'restaurant',active:false},{key:'bar',active:false},{key:'pub',active:false},{key:'hotel',active:false},
-    {key:'hospitality',active:false},{key:'nightclub',active:false},{key:'food-hall',active:false},
-    {key:'cinema',active:false},{key:'theatre',active:false},{key:'gallery',active:false},{key:'museum',active:false},
-    {key:'library',active:false},{key:'performance-venue',active:false},{key:'concert-hall',active:false},
-    {key:'exhibition-space',active:false},{key:'education',active:false},{key:'university',active:false},
-    {key:'school',active:false},{key:'health',active:false},{key:'hospital',active:false},{key:'clinic',active:false},
-    {key:'government',active:false},{key:'courthouse',active:false},{key:'place-of-worship',active:false},
-    {key:'community-centre',active:false},{key:'community-use',active:false},{key:'stadium',active:false},
-    {key:'arena',active:false},{key:'sports-facility',active:false},{key:'aquatic-centre',active:false},
-    {key:'recreation',active:false},{key:'transport',active:false},{key:'train-station',active:false},
-    {key:'bus-station',active:false},{key:'ferry-terminal',active:false},{key:'parking',active:false},
-    {key:'residential',active:false},{key:'office',active:false},{key:'commercial',active:false},
-    {key:'mixed-use',active:false},{key:'public-use',active:false}
-  ],
-  'list-light': [
-    {key:'morning',active:false},{key:'midday',active:false},{key:'afternoon',active:false},
-    {key:'evening',active:false},{key:'night',active:false},{key:'golden-hour',active:false},
-    {key:'blue-hour',active:false},{key:'sunset-light',active:false},{key:'city-lights',active:false},
-    {key:'daylight',active:false},{key:'overcast',active:false},{key:'clear-sky',active:false},
-    {key:'wet-weather',active:false},{key:'after-rain',active:false},{key:'neon-signage',active:false},
-    {key:'artificial-light',active:false},{key:'reflection',active:false},{key:'shadow',active:false}
   ],
   'list-olympic': [
     {key:'olympic-venue',active:false},{key:'olympic-precinct',active:false},{key:'olympic-infrastructure',active:false},
@@ -470,10 +467,12 @@ function onSmartInput(){
 ───────────────────────────────────────── */
 let activeSuburb = null;
 const suburbLabels = {
-  'brisbane-city':'Brisbane City','bowen-hills':'Bowen Hills','fortitude-valley':'Fortitude Valley',
-  'herston':'Herston','kangaroo-point':'Kangaroo Point','milton':'Milton','new-farm':'New Farm',
-  'newstead':'Newstead','paddington':'Paddington','red-hill':'Red Hill','south-brisbane':'South Brisbane',
-  'spring-hill':'Spring Hill','teneriffe':'Teneriffe','west-end':'West End','woolloongabba':'Woolloongabba'
+  'albion':'Albion','bowen-hills':'Bowen Hills','brisbane-city':'Brisbane City','fortitude-valley':'Fortitude Valley',
+  'herston':'Herston','kangaroo-point':'Kangaroo Point','kelvin-grove':'Kelvin Grove',
+  'milton':'Milton','new-farm':'New Farm','newstead':'Newstead',
+  'paddington':'Paddington','red-hill':'Red Hill',
+  'south-brisbane':'South Brisbane','spring-hill':'Spring Hill','teneriffe':'Teneriffe',
+  'west-end':'West End','woolloongabba':'Woolloongabba'
 };
 
 function renderSuburbList(terms){
@@ -634,7 +633,7 @@ const locations = [];
 
 async function loadLocations(){
   try {
-    const res = await fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/locations.csv');
+    const res = await fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/locations.csv?t=' + Date.now());
     const text = await res.text();
     const lines = text.trim().split('\n');
     const headers = lines[0].split(',');
@@ -855,9 +854,14 @@ function renderDataLayers(map){
        Previously used saturated, default-looking colours (#DB4436 / #009D57 /
        #4186F0) that sat outside the site's entire palette — the only place
        on the whole site with live, saturated hue. Muted here into the same
-       ink-toned family as the rest of the system. */
+       ink-toned family as the rest of the system, and given each status its
+       own line-dasharray so the three remain distinguishable even in
+       grayscale or for colour-blind visitors, not by hue alone. */
     const statusColors = {
       proposed:'#A8453B', approved:'#4A7856', under_construction:'#3D6491'
+    };
+    const statusDash = {
+      proposed: [1], approved: [3, 2], under_construction: [1, 2]
     };
     const DEV_SHOWN = ['proposed','approved','under_construction'];
 
@@ -868,7 +872,8 @@ function renderDataLayers(map){
         'fill-color':statusColors[status],'fill-opacity':0.22
       }}, 'doc-clusters');
       map.addLayer({id:'dev-'+status+'-line',type:'line',source:'dev-'+status,paint:{
-        'line-color':statusColors[status],'line-opacity':0.75,'line-width':1.3
+        'line-color':statusColors[status],'line-opacity':0.75,'line-width':1.3,
+        'line-dasharray':statusDash[status]
       }}, 'doc-clusters');
     });
 
