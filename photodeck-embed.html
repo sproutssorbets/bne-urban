@@ -6,13 +6,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PhotoIndex — Search the archive</title>
-
 <!-- This is the top-level document loaded inside PhotoDeck's <iframe>, not
      an Embed injected into an existing page (that's webflow-embed.html).
      Everything below reuses the exact same CSS/JS files as the Webflow
      version — same hashes, same behaviour, same controlled vocabulary.
      Only this wrapper (head/body, page-level margin) is new. -->
-
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://api.mapbox.com">
@@ -29,7 +27,6 @@
      Webflow included, since pi-map-search-widget.css itself is untouched. */
   .pi-map-search-widget { --bg: #FFFFFF; }
   #pi-map-search-widget{visibility:hidden}
-
   /* PhotoDeck-only: replaces the twelve individually-clickable category
      headers with one button. #filters-wide stays hidden until toggled;
      opening it shows every category and every term list at once — no
@@ -43,7 +40,6 @@
   .pi-map-search-widget #filters-toggle-all-spacer{height:52px}
   .pi-map-search-widget #filters-toggle-all-arrow{font-size:13px;color:var(--muted);transition:transform 0.2s}
   .pi-map-search-widget #filters-toggle-all.is-open #filters-toggle-all-arrow{transform:rotate(180deg)}
-
   /* PhotoDeck-only: the shared CSS sizes the map against a typical full
      page (100vh - 380px for the search bar, nav, etc. above it). Inside
      this fixed 850px iframe that leaves the map too short relative to
@@ -62,7 +58,6 @@
      boundary, exactly the native browser behaviour for nested scroll
      containers. */
   html, body{overscroll-behavior-y:auto}
-
   /* PhotoDeck-only: "recently added" panel, styled to match #legend exactly
      (same bg/border/padding language) but placed top-right instead of
      bottom-left, so the two floating panels don't collide. Purely additive
@@ -98,12 +93,9 @@
 </script>
 </head>
 <body>
-
 <div id="page-loading" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#FFFFFF;font-family:sans-serif;font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#6B6B6B;z-index:1">Loading…</div>
-
 <div class="pi-map-search-widget" id="pi-map-search-widget">
 <div id="shell">
-
   <div id="panel">
     <div id="search-top">
       <div id="search-row">
@@ -121,7 +113,6 @@
       </div>
     </div>
   </div>
-
   <div id="map-area">
     <div id="map"></div>
     <div id="map-loading"><span>Loading map…</span></div>
@@ -155,11 +146,8 @@
     </div>
     <div id="toast"></div>
   </div>
-
 </div>
-
 <div id="refine-section">
-
   <button type="button" id="filters-toggle-all">
     <span id="filters-toggle-all-text">Show all filters</span><span id="filters-toggle-all-arrow">↓</span>
   </button>
@@ -263,9 +251,7 @@
       </div>
     </div>
   </div>
-
   <div id="refine-spacer"></div>
-
   <div id="refine-top">
     <div id="active-terms"></div>
     <div id="refine-row">
@@ -283,18 +269,10 @@
     <div class="refine-hint">Fewer filters = more results. Start broad, narrow down. <a href="#" id="clearAllLink" onclick="clearAll();return false;">Clear all filters</a></div>
   </div>
 </div>
-
 <div id="filters-toggle-all-spacer"></div>
-
 </div>
-<script>
-  window.addEventListener('load', function () {
-    var s = document.createElement('script');
-    s.src = 'https://cdn.jsdelivr.net/gh/sproutssorbets/bne-urban@54a606b86a7e6388a27bd068eba26be2d70a009b/streets-by-suburb.js';
-    document.body.appendChild(s);
-  });
-</script>
 <script src="https://cdn.jsdelivr.net/npm/mapbox-gl@2.15.0/dist/mapbox-gl.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/sproutssorbets/bne-urban@54a606b86a7e6388a27bd068eba26be2d70a009b/streets-by-suburb.js" defer></script>
 <script src="https://cdn.jsdelivr.net/gh/sproutssorbets/bne-urban@cc4b82248b2f1d1a73ec59ab13f829da15c804f3/pi-map-search-logic.js" defer></script>
 <script>
   /* PhotoDeck-only behaviour, kept separate from the shared logic file on
@@ -309,13 +287,11 @@
     var label = document.getElementById('filters-toggle-all-text');
     if(!toggleBtn || !wide) return;
     var isCurrentlyOpen = wide.classList.contains('all-open');
-
     /* Deliberately NOT using scrollIntoView() here — per spec, that method
        can walk up through nested browsing contexts and scroll the PARENT
        PhotoDeck page too, not just this iframe's own document.
        window.scrollTo() only ever touches this iframe's own window, so
        the outer page stays exactly where it was. */
-
     if(!isCurrentlyOpen){
       /* Opening: reveal immediately, then scroll the (sticky) button to
          the top so the newly-unfolded filters appear below it, instead
@@ -347,8 +323,7 @@
     var toggleBtn = document.getElementById('filters-toggle-all');
     if(toggleBtn) toggleBtn.addEventListener('click', toggleAllFilters);
   });
-
-  /* PhotoDeck-only: "Recently added" panel. Reads the shared `locations`
+  /* PhotoDeck-only: "Recently added" panel. Reads the shared locations
      array and mapReadyFlag/locationsReadyFlag/mapForDataLayers globals from
      pi-map-search-logic.js rather than duplicating the fetch or the map
      init — this only runs once both are already true, polling briefly
@@ -364,7 +339,6 @@
     var day = m[1] ? parseInt(m[1]) : 1;
     return new Date(parseInt(m[3]), mi, day);
   }
-
   function focusRecentLocation(loc){
     var map = mapForDataLayers;
     if(!map) return;
@@ -380,7 +354,6 @@
       .setLngLat(loc.coords).setHTML(html).addTo(map)
       .on('close', function(){ window._activePopup = null; });
   }
-
   function renderRecentLocations(){
     var listEl = document.getElementById('recent-locations-list');
     var panelEl = document.getElementById('recent-locations');
@@ -407,7 +380,6 @@
       listEl.appendChild(row);
     });
   }
-
   var recentLocationsTimer = setInterval(function(){
     if(mapReadyFlag && locationsReadyFlag){
       clearInterval(recentLocationsTimer);
