@@ -287,9 +287,14 @@
 <div id="filters-toggle-all-spacer"></div>
 
 </div>
-
+<script>
+  window.addEventListener('load', function () {
+    var s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/gh/sproutssorbets/bne-urban@54a606b86a7e6388a27bd068eba26be2d70a009b/streets-by-suburb.js';
+    document.body.appendChild(s);
+  });
+</script>
 <script src="https://cdn.jsdelivr.net/npm/mapbox-gl@2.15.0/dist/mapbox-gl.js" defer></script>
-<script src="https://cdn.jsdelivr.net/gh/sproutssorbets/bne-urban@54a606b86a7e6388a27bd068eba26be2d70a009b/streets-by-suburb.js" defer></script>
 <script src="https://cdn.jsdelivr.net/gh/sproutssorbets/bne-urban@cc4b82248b2f1d1a73ec59ab13f829da15c804f3/pi-map-search-logic.js" defer></script>
 <script>
   /* PhotoDeck-only behaviour, kept separate from the shared logic file on
