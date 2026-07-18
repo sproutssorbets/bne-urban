@@ -1,0 +1,285 @@
+PHOTOINDEX CONTROLLED VOCABULARY v4
+
+1. REGION / CITY
+australia
+queensland
+brisbane
+brisbane inner city
+brisbane river
+
+2. SUBURB
+brisbane city
+bowen hills
+fortitude valley
+herston
+kangaroo point
+milton
+new farm
+newstead
+paddington
+red hill
+south brisbane
+spring hill
+teneriffe
+west end
+woolloongabba
+
+3. YEAR
+2026
+2027
+2028
+2029
+2030
+2031
+2032
+2033
+
+4. VIEW TYPE
+building exterior
+building facade
+building interior
+streetscape
+street level
+intersection
+laneway
+shopfront
+bridge
+river
+park
+public space
+aerial
+cityscape
+skyline
+urban detail
+
+5. BUILDING TYPE
+residential building
+residential tower
+apartment building
+mixed use building
+commercial building
+office building
+retail building
+hospitality building
+heritage building
+public building
+civic building
+industrial building
+warehouse
+parking structure
+queenslander
+highset house
+lowset house
+workers cottage
+post war house
+terrace house
+duplex
+social housing
+student housing
+
+6. ARCHITECTURAL FORM
+high rise
+mid rise
+low rise
+tower
+podium
+corner building
+corner tower
+curved facade
+glass facade
+concrete facade
+brick facade
+face brick facade
+painted brick facade
+metal facade
+stone facade
+screen facade
+grid facade
+timber facade
+corrugated iron facade
+rendered facade
+modern architecture
+contemporary architecture
+heritage architecture
+postwar architecture
+industrial architecture
+adaptive reuse
+
+7. PUBLIC REALM ELEMENTS
+footpath
+pavement
+crossing
+bike lane
+bus lane
+kerb
+median
+street light
+traffic light
+signage
+wayfinding
+bollard
+fence
+site hoarding
+hoarding art
+temporary fencing
+scaffolding
+crane
+wall
+gate
+awning
+veranda
+balcony
+arcade
+canopy
+stairs
+ramp
+handrail
+door
+window
+roof
+entry
+tree
+planting
+lawn
+garden bed
+public art
+mural
+graffiti
+monument
+fountain
+pool
+bus stop
+rail infrastructure
+outdoor dining
+street trading
+pedestrian zone
+shared zone
+shade structure
+bench
+seat
+table
+playground
+sports court
+amenity deck
+
+8. USE / PROGRAM
+retail
+shopping centre
+market
+supermarket
+showroom
+cafe
+restaurant
+bar
+pub
+hotel
+hospitality
+nightclub
+food hall
+cinema
+theatre
+gallery
+museum
+library
+performance venue
+concert hall
+exhibition space
+education
+university
+school
+health
+hospital
+clinic
+government
+courthouse
+place of worship
+community centre
+community use
+stadium
+arena
+sports facility
+aquatic centre
+recreation
+transport
+train station
+bus station
+ferry terminal
+parking
+residential
+office
+commercial
+mixed use
+public use
+
+9. PHYSICAL STATUS
+existing condition
+pre construction
+threatened building
+scheduled demolition
+under construction
+demolition in progress
+post demolition
+completed development
+vacant site
+development site
+before change
+after change
+ongoing change
+
+10. URBAN TRANSFORMATION CONTEXT
+urban renewal
+urban development
+urban intensification
+urban consolidation
+high density
+waterfront
+riverfront
+transport corridor
+commercial strip
+night economy
+street activation
+flood resilience
+construction impact
+infrastructure
+public realm
+
+11. BRISBANE 2032
+olympic venue
+olympic precinct
+olympic infrastructure
+transport upgrade
+athlete village
+temporary structure
+legacy project
+
+12. LIGHT / CONDITIONS
+morning
+midday
+afternoon
+evening
+night
+golden hour
+blue hour
+sunset light
+city lights
+daylight
+overcast
+clear sky
+wet weather
+after rain
+neon signage
+artificial light
+reflection
+shadow
+
+13. COMPOSITION
+wide view
+close view
+detail view
+street view
+elevated view
+upward perspective
+frontal view
+oblique view
+architectural elevation
+context view
