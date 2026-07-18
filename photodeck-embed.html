@@ -51,7 +51,14 @@
      min(60vh, 640px) daje mapie stały, rozsądny pułap wysokości niezależny
      od tego, jak wysoki jest cały iframe, a wciąż kurczy się na wąskich/
      niskich ekranach zamiast sztywno trzymać 640px zawsze. */
-  .pi-map-search-widget #map-area{height:min(60vh, 640px)}
+  /* PhotoDeck-only: poprzednio min(60vh, 640px). vh liczy się względem
+     wysokości samego iframe'a, a iframe sam się teraz skaluje w locie
+     na podstawie zmierzonej wysokości treści (postMessage). To tworzyło
+     pętlę: zmiana wysokości iframe'a zmienia vh, co zmienia wysokość
+     mapy, co zmienia całkowitą wysokość treści, co znowu przeskalowuje
+     iframe. Sztywne 640px zrywa tę pętlę, mapa ma jedną, stałą wartość
+     niezależną od samego siebie. */
+  .pi-map-search-widget #map-area{height:640px}
   /* PhotoDeck-only: the shared CSS sets overscroll-behavior-y:none on
      html/body to stop rubber-band bounce revealing content under the
      fixed mobile map on Webflow. Inside this iframe, that same rule has
@@ -78,7 +85,7 @@
      bottom-left, so the two floating panels don't collide. Purely additive
      — doesn't touch #shell/#map-area layout, so the existing fixed/mobile
      positioning logic in the shared CSS is untouched. */
-  .pi-map-search-widget #recent-locations{position:absolute;top:16px;right:16px;width:220px;max-width:calc(100vw - 32px);background:var(--bg);border:1px solid var(--rule);padding:10px 12px;z-index:2}
+  .pi-map-search-widget #recent-locations{display:none}
   .pi-map-search-widget #recent-locations-title{font-family:Inter,sans-serif;font-size:9px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
   .pi-map-search-widget .recent-row{display:flex;flex-direction:column;gap:1px;padding:6px 0;border-bottom:1px solid var(--rule);cursor:pointer}
   .pi-map-search-widget .recent-row:last-child{border-bottom:none}

@@ -730,6 +730,7 @@ function initMap(){
   map.dragRotate.disable();
 
   map.addControl(new mapboxgl.NavigationControl({showCompass:false}),'bottom-right');
+  map.addControl(new mapboxgl.FullscreenControl(),'bottom-right');
 
   /* Previous attempt read e.defaultPrevented on an ancestor in the bubble
      phase, assuming the event would still reach us after Mapbox handled it.
