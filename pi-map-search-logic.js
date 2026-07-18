@@ -22,76 +22,84 @@ const vocab = {
     {key:'laneway',active:false},{key:'shopfront',active:false},{key:'bridge',active:false},
     {key:'river',active:false},{key:'park',active:false},{key:'public-space',active:false},
     {key:'aerial',active:false},{key:'cityscape',active:true},{key:'skyline',active:true},
-    {key:'urban-detail',active:false},{key:'construction-site',active:true},{key:'demolition-site',active:true}
+    {key:'urban-detail',active:false}
   ],
   'list-buildingtype': [
     {key:'residential-building',active:false},{key:'residential-tower',active:true},{key:'apartment-building',active:false},
     {key:'mixed-use-building',active:false},{key:'commercial-building',active:false},{key:'office-building',active:true},
     {key:'retail-building',active:false},{key:'hospitality-building',active:false},{key:'heritage-building',active:false},
     {key:'public-building',active:false},{key:'civic-building',active:false},{key:'industrial-building',active:false},
-    {key:'warehouse',active:false},{key:'parking-structure',active:false},{key:'development-site',active:true}
-  ],
-  'list-housing': [
+    {key:'warehouse',active:false},{key:'parking-structure',active:false},
     {key:'queenslander',active:false},{key:'highset-house',active:false},{key:'lowset-house',active:false},
-    {key:'workers-cottage',active:false},{key:'post-war-house',active:false},{key:'terrace',active:false},
+    {key:'workers-cottage',active:false},{key:'post-war-house',active:false},{key:'terrace-house',active:false},
     {key:'duplex',active:false},{key:'social-housing',active:false},{key:'student-housing',active:false}
   ],
   'list-publicrealm': [
     {key:'footpath',active:false},{key:'pavement',active:false},{key:'crossing',active:false},
-    {key:'bike-lane',active:true},{key:'kerb',active:false},{key:'median',active:true},
+    {key:'bike-lane',active:true},{key:'bus-lane',active:false},{key:'kerb',active:false},{key:'median',active:true},
     {key:'street-light',active:true},{key:'traffic-light',active:true},{key:'signage',active:true},
     {key:'wayfinding',active:false},{key:'bollard',active:false},{key:'fence',active:true},
-    {key:'wall',active:true},{key:'awning',active:false},{key:'veranda',active:false},
-    {key:'balcony',active:false},{key:'arcade',active:false},{key:'canopy',active:false},
-    {key:'stairs',active:false},{key:'ramp',active:false},{key:'tree',active:true},
-    {key:'planting',active:false},{key:'lawn',active:false},{key:'garden-bed',active:false},
-    {key:'public-art',active:false},{key:'mural',active:false},{key:'monument',active:false},
-    {key:'bus-stop',active:false},{key:'rail-infrastructure',active:true},{key:'outdoor-dining',active:false},
-    {key:'street-trading',active:false},{key:'pedestrian-zone',active:false},{key:'shared-zone',active:false},
-    {key:'shade-structure',active:false},{key:'gate',active:false},{key:'door',active:false},
-    {key:'window',active:false},{key:'roof',active:false},{key:'entry',active:false},
-    {key:'handrail',active:false},{key:'bench',active:false},{key:'seat',active:false},
-    {key:'table',active:false},{key:'fountain',active:false},{key:'pool',active:false},
+    {key:'site-hoarding',active:false},{key:'hoarding-art',active:false},{key:'temporary-fencing',active:false},
+    {key:'scaffolding',active:false},{key:'crane',active:false},{key:'wall',active:true},{key:'gate',active:false},
+    {key:'awning',active:false},{key:'veranda',active:false},{key:'balcony',active:false},{key:'arcade',active:false},
+    {key:'canopy',active:false},{key:'stairs',active:false},{key:'ramp',active:false},{key:'handrail',active:false},
+    {key:'door',active:false},{key:'window',active:false},{key:'roof',active:false},{key:'entry',active:false},
+    {key:'tree',active:true},{key:'planting',active:false},{key:'lawn',active:false},{key:'garden-bed',active:false},
+    {key:'public-art',active:false},{key:'mural',active:false},{key:'graffiti',active:false},{key:'monument',active:false},
+    {key:'fountain',active:false},{key:'pool',active:false},{key:'bus-stop',active:false},
+    {key:'rail-infrastructure',active:true},{key:'outdoor-dining',active:false},{key:'street-trading',active:false},
+    {key:'pedestrian-zone',active:false},{key:'shared-zone',active:false},{key:'shade-structure',active:false},
+    {key:'bench',active:false},{key:'seat',active:false},{key:'table',active:false},
     {key:'playground',active:false},{key:'sports-court',active:false},{key:'amenity-deck',active:false}
   ],
   'list-arch': [
     {key:'high-rise',active:true},{key:'mid-rise',active:false},{key:'low-rise',active:false},
     {key:'tower',active:true},{key:'podium',active:false},{key:'corner-building',active:false},
     {key:'corner-tower',active:false},{key:'curved-facade',active:false},{key:'glass-facade',active:true},
-    {key:'concrete-facade',active:false},{key:'brick-facade',active:false},{key:'face-brick',active:false},
-    {key:'painted-brick',active:false},{key:'metal-facade',active:false},{key:'stone-facade',active:false},
+    {key:'concrete-facade',active:false},{key:'brick-facade',active:false},{key:'face-brick-facade',active:false},
+    {key:'painted-brick-facade',active:false},{key:'metal-facade',active:false},{key:'stone-facade',active:false},
     {key:'screen-facade',active:false},{key:'grid-facade',active:false},{key:'timber-facade',active:false},
-    {key:'corrugated-iron',active:false},{key:'render',active:false},{key:'modern-architecture',active:false},
-    {key:'contemporary-architecture',active:false},{key:'heritage-architecture',active:true},
-    {key:'postwar-architecture',active:false},{key:'industrial-architecture',active:false},{key:'adaptive-reuse',active:false}
+    {key:'corrugated-iron-facade',active:false},{key:'rendered-facade',active:false},
+    {key:'modern-architecture',active:false},{key:'contemporary-architecture',active:false},
+    {key:'heritage-architecture',active:true},{key:'postwar-architecture',active:false},
+    {key:'industrial-architecture',active:false},{key:'adaptive-reuse',active:false}
   ],
   'list-context': [
-    {key:'heritage',active:false},{key:'demolition',active:false},{key:'scheduled-demolition',active:false},
-    {key:'threatened-building',active:false},{key:'pre-construction',active:false},{key:'under-construction',active:true},
-    {key:'construction-impact',active:false},{key:'site-hoarding',active:false},{key:'temporary-fencing',active:false},
-    {key:'post-demolition',active:false},{key:'completed-development',active:false},{key:'development-site',active:true},
-    {key:'vacant-site',active:true},{key:'urban-renewal',active:false},{key:'urban-intensification',active:false},
-    {key:'urban-consolidation',active:false},{key:'waterfront',active:false},{key:'riverfront',active:false},
-    {key:'transport-corridor',active:false},{key:'commercial-strip',active:false},{key:'night-economy',active:false},
-    {key:'street-activation',active:false},{key:'flood-resilience',active:false},{key:'infrastructure',active:true},
-    {key:'public-realm',active:false},{key:'hoarding-art',active:false}
+    {key:'urban-renewal',active:false},{key:'urban-development',active:false},{key:'urban-intensification',active:false},
+    {key:'urban-consolidation',active:false},{key:'high-density',active:false},{key:'waterfront',active:false},
+    {key:'riverfront',active:false},{key:'transport-corridor',active:false},{key:'commercial-strip',active:false},
+    {key:'night-economy',active:false},{key:'street-activation',active:false},{key:'flood-resilience',active:false},
+    {key:'construction-impact',active:false},{key:'infrastructure',active:true},{key:'public-realm',active:false}
+  ],
+  'list-comp': [
+    {key:'wide-view',active:true},{key:'close-view',active:false},{key:'detail-view',active:false},
+    {key:'street-view',active:false},{key:'elevated-view',active:false},{key:'upward-perspective',active:false},
+    {key:'frontal-view',active:false},{key:'oblique-view',active:false},{key:'architectural-elevation',active:false},
+    {key:'context-view',active:false}
+  ],
+  'list-status': [
+    {key:'existing-condition',active:false},{key:'pre-construction',active:false},{key:'threatened-building',active:false},
+    {key:'scheduled-demolition',active:false},{key:'under-construction',active:true},{key:'demolition-in-progress',active:false},
+    {key:'post-demolition',active:false},{key:'completed-development',active:false},{key:'vacant-site',active:true},
+    {key:'development-site',active:true},{key:'before-change',active:false},{key:'after-change',active:false},
+    {key:'ongoing-change',active:false}
   ],
   'list-use': [
     {key:'retail',active:false},{key:'shopping-centre',active:false},{key:'market',active:false},
     {key:'supermarket',active:false},{key:'showroom',active:false},{key:'cafe',active:false},
-    {key:'restaurant',active:false},{key:'bar',active:false},{key:'pub',active:false},
-    {key:'hotel',active:false},{key:'nightclub',active:false},{key:'food-hall',active:false},
-    {key:'cinema',active:false},{key:'theatre',active:false},{key:'gallery',active:false},
-    {key:'museum',active:false},{key:'library',active:false},{key:'performance-venue',active:false},
-    {key:'concert-hall',active:false},{key:'exhibition-space',active:false},{key:'education',active:false},
-    {key:'university',active:false},{key:'school',active:false},{key:'health',active:false},
-    {key:'hospital',active:false},{key:'clinic',active:false},{key:'government',active:false},
-    {key:'courthouse',active:false},{key:'place-of-worship',active:false},{key:'community-centre',active:false},
-    {key:'stadium',active:false},{key:'arena',active:false},{key:'sports-facility',active:false},
-    {key:'aquatic-centre',active:false},{key:'recreation',active:false},{key:'transport',active:false},
-    {key:'train-station',active:false},{key:'bus-station',active:false},{key:'ferry-terminal',active:false},
-    {key:'parking',active:false},{key:'residential',active:false},{key:'social-housing',active:false},
-    {key:'office',active:false},{key:'commercial',active:false},{key:'mixed-use',active:false},{key:'public-use',active:false}
+    {key:'restaurant',active:false},{key:'bar',active:false},{key:'pub',active:false},{key:'hotel',active:false},
+    {key:'hospitality',active:false},{key:'nightclub',active:false},{key:'food-hall',active:false},
+    {key:'cinema',active:false},{key:'theatre',active:false},{key:'gallery',active:false},{key:'museum',active:false},
+    {key:'library',active:false},{key:'performance-venue',active:false},{key:'concert-hall',active:false},
+    {key:'exhibition-space',active:false},{key:'education',active:false},{key:'university',active:false},
+    {key:'school',active:false},{key:'health',active:false},{key:'hospital',active:false},{key:'clinic',active:false},
+    {key:'government',active:false},{key:'courthouse',active:false},{key:'place-of-worship',active:false},
+    {key:'community-centre',active:false},{key:'community-use',active:false},{key:'stadium',active:false},
+    {key:'arena',active:false},{key:'sports-facility',active:false},{key:'aquatic-centre',active:false},
+    {key:'recreation',active:false},{key:'transport',active:false},{key:'train-station',active:false},
+    {key:'bus-station',active:false},{key:'ferry-terminal',active:false},{key:'parking',active:false},
+    {key:'residential',active:false},{key:'office',active:false},{key:'commercial',active:false},
+    {key:'mixed-use',active:false},{key:'public-use',active:false}
   ],
   'list-light': [
     {key:'morning',active:false},{key:'midday',active:false},{key:'afternoon',active:false},
@@ -101,20 +109,10 @@ const vocab = {
     {key:'wet-weather',active:false},{key:'after-rain',active:false},{key:'neon-signage',active:false},
     {key:'artificial-light',active:false},{key:'reflection',active:false},{key:'shadow',active:false}
   ],
-  'list-comp': [
-    {key:'wide-view',active:true},{key:'close-view',active:false},{key:'detail-view',active:false},
-    {key:'street-view',active:false},{key:'elevated-view',active:false},{key:'upward-perspective',active:false},
-    {key:'frontal-view',active:false},{key:'oblique-view',active:false},{key:'architectural-elevation',active:false},
-    {key:'context-view',active:false}
-  ],
-  'list-status': [
-    {key:'existing-condition',active:false},{key:'under-construction',active:true},{key:'post-demolition',active:false},
-    {key:'completed-development',active:false},{key:'vacant-site',active:true},
-    {key:'scheduled-demolition',active:false},{key:'threatened-building',active:false}
-  ],
   'list-olympic': [
-    {key:'olympic-venue',active:false},{key:'olympic-infrastructure',active:false},{key:'transport-upgrade',active:false},
-    {key:'athlete-village',active:false},{key:'temporary-structure',active:false},{key:'legacy-project',active:false}
+    {key:'olympic-venue',active:false},{key:'olympic-precinct',active:false},{key:'olympic-infrastructure',active:false},
+    {key:'transport-upgrade',active:false},{key:'athlete-village',active:false},{key:'temporary-structure',active:false},
+    {key:'legacy-project',active:false}
   ]
 };
 
@@ -472,12 +470,10 @@ function onSmartInput(){
 ───────────────────────────────────────── */
 let activeSuburb = null;
 const suburbLabels = {
-  'albion':'Albion','bowen-hills':'Bowen Hills','brisbane-city':'Brisbane City','fortitude-valley':'Fortitude Valley',
-  'kangaroo-point':'Kangaroo Point','kelvin-grove':'Kelvin Grove',
-  'milton':'Milton','new-farm':'New Farm','newstead':'Newstead',
-  'paddington':'Paddington','petrie-terrace':'Petrie Terrace','red-hill':'Red Hill',
-  'south-brisbane':'South Brisbane','spring-hill':'Spring Hill','teneriffe':'Teneriffe',
-  'west-end':'West End','woolloongabba':'Woolloongabba'
+  'brisbane-city':'Brisbane City','bowen-hills':'Bowen Hills','fortitude-valley':'Fortitude Valley',
+  'herston':'Herston','kangaroo-point':'Kangaroo Point','milton':'Milton','new-farm':'New Farm',
+  'newstead':'Newstead','paddington':'Paddington','red-hill':'Red Hill','south-brisbane':'South Brisbane',
+  'spring-hill':'Spring Hill','teneriffe':'Teneriffe','west-end':'West End','woolloongabba':'Woolloongabba'
 };
 
 function renderSuburbList(terms){
