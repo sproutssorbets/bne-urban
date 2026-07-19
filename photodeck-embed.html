@@ -427,12 +427,5 @@
       renderRecentLocations();
     }
   }, 200);
-</script>
-     function reportHeight(){
-  var h = document.documentElement.scrollHeight;
-  window.parent.postMessage({piMapWidgetHeight: h}, 'https://photoindex.photodeck.com');
-}
-new ResizeObserver(reportHeight).observe(document.body);
-window.addEventListener('load', reportHeight);
 </body>
 </html>
