@@ -88,6 +88,7 @@
   .pi-map-search-widget #recent-locations{display:none}
   .pi-map-search-widget #pi-fullscreen-btn{position:absolute;top:16px;right:16px;width:29px;height:29px;display:flex;align-items:center;justify-content:center;background:#FFFFFF;border:1px solid var(--rule);padding:0;cursor:pointer;z-index:2}
   .pi-map-search-widget #pi-fullscreen-btn:hover{border-color:var(--text)}
+  .pi-map-search-widget.pi-pseudo-fullscreen{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;overflow-y:auto;background:var(--bg)}
   .pi-map-search-widget #recent-locations-title{font-family:Inter,sans-serif;font-size:9px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
   .pi-map-search-widget .recent-row{display:flex;flex-direction:column;gap:1px;padding:6px 0;border-bottom:1px solid var(--rule);cursor:pointer}
   .pi-map-search-widget .recent-row:last-child{border-bottom:none}
@@ -444,39 +445,28 @@ if (window.ResizeObserver) {
   new ResizeObserver(pi__sendHeight).observe(document.getElementById('pi-map-search-widget'));
 }
 
-/* PhotoDeck-only: własny przycisk fullscreen zamiast mapboxgl.FullscreenControl.
-   Jego wbudowany test wsparcia (_checkFullscreenSupport) odrzuca kontener inny
-   niż domyślny kontener mapy, mimo że przeglądarka faktycznie obsługuje
-   Fullscreen API dla dowolnego elementu. Wywołujemy API bezpośrednio, żeby
-   fullscreen obejmował cały widget (pasek wyszukiwania + filtry + mapę),
-   nie samą mapę. */
+/* PhotoDeck-only: pseudo-fullscreen zamiast prawdziwego Fullscreen API.
+   Prawdziwe API wymaga atrybutu allowfullscreen na tagu <iframe> w PhotoDeck,
+   do którego nie ma tu dostępu. Zamiast tego rozciągamy widget na cały
+   viewport zwykłym CSS (position:fixed), i prosimy rodzica (przez postMessage,
+   ten sam kanał co przy auto-wysokości) o zrobienie tego samego z samym
+   elementem <iframe>, tak żeby wizualnie wyglądało identycznie jak fullscreen,
+   bez potrzeby żadnego specjalnego uprawnienia przeglądarki. */
 (function(){
   var widget = document.getElementById('pi-map-search-widget');
   var btn = document.getElementById('pi-fullscreen-btn');
   var iconExpand = document.getElementById('pi-fullscreen-icon-expand');
   var iconContract = document.getElementById('pi-fullscreen-icon-contract');
   if(!widget || !btn) return;
-  if(!document.fullscreenEnabled && !document.webkitFullscreenEnabled){
-    btn.style.display = 'none';
-    return;
-  }
+  var isPseudoFs = false;
   btn.addEventListener('click', function(){
-    var isFs = document.fullscreenElement || document.webkitFullscreenElement;
-    if(!isFs){
-      if(widget.requestFullscreen) widget.requestFullscreen();
-      else if(widget.webkitRequestFullscreen) widget.webkitRequestFullscreen();
-    } else {
-      if(document.exitFullscreen) document.exitFullscreen();
-      else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
-    }
+    isPseudoFs = !isPseudoFs;
+    widget.classList.toggle('pi-pseudo-fullscreen', isPseudoFs);
+    iconExpand.style.display = isPseudoFs ? 'none' : '';
+    iconContract.style.display = isPseudoFs ? '' : 'none';
+    window.parent.postMessage({type:'pi-pseudo-fullscreen', active: isPseudoFs}, '*');
+    if(!isPseudoFs) pi__sendHeight();
   });
-  function updateIcon(){
-    var isFs = document.fullscreenElement || document.webkitFullscreenElement;
-    iconExpand.style.display = isFs ? 'none' : '';
-    iconContract.style.display = isFs ? '' : 'none';
-  }
-  document.addEventListener('fullscreenchange', updateIcon);
-  document.addEventListener('webkitfullscreenchange', updateIcon);
 })();
 </script>
 </body>
