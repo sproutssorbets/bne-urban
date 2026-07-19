@@ -12,7 +12,7 @@ html, body{overscroll-behavior-y:none}
 .pi-map-search-widget a{color:inherit;text-decoration:none}
 .pi-map-search-widget #shell{display:flex;flex-direction:column}
 .pi-map-search-widget #panel{background:var(--bg)}
-.pi-map-search-widget #search-top{padding:0px 0;border-bottom:1px solid var(--rule);flex-shrink:0;position:relative}
+.pi-map-search-widget #search-top{padding:20px 0;border-bottom:1px solid var(--rule);flex-shrink:0;position:relative}
 /* Same [bar][black button] row pattern as #refine-row below — Advanced
    search now sits at equal visual weight to the address field, not
    tucked underneath it as a small text link. */
