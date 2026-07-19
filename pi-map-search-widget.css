@@ -36,7 +36,7 @@ html, body{overscroll-behavior-y:none}
 .pi-map-search-widget .dd-item-text{font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pi-map-search-widget .dd-item-sub{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pi-map-search-widget .dd-badge{font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#9B9890;border:1px solid var(--rule);padding:2px 6px;flex-shrink:0;white-space:nowrap}
-.pi-map-search-widget #refine-section{border-top:1px solid var(--rule);padding:24px 0 40px}
+.pi-map-search-widget #refine-section{border-top:1px solid var(--rule);padding:24px 0 0px}
 .pi-map-search-widget #filters-label{margin-bottom:14px}
 /* Hidden by default — only shown at the mobile breakpoint below, where the
    map becomes full-screen and these become necessary. On desktop the map
