@@ -59,6 +59,12 @@
      iframe. Sztywne 640px zrywa tę pętlę, mapa ma jedną, stałą wartość
      niezależną od samego siebie. */
   .pi-map-search-widget #map-area{height:640px}
+  /* W prawdziwym trybie fullscreen (tylko na samodzielnej stronie, poza
+     PhotoDeck) mapa ma wypełniać resztę ekranu zamiast trzymać się 640px. */
+  .pi-map-search-widget:fullscreen,
+  .pi-map-search-widget:-webkit-full-screen{display:flex;flex-direction:column;height:100vh;overflow-y:auto}
+  .pi-map-search-widget:fullscreen #map-area,
+  .pi-map-search-widget:-webkit-full-screen #map-area{flex:1;height:auto;min-height:0}
   /* PhotoDeck-only: the shared CSS sets overscroll-behavior-y:none on
      html/body to stop rubber-band bounce revealing content under the
      fixed mobile map on Webflow. Inside this iframe, that same rule has
@@ -86,7 +92,7 @@
      — doesn't touch #shell/#map-area layout, so the existing fixed/mobile
      positioning logic in the shared CSS is untouched. */
   .pi-map-search-widget #recent-locations{display:none}
-  .pi-map-search-widget #pi-fullscreen-btn{position:absolute;top:16px;right:16px;width:29px;height:29px;display:flex;align-items:center;justify-content:center;background:#FFFFFF;border:1px solid var(--rule);padding:0;cursor:pointer;z-index:2}
+  .pi-map-search-widget #pi-fullscreen-btn{position:absolute;top:16px;right:16px;width:29px;height:29px;display:flex;align-items:center;justify-content:center;background:#FFFFFF;border:1px solid var(--rule);padding:0;cursor:pointer;z-index:2;text-decoration:none}
   .pi-map-search-widget #pi-fullscreen-btn:hover{border-color:var(--text)}
   .pi-map-search-widget #recent-locations-title{font-family:Inter,sans-serif;font-size:9px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
   .pi-map-search-widget .recent-row{display:flex;flex-direction:column;gap:1px;padding:6px 0;border-bottom:1px solid var(--rule);cursor:pointer}
@@ -144,9 +150,9 @@
   <div id="map-area">
     <div id="map"></div>
     <div id="map-loading"><span>Loading map…</span></div>
-    <button type="button" id="pi-fullscreen-btn" aria-label="Open full search in new tab">
+    <a href="https://sproutssorbets.github.io/bne-urban/photodeck-embed.html" target="_blank" id="pi-fullscreen-btn" aria-label="Open full search in new tab">
       <svg viewBox="0 0 20 20" width="16" height="16"><path d="M2 7V2h5M18 7V2h-5M2 13v5h5M18 13v5h-5" fill="none" stroke="#111" stroke-width="1.4"/></svg>
-    </button>
+    </a>
     <div id="recent-locations">
       <div id="recent-locations-title">Recently added</div>
       <div id="recent-locations-list"></div>
@@ -437,20 +443,21 @@
 /* PhotoDeck-only: PhotoDeck nie przepuszcza żadnych <script> obok <iframe>,
    więc ani prawdziwy Fullscreen API (wymaga allowfullscreen na tagu), ani
    pseudo-fullscreen sterowany przez postMessage (wymaga skryptu po stronie
-   rodzica) nie są tu możliwe. W środku iframe'a przycisk zamiast tego
-   otwiera tę samą stronę w nowej karcie, poza ograniczeniami PhotoDeck.
+   rodzica) nie są tu możliwe. Przycisk to zwykły link z target="_blank",
+   który w środku iframe'a działa sam z siebie, zwykłą nawigacją HTML, nie
+   wymaga żadnego JS ani uprawnienia (window.open() bywał po cichu blokowany
+   przez politykę popup w iframie, dlatego stąd rezygnacja z JS w tym miejscu).
    Odwiedzona bezpośrednio (nie przez iframe), strona nie ma tych ograniczeń,
-   więc tam przycisk normalnie prosi przeglądarkę o prawdziwy fullscreen. */
+   więc tam JS przechwytuje kliknięcie i prosi przeglądarkę o prawdziwy
+   fullscreen zamiast otwierać samą siebie w kółko. */
 (function(){
   var widget = document.getElementById('pi-map-search-widget');
   var btn = document.getElementById('pi-fullscreen-btn');
   if(!widget || !btn) return;
   var inIframe = (window.self !== window.top);
-  btn.addEventListener('click', function(){
-    if(inIframe){
-      window.open(window.location.href, '_blank');
-      return;
-    }
+  if(inIframe) return; /* link działa sam, zwykła nawigacja HTML */
+  btn.addEventListener('click', function(e){
+    e.preventDefault();
     if(!document.fullscreenElement){
       if(widget.requestFullscreen) widget.requestFullscreen();
       else if(widget.webkitRequestFullscreen) widget.webkitRequestFullscreen();
