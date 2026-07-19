@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://api.mapbox.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/mapbox-gl@2.15.0/dist/mapbox-gl.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/gh/sproutssorbets/bne-urban@9f30dac4268c670480614aaf1d771a68b8184d34/pi-map-search-widget.css" rel="stylesheet" onload="revealWidget()">
+<link href="https://cdn.jsdelivr.net/gh/sproutssorbets/bne-urban@6d061c7021b7c51f6f9ade8d8e1469555123447c/pi-map-search-widget.css" rel="stylesheet" onload="revealWidget()">
 <style>
   /* Page-level reset — this document owns the whole iframe, so it needs its
      own margin/background instead of inheriting them from a host page. */
@@ -59,7 +59,7 @@
      mapy, co zmienia całkowitą wysokość treści, co znowu przeskalowuje
      iframe. Sztywne 850px zrywa tę pętlę, mapa ma jedną, stałą wartość
      niezależną od samego siebie. */
-  .pi-map-search-widget #map-area{height:800px}
+  .pi-map-search-widget #map-area{height:850px}
   /* PhotoDeck-only: the shared CSS sets overscroll-behavior-y:none on
      html/body to stop rubber-band bounce revealing content under the
      fixed mobile map on Webflow. Inside this iframe, that same rule has
@@ -87,6 +87,11 @@
      — doesn't touch #shell/#map-area layout, so the existing fixed/mobile
      positioning logic in the shared CSS is untouched. */
   .pi-map-search-widget #recent-locations{display:none}
+  /* PhotoDeck-only: shared CSS ustawia #refine-section na padding:24px 0 40px,
+     te 40px na dole zostawały jako pusty pas pod "Show all filters", zupełnie
+     niezależnie od wysokości iframe'a, bo to padding, nie coś, co auto-resize
+     mógłby zmierzyć i skompensować. */
+  .pi-map-search-widget #refine-section{padding-bottom:0}
   .pi-map-search-widget #recent-locations-title{font-family:Inter,sans-serif;font-size:9px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
   .pi-map-search-widget .recent-row{display:flex;flex-direction:column;gap:1px;padding:6px 0;border-bottom:1px solid var(--rule);cursor:pointer}
   .pi-map-search-widget .recent-row:last-child{border-bottom:none}
