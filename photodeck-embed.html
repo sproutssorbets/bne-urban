@@ -85,6 +85,28 @@
   .last-updated-badge { font-weight: 500; color: #111111; letter-spacing: 0.08em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 4px; }
   .last-updated-badge::before { content: "●"; font-size: 8px; color: #111111; }
 
+  /* Optymalizacja UX dla pinów: mały kwadracik wizualny + duży niewidoczny hitbox 44x44px do łatwego trafienia palcem */
+  .custom-marker-hitbox {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transform: translate(-22px, -22px); /* wyśrodkowanie hitboxa względem współrzędnych geograficznych */
+  }
+  .custom-marker-visual {
+    width: 8px;
+    height: 8px;
+    background: #111111;
+    border-radius: 0 !important;
+    transition: transform 0.15s ease, background-color 0.15s ease;
+  }
+  .custom-marker-hitbox:hover .custom-marker-visual {
+    transform: scale(1.6); /* powiększenie po najechaniu */
+    background: #000000;
+  }
+
   #map-wrap { flex: 1; position: relative; background: #FFFFFF; }
   #map { position: absolute; inset: 0; }
   .mapboxgl-ctrl-logo, .mapboxgl-ctrl-attrib { font-family: 'Inter', system-ui, sans-serif !important; }
@@ -106,7 +128,6 @@
 <div id="topbar">
   <div id="search-row">
     <div id="geocoder"></div>
-    <!-- Zmiana target="_blank" na target="_top" aby linki działały poprawnie wewnątrz iframe -->
     <a id="search-archive-btn" href="https://photoindex.photodeck.com/" target="_top">
       <span id="search-archive-text">Search archive</span> →
     </a>
@@ -651,8 +672,10 @@ function initMapEverything() {
     };
 
     locations.forEach(function (loc) {
+      // Zastosowanie hitboxa UX (44x44px) wokół małego kwadracika (8x8px)
       var el = document.createElement('div');
-      el.style.width = '8px'; el.style.height = '8px'; el.style.background = '#111111'; el.style.borderRadius = '0'; el.style.cursor = 'pointer';
+      el.className = 'custom-marker-hitbox';
+      el.innerHTML = '<div class="custom-marker-visual"></div>';
 
       var popupHtml =
         '<div style="font-family:Inter,system-ui,sans-serif;padding:2px 2px 4px;min-width:180px;">' +
