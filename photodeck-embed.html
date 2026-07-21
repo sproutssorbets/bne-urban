@@ -21,12 +21,14 @@
   #geocoder .mapboxgl-ctrl-geocoder input { height: 36px; font-size: 13px; color: #111111; font-family: inherit; background: #FFFFFF; }
   #geocoder .mapboxgl-ctrl-geocoder--icon-search { fill: #6B6B6B; top: 9px; }
   
-  #search-archive-btn { height: 36px; padding: 0 16px; border: 1px solid #111111; background: #111111; color: #FFFFFF; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 6px; text-decoration: none; flex-shrink: 0; outline: none; }
+  #search-archive-btn { height: 36px; padding: 0 16px; border: 1px solid #111111; background: #111111; color: #FFFFFF; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 6px; text-decoration: none; flex-shrink: 0; }
   #search-archive-btn:hover { background: #333333; }
 
-  #chip-row { display: flex; align-items: center; padding: 12px 20px; flex-wrap: wrap; min-height: 20px; gap: 12px; background: #FFFFFF; }
-  #chip-label { font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6B6B6B; margin-right: 8px; }
-  .chip { display: inline-flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #111111; padding: 4px 10px; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #111111; cursor: pointer; background: #FFFFFF; line-height: 1.2; }
+  #chip-row { display: flex; align-items: center; padding: 10px 20px; flex-wrap: wrap; min-height: 20px; background: #FFFFFF; }
+  #chip-label { font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6B6B6B; margin-right: 12px; }
+  
+  /* Odstępy między tagami dokładnie wg wytycznych z inspectora */
+  .chip { display: inline-flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #111111; padding: 3px 8px; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #111111; cursor: pointer; background: #FFFFFF; margin: 0 6px 6px 0; line-height: 1.2; }
   .chip:hover { background: #F0F0F0; }
 
   #layout { display: flex; height: calc(100vh - 105px); height: calc(100dvh - 105px); background: #FFFFFF; }
@@ -128,29 +130,29 @@
         </div>
       </div>
 
-      <!-- SUBURB - Otwarty panel z dzielnicami na stałe -->
-      <div class="section" id="suburb-section">
-        <div class="section-label" style="margin-bottom:12px;">Suburb</div>
-        <div style="display:flex; flex-direction:column; gap:6px; font-size:11px;">
-          <label><input type="radio" name="suburb-group" class="suburb-check" value="" checked> All suburbs</label>
-          <label><input type="radio" name="suburb-group" class="suburb-check" value="Albion"> Albion</label>
-          <label><input type="radio" name="suburb-group" class="suburb-check" value="Bowen Hills"> Bowen Hills</label>
-          <label><input type="radio" name="suburb-group" class="suburb-check" value="Brisbane City"> Brisbane City</label>
-          <label><input type="radio" name="suburb-group" class="suburb-check" value="Fortitude Valley"> Fortitude Valley</label>
-          <label><input type="radio" name="suburb-group" class="suburb-check" value="Herston"> Herston</label>
-          <label><input type="radio" name="suburb-group" class="suburb-check" value="Kangaroo Point"> Kangaroo Point</label>
-          <label><input type="radio" name="suburb-group" class="suburb-check" value="Kelvin Grove"> Kelvin Grove</label>
-          <label><input type="radio" name="suburb-group" class="suburb-check" value="Milton"> Milton</label>
-          <label><input type="radio" name="suburb-group" class="suburb-check" value="New Farm"> New Farm</label>
-          <label><input type="radio" name="suburb-group" class="suburb-check" value="Newstead"> Newstead</label>
-          <label><input type="radio" name="suburb-group" class="suburb-check" value="Paddington"> Paddington</label>
-          <label><input type="radio" name="suburb-group" class="suburb-check" value="Red Hill"> Red Hill</label>
-          <label><input type="radio" name="suburb-group" class="suburb-check" value="South Brisbane"> South Brisbane</label>
-          <label><input type="radio" name="suburb-group" class="suburb-check" value="Spring Hill"> Spring Hill</label>
-          <label><input type="radio" name="suburb-group" class="suburb-check" value="Teneriffe"> Teneriffe</label>
-          <label><input type="radio" name="suburb-group" class="suburb-check" value="West End"> West End</label>
-          <label><input type="radio" name="suburb-group" class="suburb-check" value="Woolloongabba"> Woolloongabba</label>
-        </div>
+      <!-- SUBURB - Jako zwinięty akordeon na starcie -->
+      <div class="acc-head" data-target="acc-suburb">
+        <span class="section-label" style="margin:0;">Suburb</span><span style="font-size:10px;color:#111111;">＋</span>
+      </div>
+      <div class="acc-body" id="acc-suburb">
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="" checked> All suburbs</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Albion"> Albion</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Bowen Hills"> Bowen Hills</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Brisbane City"> Brisbane City</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Fortitude Valley"> Fortitude Valley</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Herston"> Herston</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Kangaroo Point"> Kangaroo Point</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Kelvin Grove"> Kelvin Grove</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Milton"> Milton</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="New Farm"> New Farm</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Newstead"> Newstead</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Paddington"> Paddington</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Red Hill"> Red Hill</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="South Brisbane"> South Brisbane</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Spring Hill"> Spring Hill</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Teneriffe"> Teneriffe</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="West End"> West End</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Woolloongabba"> Woolloongabba</label>
       </div>
 
       <!-- SEKCJA 1: WARUNKI OŚWIETLENIOWE -->
@@ -589,7 +591,6 @@ function initMapEverything() {
 
     map.addSource('projects', { type: 'geojson', data: projects });
 
-    /* Poligony stają się widoczne od poziomu zoom 13.5 */
     map.addLayer({
       id: 'projects-fill',
       type: 'fill',
