@@ -1,537 +1,600 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://raw.githubusercontent.com">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PhotoIndex — Search the archive</title>
-
-<!-- This is the top-level document loaded inside PhotoDeck's <iframe>, not
-     an Embed injected into an existing page (that's webflow-embed.html).
-     Everything below reuses the exact same CSS/JS files as the Webflow
-     version — same hashes, same behaviour, same controlled vocabulary.
-     Only this wrapper (head/body, page-level margin) is new. -->
-
-<script>
-  /* Defined here, before the stylesheet link below, on purpose. The link's
-     onload="revealWidget()" can fire the moment that CSS file finishes
-     downloading — which, on a fast connection, can happen before the
-     parser reaches a <script> placed further down the page. When that
-     race was lost, onload called a function that didn't exist yet and
-     threw ReferenceError: revealWidget is not defined, so the widget
-     never got its visibility:visible and stayed hidden behind #page-
-     loading indefinitely (the setTimeout(revealWidget,4000) fallback
-     below still caught it after 4s, but the first paint was needlessly
-     delayed and the console carried a real error).
-
-     Two-stage loading, not one. Stage 1: before the widget's own
-     stylesheet has loaded, #pi-map-search-widget stays visibility:hidden
-     to avoid a flash of unstyled content — but that leaves a completely
-     blank white page during this stage, since even the widget's own
-     "Loading map…" placeholder lives inside the hidden element. #page-
-     loading below sits outside that hidden wrapper and is styled with
-     plain inline attributes only, so it needs no external CSS to render
-     — it shows immediately, then this same function hides it the moment
-     the widget itself becomes visible (stage 2, where the widget's own
-     Mapbox loading indicator takes over). */
-  function revealWidget(){
-    var w = document.getElementById('pi-map-search-widget');
-    var p = document.getElementById('page-loading');
-    if(w) w.style.visibility = 'visible';
-    if(p) p.style.display = 'none';
-  }
-  setTimeout(revealWidget, 4000);
-</script>
-<link rel="preconnect" href="https://cdn.jsdelivr.net">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://api.mapbox.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/mapbox-gl@2.15.0/dist/mapbox-gl.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/gh/sproutssorbets/bne-urban@e4ede4253d9ebf060d02c96a769ae3278c0f75e6/pi-map-search-widget.css" rel="stylesheet" onload="revealWidget()">
+<title>PhotoIndex — Map prototype (live filter test)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 <style>
-  /* Page-level reset — this document owns the whole iframe, so it needs its
-     own margin/background instead of inheriting them from a host page. */
-  html, body { margin:0; padding:0; background:#FFFFFF; }
-  /* Overriding --bg here, locally, rather than in the shared CSS file —
-     this file is the only place that should be pure white. The design
-     system's own rule ("never pure white") still applies everywhere else,
-     Webflow included, since pi-map-search-widget.css itself is untouched. */
-  .pi-map-search-widget { --bg: #FFFFFF; }
-  #pi-map-search-widget{visibility:hidden}
+  * { box-sizing: border-box; border-radius: 0 !important; box-shadow: none !important; }
+  body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background: #F7F7F5; color: #111111; }
 
-  /* PhotoDeck-only: replaces the twelve individually-clickable category
-     headers with one button. #filters-wide stays hidden until toggled;
-     opening it shows every category and every term list at once — no
-     per-category collapsing. This overrides the shared CSS's default
-     accordion behaviour locally, without touching the shared file, so
-     Webflow keeps its normal per-category accordions untouched. */
-  .pi-map-search-widget #filters-wide{display:none}
-  .pi-map-search-widget #filters-wide.all-open{display:block}
-  .pi-map-search-widget #filters-wide.all-open .acc-body{display:block}
-  .pi-map-search-widget #filters-toggle-all{display:flex;justify-content:space-between;align-items:center;width:100%;font-family:Inter,sans-serif;font-size:11px;font-weight:500;letter-spacing:1.54px;text-transform:uppercase;color:#111111;text-decoration:none;padding:14px 20px;background:var(--bg);border:none;border-top:1px solid #111111;border-bottom:1px solid #111111;box-sizing:border-box;cursor:pointer;outline:none;margin:0}
-  .pi-map-search-widget #filters-toggle-all:focus-visible{box-shadow:inset 0 0 0 1px var(--text)}
-  .pi-map-search-widget #filters-toggle-all-spacer{display:none}
-  .pi-map-search-widget #filters-toggle-all-arrow{font-size:13px;font-weight:500;color:#6b6b6b;transition:transform 0.2s}
-  .pi-map-search-widget #filters-toggle-all.is-open #filters-toggle-all-arrow{transform:rotate(180deg)}
+  #topbar { border-bottom: 1px solid #DADADA; }
+  #search-row { display: flex; align-items: center; height: 56px; padding: 0 20px; border-bottom: 1px solid #DADADA; }
+  #geocoder { flex: 1; }
+  #geocoder .mapboxgl-ctrl-geocoder { width: 100%; max-width: none; font-family: inherit; box-shadow: none; background: transparent; }
+  #geocoder .mapboxgl-ctrl-geocoder input { height: 36px; font-size: 13px; color: #111111; font-family: inherit; }
+  #geocoder .mapboxgl-ctrl-geocoder--icon-search { fill: #6B6B6B; top: 9px; }
+  #adv-btn { height: 36px; padding: 0 20px; border: 1px solid #111111; background: #111111; color: #F7F7F5; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; cursor: pointer; }
+  #chip-row { display: flex; align-items: center; padding: 8px 20px; flex-wrap: wrap; min-height: 20px; }
+  #chip-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #6B6B6B; margin-right: 10px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid #111111; padding: 3px 8px; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: #111111; margin: 0 6px 6px 0; cursor: pointer; }
 
-  /* PhotoDeck-only: wcześniej liczone jako 100vh - 160px, czyli zależnie
-     od wysokości iframe'a. Działało dobrze przy stałym, niskim iframe
-     (np. 850-950px), ale gdy iframe trzeba było powiększyć ręcznie, żeby
-     zmieściły się rozwinięte filtry, mapa rosła razem z nim bez ograniczeń.
-     min(60vh, 640px) daje mapie stały, rozsądny pułap wysokości niezależny
-     od tego, jak wysoki jest cały iframe, a wciąż kurczy się na wąskich/
-     niskich ekranach zamiast sztywno trzymać 640px zawsze. */
-  /* PhotoDeck-only: poprzednio min(60vh, 640px). vh liczy się względem
-     wysokości samego iframe'a, a iframe sam się teraz skaluje w locie
-     na podstawie zmierzonej wysokości treści (postMessage). To tworzyło
-     pętlę: zmiana wysokości iframe'a zmienia vh, co zmienia wysokość
-     mapy, co zmienia całkowitą wysokość treści, co znowu przeskalowuje
-     iframe. Sztywne 850px zrywa tę pętlę, mapa ma jedną, stałą wartość
-     niezależną od samego siebie. */
-  .pi-map-search-widget #map-area{height:850px}
-  /* PhotoDeck-only: poniżej 900px wspólny plik CSS ustawia #shell na
-     position:fixed, height:100dvh — czyli mapa zajmuje cały ekran telefonu
-     jako osobna warstwa, a "Show all filters" pojawia się dopiero po
-     przewinięciu całej wysokości ekranu. To dawało wrażenie bardzo długiej
-     mapy na komórce. Tutaj przywracam normalny, przewijany układ i skracam
-     samą mapę do stałej, niższej wysokości, żeby filtry były widoczne od
-     razu po krótkim przewinięciu, bez pełnoekranowego kroku pośredniego. */
-  @media(max-width:900px){
-    .pi-map-search-widget #shell{position:static;height:auto}
-    .pi-map-search-widget #panel{flex-shrink:0}
-    .pi-map-search-widget #map-area{flex:none;height:380px;min-height:380px}
-    .pi-map-search-widget #refine-section{margin-top:0}
-    /* Przycisk "Show all filters" wychodzi poza boczny padding rodzica
-       (#refine-section ma padding-left/right:20px na mobile), żeby jego
-       górna i dolna linia sięgały tych samych krawędzi co mapa i zdjęcia
-       poniżej. Margines ujemny wyprowadza element poza padding, dopisany
-       padding przywraca odstęp samemu tekstowi od krawędzi ekranu. */
-    .pi-map-search-widget #filters-toggle-all{margin-left:-20px;margin-right:-20px;width:calc(100% + 40px);padding-left:20px;padding-right:20px}
-    /* Wspólny plik CSS ustawia #refine-section na padding:20px 0 0px na
-       mobile — te 20px u góry to pusta przestrzeń między mapą a górną
-       linią przycisku "Show all filters", bez żadnej funkcji. Zerowanie
-       tylko padding-top, reszta (lewy/prawy/dolny) zostaje bez zmian. */
-    .pi-map-search-widget #refine-section{padding-top:0}
-    /* Przycisk "Show all filters"/"Hide filters" na mobile: gdy panel jest
-       otwarty (.is-open), przykleja się do dołu ekranu, żeby zostawał
-       osiągalny podczas przewijania długiej listy kategorii, zamiast
-       znikać z widoku zaraz po pierwszym scrollu. #refine-top (pasek z
-       wybranymi filtrami) też przykleja się do dołu, ale tylko gdy
-       użytkownik coś już wybrał — --pi-refine-top-h, ustawiane w skrypcie
-       niżej, przesuwa wtedy ten przycisk wyżej dokładnie o wysokość tamtego
-       paska, żeby oba stały jeden nad drugim, nigdy na sobie. */
-    .pi-map-search-widget #filters-toggle-all.is-open{
-      position:fixed;left:0;right:0;bottom:var(--pi-refine-top-h,0px);
-      z-index:150;width:100%;margin:0;transition:bottom 0.15s ease;
-    }
-    /* Rezerwuje na dole listy filtrów tyle miejsca, ile realnie zajmuje
-       przyklejony przycisk (plus pasek nad nim, jeśli widoczny), żeby
-       ostatnia pozycja na liście nie chowała się pod żadnym z nich.
-       Wysokość ustawia skrypt niżej, tu tylko włączam sam element,
-       bazowa reguła w tym pliku ma go domyślnie ukrytego. */
-    .pi-map-search-widget #filters-toggle-all-spacer{display:block}
+  #layout { display: flex; height: calc(100vh - 96px); }
+
+  .mobile-tabs { display: none; border-bottom: 1px solid #DADADA; }
+  .mobile-tab { flex: 1; height: 44px; border: none; border-right: 1px solid #DADADA; background: #F7F7F5; color: #111111; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; cursor: pointer; }
+  .mobile-tab:last-child { border-right: none; }
+  .mobile-tab.active { background: #111111; color: #F7F7F5; }
+
+  @media (max-width: 720px) {
+    .mobile-tabs { display: flex; }
+    #adv-btn { padding: 0 12px; font-size: 10px; }
+    #layout { flex-direction: column; height: auto; }
+    #index-panel { width: 100%; border-right: none; max-height: none; }
+    #map-wrap { width: 100%; height: 70vh; }
+    .mobile-hidden { display: none !important; }
   }
-  /* PhotoDeck-only: the shared CSS sets overscroll-behavior-y:none on
-     html/body to stop rubber-band bounce revealing content under the
-     fixed mobile map on Webflow. Inside this iframe, that same rule has
-     a different, unwanted effect — it blocks scroll from ever chaining
-     through to the parent PhotoDeck page once this document's own
-     content is fully scrolled, trapping the visitor inside the frame
-     instead of continuing on to the photos below it. Restoring the
-     default here (auto) lets the scroll hand off naturally at the
-     boundary, exactly the native browser behaviour for nested scroll
-     containers. */
-  html, body{overscroll-behavior-y:auto}
 
-  /* PhotoDeck-only: shared CSS ustawia .term-list na columns:220px 5,
-     czyli układ wypełnia najpierw szerokość (do 5 kolumn), a dopiero
-     potem wysokość. Przy 55 terminach w jednej sekcji (Public Realm
-     Elements) panel robi się bardzo szeroki zamiast po prostu wyższy.
-     Zawężenie do 2 kolumn odwraca priorytet: lista rośnie w dół, nie
-     w bok, a strona sama przewija się niżej zamiast wymuszać szerszy
-     kontener. */
-  .pi-map-search-widget .term-list{columns:220px 2}
+  #index-panel { width: 340px; flex-shrink: 0; border-right: 1px solid #DADADA; display: flex; flex-direction: column; overflow-y: auto; }
+  .section { padding: 14px 20px; border-bottom: 1px solid #DADADA; }
+  .section-label { font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: #6B6B6B; margin-bottom: 10px; }
 
-  /* PhotoDeck-only: "recently added" panel, styled to match #legend exactly
-     (same bg/border/padding language) but placed top-right instead of
-     bottom-left, so the two floating panels don't collide. Purely additive
-     — doesn't touch #shell/#map-area layout, so the existing fixed/mobile
-     positioning logic in the shared CSS is untouched. */
-  .pi-map-search-widget #recent-locations{display:none}
-  /* PhotoDeck-only: shared CSS ustawia #refine-section na padding:24px 0 40px,
-     te 40px na dole zostawały jako pusty pas pod "Show all filters", zupełnie
-     niezależnie od wysokości iframe'a, bo to padding, nie coś, co auto-resize
-     mógłby zmierzyć i skompensować. */
-  .pi-map-search-widget #refine-section{padding-bottom:0}
-  .pi-map-search-widget #recent-locations-title{font-family:Inter,sans-serif;font-size:9px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-  .pi-map-search-widget .recent-row{display:flex;flex-direction:column;gap:1px;padding:6px 0;border-bottom:1px solid var(--rule);cursor:pointer}
-  .pi-map-search-widget .recent-row:last-child{border-bottom:none}
-  .pi-map-search-widget .recent-row:hover .recent-row-title{color:var(--muted)}
-  .pi-map-search-widget .recent-row-title{font-family:Inter,sans-serif;font-size:11px;font-weight:500;color:var(--text)}
-  .pi-map-search-widget .recent-row-meta{font-family:Inter,sans-serif;font-size:10px;color:var(--muted)}
-  @media(max-width:1024px){.pi-map-search-widget #recent-locations{display:none}}
+  .filter-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; cursor: pointer; }
+  .filter-row.off { opacity: 0.35; }
+  .swatch { width: 8px; height: 8px; flex-shrink: 0; }
+  .filter-count { font-size: 10px; color: #6B6B6B; }
+  .filter-label { font-size: 11px; color: #111111; }
+
+  .acc-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid #DADADA; cursor: pointer; user-select: none; }
+  .acc-body { display: none; padding: 10px 20px; border-bottom: 1px solid #DADADA; font-size: 11px; color: #111111; line-height: 2; }
+  .acc-body.open { display: block; }
+  .acc-body label { display: block; cursor: pointer; }
+
+  #list-wrap { flex: 1; }
+  .list-row { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 20px; border-bottom: 1px solid #DADADA; cursor: pointer; }
+  .list-row:hover { background: #EFEFEA; }
+  .list-ref { font-size: 10px; letter-spacing: 0.08em; color: #6B6B6B; margin-bottom: 3px; }
+  .list-street { font-size: 13px; color: #111111; }
+
+  #footer-row { padding: 12px 20px; font-size: 10px; letter-spacing: 0.06em; color: #6B6B6B; }
+
+  #map-wrap { flex: 1; position: relative; }
+  #map { position: absolute; inset: 0; }
+  .mapboxgl-ctrl-logo, .mapboxgl-ctrl-attrib { font-family: 'Inter', system-ui, sans-serif !important; }
+  .mapboxgl-ctrl-attrib a { color: #6B6B6B !important; }
+  .mapboxgl-ctrl-group button { border-radius: 0 !important; }
+  .pi-popup .mapboxgl-popup-content { background: #F7F7F5; border: 1px solid #111111; padding: 14px; font-family: 'Inter', system-ui, sans-serif; }
+  .pi-popup .mapboxgl-popup-tip { border-top-color: #F7F7F5 !important; border-bottom-color: #F7F7F5 !important; }
+  .pi-popup .mapboxgl-popup-close-button { font-size: 16px; color: #6B6B6B; padding: 4px 8px; }
+  .pi-popup .mapboxgl-popup-close-button:hover { background: transparent; color: #111111; }
+  .pi-popup .mapboxgl-popup-close-button { outline: none; border: none; }
+  .pi-popup .mapboxgl-popup-close-button:focus { outline: none; box-shadow: none; }
+  input[type="checkbox"], input[type="radio"] { accent-color: #111111; }
+  #adv-clear:hover { background: #111111 !important; color: #F7F7F5 !important; }
+
+  #debug { position: absolute; bottom: 12px; left: 12px; background: #F7F7F5; border: 1px solid #DADADA; padding: 8px 12px; font-size: 10px; color: #6B6B6B; line-height: 1.6; z-index: 5; max-width: 260px; }
+  #debug b { color: #111111; }
 </style>
 </head>
 <body>
 
-<div id="page-loading" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#FFFFFF;font-family:sans-serif;font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#6B6B6B;z-index:1">Loading…</div>
-
-<div class="pi-map-search-widget" id="pi-map-search-widget">
-<div id="shell">
-
-  <div id="panel">
-    <div id="search-top">
-      <div id="search-row">
-        <div class="search-bar" id="searchBarWrap">
-          <svg style="width:14px;height:14px;flex-shrink:0;margin-left:12px;opacity:0.4" viewBox="0 0 14 14"><circle cx="6" cy="6" r="4.5" stroke="#111" stroke-width="1.3" fill="none"/><path d="M10 10L13 13" stroke="#111" stroke-width="1.3" stroke-linecap="round"/></svg>
-          <input type="text" id="smartInput" autocomplete="off" placeholder="Type an address or place..." spellcheck="false" aria-label="Type an address or place">
-          <button type="button" class="btn-clear" id="btnClear" onclick="clearAll()">×</button>
-        </div>
-        <button type="button" id="advanced-search-btn" class="btn-search-archive" onclick="toggleAllFilters()">Advanced search →</button>
-      </div>
-      <div id="smart-dropdown" style="display:none;border:1px solid var(--rule);border-top:none;background:var(--bg);max-height:280px;overflow-y:auto">
-        <div id="dd-addr" style="display:none">
-          <div id="dd-addr-list"></div>
-        </div>
-      </div>
+<div id="topbar">
+  <div id="search-row">
+    <div id="geocoder"></div>
+    <button id="adv-btn">Advanced search</button>
+  </div>
+  <div id="chip-row">
+    <span id="chip-label">Your search</span>
+    <span id="chips-here"></span>
+  </div>
+  <div id="adv-panel" style="display:none;border-top:1px solid #DADADA;">
+    <div class="acc-head" data-target="acc-view">
+      <span class="section-label" style="margin:0;">View type</span><span style="font-size:10px;color:#6B6B6B;">＋</span>
+    </div>
+    <div class="acc-body" id="acc-view">
+      <label><input type="checkbox" class="adv-check" value="street-level"> street-level</label>
+      <label><input type="checkbox" class="adv-check" value="building-facade"> building-facade</label>
+      <label><input type="checkbox" class="adv-check" value="aerial"> aerial</label>
+      <label><input type="checkbox" class="adv-check" value="streetscape"> streetscape</label>
+      <label><input type="checkbox" class="adv-check" value="laneway"> laneway</label>
+    </div>
+    <div class="acc-head" data-target="acc-use">
+      <span class="section-label" style="margin:0;">Use / program</span><span style="font-size:10px;color:#6B6B6B;">＋</span>
+    </div>
+    <div class="acc-body" id="acc-use">
+      <label><input type="checkbox" class="adv-check" value="residential"> residential</label>
+      <label><input type="checkbox" class="adv-check" value="commercial"> commercial</label>
+      <label><input type="checkbox" class="adv-check" value="retail"> retail</label>
+      <label><input type="checkbox" class="adv-check" value="hospitality"> hospitality</label>
+      <label><input type="checkbox" class="adv-check" value="community-use"> community-use</label>
+    </div>
+    <div class="acc-head" data-target="acc-context">
+      <span class="section-label" style="margin:0;">Urban context</span><span style="font-size:10px;color:#6B6B6B;">＋</span>
+    </div>
+    <div class="acc-body" id="acc-context">
+      <label><input type="checkbox" class="adv-check" value="under-construction"> under-construction</label>
+      <label><input type="checkbox" class="adv-check" value="demolition"> demolition</label>
+      <label><input type="checkbox" class="adv-check" value="heritage"> heritage</label>
+      <label><input type="checkbox" class="adv-check" value="riverfront"> riverfront</label>
+      <label><input type="checkbox" class="adv-check" value="high-density"> high-density</label>
+    </div>
+    <div class="acc-head" data-target="acc-light">
+      <span class="section-label" style="margin:0;">Light / time</span><span style="font-size:10px;color:#6B6B6B;">＋</span>
+    </div>
+    <div class="acc-body" id="acc-light">
+      <label><input type="checkbox" class="adv-check" value="golden-hour"> golden-hour</label>
+      <label><input type="checkbox" class="adv-check" value="overcast"> overcast</label>
+      <label><input type="checkbox" class="adv-check" value="night"> night</label>
+      <label><input type="checkbox" class="adv-check" value="after-rain"> after-rain</label>
+    </div>
+    <div style="display:flex;justify-content:flex-end;align-items:center;gap:12px;padding:14px 20px;border-top:1px solid #DADADA;">
+      <button id="adv-clear" style="height:36px;padding:0 20px;border:1px solid #111111;background:transparent;color:#111111;font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;font-family:inherit;cursor:pointer;">Clear all</button>
+      <button id="adv-apply" style="height:36px;padding:0 20px;border:1px solid #111111;background:#111111;color:#F7F7F5;font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;font-family:inherit;cursor:pointer;">Apply</button>
     </div>
   </div>
+</div>
 
-  <div id="map-area">
+<div class="mobile-tabs">
+  <button class="mobile-tab active" id="tab-index">Index</button>
+  <button class="mobile-tab" id="tab-filters">Filters</button>
+  <button class="mobile-tab" id="tab-map">Map</button>
+</div>
+
+<div id="layout">
+
+  <div id="index-panel">
+
+    <div id="filters-group" class="mobile-hidden">
+
+    <div class="section">
+      <div class="section-label">Development projects — polygon layer</div>
+      <div class="filter-row" data-status="proposed">
+        <div style="display:flex;align-items:center;gap:9px;"><span class="swatch" style="border:1px solid #DADADA;"></span><span class="filter-label">Proposed</span></div>
+        <span class="filter-count" id="count-proposed">–</span>
+      </div>
+      <div class="filter-row" data-status="construction">
+        <div style="display:flex;align-items:center;gap:9px;"><span class="swatch" style="background:#6B6B6B;"></span><span class="filter-label">Under construction</span></div>
+        <span class="filter-count" id="count-construction">–</span>
+      </div>
+      <div class="filter-row" data-status="approved">
+        <div style="display:flex;align-items:center;gap:9px;"><span class="swatch" style="background:#111111;"></span><span class="filter-label">Approved</span></div>
+        <span class="filter-count" id="count-approved">–</span>
+      </div>
+      <div style="font-size:10px;color:#6B6B6B;margin-top:10px;">Visible only from zoom 13. Zoom out to see documented locations only.</div>
+    </div>
+
+    <div class="acc-head" data-target="acc-year">
+      <span class="section-label" style="margin:0;">Year</span><span style="font-size:10px;color:#6B6B6B;">＋</span>
+    </div>
+    <div class="acc-body" id="acc-year">
+      <label><input type="checkbox" class="year-check" value="2026" checked> 2026</label>
+      <label><input type="checkbox" class="year-check" value="2027"> 2027</label>
+      <label><input type="checkbox" class="year-check" value="2028"> 2028</label>
+    </div>
+
+    <div class="acc-head" data-target="acc-suburb">
+      <span class="section-label" style="margin:0;">Suburb</span><span style="font-size:10px;color:#6B6B6B;">＋</span>
+    </div>
+    <div class="acc-body" id="acc-suburb">
+      <label><input type="radio" name="suburb-group" class="suburb-check" value="Kelvin Grove" checked> Kelvin Grove</label>
+      <label><input type="radio" name="suburb-group" class="suburb-check" value="Herston"> Herston</label>
+    </div>
+
+    <div class="acc-head" data-target="acc-building">
+      <span class="section-label" style="margin:0;">Building type</span><span style="font-size:10px;color:#6B6B6B;">＋</span>
+    </div>
+    <div class="acc-body" id="acc-building">
+      <label><input type="checkbox" class="building-check" value="residential-tower"> residential-tower</label>
+      <label><input type="checkbox" class="building-check" value="apartment-building"> apartment-building</label>
+      <label><input type="checkbox" class="building-check" value="mixed-use-building"> mixed-use-building</label>
+      <label><input type="checkbox" class="building-check" value="commercial-building"> commercial-building</label>
+      <label><input type="checkbox" class="building-check" value="heritage-building"> heritage-building</label>
+      <label><input type="checkbox" class="building-check" value="construction-site"> construction-site</label>
+    </div>
+
+    </div>
+
+    <div id="index-group">
+      <div id="list-wrap"></div>
+      <div id="footer-row"></div>
+    </div>
+
+  </div>
+
+  <div id="map-wrap" class="mobile-hidden">
     <div id="map"></div>
-    <div id="map-loading"><span>Loading map…</span></div>
-    <div id="recent-locations">
-      <div id="recent-locations-title">Recently added</div>
-      <div id="recent-locations-list"></div>
-    </div>
-    <div id="legend">
-      <button id="legend-toggle" onclick="toggleLegend()" aria-expanded="false" aria-controls="legend-body">
-        <span class="ldot" style="background:#111"></span><span>Legend</span><span id="legend-caret">▾</span>
-      </button>
-      <div id="legend-body">
-      <div class="legend-row"><div class="ldot" style="background:#111"></div><span id="docCount">Loading...</span></div>
-      <hr style="border:none;border-top:1px solid var(--rule);margin:5px 0">
-      <div style="font-size:9px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Development projects</div>
-      <div id="btn-proposed" data-visible="true" onclick="toggleStatus('proposed')" class="legend-filter-row">
-        <div style="display:flex;align-items:center;gap:7px"><div class="ldot ldot-proposed"></div><span>Proposed</span></div>
-        <span class="legend-ind">−</span>
-      </div>
-      <div id="btn-approved" data-visible="true" onclick="toggleStatus('approved')" class="legend-filter-row">
-        <div style="display:flex;align-items:center;gap:7px"><div class="ldot ldot-approved"></div><span>Approved</span></div>
-        <span class="legend-ind">−</span>
-      </div>
-      <div id="btn-under_construction" data-visible="true" onclick="toggleStatus('under_construction')" class="legend-filter-row">
-        <div style="display:flex;align-items:center;gap:7px"><div class="ldot ldot-under_construction"></div><span>Under construction</span></div>
-        <span class="legend-ind">−</span>
-      </div>
-      <div style="font-size:9px;color:var(--muted);margin-top:6px;line-height:1.4">Tap a status to show or hide it on the map</div>
-      <div style="font-size:10px;color:var(--muted);margin-top:5px;border-top:1px solid var(--rule);padding-top:5px" id="archiveDate">Last updated</div>
-      </div>
-    </div>
-    <div id="toast"></div>
+    <div id="debug"><b>State (open console for detail)</b><br>searchState → filters list + dots + PhotoDeck ?search=<br>layerState → polygon visibility only</div>
   </div>
 
 </div>
 
-<div id="refine-section">
-
-  <button type="button" id="filters-toggle-all">
-    <span id="filters-toggle-all-text">Show all filters</span><span id="filters-toggle-all-arrow">↓</span>
-  </button>
-  <div id="filters-wide">
-    <div class="acc" id="acc-location">
-      <div class="acc-header" onclick="toggleAcc('acc-location')">
-        <span class="acc-title">Suburb</span>
-        <span class="acc-icon">↓</span>
-      </div>
-      <div class="acc-body">
-        <span class="term-col-title" id="suburb-col-title">Suburb</span>
-        <ul class="term-list" id="list-suburb"></ul>
-      </div>
-    </div>
-    <div class="acc" id="acc-year">
-      <div class="acc-header" onclick="toggleAcc('acc-year')">
-        <span class="acc-title">Year</span><span class="acc-icon">↓</span>
-      </div>
-      <div class="acc-body">
-        <ul class="term-list" id="list-year"></ul>
-      </div>
-    </div>
-    <div class="acc" id="acc-viewtype">
-      <div class="acc-header" onclick="toggleAcc('acc-viewtype')">
-        <span class="acc-title">View Type</span><span class="acc-icon">↓</span>
-      </div>
-      <div class="acc-body">
-        <ul class="term-list" id="list-viewtype"></ul>
-      </div>
-    </div>
-    <div class="acc" id="acc-buildingtype">
-      <div class="acc-header" onclick="toggleAcc('acc-buildingtype')">
-        <span class="acc-title">Building Type</span><span class="acc-icon">↓</span>
-      </div>
-      <div class="acc-body">
-        <ul class="term-list" id="list-buildingtype"></ul>
-      </div>
-    </div>
-    <div class="acc" id="acc-publicrealm">
-      <div class="acc-header" onclick="toggleAcc('acc-publicrealm')">
-        <span class="acc-title">Public Realm Elements</span><span class="acc-icon">↓</span>
-      </div>
-      <div class="acc-body">
-        <ul class="term-list" id="list-publicrealm"></ul>
-      </div>
-    </div>
-    <div class="acc" id="acc-arch">
-      <div class="acc-header" onclick="toggleAcc('acc-arch')">
-        <span class="acc-title">Architectural Form</span><span class="acc-icon">↓</span>
-      </div>
-      <div class="acc-body">
-        <ul class="term-list" id="list-arch"></ul>
-      </div>
-    </div>
-    <div class="acc" id="acc-context">
-      <div class="acc-header" onclick="toggleAcc('acc-context')">
-        <span class="acc-title">Urban Transformation Context</span><span class="acc-icon">↓</span>
-      </div>
-      <div class="acc-body">
-        <ul class="term-list" id="list-context"></ul>
-      </div>
-    </div>
-    <div class="acc" id="acc-use">
-      <div class="acc-header" onclick="toggleAcc('acc-use')">
-        <span class="acc-title">Use / Program</span><span class="acc-icon">↓</span>
-      </div>
-      <div class="acc-body">
-        <ul class="term-list" id="list-use"></ul>
-      </div>
-    </div>
-    <div class="acc" id="acc-light">
-      <div class="acc-header" onclick="toggleAcc('acc-light')">
-        <span class="acc-title">Light / Conditions</span><span class="acc-icon">↓</span>
-      </div>
-      <div class="acc-body">
-        <ul class="term-list" id="list-light"></ul>
-      </div>
-    </div>
-    <div class="acc" id="acc-comp">
-      <div class="acc-header" onclick="toggleAcc('acc-comp')">
-        <span class="acc-title">Composition</span><span class="acc-icon">↓</span>
-      </div>
-      <div class="acc-body">
-        <ul class="term-list" id="list-comp"></ul>
-      </div>
-    </div>
-    <div class="acc" id="acc-status">
-      <div class="acc-header" onclick="toggleAcc('acc-status')">
-        <span class="acc-title">Physical Status</span><span class="acc-icon">↓</span>
-      </div>
-      <div class="acc-body">
-        <ul class="term-list" id="list-status"></ul>
-      </div>
-    </div>
-    <div class="acc" id="acc-olympic">
-      <div class="acc-header" onclick="toggleAcc('acc-olympic')">
-        <span class="acc-title">Brisbane 2032</span><span class="acc-icon">↓</span>
-      </div>
-      <div class="acc-body">
-        <ul class="term-list" id="list-olympic"></ul>
-      </div>
-    </div>
-  </div>
-
-  <div id="refine-spacer"></div>
-
-  <div id="refine-top">
-    <div id="active-terms"></div>
-    <div id="refine-row">
-      <form id="searchForm" action="https://photoindex.photodeck.com/" method="get" target="_blank">
-        <input type="hidden" id="vocabState">
-        <input type="hidden" id="searchSubmitValue" name="search">
-        <div class="search-bar" id="refineBarWrap">
-          <input type="text" id="refineInput" autocomplete="off" placeholder="Pick an address above or a category below..." spellcheck="false" readonly>
-          <button type="button" class="btn-clear-refine" onclick="clearAll()" aria-label="Clear all filters">×</button>
-          <div id="refine-locked-hint">Use the filters below to search</div>
-        </div>
-      </form>
-      <button class="btn-search-archive" onclick="doSearch()">Search archive →</button>
-    </div>
-    <div class="refine-hint">Fewer filters = more results. Start broad, narrow down. <a href="#" id="clearAllLink" onclick="clearAll();return false;">Clear all filters</a></div>
-  </div>
-</div>
-
-<div id="filters-toggle-all-spacer"></div>
-
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/mapbox-gl@2.15.0/dist/mapbox-gl.js" defer></script>
-<script src="https://cdn.jsdelivr.net/gh/sproutssorbets/bne-urban@main/streets-by-suburb.js" defer></script>
-<script src="https://cdn.jsdelivr.net/gh/sproutssorbets/bne-urban@main/pi-map-search-logic.js" defer></script>
 <script>
-  /* PhotoDeck-only behaviour, kept separate from the shared logic file on
-     purpose — this page shows every filter category at once behind a
-     single toggle, instead of the twelve independent accordions used on
-     Webflow. Runs after the shared script (defer preserves load order).
-     Named toggleAllFilters() so both #filters-toggle-all and
-     #advanced-search-btn can trigger the identical reaction. */
-  function toggleAllFilters(){
-    var toggleBtn = document.getElementById('filters-toggle-all');
-    var wide = document.getElementById('filters-wide');
-    var label = document.getElementById('filters-toggle-all-text');
-    if(!toggleBtn || !wide) return;
-    var isCurrentlyOpen = wide.classList.contains('all-open');
+mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
 
-    /* Deliberately NOT using scrollIntoView() here — per spec, that method
-       can walk up through nested browsing contexts and scroll the PARENT
-       PhotoDeck page too, not just this iframe's own document.
-       window.scrollTo() only ever touches this iframe's own window, so
-       the outer page stays exactly where it was. */
+/* --- DEMO DATA — replace with real archive + GeoJSON before shipping --- */
+var locations = [
+  { ref: 'PX.26.00184', street: 'Gregory Terrace', suburb: 'Herston', year: '2026', buildingType: 'heritage-building', count: 6, coords: [153.028, -27.457] },
+  { ref: 'PX.26.00191', street: 'Victoria Park Road', suburb: 'Kelvin Grove', year: '2026', buildingType: 'residential-tower', count: 4, coords: [153.017, -27.458] },
+  { ref: 'PX.26.00203', street: 'Kelvin Grove Road', suburb: 'Kelvin Grove', year: '2026', buildingType: 'mixed-use-building', count: 9, coords: [153.019, -27.456] },
+  { ref: 'PX.27.00012', street: 'Enoggera Terrace', suburb: 'Kelvin Grove', year: '2027', buildingType: 'apartment-building', count: 3, coords: [153.015, -27.455] },
+  { ref: 'PX.27.00045', street: 'Bowen Bridge Road', suburb: 'Herston', year: '2027', buildingType: 'commercial-building', count: 5, coords: [153.030, -27.454] },
+  { ref: 'PX.26.00210', street: 'Herston Road', suburb: 'Herston', year: '2026', buildingType: 'construction-site', count: 2, coords: [153.026, -27.453] }
+];
 
-    if(!isCurrentlyOpen){
-      /* Opening: reveal immediately, then scroll so the newly-unfolded
-         filters appear right at the top of the screen. Scrolling to
-         wide.offsetTop rather than the button's own offsetTop —
-         once .is-open is added (line above) the button becomes
-         position:fixed and leaves the normal document flow, so its own
-         offsetTop no longer describes a meaningful on-page position.
-         #filters-wide stays in flow throughout and immediately shifts up
-         into the button's old spot once it's removed from flow, so its
-         offsetTop is the correct, stable target either way. */
-      wide.classList.add('all-open');
-      toggleBtn.classList.add('is-open');
-      if(label) label.textContent = 'Hide filters';
-      /* getBoundingClientRect() + window.scrollY, not offsetTop — offsetTop
-         is relative to the nearest positioned ancestor, and on mobile
-         #refine-section has position:relative (set in the shared CSS file,
-         only under 900px), which makes it that ancestor. wide.offsetTop
-         then measures a few dozen pixels from the top of #refine-section
-         instead of the page, so the scroll barely moves anything on
-         mobile even though it scrolls the full, correct distance on
-         desktop, where #refine-section has no positioning context in the
-         way. getBoundingClientRect gives the element's position relative
-         to the current viewport regardless of any positioned ancestors;
-         adding the current scroll offset converts that into an absolute,
-         document-relative target that works the same on both. */
-      var targetY = wide.getBoundingClientRect().top + window.scrollY;
-      window.scrollTo({top: targetY, behavior:'smooth'});
-    } else {
-      /* Closing: scroll to the top FIRST, then collapse the filter list
-         only once that scroll has had time to finish. Collapsing first
-         would shrink the page height out from under the current scroll
-         position — with nothing left to scroll to, the browser just
-         clamps the position instantly, which reads as a jarring jump
-         rather than the same smooth motion opening has. window.scrollTo(0)
-         targets the absolute top of this document regardless of where the
-         button currently sits on screen, fixed or not, so it works the
-         same whether or not #refine-top is also visible below it. */
-     window.scrollTo({top: 0, behavior:'smooth'});
-      setTimeout(function(){
-        wide.classList.remove('all-open');
-        toggleBtn.classList.remove('is-open');
-        if(label) label.textContent = 'Show all filters';
-        window.scrollTo(0, 0);
-      }, 350);
-    }
+var projects = {
+  type: 'FeatureCollection',
+  features: [
+    { type: 'Feature', properties: { status: 'proposed' }, geometry: { type: 'Polygon', coordinates: [[[153.026,-27.459],[153.028,-27.4585],[153.0275,-27.4575],[153.0255,-27.458],[153.026,-27.459]]] } },
+    { type: 'Feature', properties: { status: 'construction' }, geometry: { type: 'Polygon', coordinates: [[[153.019,-27.4565],[153.021,-27.456],[153.0215,-27.455],[153.0195,-27.4545],[153.018,-27.455],[153.019,-27.4565]]] } },
+    { type: 'Feature', properties: { status: 'proposed' }, geometry: { type: 'Polygon', coordinates: [[[153.015,-27.459],[153.017,-27.4585],[153.0175,-27.4575],[153.0155,-27.458],[153.015,-27.459]]] } }
+  ]
+};
+/* --- end demo data --- */
+
+// where a documented location's coordinates fall inside a project's
+// footprint, cross-reference them so the popup can say so — the two
+// layers describe the same physical spot, so a click there shouldn't
+// have to guess which of the two competing facts to show.
+projects.features.forEach(function (feature) {
+  var match = locations.find(function (loc) {
+    return turf.booleanPointInPolygon(turf.point(loc.coords), feature);
+  });
+  if (match) {
+    feature.properties.documentedRef = match.ref;
+    feature.properties.documentedStreet = match.street;
+    match.projectStatus = feature.properties.status;
   }
-  document.addEventListener('DOMContentLoaded', function(){
-    var toggleBtn = document.getElementById('filters-toggle-all');
-    if(toggleBtn) toggleBtn.addEventListener('click', toggleAllFilters);
+});
+
+function statusLabel(status) {
+  return status === 'construction' ? 'Under construction' : status.charAt(0).toUpperCase() + status.slice(1);
+}
+
+var searchState = { years: ['2026'], suburb: 'Kelvin Grove', buildingTypes: [], advanced: [] };
+var layerState = { proposed: true, construction: true, approved: true };
+
+var map = new mapboxgl.Map({
+  container: 'map',
+  style: 'mapbox://styles/mapbox/light-v11',
+  center: [153.020, -27.4575],
+  zoom: 12.5
+});
+map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
+
+var geocoder = new MapboxGeocoder({
+  accessToken: mapboxgl.accessToken,
+  mapboxgl: mapboxgl,
+  marker: false,
+  placeholder: 'Search address or place…',
+  countries: 'au',
+  bbox: [152.85, -27.65, 153.25, -27.25], // Brisbane metro only — nothing outside this box suggests
+  types: 'address,poi,place,locality,neighborhood',
+  flyTo: false
+});
+document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
+// this box only moves the map to a real-world address or place — it never
+// touches searchState and never filters the list. narrowing the archive
+// itself happens exclusively by clicking the filters below.
+
+function frameArea(center, bbox) {
+  // 13 is the ceiling — this style stops drawing the suburb-name label
+  // somewhere around zoom 13–14, so no matter how tight the bounding box
+  // is, fitBounds is never allowed to push past the point where the name
+  // itself disappears from the map it's supposed to be labelling.
+  if (bbox) {
+    map.fitBounds(bbox, { padding: 60, duration: 800, maxZoom: 13 });
+  } else {
+    var buffered = turf.buffer(turf.point(center), 0.7, { units: 'kilometers' });
+    map.fitBounds(turf.bbox(buffered), { padding: 60, duration: 800, maxZoom: 13 });
+  }
+}
+
+geocoder.on('result', function (e) {
+  var result = e.result;
+  var isSuburb = result.place_type && result.place_type.some(function (t) { return t === 'place' || t === 'locality' || t === 'neighborhood'; });
+  if (isSuburb) {
+    frameArea(result.center, result.bbox);
+
+    // selecting a suburb from the dropdown is a click, not free typing,
+    // so it's allowed to check the matching Suburb filter automatically —
+    // otherwise you land on the suburb but still see zero photographed
+    // locations until you go tick the box yourself.
+    var suburbName = result.text || '';
+    var matchedBox = null;
+    document.querySelectorAll('.suburb-check').forEach(function (cb) {
+      if (cb.value.toLowerCase() === suburbName.toLowerCase()) matchedBox = cb;
+    });
+    if (matchedBox && !matchedBox.checked) {
+      matchedBox.checked = true; // radio group unchecks the previous suburb on its own
+      searchState.suburb = matchedBox.value;
+      applySearchState();
+    } else if (!matchedBox) {
+      console.log('→ "' + suburbName + '" has no matching option yet — this demo only wires up Kelvin Grove and Herston.');
+    }
+  } else {
+    // single address or POI — just a point, go in close. does not touch
+    // any filter, per the rule: search only navigates, never narrows.
+    map.flyTo({ center: result.center, zoom: 16 });
+  }
+});
+
+map.on('load', function () {
+  // force every layer in the base style to black / white / grays, no exceptions.
+  // covers fills (parks, water, buildings), lines (roads, borders), symbols
+  // (labels, road shields), and the background — not just the handful of
+  // obviously-coloured ones from before.
+  var style = map.getStyle();
+  style.layers.forEach(function (l) {
+    try {
+      if (l.type === 'background') {
+        map.setPaintProperty(l.id, 'background-color', '#F7F7F5');
+      } else if (l.type === 'fill') {
+        var isWater = /water/i.test(l.id);
+        map.setPaintProperty(l.id, 'fill-color', isWater ? '#E4E4E0' : '#EFEFEA');
+        if (map.getPaintProperty(l.id, 'fill-outline-color') !== undefined) {
+          map.setPaintProperty(l.id, 'fill-outline-color', '#DADADA');
+        }
+      } else if (l.type === 'fill-extrusion') {
+        map.setPaintProperty(l.id, 'fill-extrusion-color', '#E4E4E0');
+      } else if (l.type === 'line') {
+        var isMajorRoad = /motorway|trunk|primary/i.test(l.id);
+        map.setPaintProperty(l.id, 'line-color', isMajorRoad ? '#6B6B6B' : '#DADADA');
+      } else if (l.type === 'symbol') {
+        if (map.getPaintProperty(l.id, 'text-color') !== undefined) {
+          map.setPaintProperty(l.id, 'text-color', '#6B6B6B');
+          map.setPaintProperty(l.id, 'text-halo-color', '#F7F7F5');
+          map.setPaintProperty(l.id, 'text-halo-width', 1);
+        }
+        if (map.getPaintProperty(l.id, 'icon-color') !== undefined) {
+          map.setPaintProperty(l.id, 'icon-opacity', 0); // no decorative POI icons, per system rule
+        }
+      }
+    } catch (e) { /* layer doesn't support this property, skip it */ }
   });
 
-  /* PhotoDeck-only: utrzymuje przyklejony "Hide filters" i przyklejony
-     #refine-top (pasek z wybranymi filtrami, z pliku wspólnego) nad sobą,
-     bez nachodzenia. Mierzy realną wysokość #refine-top za każdym razem,
-     gdy się pokazuje/chowa albo zmienia rozmiar (np. gdy przybywa tagów
-     wybranych filtrów i pasek robi się wyższy), i zapisuje ją jako zmienną
-     CSS, z której korzysta reguła #filters-toggle-all.is-open powyżej.
-     Ten sam pomiar ustawia też wysokość spacera na dole listy filtrów. */
-  (function(){
-    var refineTop = document.getElementById('refine-top');
-    var toggleBtn = document.getElementById('filters-toggle-all');
-    var spacer = document.getElementById('filters-toggle-all-spacer');
-    if(!refineTop || !toggleBtn || !spacer) return;
-    function sync(){
-      var isOpen = toggleBtn.classList.contains('is-open');
-      var refineH = refineTop.classList.contains('is-visible') ? refineTop.offsetHeight : 0;
-      document.documentElement.style.setProperty('--pi-refine-top-h', refineH + 'px');
-      spacer.style.height = isOpen ? (toggleBtn.offsetHeight + refineH) + 'px' : '0px';
+  map.addSource('projects', { type: 'geojson', data: projects });
+
+  map.addLayer({
+    id: 'projects-fill',
+    type: 'fill',
+    source: 'projects',
+    minzoom: 13, // <-- this is the fix for the "invisible at city scale" problem
+    paint: {
+      'fill-color': ['match', ['get', 'status'],
+        'approved', '#111111',
+        'construction', '#6B6B6B',
+        'proposed', '#F7F7F5',
+        '#F7F7F5'],
+      'fill-opacity': ['match', ['get', 'status'], 'proposed', 0, 0.55]
     }
-    if(window.ResizeObserver){
-      new ResizeObserver(sync).observe(refineTop);
-      new ResizeObserver(sync).observe(toggleBtn);
-    }
-    new MutationObserver(sync).observe(refineTop, {attributes:true, attributeFilter:['class']});
-    new MutationObserver(sync).observe(toggleBtn, {attributes:true, attributeFilter:['class']});
-    window.addEventListener('resize', sync);
-    sync();
-  })();
+  });
+  map.addLayer({
+    id: 'projects-line',
+    type: 'line',
+    source: 'projects',
+    minzoom: 13,
+    paint: { 'line-color': ['match', ['get', 'status'], 'proposed', '#DADADA', '#6B6B6B'], 'line-width': 1 }
+  });
 
-  /* PhotoDeck-only: "Recently added" panel. Reads the shared `locations`
-     array and mapReadyFlag/locationsReadyFlag/mapForDataLayers globals from
-     pi-map-search-logic.js rather than duplicating the fetch or the map
-     init — this only runs once both are already true, polling briefly
-     instead of hooking into the shared file's own render sequence, so the
-     shared script stays untouched (it's used by the Webflow embed too). */
-  function parseLocationDate(dateStr){
-    if(!dateStr) return null;
-    var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    var m = dateStr.match(/^(?:(\d{1,2})\s+)?([A-Za-z]+)\s+(\d{4})$/);
-    if(!m) return null;
-    var mi = months.indexOf(m[2]);
-    if(mi < 0) return null;
-    var day = m[1] ? parseInt(m[1]) : 1;
-    return new Date(parseInt(m[3]), mi, day);
+  var activePopup = null;
+  var lastMarkerClickAt = 0;
+  function closeAllPopups() {
+    if (activePopup) { activePopup.remove(); activePopup = null; }
   }
-
-  function focusRecentLocation(loc){
-    var map = mapForDataLayers;
-    if(!map) return;
-    map.easeTo({center: loc.coords, zoom: 16, essential: true});
-    if(window._activePopup) window._activePopup.remove();
-    if(window._searchPopup){ window._searchPopup.remove(); window._searchPopup = null; }
-    var html = '<div class="pi-popup-body">'
-      + '<div class="pi-popup-street">' + (loc.address || loc.street) + '</div>'
-      + '<div class="pi-popup-suburb">' + loc.suburb + (loc.count ? ' · ' + loc.count + ' photo' + (loc.count > 1 ? 's' : '') : '') + '</div>'
-      + '<a class="pi-popup-add" href="' + loc.archiveUrl + '" target="_blank">View photos</a>'
-      + '</div>';
-    window._activePopup = new mapboxgl.Popup({closeButton:true, maxWidth:'240px'})
-      .setLngLat(loc.coords).setHTML(html).addTo(map)
-      .on('close', function(){ window._activePopup = null; });
+  function showPopup(popup, lngLat) {
+    closeAllPopups();
+    popup.setLngLat(lngLat).addTo(map);
+    activePopup = popup;
   }
+  window.piCloseAllPopups = closeAllPopups; // reachable from filter listeners outside this closure
+  window.piShowPopup = showPopup;
 
-  function renderRecentLocations(){
-    var listEl = document.getElementById('recent-locations-list');
-    var panelEl = document.getElementById('recent-locations');
-    if(!listEl || !panelEl) return;
-    var dated = locations
-      .filter(function(l){ return l.documented && !isNaN(l.coords[0]) && parseLocationDate(l.date); })
-      .map(function(l){ return {loc:l, parsed:parseLocationDate(l.date)}; })
-      .sort(function(a,b){ return b.parsed - a.parsed; })
-      .slice(0, 5);
-    if(dated.length === 0){ panelEl.style.display = 'none'; return; }
-    listEl.innerHTML = '';
-    dated.forEach(function(entry){
-      var row = document.createElement('div');
-      row.className = 'recent-row';
-      var title = document.createElement('div');
-      title.className = 'recent-row-title';
-      title.textContent = entry.loc.address || entry.loc.street;
-      var meta = document.createElement('div');
-      meta.className = 'recent-row-meta';
-      meta.textContent = entry.loc.suburb + ' · ' + entry.loc.date;
-      row.appendChild(title);
-      row.appendChild(meta);
-      row.addEventListener('click', function(){ focusRecentLocation(entry.loc); });
-      listEl.appendChild(row);
+  locations.forEach(function (loc) {
+    var el = document.createElement('div');
+    el.style.width = '8px'; el.style.height = '8px'; el.style.background = '#111111'; el.style.borderRadius = '0'; el.style.cursor = 'pointer';
+
+    var popupHtml =
+      '<div style="font-family:Inter,system-ui,sans-serif;padding:2px 2px 4px;min-width:180px;">' +
+        '<div style="font-size:13px;color:#111111;margin-bottom:4px;">' + loc.street + '</div>' +
+        '<div style="font-size:10px;color:#6B6B6B;margin-bottom:8px;">' + loc.count + (loc.count === 1 ? ' photo documented' : ' photos documented') + '</div>' +
+        '<div style="font-size:10px;color:#6B6B6B;border-top:1px solid #DADADA;padding-top:6px;">' + loc.suburb + ' · ' + loc.year + ' · ' + loc.buildingType + '</div>' +
+        (loc.projectStatus ? '<div style="font-size:10px;color:#111111;border-top:1px solid #DADADA;padding-top:6px;margin-top:6px;">This spot also sits inside a development project — ' + statusLabel(loc.projectStatus) + '</div>' : '') +
+      '</div>';
+
+    loc.popup = new mapboxgl.Popup({ offset: 14, closeButton: true, className: 'pi-popup' }).setHTML(popupHtml);
+    loc.marker = new mapboxgl.Marker({ element: el }).setLngLat(loc.coords).addTo(map);
+    el.addEventListener('click', function (ev) {
+      ev.stopPropagation();
+      lastMarkerClickAt = Date.now(); // tells the polygon handler below "this click already had an owner"
+      showPopup(loc.popup, loc.coords);
     });
-  }
+  });
 
-  var recentLocationsTimer = setInterval(function(){
-    if(mapReadyFlag && locationsReadyFlag){
-      clearInterval(recentLocationsTimer);
-      renderRecentLocations();
-    }
-  }, 200);
+  map.on('mouseenter', 'projects-fill', function () { map.getCanvas().style.cursor = 'pointer'; });
+  map.on('mouseleave', 'projects-fill', function () { map.getCanvas().style.cursor = ''; });
+
+  map.on('click', 'projects-fill', function (e) {
+    if (Date.now() - lastMarkerClickAt < 80) return; // a marker sitting inside this polygon just handled this same click
+    var props = e.features[0].properties;
+    var html =
+      '<div style="font-family:Inter,system-ui,sans-serif;padding:2px 2px 4px;min-width:180px;">' +
+        '<div style="font-size:10px;letter-spacing:0.08em;color:#6B6B6B;margin-bottom:4px;">Development project</div>' +
+        '<div style="font-size:13px;color:#111111;margin-bottom:8px;">' + statusLabel(props.status) + '</div>' +
+        '<div style="font-size:10px;color:#6B6B6B;border-top:1px solid #DADADA;padding-top:6px;">Demo data — no council reference wired yet.</div>' +
+        (props.documentedRef ? '<div style="font-size:10px;color:#111111;border-top:1px solid #DADADA;padding-top:6px;margin-top:6px;">A documented photo exists within this footprint — ' + props.documentedRef + ', ' + props.documentedStreet + '</div>' : '') +
+      '</div>';
+    showPopup(new mapboxgl.Popup({ offset: 8, closeButton: true, className: 'pi-popup' }).setHTML(html), e.lngLat);
+  });
+
+  renderList();
+  applySearchState();
+  applyLayerState();
+});
+
+function applyLayerState() {
+  var expr = ['any'];
+  Object.keys(layerState).forEach(function (k) {
+    if (layerState[k]) expr.push(['==', ['get', 'status'], k]);
+  });
+  map.setFilter('projects-fill', expr.length > 1 ? expr : ['==', ['get', 'status'], '__none__']);
+  map.setFilter('projects-line', expr.length > 1 ? expr : ['==', ['get', 'status'], '__none__']);
+
+  ['proposed', 'construction', 'approved'].forEach(function (s) {
+    var n = projects.features.filter(function (f) { return f.properties.status === s; }).length;
+    document.getElementById('count-' + s).textContent = n;
+  });
+}
+
+function applySearchState() {
+  var visibleLocs = locations.filter(function (loc) {
+    var matchesYear = searchState.years.indexOf(loc.year) !== -1;
+    var matchesSuburb = !searchState.suburb || loc.suburb === searchState.suburb;
+    var matchesBuilding = searchState.buildingTypes.length === 0 || searchState.buildingTypes.indexOf(loc.buildingType) !== -1;
+    return matchesYear && matchesSuburb && matchesBuilding;
+  });
+
+  locations.forEach(function (loc) {
+    var visible = visibleLocs.indexOf(loc) !== -1;
+    loc.marker.getElement().style.display = visible ? '' : 'none';
+  });
+
+  renderList(visibleLocs);
+  renderChips();
+  document.getElementById('footer-row').textContent = visibleLocs.length + ' locations documented · last updated 28 June 2026';
+
+  // this is the line that would become a real PhotoDeck fetch:
+  var searchParam = [searchState.years.join(','), searchState.suburb, searchState.buildingTypes.join(','), searchState.advanced.join(',')].filter(Boolean).join(' ');
+  console.log('→ would fetch PhotoDeck with ?search=' + encodeURIComponent(searchParam));
+}
+
+function renderList(items) {
+  items = items || locations;
+  var wrap = document.getElementById('list-wrap');
+  wrap.innerHTML = '';
+  items.forEach(function (loc) {
+    var row = document.createElement('div');
+    row.className = 'list-row';
+    row.innerHTML = '<div><div class="list-ref">' + loc.ref + '</div><div class="list-street">' + loc.street + '</div></div>';
+    row.addEventListener('click', function () {
+      map.flyTo({ center: loc.coords, zoom: 15 });
+      window.piShowPopup(loc.popup, loc.coords);
+    });
+    wrap.appendChild(row);
+  });
+}
+
+function renderChips() {
+  var chips = [];
+  searchState.years.forEach(function (y) { chips.push({ label: y, clear: function () { toggleValue(searchState.years, y); syncCheckbox('.year-check', y, false); applySearchState(); } }); });
+  if (searchState.suburb) chips.push({ label: searchState.suburb, clear: function () { searchState.suburb = ''; document.querySelectorAll('.suburb-check').forEach(function (cb) { cb.checked = false; }); applySearchState(); } });
+  searchState.buildingTypes.forEach(function (b) { chips.push({ label: b, clear: function () { toggleValue(searchState.buildingTypes, b); syncCheckbox('.building-check', b, false); applySearchState(); } }); });
+  searchState.advanced.forEach(function (a) { chips.push({ label: a, clear: function () { toggleValue(searchState.advanced, a); syncCheckbox('.adv-check', a, false); applySearchState(); } }); });
+
+  var host = document.getElementById('chips-here');
+  host.innerHTML = '';
+  chips.forEach(function (c) {
+    var span = document.createElement('span');
+    span.className = 'chip';
+    span.textContent = c.label + ' ×';
+    span.addEventListener('click', c.clear);
+    host.appendChild(span);
+  });
+}
+
+function toggleValue(arr, val) {
+  var i = arr.indexOf(val);
+  if (i === -1) arr.push(val); else arr.splice(i, 1);
+}
+function syncCheckbox(sel, val, checked) {
+  document.querySelectorAll(sel).forEach(function (cb) { if (cb.value === val) cb.checked = checked; });
+}
+
+document.querySelectorAll('.filter-row').forEach(function (row) {
+  row.addEventListener('click', function () {
+    var status = row.getAttribute('data-status');
+    layerState[status] = !layerState[status];
+    row.classList.toggle('off', !layerState[status]);
+    applyLayerState();
+  });
+});
+
+document.querySelectorAll('.acc-head').forEach(function (h) {
+  h.addEventListener('click', function () {
+    document.getElementById(h.getAttribute('data-target')).classList.toggle('open');
+  });
+});
+
+
+document.querySelectorAll('.year-check').forEach(function (cb) {
+  cb.addEventListener('change', function () { toggleValue(searchState.years, cb.value); applySearchState(); });
+});
+function flyToSuburb(name) {
+  var url = 'https://api.mapbox.com/geocoding/v5/mapbox.places/' + encodeURIComponent(name + ', Brisbane, Australia') + '.json?access_token=' + mapboxgl.accessToken + '&country=au&types=place,locality,neighborhood&limit=1';
+  fetch(url).then(function (r) { return r.json(); }).then(function (data) {
+    var feature = data.features && data.features[0];
+    if (!feature) return;
+    frameArea(feature.center, feature.bbox);
+  }).catch(function (err) { console.log('→ suburb geocoding lookup failed', err); });
+}
+
+document.querySelectorAll('.suburb-check').forEach(function (cb) {
+  cb.addEventListener('change', function () {
+    if (window.piCloseAllPopups) window.piCloseAllPopups();
+    searchState.suburb = cb.value;
+    applySearchState();
+    flyToSuburb(cb.value); // same geocoding call the top search bar uses, so the map behaves identically either way
+  });
+});
+document.querySelectorAll('.building-check').forEach(function (cb) {
+  cb.addEventListener('change', function () { toggleValue(searchState.buildingTypes, cb.value); applySearchState(); });
+});
+function closeAdvPanel() {
+  document.getElementById('adv-panel').style.display = 'none';
+  var advBtn = document.getElementById('adv-btn');
+  advBtn.style.background = '#111111'; advBtn.style.color = '#F7F7F5';
+}
+document.getElementById('adv-btn').addEventListener('click', function () {
+  var panel = document.getElementById('adv-panel');
+  var open = panel.style.display !== 'none';
+  panel.style.display = open ? 'none' : 'block';
+  this.style.background = open ? '#111111' : '#F7F7F5';
+  this.style.color = open ? '#F7F7F5' : '#111111';
+});
+document.getElementById('adv-clear').addEventListener('click', function () {
+  document.querySelectorAll('.adv-check').forEach(function (cb) { cb.checked = false; });
+  searchState.advanced = [];
+  closeAdvPanel();
+  applySearchState();
+});
+document.getElementById('adv-apply').addEventListener('click', function () {
+  var chosen = Array.prototype.slice.call(document.querySelectorAll('.adv-check:checked')).map(function (cb) { return cb.value; });
+  searchState.advanced = chosen;
+  closeAdvPanel();
+  applySearchState();
+});
+var mobileTabs = {
+  index: { btn: document.getElementById('tab-index'), group: document.getElementById('index-group') },
+  filters: { btn: document.getElementById('tab-filters'), group: document.getElementById('filters-group') },
+  map: { btn: document.getElementById('tab-map'), group: document.getElementById('map-wrap') }
+};
+Object.keys(mobileTabs).forEach(function (key) {
+  mobileTabs[key].btn.addEventListener('click', function () {
+    Object.keys(mobileTabs).forEach(function (k) {
+      mobileTabs[k].btn.classList.toggle('active', k === key);
+      mobileTabs[k].group.classList.toggle('mobile-hidden', k !== key);
+    });
+    if (key === 'map') setTimeout(function () { map.resize(); }, 50);
+  });
+});
+
+
 </script>
+
 </body>
 </html>
