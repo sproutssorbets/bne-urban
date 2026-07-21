@@ -85,7 +85,7 @@
   .last-updated-badge { font-weight: 500; color: #111111; letter-spacing: 0.08em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 4px; }
   .last-updated-badge::before { content: "●"; font-size: 8px; color: #111111; }
 
-  /* Optymalizacja UX dla pinów: mały kwadracik wizualny + duży niewidoczny hitbox 44x44px do łatwego trafienia palcem */
+  /* Hitbox dla wygody klikania palcem na mobile (44x44px) */
   .custom-marker-hitbox {
     width: 44px;
     height: 44px;
@@ -93,18 +93,25 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transform: translate(-22px, -22px); /* wyśrodkowanie hitboxa względem współrzędnych geograficznych */
+    transform: translate(-22px, -22px);
   }
+
+  /* Wizualny kwadracik: dodajemy białe tło, czarną ramkę 1px oraz płynną animację */
   .custom-marker-visual {
-    width: 8px;
-    height: 8px;
-    background: #111111;
+    width: 10px;
+    height: 10px;
+    background: #FFFFFF;
+    border: 1px solid #111111;
     border-radius: 0 !important;
-    transition: transform 0.15s ease, background-color 0.15s ease;
+    transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
   }
-  .custom-marker-hitbox:hover .custom-marker-visual {
-    transform: scale(1.6); /* powiększenie po najechaniu */
-    background: #000000;
+
+  /* Efekt interaktywności po najechaniu / dotknięciu (zmienia się w pełny czarny kwadrat z powiększeniem) */
+  .custom-marker-hitbox:hover .custom-marker-visual,
+  .custom-marker-hitbox:active .custom-marker-visual {
+    transform: scale(1.5);
+    background: #111111;
+    border-color: #111111;
   }
 
   #map-wrap { flex: 1; position: relative; background: #FFFFFF; }
