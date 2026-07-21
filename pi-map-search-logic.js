@@ -715,9 +715,9 @@ function initMap(){
     startZoom = parseFloat(savedZoom);
   }
 
-  /* 2. Inicjujemy mapę używając zapisanych (lub domyślnych) wartości */
+ /* 2. Inicjujemy mapę używając zapisanych (lub domyślnych) wartości */
   const map = new mapboxgl.Map({
-    container:'map', style:'mapbox://styles/mapbox/light-v11',
+    container:'map', style:'mapbox://styles/mapbox/light-v11?optimize=true',
     center: startCenter, 
     zoom: startZoom, 
     minZoom:11, maxZoom:19,
