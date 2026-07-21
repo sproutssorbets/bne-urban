@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,97 +10,103 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
 
+  :root{
+    --bg:#FFFFFF;
+    --text:#111111;
+    --muted:#6B6B6B;
+    --rule:#111111;
+    --rule-strong:#111111;
+  }
+
   .pi-acc{
   scroll-margin-top: 100px;
 }
 
 html{scroll-behavior:smooth;}
 
-html,body{margin:0;padding:0;background:#FFFFFF;}
+html,body{margin:0;padding:0;background:var(--bg);}
 .pi-lic,.pi-lic *,.pi-lic ::before,.pi-lic *::after{box-sizing:border-box;margin:0;padding:0}
 .pi-lic{
   font-family:Inter,sans-serif;
-  color:#1A1A1A;
-  background:#FFFFFF;
-  max-width:none;
-  margin:0;
-  padding:0;
-  font-size:13.333px;
+  color:var(--text);
+  background:var(--bg);
+  max-width:934px; /* Zmieniono szerokość na 934px zgodnie z resztą podstron */
+  margin:60px auto; 
+  padding:0 24px;
+  font-size:13px;
   line-height:1.6;
 }
 .pi-lic-header{
   padding-bottom:32px;
-  margin-bottom:56px;
-  border-bottom:1px solid #111111;
 }
 .pi-lic-h1{
-  font-size:13.333px;
-  font-weight:400;
-  letter-spacing:normal;
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:.14em;
   text-transform:uppercase;
-  color:#1A1A1A;
+  color:var(--text);
   margin-bottom:16px;
 }
 .pi-lic-intro{
-  font-size:13.333px;
+  font-size:13px;
   font-weight:400;
   line-height:1.6;
-  color:#1A1A1A;
+  color:var(--text);
   max-width:none;
   margin-bottom:12px;
 }
 .pi-lic-note{
   font-size:11px;
-  font-weight:400;
+  font-weight:500;
   letter-spacing:.14em;
   text-transform:uppercase;
-  color:#6B6B6B;
+  color:var(--muted);
 }
 .pi-finder{
-  border-top:1px solid #111111;
+  border-top:1px solid var(--rule-strong);
   margin-bottom:72px;
 }
 .pi-finder-header{
   display:grid;
   grid-template-columns:240px 1fr;
-  border-bottom:1px solid #DADADA;
-  padding:12px 0;
+  border-bottom:1px solid var(--rule);
+  padding:14px 0; /* Zmieniono na 14px na podstawie DevTools z zrzutu ekranu */
 }
 .pi-finder-hcell{
   font-size:11px;
-  font-weight:400;
+  font-weight:500;
   letter-spacing:.14em;
   text-transform:uppercase;
-  color:#6B6B6B;
+  color:var(--muted);
 }
 .pi-finder-row{
   display:grid;
   grid-template-columns:240px 1fr;
   gap:16px;
   align-items:start;
-  padding:16px 0;
-  border-bottom:1px solid #DADADA;
+  padding:14px 0; /* Zmieniono na 14px na podstawie DevTools z zrzutu ekranu */
+  border-bottom:1px solid var(--rule);
   text-decoration:none;
   color:inherit;
 }
 .pi-finder-row:hover{
-  border-bottom:1px solid #111111;
+  border-bottom:1px solid var(--rule-strong);
 }
 .pi-finder-client{
-  font-size:13.333px;
+  font-size:13px;
   font-weight:400;
-  color:#1A1A1A;
+  color:var(--text);
 }
 .pi-finder-tags{
   font-size:11px;
-  font-weight:400;
-  letter-spacing:.06em;
+  font-weight:500;
+  letter-spacing:.14em;
   text-transform:uppercase;
-  color:#6B6B6B;
+  color:var(--muted);
 }
 .pi-finder-tags span:not(:last-child)::after{
   content:" / ";
-  color:#DADADA;
+  color:var(--rule);
 }
 @media (max-width:900px){
   .pi-finder-header{display:none}
@@ -107,18 +114,18 @@ html,body{margin:0;padding:0;background:#FFFFFF;}
   .pi-finder-tags{display:none}
 }
 .pi-acc{
-  border-top:1px solid #DADADA;
+  border-top:1px solid var(--rule);
   scroll-margin-top:100px;
 }
 .pi-acc:last-of-type{
-  border-bottom:1px solid #111111;
+  border-bottom:1px solid var(--rule-strong);
 }
 .pi-acc summary{
   display:grid;
   grid-template-columns:32px 1fr auto auto;
   align-items:baseline;
   gap:16px;
-  padding:22px 0;
+  padding:14px 0; /* Zmieniono na 14px na podstawie DevTools z zrzutu ekranu */
   cursor:pointer;
   list-style:none;
 }
@@ -126,25 +133,25 @@ html,body{margin:0;padding:0;background:#FFFFFF;}
 .pi-acc-index{
   font-size:11px;
   font-weight:400;
-  color:#6B6B6B;
+  color:var(--muted);
   letter-spacing:.04em;
 }
 .pi-acc-title{
-  font-size:13.333px;
-  font-weight:400;
-  letter-spacing:normal;
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:.14em;
   text-transform:uppercase;
-  color:#1A1A1A;
+  color:var(--text);
 }
 .pi-acc-preview{
-  font-size:13.333px;
+  font-size:13px;
   font-weight:400;
-  color:#1A1A1A;
+  color:var(--text);
   white-space:nowrap;
 }
 .pi-acc-chevron{
   font-size:11px;
-  color:#6B6B6B;
+  color:var(--muted);
   transition:transform .15s;
 }
 .pi-acc[open] .pi-acc-chevron{
@@ -155,64 +162,61 @@ html,body{margin:0;padding:0;background:#FFFFFF;}
   padding-left:48px;
 }
 .pi-lic-table{
-  border-top:1px solid #DADADA;
+  border-top:1px solid var(--rule);
   margin-bottom:24px;
 }
 .pi-lic-row{
   display:grid;
-  border-bottom:1px solid #DADADA;
+  border-bottom:1px solid var(--rule);
   align-items:start;
-}
-.pi-lic-row:last-child{
-  border-bottom:1px solid #111111;
 }
 .pi-lic-row-cols3{grid-template-columns:220px 1fr 100px}
 .pi-lic-row-cols2{grid-template-columns:200px 1fr}
 .pi-lic-cell{
-  padding:12px 16px 12px 0;
-  font-size:13.333px;
+  padding:14px 16px 14px 0; /* Dopasowano pionowy padding do 14px */
+  font-size:13px;
 }
 .pi-lic-cell:first-child{padding-left:0}
 .pi-lic-cell-label{
   font-size:11px;
-  font-weight:400;
-  letter-spacing:.1em;
+  font-weight:500;
+  letter-spacing:.14em;
   text-transform:uppercase;
-  color:#6B6B6B;
+  color:var(--muted);
   padding-top:8px;
   padding-bottom:8px;
 }
 .pi-lic-cell-title{
   font-weight:400;
-  color:#1A1A1A;
+  color:var(--text);
 }
 .pi-lic-cell-meta{
-  color:#1A1A1A;
+  color:var(--text);
   line-height:1.6;
 }
 .pi-lic-cell-price{
   text-align:right;
   white-space:nowrap;
   font-weight:400;
-  color:#1A1A1A;
+  color:var(--text);
 }
 .pi-lic-cell-label.pi-lic-cell-price{font-size:11px}
 .pi-cond-label{
   font-size:11px;
-  font-weight:400;
-  letter-spacing:.1em;
+  font-weight:500;
+  letter-spacing:.14em;
   text-transform:uppercase;
-  color:#6B6B6B;
-  padding:14px 16px 14px 0;
+  color:var(--muted);
+  padding:14px 16px 14px 0; /* Ten margines miał już wartość 14px */
 }
 .pi-cond-text{
-  font-size:13.333px;
+  font-size:13px;
   line-height:1.6;
-  color:#1A1A1A;
-  padding:14px 0;
+  color:var(--text);
+  padding:14px 0; /* Ten margines miał już wartość 14px */
 }
 @media (max-width:900px){
-  .pi-lic{padding:36px 0 72px}
+  .pi-lic{padding:36px 16px 72px; margin:0 auto;}
   .pi-acc-body{padding-left:0}
   .pi-acc summary{grid-template-columns:24px 1fr auto}
   .pi-acc-preview{display:none}
@@ -227,7 +231,7 @@ html,body{margin:0;padding:0;background:#FFFFFF;}
   transform:rotate(180deg);
 }
 
-  .pi-lic__intro{
+.pi-lic__intro{
   padding-bottom: 24px;
   border-bottom: none;
   margin-bottom: 0;
@@ -534,4 +538,4 @@ history.replaceState(null, '', '#' + id);
 });
 </script>
 </body>
-</html>  
+</html>
