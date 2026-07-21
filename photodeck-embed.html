@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>PhotoIndex — Archive & Map Explorer</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet">
@@ -11,10 +11,10 @@
 <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 <style>
-  * { box-sizing: border-box; border-radius: 0 !important; box-shadow: none !important; }
-  body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background: #FFFFFF; color: #111111; overflow-x: hidden; }
+  * { box-sizing: border-box; border-radius: 0 !important; box-shadow: none !important; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Inter', system-ui, sans-serif; background: #FFFFFF; color: #111111; }
 
-  #topbar { border-bottom: 1px solid #111111; background: #FFFFFF; }
+  #topbar { border-bottom: 1px solid #111111; background: #FFFFFF; flex-shrink: 0; }
   #search-row { display: flex; align-items: center; height: 56px; padding: 0 20px; border-bottom: 1px solid #111111; gap: 12px; }
   #geocoder { flex: 1; }
   #geocoder .mapboxgl-ctrl-geocoder { width: 100%; max-width: none; font-family: inherit; box-shadow: none; background: #FFFFFF; }
@@ -24,31 +24,34 @@
   #search-archive-btn { height: 36px; padding: 0 16px; border: 1px solid #111111; background: #111111; color: #FFFFFF; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 6px; text-decoration: none; flex-shrink: 0; }
   #search-archive-btn:hover { background: #333333; }
 
-  #chip-row { display: flex; align-items: center; padding: 12px 20px; flex-wrap: wrap; min-height: 20px; background: #FFFFFF; border-bottom: 1px solid #111111; }
+  #chip-row { display: flex; align-items: center; padding: 10px 20px; flex-wrap: wrap; min-height: 20px; background: #FFFFFF; border-bottom: 1px solid #111111; }
   #chip-label { font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6B6B6B; margin-right: 12px; }
   .chip { display: inline-flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #111111; padding: 3px 8px; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #111111; cursor: pointer; background: #FFFFFF; margin: 0 6px 6px 0; line-height: 1.2; }
   .chip:hover { background: #F0F0F0; }
 
-  #layout { display: flex; height: calc(100vh - 147px); height: calc(100dvh - 147px); background: #FFFFFF; position: relative; }
+  #layout { display: flex; width: 100%; height: calc(100% - 106px); background: #FFFFFF; position: relative; overflow: hidden; }
 
-  .mobile-tabs { display: none; border-bottom: 1px solid #111111; background: #FFFFFF; }
+  .mobile-tabs { display: none; border-bottom: 1px solid #111111; background: #FFFFFF; flex-shrink: 0; }
   .mobile-tab { flex: 1; height: 44px; border: none; border-right: 1px solid #111111; background: #FFFFFF; color: #111111; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; cursor: pointer; }
   .mobile-tab:last-child { border-right: none; }
   .mobile-tab.active { background: #111111; color: #FFFFFF; }
 
   @media (max-width: 720px) {
     .mobile-tabs { display: flex; }
-    #layout { height: calc(100vh - 146px); height: calc(100dvh - 146px); }
-    #index-panel { width: 100%; border-right: none; height: 100%; }
-    #map-wrap { width: 100%; height: 100%; position: absolute; inset: 0; z-index: 2; display: none; }
-    #map-wrap.mobile-active { display: block; }
+    #layout { height: calc(100% - 150px); }
+    #index-panel { width: 100% !important; border-right: none !important; height: 100% !important; position: absolute; inset: 0; z-index: 3; }
+    #map-wrap { width: 100% !important; height: 100% !important; position: absolute; inset: 0; z-index: 2; display: none; }
+    #map-wrap.mobile-active { display: block !important; }
     
     #search-archive-btn { width: 36px; padding: 0; justify-content: center; font-size: 14px; letter-spacing: normal; }
     #search-archive-text { display: none; }
   }
 
-  #index-panel { width: 380px; flex-shrink: 0; border-right: 1px solid #111111; display: flex; flex-direction: column; overflow-y: auto; background: #FFFFFF; }
-  .section { padding: 14px 20px; border-bottom: 1px solid #111111; background: #FFFFFF; }
+  #index-panel { width: 380px; flex-shrink: 0; border-right: 1px solid #111111; display: flex; flex-direction: column; background: #FFFFFF; overflow: hidden; }
+  
+  .panel-section-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+  
+  .section { padding: 14px 20px; border-bottom: 1px solid #111111; background: #FFFFFF; flex-shrink: 0; }
   .section-label { font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: #6B6B6B; margin-bottom: 10px; }
 
   .filter-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; cursor: pointer; user-select: none; }
@@ -57,7 +60,7 @@
   .filter-count { font-size: 10px; color: #6B6B6B; }
   .filter-label { font-size: 11px; color: #111111; }
 
-  .acc-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid #111111; cursor: pointer; user-select: none; background: #FFFFFF; }
+  .acc-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid #111111; cursor: pointer; user-select: none; background: #FFFFFF; flex-shrink: 0; }
   .acc-head:hover { background: #F0F0F0; }
   .acc-body { display: none; padding: 14px 20px; border-bottom: 1px solid #111111; font-size: 11px; color: #111111; background: #FFFFFF; }
   .acc-body.open { display: block; }
@@ -67,18 +70,18 @@
   .acc-body label { display: block; cursor: pointer; padding: 4px 0; }
 
   #index-group { display: flex; flex: 1; overflow-y: auto; flex-direction: column; background: #FFFFFF; }
-  #filters-group { display: flex; flex-direction: column; }
+  #filters-group { display: flex; flex-direction: column; flex: 1; overflow-y: auto; }
 
   @media (max-width: 720px) {
     #filters-group { display: none; }
   }
 
-  #list-wrap { flex: 1; background: #FFFFFF; }
+  #list-wrap { flex: 1; background: #FFFFFF; overflow-y: auto; }
   .list-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid #111111; cursor: pointer; background: #FFFFFF; }
   .list-row:hover { background: #F0F0F0; }
   .list-street { font-size: 12px; color: #111111; font-weight: 400; }
 
-  #footer-row { padding: 12px 20px; font-size: 10px; letter-spacing: 0.06em; color: #6B6B6B; border-top: 1px solid #111111; background: #FFFFFF; display: flex; justify-content: space-between; align-items: center; }
+  #footer-row { padding: 12px 20px; font-size: 10px; letter-spacing: 0.06em; color: #6B6B6B; border-top: 1px solid #111111; background: #FFFFFF; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
   .last-updated-badge { font-weight: 500; color: #111111; letter-spacing: 0.08em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 4px; }
   .last-updated-badge::before { content: "●"; font-size: 8px; color: #111111; }
 
@@ -103,7 +106,8 @@
 <div id="topbar">
   <div id="search-row">
     <div id="geocoder"></div>
-    <a id="search-archive-btn" href="https://photoindex.photodeck.com/" target="_blank">
+    <!-- Zmiana target="_blank" na target="_top" aby linki działały poprawnie wewnątrz iframe -->
+    <a id="search-archive-btn" href="https://photoindex.photodeck.com/" target="_top">
       <span id="search-archive-text">Search archive</span> →
     </a>
   </div>
@@ -114,14 +118,14 @@
 </div>
 
 <div class="mobile-tabs">
-  <button class="mobile-tab active" data-tab="index">Index</button>
-  <button class="mobile-tab" data-tab="filters">Filters</button>
-  <button class="mobile-tab" data-tab="map">Map</button>
+  <button class="mobile-tab active" id="tab-index" data-tab="index">Index</button>
+  <button class="mobile-tab" id="tab-filters" data-tab="filters">Filters</button>
+  <button class="mobile-tab" id="tab-map" data-tab="map">Map</button>
 </div>
 
 <div id="layout">
   <div id="index-panel">
-    <div id="filters-group">
+    <div class="panel-section-container" id="filters-group">
       
       <!-- Warstwy projektów deweloperskich -->
       <div class="section">
@@ -654,7 +658,7 @@ function initMapEverything() {
         '<div style="font-family:Inter,system-ui,sans-serif;padding:2px 2px 4px;min-width:180px;">' +
           '<div style="font-size:13px;color:#111111;margin-bottom:4px;font-weight:500;">' + loc.street + '</div>' +
           '<div style="font-size:10px;color:#6B6B6B;margin-bottom:8px;">' + loc.count + (loc.count === 1 ? ' photo documented' : ' photos documented') + '</div>' +
-          '<a href="' + loc.archiveUrl + '" target="_blank" style="display:block;text-align:center;background:#111;color:#fff;padding:8px 6px;font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;text-decoration:none;outline:none;">VIEW PHOTOS →</a>' +
+          '<a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:#111;color:#fff;padding:8px 6px;font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;text-decoration:none;outline:none;">VIEW PHOTOS →</a>' +
           '<div style="font-size:10px;color:#6B6B6B;border-top:1px solid #111111;padding-top:6px;">' + loc.suburb + '</div>' +
         '</div>';
 
@@ -832,11 +836,11 @@ document.querySelectorAll('.suburb-check').forEach(function (cb) {
   });
 });
 
-// Zunifikowana, czysta pętla obsługi zakładek mobilnych
+// Zunifikowana obsługa zakładek mobilnych z obsługą dotyku
 var mobileTabConfigs = {
-  index: { btn: document.getElementById('tab-index'), show: 'index-group' },
-  filters: { btn: document.getElementById('tab-filters'), show: 'filters-group' },
-  map: { btn: document.getElementById('tab-map'), show: 'map-wrap' }
+  index: { btn: document.getElementById('tab-index') },
+  filters: { btn: document.getElementById('tab-filters') },
+  map: { btn: document.getElementById('tab-map') }
 };
 
 Object.keys(mobileTabConfigs).forEach(function(key) {
