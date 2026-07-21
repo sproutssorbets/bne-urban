@@ -878,31 +878,67 @@ function renderDataLayers(map){
     /* Development projects — polygons loaded from external GeoJSON, 3 statuses.
        Previously used saturated, default-looking colours (#DB4436 / #009D57 /
        #4186F0) that sat outside the site's entire palette — the only place
-       on the whole site with live, saturated hue. Muted here into the same
-       ink-toned family as the rest of the system, and given each status its
-       own line-dasharray so the three remain distinguishable even in
-       grayscale or for colour-blind visitors, not by hue alone. */
-    const statusColors = {
-      proposed:'#A8453B', approved:'#4A7856', under_construction:'#3D6491'
-    };
-    const statusDash = {
-      proposed: [1], approved: [3, 2], under_construction: [1, 2]
-    };
+       on the whole site with live, saturated hue. First attempt muted these
+       into an ink-toned family with line-dasharray for distinction — at
+       1.3px line width, [1] vs [1,2] disappears from normal viewing
+       distance, so that layer of redundancy was itself unreliable.
+
+       This version drops hue entirely and puts the distinction in the fill
+       itself, not the outline: diagonal hatch for Proposed (sketch-like,
+       nothing built yet), a dot/stipple texture for Under construction
+       (gravel, work-in-progress), solid dark fill with no texture at all
+       for Approved (the one status that's actually there — it doesn't need
+       a pattern to prove it). Value and texture both carry the meaning, so
+       it still reads correctly in grayscale, at a glance, or for a
+       colour-blind visitor — never relying on hue alone, same principle as
+       the line-dasharray attempt, just executed somewhere it can't
+       disappear at typical line weights. */
+    function makeStatusPattern(status){
+      var ratio = 2, size = 16 * ratio;
+      var c = document.createElement('canvas');
+      c.width = size; c.height = size;
+      var ctx = c.getContext('2d');
+      if(status === 'proposed'){
+        ctx.fillStyle = '#DADADA'; ctx.fillRect(0, 0, size, size);
+        ctx.strokeStyle = '#111111'; ctx.lineWidth = 1 * ratio;
+        ctx.beginPath();
+        ctx.moveTo(0, size); ctx.lineTo(size, 0);
+        ctx.moveTo(-size / 2, size / 2); ctx.lineTo(size / 2, -size / 2);
+        ctx.moveTo(size / 2, size * 1.5); ctx.lineTo(size * 1.5, size / 2);
+        ctx.stroke();
+      } else if(status === 'under_construction'){
+        ctx.fillStyle = '#B5B5B0'; ctx.fillRect(0, 0, size, size);
+        ctx.fillStyle = '#111111';
+        var r = 1.3 * ratio;
+        [[0.25,0.25],[0.75,0.25],[0.25,0.75],[0.75,0.75]].forEach(function(p){
+          ctx.beginPath(); ctx.arc(p[0]*size, p[1]*size, r, 0, Math.PI*2); ctx.fill();
+        });
+      } else {
+        ctx.fillStyle = '#4A4A47'; ctx.fillRect(0, 0, size, size);
+      }
+      return ctx.getImageData(0, 0, size, size);
+    }
+
     const DEV_SHOWN = ['proposed','approved','under_construction'];
+
+    DEV_SHOWN.forEach(status => {
+      if(!map.hasImage('dev-pattern-'+status)){
+        map.addImage('dev-pattern-'+status, makeStatusPattern(status), {pixelRatio: 2});
+      }
+    });
 
     /* Initialise empty sources + fill and outline layers for each status */
     DEV_SHOWN.forEach(status => {
       map.addSource('dev-'+status,{type:'geojson',data:{type:'FeatureCollection',features:[]}});
       map.addLayer({id:'dev-'+status,type:'fill',source:'dev-'+status,paint:{
-        'fill-color':statusColors[status],'fill-opacity':0.22
+        'fill-pattern':'dev-pattern-'+status, 'fill-opacity':0.85
       }}, 'doc-clusters');
       map.addLayer({id:'dev-'+status+'-line',type:'line',source:'dev-'+status,paint:{
-        'line-color':statusColors[status],'line-opacity':0.75,'line-width':1.3,
-        'line-dasharray':statusDash[status]
+        'line-color':'#111111','line-opacity':0.5,'line-width':1
       }}, 'doc-clusters');
     });
 
-    loadKMLData(map, statusColors);
+    loadKMLData(map, null);
 
     /* Hover / tap indicator for development polygons.
        Desktop keeps true hover. Touch devices have no real hover state, so
@@ -1133,4 +1169,5 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     loadLocations();
   }, 300);
+  }, 100);
 });

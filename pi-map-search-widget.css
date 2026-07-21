@@ -166,6 +166,12 @@ html, body{overscroll-behavior-y:none}
 .pi-map-search-widget .legend-row{display:flex;align-items:center;gap:7px;font-size:10px;color:var(--text);margin-bottom:3px}
 .pi-map-search-widget .legend-row:last-child{margin-bottom:0;color:var(--muted)}
 .pi-map-search-widget .ldot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+/* Match the three fill-pattern textures used on the map itself — same
+   proposed/under_construction/approved logic, drawn in CSS instead of
+   canvas since this is a flat 8px swatch, not a map layer. */
+.pi-map-search-widget .ldot-proposed{background-color:#DADADA;background-image:repeating-linear-gradient(45deg,#111111 0,#111111 0.5px,transparent 0.5px,transparent 2.5px)}
+.pi-map-search-widget .ldot-under_construction{background-color:#B5B5B0;background-image:radial-gradient(#111111 0.6px,transparent 0.8px);background-size:4px 4px;background-position:0 0,2px 2px}
+.pi-map-search-widget .ldot-approved{background-color:#4A4A47}
 .pi-map-search-widget .legend-filter-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid var(--rule);cursor:pointer;user-select:none;font-size:10px;color:var(--text)}
 .pi-map-search-widget .legend-filter-row:last-of-type{border-bottom:none}
 .pi-map-search-widget .legend-filter-row:hover{opacity:0.8}
