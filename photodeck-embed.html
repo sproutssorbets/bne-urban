@@ -14,8 +14,8 @@
   * { box-sizing: border-box; border-radius: 0 !important; box-shadow: none !important; }
   body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background: #FFFFFF; color: #111111; }
 
-#topbar { border-bottom: 1px solid #111111; background: #FFFFFF; }
- #search-row { border-bottom: 1px solid #111111; }
+  #topbar { border-bottom: 1px solid #111111; background: #FFFFFF; }
+  #search-row { display: flex; align-items: center; height: 56px; padding: 0 20px; border-bottom: 1px solid #111111; gap: 12px; }
   #geocoder { flex: 1; }
   #geocoder .mapboxgl-ctrl-geocoder { width: 100%; max-width: none; font-family: inherit; box-shadow: none; background: #FFFFFF; }
   #geocoder .mapboxgl-ctrl-geocoder input { height: 36px; font-size: 13px; color: #111111; font-family: inherit; background: #FFFFFF; }
@@ -31,8 +31,8 @@
 
   #layout { display: flex; height: calc(100vh - 105px); height: calc(100dvh - 105px); background: #FFFFFF; }
 
-  .mobile-tabs { display: none; border-bottom: 1px solid #DADADA; background: #FFFFFF; }
-  .mobile-tab { flex: 1; height: 44px; border: none; border-right: 1px solid #DADADA; background: #FFFFFF; color: #111111; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; cursor: pointer; }
+  .mobile-tabs { display: none; border-bottom: 1px solid #111111; background: #FFFFFF; }
+  .mobile-tab { flex: 1; height: 44px; border: none; border-right: 1px solid #111111; background: #FFFFFF; color: #111111; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; cursor: pointer; }
   .mobile-tab:last-child { border-right: none; }
   .mobile-tab.active { background: #111111; color: #FFFFFF; }
 
@@ -44,8 +44,8 @@
     .mobile-hidden { display: none !important; }
   }
 
-  #index-panel { width: 380px; flex-shrink: 0; border-right: 1px solid #DADADA; display: flex; flex-direction: column; overflow-y: auto; background: #FFFFFF; }
-  .section { padding: 14px 20px; border-bottom: 1px solid #DADADA; background: #FFFFFF; }
+  #index-panel { width: 380px; flex-shrink: 0; border-right: 1px solid #111111; display: flex; flex-direction: column; overflow-y: auto; background: #FFFFFF; }
+  .section { padding: 14px 20px; border-bottom: 1px solid #111111; background: #FFFFFF; }
   .section-label { font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: #6B6B6B; margin-bottom: 10px; }
 
   .filter-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; cursor: pointer; user-select: none; }
@@ -54,9 +54,9 @@
   .filter-count { font-size: 10px; color: #6B6B6B; }
   .filter-label { font-size: 11px; color: #111111; }
 
-  .acc-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid #DADADA; cursor: pointer; user-select: none; background: #FFFFFF; }
+  .acc-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid #111111; cursor: pointer; user-select: none; background: #FFFFFF; }
   .acc-head:hover { background: #F0F0F0; }
-  .acc-body { display: none; padding: 14px 20px; border-bottom: 1px solid #DADADA; font-size: 11px; color: #111111; background: #FFFFFF; }
+  .acc-body { display: none; padding: 14px 20px; border-bottom: 1px solid #111111; font-size: 11px; color: #111111; background: #FFFFFF; }
   .acc-body.open { display: block; }
   
   .sub-category-title { font-size: 9px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #6B6B6B; margin: 12px 0 6px 0; }
@@ -64,11 +64,11 @@
   .acc-body label { display: block; cursor: pointer; padding: 4px 0; }
 
   #list-wrap { flex: 1; background: #FFFFFF; }
-  .list-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid #DADADA; cursor: pointer; background: #FFFFFF; }
+  .list-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid #111111; cursor: pointer; background: #FFFFFF; }
   .list-row:hover { background: #F0F0F0; }
   .list-street { font-size: 12px; color: #111111; font-weight: 400; }
 
-  #footer-row { padding: 12px 20px; font-size: 10px; letter-spacing: 0.06em; color: #6B6B6B; border-top: 1px solid #DADADA; background: #FFFFFF; display: flex; justify-content: space-between; align-items: center; }
+  #footer-row { padding: 12px 20px; font-size: 10px; letter-spacing: 0.06em; color: #6B6B6B; border-top: 1px solid #111111; background: #FFFFFF; display: flex; justify-content: space-between; align-items: center; }
   .last-updated-badge { font-weight: 500; color: #111111; letter-spacing: 0.08em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 4px; }
   .last-updated-badge::before { content: "●"; font-size: 8px; color: #111111; }
 
@@ -110,7 +110,7 @@
   <div id="index-panel">
     <div id="filters-group" class="mobile-hidden">
       
-      <!-- Warstwy projektów deweloperskich (Czytelna 3-stopniowa skala) -->
+      <!-- Warstwy projektów deweloperskich -->
       <div class="section">
         <div class="section-label">Development projects — map layer</div>
         <div class="filter-row" data-status="proposed">
@@ -588,12 +588,12 @@ function initMapEverything() {
 
     map.addSource('projects', { type: 'geojson', data: projects });
 
-    /* 3-STOPNIOWA SKALA WIDOCZNOŚCI DLA MAPY */
+    /* Poligony stają się widoczne od poziomu zoom 13.5 (przy bliższym zbliżeniu) */
     map.addLayer({
       id: 'projects-fill',
       type: 'fill',
       source: 'projects',
-      minzoom: 13,
+      minzoom: 13.5,
       paint: {
         'fill-color': ['match', ['get', 'status'],
           'approved', '#111111',
@@ -611,7 +611,7 @@ function initMapEverything() {
       id: 'projects-line',
       type: 'line',
       source: 'projects',
-      minzoom: 13,
+      minzoom: 13.5,
       paint: { 
         'line-color': ['match', ['get', 'status'], 
           'approved', '#111111', 
@@ -638,13 +638,12 @@ function initMapEverything() {
       var el = document.createElement('div');
       el.style.width = '8px'; el.style.height = '8px'; el.style.background = '#111111'; el.style.borderRadius = '0'; el.style.cursor = 'pointer';
 
-      /* USUNIĘCIE PODKREŚLENIA Z LINKU DZIĘKI text-decoration:none */
       var popupHtml =
         '<div style="font-family:Inter,system-ui,sans-serif;padding:2px 2px 4px;min-width:180px;">' +
           '<div style="font-size:13px;color:#111111;margin-bottom:4px;font-weight:500;">' + loc.street + '</div>' +
           '<div style="font-size:10px;color:#6B6B6B;margin-bottom:8px;">' + loc.count + (loc.count === 1 ? ' photo documented' : ' photos documented') + '</div>' +
           '<a href="' + loc.archiveUrl + '" target="_blank" style="display:block;text-align:center;background:#111;color:#fff;padding:8px 6px;font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;text-decoration:none;">VIEW PHOTOS →</a>' +
-          '<div style="font-size:10px;color:#6B6B6B;border-top:1px solid #DADADA;padding-top:6px;">' + loc.suburb + '</div>' +
+          '<div style="font-size:10px;color:#6B6B6B;border-top:1px solid #111111;padding-top:6px;">' + loc.suburb + '</div>' +
         '</div>';
 
       loc.popup = new mapboxgl.Popup({ offset: 14, closeButton: true, className: 'pi-popup' }).setHTML(popupHtml);
@@ -666,7 +665,7 @@ function initMapEverything() {
         '<div style="font-family:Inter,system-ui,sans-serif;padding:2px 2px 4px;min-width:180px;">' +
           '<div style="font-size:10px;letter-spacing:0.08em;color:#6B6B6B;margin-bottom:4px;">Development project</div>' +
           '<div style="font-size:13px;color:#111111;margin-bottom:8px;">' + statusLabel(props.status) + (props.name ? ' — ' + props.name : '') + '</div>' +
-          (props.documentedStreet ? '<div style="font-size:10px;color:#111111;border-top:1px solid #DADADA;padding-top:6px;margin-top:6px;">Documented photo within footprint: ' + props.documentedStreet + '</div>' : '') +
+          (props.documentedStreet ? '<div style="font-size:10px;color:#111111;border-top:1px solid #111111;padding-top:6px;margin-top:6px;">Documented photo within footprint: ' + props.documentedStreet + '</div>' : '') +
         '</div>';
       window.piShowPopup(new mapboxgl.Popup({ offset: 8, closeButton: true, className: 'pi-popup' }).setHTML(html), e.lngLat);
     });
@@ -729,7 +728,6 @@ function applySearchState() {
   if (countEl) countEl.textContent = visibleLocs.length + ' of ' + locations.length + ' locations documented';
 }
 
-/* USUNIĘCIE PX / NAZW PLIKÓW Z LISTY INDEXU */
 function renderList(items) {
   items = items || locations;
   var wrap = document.getElementById('list-wrap');
