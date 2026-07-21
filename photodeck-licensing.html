@@ -161,9 +161,12 @@ html,body{margin:0;padding:0;background:var(--bg);}
   padding-bottom:48px;
   padding-left:48px;
 }
-.pi-lic-table{
-  border-top:1px solid var(--rule);
-  margin-bottom:24px;
+.pi-lic-table {
+  border-top: 1px solid var(--rule);
+}
+
+.pi-lic-table + .pi-lic-table {
+  border-top: none;
 }
 .pi-lic-row{
   display:grid;
