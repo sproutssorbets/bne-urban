@@ -60,6 +60,19 @@
      iframe. Sztywne 850px zrywa tę pętlę, mapa ma jedną, stałą wartość
      niezależną od samego siebie. */
   .pi-map-search-widget #map-area{height:850px}
+  /* PhotoDeck-only: poniżej 900px wspólny plik CSS ustawia #shell na
+     position:fixed, height:100dvh — czyli mapa zajmuje cały ekran telefonu
+     jako osobna warstwa, a "Show all filters" pojawia się dopiero po
+     przewinięciu całej wysokości ekranu. To dawało wrażenie bardzo długiej
+     mapy na komórce. Tutaj przywracam normalny, przewijany układ i skracam
+     samą mapę do stałej, niższej wysokości, żeby filtry były widoczne od
+     razu po krótkim przewinięciu, bez pełnoekranowego kroku pośredniego. */
+  @media(max-width:900px){
+    .pi-map-search-widget #shell{position:static;height:auto}
+    .pi-map-search-widget #panel{flex-shrink:0}
+    .pi-map-search-widget #map-area{flex:none;height:380px;min-height:380px}
+    .pi-map-search-widget #refine-section{margin-top:0}
+  }
   /* PhotoDeck-only: the shared CSS sets overscroll-behavior-y:none on
      html/body to stop rubber-band bounce revealing content under the
      fixed mobile map on Webflow. Inside this iframe, that same rule has
