@@ -389,7 +389,20 @@
       wide.classList.add('all-open');
       toggleBtn.classList.add('is-open');
       if(label) label.textContent = 'Hide filters';
-      window.scrollTo({top: wide.offsetTop, behavior:'smooth'});
+      /* getBoundingClientRect() + window.scrollY, not offsetTop — offsetTop
+         is relative to the nearest positioned ancestor, and on mobile
+         #refine-section has position:relative (set in the shared CSS file,
+         only under 900px), which makes it that ancestor. wide.offsetTop
+         then measures a few dozen pixels from the top of #refine-section
+         instead of the page, so the scroll barely moves anything on
+         mobile even though it scrolls the full, correct distance on
+         desktop, where #refine-section has no positioning context in the
+         way. getBoundingClientRect gives the element's position relative
+         to the current viewport regardless of any positioned ancestors;
+         adding the current scroll offset converts that into an absolute,
+         document-relative target that works the same on both. */
+      var targetY = wide.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({top: targetY, behavior:'smooth'});
     } else {
       /* Closing: scroll to the top FIRST, then collapse the filter list
          only once that scroll has had time to finish. Collapsing first
