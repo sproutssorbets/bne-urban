@@ -78,6 +78,11 @@
        poniżej. Margines ujemny wyprowadza element poza padding, dopisany
        padding przywraca odstęp samemu tekstowi od krawędzi ekranu. */
     .pi-map-search-widget #filters-toggle-all{margin-left:-20px;margin-right:-20px;width:calc(100% + 40px);padding-left:20px;padding-right:20px}
+    /* Wspólny plik CSS ustawia #refine-section na padding:20px 0 0px na
+       mobile — te 20px u góry to pusta przestrzeń między mapą a górną
+       linią przycisku "Show all filters", bez żadnej funkcji. Zerowanie
+       tylko padding-top, reszta (lewy/prawy/dolny) zostaje bez zmian. */
+    .pi-map-search-widget #refine-section{padding-top:0}
   }
   /* PhotoDeck-only: the shared CSS sets overscroll-behavior-y:none on
      html/body to stop rubber-band bounce revealing content under the
