@@ -701,21 +701,35 @@ function loadArchiveDate(){
 mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
 
 function initMap(){
+  /* 1. Sprawdzamy, czy w pamięci sesji są zapisane poprzednie współrzędne i zoom */
+  let startCenter = [153.0307, -27.4598];
+  let startZoom = 14;
+
+  const savedCenter = sessionStorage.getItem('pi_map_center');
+  const savedZoom = sessionStorage.getItem('pi_map_zoom');
+
+  if (savedCenter) {
+    try { startCenter = JSON.parse(savedCenter); } catch(e) {}
+  }
+  if (savedZoom) {
+    startZoom = parseFloat(savedZoom);
+  }
+
+  /* 2. Inicjujemy mapę używając zapisanych (lub domyślnych) wartości */
   const map = new mapboxgl.Map({
     container:'map', style:'mapbox://styles/mapbox/light-v11',
-    center:[153.0307,-27.4598], zoom:14, minZoom:11, maxZoom:19,
-    /* Covers both cases: a one-finger touch on mobile, and a plain scroll
-       over the map on desktop, would otherwise be captured by the map
-       (panning it or zooming it) instead of scrolling the page underneath.
-       cooperativeGestures handles both — two fingers to pan/zoom on touch,
-       Ctrl/Cmd+scroll to zoom with the mouse — and shows its own built-in
-       message explaining why, in every browser it's tested against. A
-       hand-rolled wheel listener doing the same thing used to sit here; it
-       duplicated this exact feature and was the likely cause of scrolling
-       breaking specifically in Safari, since it had none of Mapbox's own
-       cross-browser handling behind it. */
+    center: startCenter, 
+    zoom: startZoom, 
+    minZoom:11, maxZoom:19,
     cooperativeGestures: true
   });
+
+  /* 3. Zapisujemy nową pozycję do pamięci przeglądarki za każdym razem, gdy użytkownik skończy przesuwać lub przybliżać mapę */
+  map.on('moveend', () => {
+    const currentCenter = map.getCenter();
+    sessionStorage.setItem('pi_map_center', JSON.stringify([currentCenter.lng, currentCenter.lat]));
+    sessionStorage.setItem('pi_map_zoom', map.getZoom());
+  });;
   mapInstance = map;
   window._mapInstance = map;
 
