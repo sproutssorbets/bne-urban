@@ -1122,6 +1122,10 @@ document.addEventListener('DOMContentLoaded', () => {
   /* Started together, not one nested inside the other — the map begins
      fetching its own style/tiles immediately, at the same time as the
      location data fetch, instead of waiting for it to finish first. */
-  initMap();
-  loadLocations();
+/* Dajemy przeglądarce (szczególnie Chrome) 100 milisekund oddechu 
+     na wyrenderowanie struktury strony, zanim uderzymy w silnik mapy */
+  setTimeout(() => {
+    initMap();
+    loadLocations();
+  }, 100);
 });
