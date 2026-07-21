@@ -25,6 +25,16 @@
 html{scroll-behavior:smooth;}
 
 html,body{margin:0;padding:0;background:var(--bg);}
+  /* Ukrycie paska przewijania dla przeglądarek opartych na WebKit (Chrome, Safari, Opera) */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Ukrycie paska przewijania dla Firefox, IE oraz Edge */
+html, body {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
 .pi-lic,.pi-lic *,.pi-lic ::before,.pi-lic *::after{box-sizing:border-box;margin:0;padding:0}
 .pi-lic{
   font-family:Inter,sans-serif;
