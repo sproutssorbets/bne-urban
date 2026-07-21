@@ -24,7 +24,7 @@
   #search-archive-btn { height: 36px; padding: 0 16px; border: 1px solid #111111; background: #111111; color: #FFFFFF; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 6px; text-decoration: none; flex-shrink: 0; }
   #search-archive-btn:hover { background: #333333; }
 
-  #chip-row { display: flex; align-items: center; padding: 12px 20px; flex-wrap: wrap; min-height: 20px; background: #FFFFFF; }
+  #chip-row { display: flex; align-items: center; padding: 12px 20px; flex-wrap: wrap; min-height: 20px; background: #FFFFFF; border-bottom: 1px solid #111111; }
   #chip-label { font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6B6B6B; margin-right: 12px; }
   .chip { display: inline-flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #111111; padding: 3px 8px; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #111111; cursor: pointer; background: #FFFFFF; margin: 0 6px 6px 0; line-height: 1.2; }
   .chip:hover { background: #F0F0F0; }
@@ -42,7 +42,10 @@
     #index-panel { width: 100%; border-right: none; height: 100%; }
     #map-wrap { width: 100%; height: 100%; position: absolute; inset: 0; z-index: 2; display: none; }
     #map-wrap.mobile-active { display: block; }
-    .mobile-hidden { display: none !important; }
+    
+    /* Przycisk wyszukiwania na mobile zamieniony w kwadracik ze strzałką */
+    #search-archive-btn { width: 36px; padding: 0; justify-content: center; font-size: 14px; letter-spacing: normal; }
+    #search-archive-text { display: none; }
   }
 
   #index-panel { width: 380px; flex-shrink: 0; border-right: 1px solid #111111; display: flex; flex-direction: column; overflow-y: auto; background: #FFFFFF; }
@@ -94,7 +97,9 @@
 <div id="topbar">
   <div id="search-row">
     <div id="geocoder"></div>
-    <a id="search-archive-btn" href="https://photoindex.photodeck.com/" target="_blank">Search archive →</a>
+    <a id="search-archive-btn" href="https://photoindex.photodeck.com/" target="_blank">
+      <span id="search-archive-text">Search archive</span> →
+    </a>
   </div>
   <div id="chip-row">
     <span id="chip-label">Your search</span>
@@ -110,7 +115,8 @@
 
 <div id="layout">
   <div id="index-panel">
-    <div id="filters-group" class="mobile-hidden">
+    <!-- Usunięto klasę mobile-hidden powodującą konflikt z wyświetlaniem -->
+    <div id="filters-group" style="display:none; flex-direction:column;">
       
       <!-- Warstwy projektów deweloperskich -->
       <div class="section">
@@ -411,7 +417,7 @@
         <label><input type="checkbox" class="filter-check" data-cat="status" value="existing condition"> existing condition</label>
         <label><input type="checkbox" class="filter-check" data-cat="status" value="ongoing change"> ongoing change</label>
         <label><input type="checkbox" class="filter-check" data-cat="status" value="post demolition"> post demolition</label>
-        <label><input type="checkbox" class="filter-check" data-cat="filter-check" data-cat="status" value="pre construction"> pre construction</label>
+        <label><input type="checkbox" class="filter-check" data-cat="status" value="pre construction"> pre construction</label>
         <label><input type="checkbox" class="filter-check" data-cat="status" value="scheduled demolition"> scheduled demolition</label>
         <label><input type="checkbox" class="filter-check" data-cat="status" value="threatened building"> threatened building</label>
         <label><input type="checkbox" class="filter-check" data-cat="status" value="under construction"> under construction</label>
@@ -429,7 +435,7 @@
 
     </div>
 
-    <div id="index-group" style="display:none; flex:1; overflow-y:auto; flex-direction:column; background:#FFFFFF;">
+    <div id="index-group" style="display:flex; flex:1; overflow-y:auto; flex-direction:column; background:#FFFFFF;">
       <div id="list-wrap" style="flex:1;"></div>
       <div id="footer-row" style="border-top:1px solid #111111;">
         <span id="archive-count">Loading archive statistics...</span>
@@ -822,13 +828,13 @@ document.querySelectorAll('.suburb-check').forEach(function (cb) {
 });
 
 var mobileTabs = {
-  index: { btn: document.getElementById('tab-index'), group: document.getElementById('index-group') },
-  filters: { btn: document.getElementById('tab-filters'), group: document.getElementById('filters-group') },
-  map: { btn: document.getElementById('tab-map'), group: document.getElementById('map-wrap') }
+  index: { btn: document.getElementById('tab-index') },
+  filters: { btn: document.getElementById('tab-filters') },
+  map: { btn: document.getElementById('tab-map') }
 };
 
 document.getElementById('tab-index').addEventListener('click', function() {
-  document.querySelectorAll('.mobile-tab').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.mobile-tabs .mobile-tab').forEach(function(t) { t.classList.remove('active'); });
   this.classList.add('active');
   document.getElementById('index-panel').style.display = 'flex';
   document.getElementById('filters-group').style.display = 'none';
@@ -841,7 +847,7 @@ document.getElementById('tab-filters').addEventListener('click', function() {
   this.classList.add('active');
   document.getElementById('index-panel').style.display = 'flex';
   document.getElementById('index-group').style.display = 'none';
-  document.getElementById('filters-group').style.display = 'block';
+  document.getElementById('filters-group').style.display = 'flex';
   document.getElementById('map-wrap').classList.remove('mobile-active');
 });
 
