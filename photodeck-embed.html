@@ -12,7 +12,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 <style>
   * { box-sizing: border-box; border-radius: 0 !important; box-shadow: none !important; }
-  body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background: #FFFFFF; color: #111111; }
+  body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background: #FFFFFF; color: #111111; overflow-x: hidden; }
 
   #topbar { border-bottom: 1px solid #111111; background: #FFFFFF; }
   #search-row { display: flex; align-items: center; height: 56px; padding: 0 20px; border-bottom: 1px solid #111111; gap: 12px; }
@@ -24,12 +24,12 @@
   #search-archive-btn { height: 36px; padding: 0 16px; border: 1px solid #111111; background: #111111; color: #FFFFFF; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 6px; text-decoration: none; flex-shrink: 0; }
   #search-archive-btn:hover { background: #333333; }
 
-  #chip-row { display: flex; align-items: center; padding: 12px 20px; flex-wrap: wrap; min-height: 20px; background: #FFFFFF; }
+  #chip-row { display: flex; align-items: center; padding: 12px 20px; flex-wrap: wrap; min-height: 20px; background: #FFFFFF; border-bottom: 1px solid #111111; }
   #chip-label { font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6B6B6B; margin-right: 12px; }
   .chip { display: inline-flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #111111; padding: 3px 8px; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #111111; cursor: pointer; background: #FFFFFF; margin: 0 6px 6px 0; line-height: 1.2; }
   .chip:hover { background: #F0F0F0; }
 
-  #layout { display: flex; height: calc(100vh - 105px); height: calc(100dvh - 105px); background: #FFFFFF; }
+  #layout { display: flex; height: calc(100vh - 147px); height: calc(100dvh - 147px); background: #FFFFFF; position: relative; }
 
   .mobile-tabs { display: none; border-bottom: 1px solid #111111; background: #FFFFFF; }
   .mobile-tab { flex: 1; height: 44px; border: none; border-right: 1px solid #111111; background: #FFFFFF; color: #111111; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; cursor: pointer; }
@@ -38,9 +38,10 @@
 
   @media (max-width: 720px) {
     .mobile-tabs { display: flex; }
-    #layout { flex-direction: column; height: calc(100vh - 145px); height: calc(100dvh - 145px); }
-    #index-panel { width: 100%; border-right: none; max-height: none; flex: 1; }
-    #map-wrap { width: 100%; flex: 1; min-height: 350px; }
+    #layout { height: calc(100vh - 146px); height: calc(100dvh - 146px); }
+    #index-panel { width: 100%; border-right: none; height: 100%; }
+    #map-wrap { width: 100%; height: 100%; position: absolute; inset: 0; z-index: 2; display: none; }
+    #map-wrap.mobile-active { display: block; }
     .mobile-hidden { display: none !important; }
   }
 
@@ -128,7 +129,7 @@
         </div>
       </div>
 
-      <!-- SUBURB (Zwinięty na starcie) -->
+      <!-- SUBURB -->
       <div class="acc-head" data-target="acc-suburb">
         <span class="section-label" style="margin:0;">Suburb</span><span style="font-size:10px;color:#111111;">＋</span>
       </div>
@@ -428,16 +429,16 @@
 
     </div>
 
-    <div id="index-group">
-      <div id="list-wrap"></div>
-      <div id="footer-row">
+    <div id="index-group" style="display:none; flex:1; overflow-y:auto; flex-direction:column;">
+      <div id="list-wrap" style="flex:1;"></div>
+      <div id="footer-row" style="border-top:1px solid #111111;">
         <span id="archive-count">Loading archive statistics...</span>
         <span class="last-updated-badge">UPDATED: JUL 2026</span>
       </div>
     </div>
   </div>
 
-  <div id="map-wrap" class="mobile-hidden">
+  <div id="map-wrap">
     <div id="map"></div>
   </div>
 </div>
@@ -738,6 +739,10 @@ function renderList(items) {
     row.className = 'list-row';
     row.innerHTML = '<div class="list-street">' + loc.street + '</div>';
     row.addEventListener('click', function () {
+      if (window.innerWidth <= 720) {
+        // Na mobile kliknięcie w element listy automatycznie przenosi na zakładkę mapy
+        document.getElementById('tab-map').click();
+      }
       map.flyTo({ center: loc.coords, zoom: 15 });
       if (loc.popup) window.piShowPopup(loc.popup, loc.coords);
     });
@@ -808,24 +813,54 @@ document.querySelectorAll('.suburb-check').forEach(function (cb) {
     if (window.piCloseAllPopups) window.piCloseAllPopups();
     searchState.suburb = cb.value;
     applySearchState();
-    if (cb.value) flyToSuburb(cb.value);
+    if (cb.value) {
+      flyToSuburb(cb.value);
+      if (window.innerWidth <= 720) {
+        // Po wybraniu dzielnicy na mobile od razu pokaż mapę
+        document.getElementById('tab-map').click();
+      }
+    }
   });
 });
 
+// Płynne przełączanie zakładek mobilnych (Index / Filters / Map)
 var mobileTabs = {
-  index: { btn: document.getElementById('tab-index'), group: document.getElementById('index-group') },
-  filters: { btn: document.getElementById('tab-filters'), group: document.getElementById('filters-group') },
-  map: { btn: document.getElementById('tab-map'), group: document.getElementById('map-wrap') }
+  index: { btn: document.getElementById('tab-index'), panel: document.getElementById('index-panel'), filtersGroup: document.getElementById('filters-group'), indexGroup: document.getElementById('index-group'), mapWrap: document.getElementById('map-wrap') },
+  filters: { btn: document.getElementById('tab-filters'), panel: document.getElementById('index-panel'), filtersGroup: document.getElementById('filters-group'), indexGroup: document.getElementById('index-group'), mapWrap: document.getElementById('map-wrap') },
+  map: { btn: document.getElementById('tab-map'), panel: document.getElementById('index-panel'), filtersGroup: document.getElementById('filters-group'), indexGroup: document.getElementById('index-group'), mapWrap: document.getElementById('map-wrap') }
 };
-Object.keys(mobileTabs).forEach(function (key) {
-  mobileTabs[key].btn.addEventListener('click', function () {
-    Object.keys(mobileTabs).forEach(function (k) {
-      mobileTabs[k].btn.classList.toggle('active', k === key);
-      mobileTabs[k].group.classList.toggle('mobile-hidden', k !== key);
-    });
-    if (key === 'map') setTimeout(function () { map.resize(); }, 50);
-  });
+
+document.getElementById('tab-index').addEventListener('click', function() {
+  document.querySelectorAll('.mobile-tab').forEach(function(t) { t.classList.remove('active'); });
+  this.classList.add('active');
+  document.getElementById('index-panel').style.display = 'flex';
+  document.getElementById('filters-group').style.display = 'none';
+  document.getElementById('index-group').style.display = 'flex';
+  document.getElementById('map-wrap').classList.remove('mobile-active');
 });
+
+document.getElementById('tab-filters').addEventListener('click', function() {
+  document.querySelectorAll('.mobile-tab').forEach(function(t) { t.classList.remove('active'); });
+  this.classList.add('active');
+  document.getElementById('index-panel').style.display = 'flex';
+  document.getElementById('index-group').style.display = 'none';
+  document.getElementById('filters-group').style.display = 'block';
+  document.getElementById('map-wrap').classList.remove('mobile-active');
+});
+
+document.getElementById('tab-map').addEventListener('click', function() {
+  document.querySelectorAll('.mobile-tab').forEach(function(t) { t.classList.remove('active'); });
+  this.classList.add('active');
+  document.getElementById('index-panel').style.display = 'none';
+  document.getElementById('map-wrap').classList.add('mobile-active');
+  setTimeout(function () { map.resize(); }, 50);
+});
+
+// Domyślny stan mobilny przy starcie (< 720px): włączona zakładka Index
+if (window.innerWidth <= 720) {
+  document.getElementById('filters-group').style.display = 'none';
+  document.getElementById('index-group').style.display = 'flex';
+}
 </script>
 
 </body>
