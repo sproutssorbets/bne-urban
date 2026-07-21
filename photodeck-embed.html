@@ -72,6 +72,12 @@
     .pi-map-search-widget #panel{flex-shrink:0}
     .pi-map-search-widget #map-area{flex:none;height:380px;min-height:380px}
     .pi-map-search-widget #refine-section{margin-top:0}
+    /* Przycisk "Show all filters" wychodzi poza boczny padding rodzica
+       (#refine-section ma padding-left/right:20px na mobile), żeby jego
+       górna i dolna linia sięgały tych samych krawędzi co mapa i zdjęcia
+       poniżej. Margines ujemny wyprowadza element poza padding, dopisany
+       padding przywraca odstęp samemu tekstowi od krawędzi ekranu. */
+    .pi-map-search-widget #filters-toggle-all{margin-left:-20px;margin-right:-20px;width:calc(100% + 40px);padding-left:20px;padding-right:20px}
   }
   /* PhotoDeck-only: the shared CSS sets overscroll-behavior-y:none on
      html/body to stop rubber-band bounce revealing content under the
