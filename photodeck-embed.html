@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PhotoIndex — Map prototype (live filter test)</title>
+<title>PhotoIndex — Archive & Map Explorer</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet">
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
@@ -14,55 +14,62 @@
   * { box-sizing: border-box; border-radius: 0 !important; box-shadow: none !important; }
   body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background: #F7F7F5; color: #111111; }
 
-  #topbar { border-bottom: 1px solid #DADADA; }
-  #search-row { display: flex; align-items: center; height: 56px; padding: 0 20px; border-bottom: 1px solid #DADADA; }
+  #topbar { border-bottom: 1px solid #DADADA; background: #F7F7F5; }
+  #search-row { display: flex; align-items: center; height: 56px; padding: 0 20px; border-bottom: 1px solid #DADADA; gap: 12px; }
   #geocoder { flex: 1; }
   #geocoder .mapboxgl-ctrl-geocoder { width: 100%; max-width: none; font-family: inherit; box-shadow: none; background: transparent; }
   #geocoder .mapboxgl-ctrl-geocoder input { height: 36px; font-size: 13px; color: #111111; font-family: inherit; }
   #geocoder .mapboxgl-ctrl-geocoder--icon-search { fill: #6B6B6B; top: 9px; }
-  #adv-btn { height: 36px; padding: 0 20px; border: 1px solid #111111; background: #111111; color: #F7F7F5; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; cursor: pointer; }
-  #chip-row { display: flex; align-items: center; padding: 8px 20px; flex-wrap: wrap; min-height: 20px; }
-  #chip-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #6B6B6B; margin-right: 10px; }
-  .chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid #111111; padding: 3px 8px; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: #111111; margin: 0 6px 6px 0; cursor: pointer; }
+  
+  #search-archive-btn { height: 36px; padding: 0 16px; border: 1px solid #111111; background: #111111; color: #F7F7F5; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 6px; text-decoration: none; flex-shrink: 0; }
+  #search-archive-btn:hover { background: #333333; }
 
-  #layout { display: flex; height: calc(100vh - 96px); }
+  #chip-row { display: flex; align-items: center; padding: 12px 20px; flex-wrap: wrap; min-height: 20px; gap: 12px; }
+  #chip-label { font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6B6B6B; margin-right: 8px; }
+  .chip { display: inline-flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #111111; padding: 4px 10px; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #111111; cursor: pointer; background: #FFFFFF; line-height: 1.2; }
+  .chip:hover { background: #EFEFEA; }
 
-  .mobile-tabs { display: none; border-bottom: 1px solid #DADADA; }
+  #layout { display: flex; height: calc(100vh - 105px); height: calc(100dvh - 105px); }
+
+  .mobile-tabs { display: none; border-bottom: 1px solid #DADADA; background: #F7F7F5; }
   .mobile-tab { flex: 1; height: 44px; border: none; border-right: 1px solid #DADADA; background: #F7F7F5; color: #111111; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; cursor: pointer; }
   .mobile-tab:last-child { border-right: none; }
   .mobile-tab.active { background: #111111; color: #F7F7F5; }
 
   @media (max-width: 720px) {
     .mobile-tabs { display: flex; }
-    #adv-btn { padding: 0 12px; font-size: 10px; }
     #layout { flex-direction: column; height: auto; }
     #index-panel { width: 100%; border-right: none; max-height: none; }
     #map-wrap { width: 100%; height: 70vh; }
     .mobile-hidden { display: none !important; }
   }
 
-  #index-panel { width: 340px; flex-shrink: 0; border-right: 1px solid #DADADA; display: flex; flex-direction: column; overflow-y: auto; }
+  #index-panel { width: 380px; flex-shrink: 0; border-right: 1px solid #DADADA; display: flex; flex-direction: column; overflow-y: auto; background: #F7F7F5; }
   .section { padding: 14px 20px; border-bottom: 1px solid #DADADA; }
   .section-label { font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: #6B6B6B; margin-bottom: 10px; }
 
-  .filter-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; cursor: pointer; }
+  .filter-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; cursor: pointer; user-select: none; }
   .filter-row.off { opacity: 0.35; }
   .swatch { width: 8px; height: 8px; flex-shrink: 0; }
   .filter-count { font-size: 10px; color: #6B6B6B; }
   .filter-label { font-size: 11px; color: #111111; }
 
-  .acc-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid #DADADA; cursor: pointer; user-select: none; }
-  .acc-body { display: none; padding: 10px 20px; border-bottom: 1px solid #DADADA; font-size: 11px; color: #111111; line-height: 2; }
+  .acc-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid #DADADA; cursor: pointer; user-select: none; background: #F7F7F5; }
+  .acc-head:hover { background: #EFEFEA; }
+  .acc-body { display: none; padding: 14px 20px; border-bottom: 1px solid #DADADA; font-size: 11px; color: #111111; background: #FFFFFF; }
   .acc-body.open { display: block; }
-  .acc-body label { display: block; cursor: pointer; }
+  
+  .sub-category-title { font-size: 9px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #6B6B6B; margin: 12px 0 6px 0; }
+  .sub-category-title:first-child { margin-top: 0; }
+  .acc-body label { display: block; cursor: pointer; padding: 4px 0; }
 
   #list-wrap { flex: 1; }
-  .list-row { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 20px; border-bottom: 1px solid #DADADA; cursor: pointer; }
+  .list-row { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 20px; border-bottom: 1px solid #DADADA; cursor: pointer; background: #F7F7F5; }
   .list-row:hover { background: #EFEFEA; }
   .list-ref { font-size: 10px; letter-spacing: 0.08em; color: #6B6B6B; margin-bottom: 3px; }
   .list-street { font-size: 13px; color: #111111; }
 
-  #footer-row { padding: 12px 20px; font-size: 10px; letter-spacing: 0.06em; color: #6B6B6B; }
+  #footer-row { padding: 12px 20px; font-size: 10px; letter-spacing: 0.06em; color: #6B6B6B; border-top: 1px solid #DADADA; background: #F7F7F5; }
 
   #map-wrap { flex: 1; position: relative; }
   #map { position: absolute; inset: 0; }
@@ -71,72 +78,24 @@
   .mapboxgl-ctrl-group button { border-radius: 0 !important; }
   .pi-popup .mapboxgl-popup-content { background: #F7F7F5; border: 1px solid #111111; padding: 14px; font-family: 'Inter', system-ui, sans-serif; }
   .pi-popup .mapboxgl-popup-tip { border-top-color: #F7F7F5 !important; border-bottom-color: #F7F7F5 !important; }
-  .pi-popup .mapboxgl-popup-close-button { font-size: 16px; color: #6B6B6B; padding: 4px 8px; }
-  .pi-popup .mapboxgl-popup-close-button:hover { background: transparent; color: #111111; }
-  .pi-popup .mapboxgl-popup-close-button { outline: none; border: none; }
-  .pi-popup .mapboxgl-popup-close-button:focus { outline: none; box-shadow: none; }
+  .pi-popup .mapboxgl-popup-close-button { font-size: 16px; color: #6B6B6B; padding: 4px 8px; outline: none; border: none; background: transparent; cursor: pointer; }
+  .pi-popup .mapboxgl-popup-close-button:hover { color: #111111; }
   input[type="checkbox"], input[type="radio"] { accent-color: #111111; }
-  #adv-clear:hover { background: #111111 !important; color: #F7F7F5 !important; }
-
-  #debug { position: absolute; bottom: 12px; left: 12px; background: #F7F7F5; border: 1px solid #DADADA; padding: 8px 12px; font-size: 10px; color: #6B6B6B; line-height: 1.6; z-index: 5; max-width: 260px; }
-  #debug b { color: #111111; }
+  #page-loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #FFFFFF; font-family: sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #6B6B6B; z-index: 9999; }
 </style>
 </head>
 <body>
 
+<div id="page-loading">Loading archive data...</div>
+
 <div id="topbar">
   <div id="search-row">
     <div id="geocoder"></div>
-    <button id="adv-btn">Advanced search</button>
+    <a id="search-archive-btn" href="https://photoindex.photodeck.com/" target="_blank">Search archive →</a>
   </div>
   <div id="chip-row">
     <span id="chip-label">Your search</span>
     <span id="chips-here"></span>
-  </div>
-  <div id="adv-panel" style="display:none;border-top:1px solid #DADADA;">
-    <div class="acc-head" data-target="acc-view">
-      <span class="section-label" style="margin:0;">View type</span><span style="font-size:10px;color:#6B6B6B;">＋</span>
-    </div>
-    <div class="acc-body" id="acc-view">
-      <label><input type="checkbox" class="adv-check" value="street-level"> street-level</label>
-      <label><input type="checkbox" class="adv-check" value="building-facade"> building-facade</label>
-      <label><input type="checkbox" class="adv-check" value="aerial"> aerial</label>
-      <label><input type="checkbox" class="adv-check" value="streetscape"> streetscape</label>
-      <label><input type="checkbox" class="adv-check" value="laneway"> laneway</label>
-    </div>
-    <div class="acc-head" data-target="acc-use">
-      <span class="section-label" style="margin:0;">Use / program</span><span style="font-size:10px;color:#6B6B6B;">＋</span>
-    </div>
-    <div class="acc-body" id="acc-use">
-      <label><input type="checkbox" class="adv-check" value="residential"> residential</label>
-      <label><input type="checkbox" class="adv-check" value="commercial"> commercial</label>
-      <label><input type="checkbox" class="adv-check" value="retail"> retail</label>
-      <label><input type="checkbox" class="adv-check" value="hospitality"> hospitality</label>
-      <label><input type="checkbox" class="adv-check" value="community-use"> community-use</label>
-    </div>
-    <div class="acc-head" data-target="acc-context">
-      <span class="section-label" style="margin:0;">Urban context</span><span style="font-size:10px;color:#6B6B6B;">＋</span>
-    </div>
-    <div class="acc-body" id="acc-context">
-      <label><input type="checkbox" class="adv-check" value="under-construction"> under-construction</label>
-      <label><input type="checkbox" class="adv-check" value="demolition"> demolition</label>
-      <label><input type="checkbox" class="adv-check" value="heritage"> heritage</label>
-      <label><input type="checkbox" class="adv-check" value="riverfront"> riverfront</label>
-      <label><input type="checkbox" class="adv-check" value="high-density"> high-density</label>
-    </div>
-    <div class="acc-head" data-target="acc-light">
-      <span class="section-label" style="margin:0;">Light / time</span><span style="font-size:10px;color:#6B6B6B;">＋</span>
-    </div>
-    <div class="acc-body" id="acc-light">
-      <label><input type="checkbox" class="adv-check" value="golden-hour"> golden-hour</label>
-      <label><input type="checkbox" class="adv-check" value="overcast"> overcast</label>
-      <label><input type="checkbox" class="adv-check" value="night"> night</label>
-      <label><input type="checkbox" class="adv-check" value="after-rain"> after-rain</label>
-    </div>
-    <div style="display:flex;justify-content:flex-end;align-items:center;gap:12px;padding:14px 20px;border-top:1px solid #DADADA;">
-      <button id="adv-clear" style="height:36px;padding:0 20px;border:1px solid #111111;background:transparent;color:#111111;font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;font-family:inherit;cursor:pointer;">Clear all</button>
-      <button id="adv-apply" style="height:36px;padding:0 20px;border:1px solid #111111;background:#111111;color:#F7F7F5;font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;font-family:inherit;cursor:pointer;">Apply</button>
-    </div>
   </div>
 </div>
 
@@ -147,123 +106,351 @@
 </div>
 
 <div id="layout">
-
   <div id="index-panel">
-
     <div id="filters-group" class="mobile-hidden">
-
-    <div class="section">
-      <div class="section-label">Development projects — polygon layer</div>
-      <div class="filter-row" data-status="proposed">
-        <div style="display:flex;align-items:center;gap:9px;"><span class="swatch" style="border:1px solid #DADADA;"></span><span class="filter-label">Proposed</span></div>
-        <span class="filter-count" id="count-proposed">–</span>
+      
+      <!-- Warstwy projektów deweloperskich -->
+      <div class="section">
+        <div class="section-label">Development projects — map layer</div>
+        <div class="filter-row" data-status="proposed">
+          <div style="display:flex;align-items:center;gap:9px;"><span class="swatch" style="border:1px solid #DADADA;"></span><span class="filter-label">Proposed</span></div>
+          <span class="filter-count" id="count-proposed">–</span>
+        </div>
+        <div class="filter-row" data-status="under_construction">
+          <div style="display:flex;align-items:center;gap:9px;"><span class="swatch" style="background:#6B6B6B;"></span><span class="filter-label">Under construction</span></div>
+          <span class="filter-count" id="count-under_construction">–</span>
+        </div>
+        <div class="filter-row" data-status="approved">
+          <div style="display:flex;align-items:center;gap:9px;"><span class="swatch" style="background:#111111;"></span><span class="filter-label">Approved</span></div>
+          <span class="filter-count" id="count-approved">–</span>
+        </div>
       </div>
-      <div class="filter-row" data-status="construction">
-        <div style="display:flex;align-items:center;gap:9px;"><span class="swatch" style="background:#6B6B6B;"></span><span class="filter-label">Under construction</span></div>
-        <span class="filter-count" id="count-construction">–</span>
+
+      <!-- SUBURB (A-Z) -->
+      <div class="acc-head" data-target="acc-suburb">
+        <span class="section-label" style="margin:0;">Suburb</span><span style="font-size:10px;color:#6B6B6B;">＋</span>
       </div>
-      <div class="filter-row" data-status="approved">
-        <div style="display:flex;align-items:center;gap:9px;"><span class="swatch" style="background:#111111;"></span><span class="filter-label">Approved</span></div>
-        <span class="filter-count" id="count-approved">–</span>
+      <div class="acc-body open" id="acc-suburb">
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="" checked> All suburbs</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Albion"> Albion</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Bowen Hills"> Bowen Hills</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Brisbane City"> Brisbane City</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Fortitude Valley"> Fortitude Valley</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Herston"> Herston</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Kangaroo Point"> Kangaroo Point</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Kelvin Grove"> Kelvin Grove</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Milton"> Milton</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="New Farm"> New Farm</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Newstead"> Newstead</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Paddington"> Paddington</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Red Hill"> Red Hill</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="South Brisbane"> South Brisbane</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Spring Hill"> Spring Hill</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Teneriffe"> Teneriffe</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="West End"> West End</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Woolloongabba"> Woolloongabba</label>
       </div>
-      <div style="font-size:10px;color:#6B6B6B;margin-top:10px;">Visible only from zoom 13. Zoom out to see documented locations only.</div>
-    </div>
 
-    <div class="acc-head" data-target="acc-year">
-      <span class="section-label" style="margin:0;">Year</span><span style="font-size:10px;color:#6B6B6B;">＋</span>
-    </div>
-    <div class="acc-body" id="acc-year">
-      <label><input type="checkbox" class="year-check" value="2026" checked> 2026</label>
-      <label><input type="checkbox" class="year-check" value="2027"> 2027</label>
-      <label><input type="checkbox" class="year-check" value="2028"> 2028</label>
-    </div>
+      <!-- SEKCJA 1: WARUNKI OŚWIETLENIOWE (A-Z) -->
+      <div class="acc-head" data-target="acc-light">
+        <span class="section-label" style="margin:0;">1. Light & Conditions</span><span style="font-size:10px;color:#6B6B6B;">＋</span>
+      </div>
+      <div class="acc-body" id="acc-light">
+        <label><input type="checkbox" class="filter-check" data-cat="light" value="after rain"> after rain</label>
+        <label><input type="checkbox" class="filter-check" data-cat="light" value="afternoon"> afternoon</label>
+        <label><input type="checkbox" class="filter-check" data-cat="light" value="artificial light"> artificial light</label>
+        <label><input type="checkbox" class="filter-check" data-cat="light" value="blue hour"> blue hour</label>
+        <label><input type="checkbox" class="filter-check" data-cat="light" value="city lights"> city lights</label>
+        <label><input type="checkbox" class="filter-check" data-cat="light" value="clear sky"> clear sky</label>
+        <label><input type="checkbox" class="filter-check" data-cat="light" value="daylight"> daylight</label>
+        <label><input type="checkbox" class="filter-check" data-cat="light" value="evening"> evening</label>
+        <label><input type="checkbox" class="filter-check" data-cat="light" value="golden hour"> golden hour</label>
+        <label><input type="checkbox" class="filter-check" data-cat="light" value="midday"> midday</label>
+        <label><input type="checkbox" class="filter-check" data-cat="light" value="morning"> morning</label>
+        <label><input type="checkbox" class="filter-check" data-cat="light" value="neon signage"> neon signage</label>
+        <label><input type="checkbox" class="filter-check" data-cat="light" value="night"> night</label>
+        <label><input type="checkbox" class="filter-check" data-cat="light" value="overcast"> overcast</label>
+        <label><input type="checkbox" class="filter-check" data-cat="light" value="reflection"> reflection</label>
+        <label><input type="checkbox" class="filter-check" data-cat="light" value="shadow"> shadow</label>
+        <label><input type="checkbox" class="filter-check" data-cat="light" value="sunset light"> sunset light</label>
+        <label><input type="checkbox" class="filter-check" data-cat="light" value="wet weather"> wet weather</label>
+      </div>
 
-    <div class="acc-head" data-target="acc-suburb">
-      <span class="section-label" style="margin:0;">Suburb</span><span style="font-size:10px;color:#6B6B6B;">＋</span>
-    </div>
-    <div class="acc-body" id="acc-suburb">
-      <label><input type="radio" name="suburb-group" class="suburb-check" value="Kelvin Grove" checked> Kelvin Grove</label>
-      <label><input type="radio" name="suburb-group" class="suburb-check" value="Herston"> Herston</label>
-    </div>
+      <!-- SEKCJA 2: ARCHITEKTURA I WIDOKI (A-Z) -->
+      <div class="acc-head" data-target="acc-arch-bldg">
+        <span class="section-label" style="margin:0;">2. Architecture & View</span><span style="font-size:10px;color:#6B6B6B;">＋</span>
+      </div>
+      <div class="acc-body" id="acc-arch-bldg">
+        <div class="sub-category-title">Building Type</div>
+        <label><input type="checkbox" class="filter-check" data-cat="building" value="apartment building"> apartment building</label>
+        <label><input type="checkbox" class="filter-check" data-cat="building" value="civic building"> civic building</label>
+        <label><input type="checkbox" class="filter-check" data-cat="building" value="commercial building"> commercial building</label>
+        <label><input type="checkbox" class="filter-check" data-cat="building" value="duplex"> duplex</label>
+        <label><input type="checkbox" class="filter-check" data-cat="building" value="heritage building"> heritage building</label>
+        <label><input type="checkbox" class="filter-check" data-cat="building" value="highset house"> highset house</label>
+        <label><input type="checkbox" class="filter-check" data-cat="building" value="hospitality building"> hospitality building</label>
+        <label><input type="checkbox" class="filter-check" data-cat="building" value="industrial building"> industrial building</label>
+        <label><input type="checkbox" class="filter-check" data-cat="building" value="lowset house"> lowset house</label>
+        <label><input type="checkbox" class="filter-check" data-cat="building" value="mixed use building"> mixed use building</label>
+        <label><input type="checkbox" class="filter-check" data-cat="building" value="office building"> office building</label>
+        <label><input type="checkbox" class="filter-check" data-cat="building" value="parking structure"> parking structure</label>
+        <label><input type="checkbox" class="filter-check" data-cat="building" value="post war house"> post war house</label>
+        <label><input type="checkbox" class="filter-check" data-cat="building" value="public building"> public building</label>
+        <label><input type="checkbox" class="filter-check" data-cat="building" value="queenslander"> queenslander</label>
+        <label><input type="checkbox" class="filter-check" data-cat="building" value="residential building"> residential building</label>
+        <label><input type="checkbox" class="filter-check" data-cat="building" value="residential tower"> residential tower</label>
+        <label><input type="checkbox" class="filter-check" data-cat="building" value="retail building"> retail building</label>
+        <label><input type="checkbox" class="filter-check" data-cat="building" value="social housing"> social housing</label>
+        <label><input type="checkbox" class="filter-check" data-cat="building" value="student housing"> student housing</label>
+        <label><input type="checkbox" class="filter-check" data-cat="building" value="terrace house"> terrace house</label>
+        <label><input type="checkbox" class="filter-check" data-cat="building" value="warehouse"> warehouse</label>
+        <label><input type="checkbox" class="filter-check" data-cat="building" value="workers cottage"> workers cottage</label>
 
-    <div class="acc-head" data-target="acc-building">
-      <span class="section-label" style="margin:0;">Building type</span><span style="font-size:10px;color:#6B6B6B;">＋</span>
-    </div>
-    <div class="acc-body" id="acc-building">
-      <label><input type="checkbox" class="building-check" value="residential-tower"> residential-tower</label>
-      <label><input type="checkbox" class="building-check" value="apartment-building"> apartment-building</label>
-      <label><input type="checkbox" class="building-check" value="mixed-use-building"> mixed-use-building</label>
-      <label><input type="checkbox" class="building-check" value="commercial-building"> commercial-building</label>
-      <label><input type="checkbox" class="building-check" value="heritage-building"> heritage-building</label>
-      <label><input type="checkbox" class="building-check" value="construction-site"> construction-site</label>
-    </div>
+        <div class="sub-category-title" style="margin-top:12px;">Architectural Form</div>
+        <label><input type="checkbox" class="filter-check" data-cat="archForm" value="adaptive reuse"> adaptive reuse</label>
+        <label><input type="checkbox" class="filter-check" data-cat="archForm" value="brick facade"> brick facade</label>
+        <label><input type="checkbox" class="filter-check" data-cat="archForm" value="concrete facade"> concrete facade</label>
+        <label><input type="checkbox" class="filter-check" data-cat="archForm" value="contemporary architecture"> contemporary architecture</label>
+        <label><input type="checkbox" class="filter-check" data-cat="archForm" value="corner building"> corner building</label>
+        <label><input type="checkbox" class="filter-check" data-cat="archForm" value="corner tower"> corner tower</label>
+        <label><input type="checkbox" class="filter-check" data-cat="archForm" value="corrugated iron facade"> corrugated iron facade</label>
+        <label><input type="checkbox" class="filter-check" data-cat="archForm" value="curved facade"> curved facade</label>
+        <label><input type="checkbox" class="filter-check" data-cat="archForm" value="face brick facade"> face brick facade</label>
+        <label><input type="checkbox" class="filter-check" data-cat="archForm" value="glass facade"> glass facade</label>
+        <label><input type="checkbox" class="filter-check" data-cat="archForm" value="grid facade"> grid facade</label>
+        <label><input type="checkbox" class="filter-check" data-cat="archForm" value="heritage architecture"> heritage architecture</label>
+        <label><input type="checkbox" class="filter-check" data-cat="archForm" value="high rise"> high rise</label>
+        <label><input type="checkbox" class="filter-check" data-cat="archForm" value="industrial architecture"> industrial architecture</label>
+        <label><input type="checkbox" class="filter-check" data-cat="archForm" value="low rise"> low rise</label>
+        <label><input type="checkbox" class="filter-check" data-cat="archForm" value="metal facade"> metal facade</label>
+        <label><input type="checkbox" class="filter-check" data-cat="archForm" value="mid rise"> mid rise</label>
+        <label><input type="checkbox" class="filter-check" data-cat="archForm" value="modern architecture"> modern architecture</label>
+        <label><input type="checkbox" class="filter-check" data-cat="archForm" value="painted brick facade"> painted brick facade</label>
+        <label><input type="checkbox" class="filter-check" data-cat="archForm" value="podium"> podium</label>
+        <label><input type="checkbox" class="filter-check" data-cat="archForm" value="postwar architecture"> postwar architecture</label>
+        <label><input type="checkbox" class="filter-check" data-cat="archForm" value="rendered facade"> rendered facade</label>
+        <label><input type="checkbox" class="filter-check" data-cat="archForm" value="screen facade"> screen facade</label>
+        <label><input type="checkbox" class="filter-check" data-cat="archForm" value="stone facade"> stone facade</label>
+        <label><input type="checkbox" class="filter-check" data-cat="archForm" value="timber facade"> timber facade</label>
+        <label><input type="checkbox" class="filter-check" data-cat="archForm" value="tower"> tower</label>
+
+        <div class="sub-category-title" style="margin-top:12px;">View Type</div>
+        <label><input type="checkbox" class="filter-check" data-cat="viewType" value="aerial"> aerial</label>
+        <label><input type="checkbox" class="filter-check" data-cat="viewType" value="bridge"> bridge</label>
+        <label><input type="checkbox" class="filter-check" data-cat="viewType" value="building exterior"> building exterior</label>
+        <label><input type="checkbox" class="filter-check" data-cat="viewType" value="building facade"> building facade</label>
+        <label><input type="checkbox" class="filter-check" data-cat="viewType" value="building interior"> building interior</label>
+        <label><input type="checkbox" class="filter-check" data-cat="viewType" value="cityscape"> cityscape</label>
+        <label><input type="checkbox" class="filter-check" data-cat="viewType" value="intersection"> intersection</label>
+        <label><input type="checkbox" class="filter-check" data-cat="viewType" value="laneway"> laneway</label>
+        <label><input type="checkbox" class="filter-check" data-cat="viewType" value="park"> park</label>
+        <label><input type="checkbox" class="filter-check" data-cat="viewType" value="public space"> public space</label>
+        <label><input type="checkbox" class="filter-check" data-cat="viewType" value="river"> river</label>
+        <label><input type="checkbox" class="filter-check" data-cat="viewType" value="shopfront"> shopfront</label>
+        <label><input type="checkbox" class="filter-check" data-cat="viewType" value="skyline"> skyline</label>
+        <label><input type="checkbox" class="filter-check" data-cat="viewType" value="street level"> street level</label>
+        <label><input type="checkbox" class="filter-check" data-cat="viewType" value="streetscape"> streetscape</label>
+        <label><input type="checkbox" class="filter-check" data-cat="viewType" value="urban detail"> urban detail</label>
+
+        <div class="sub-category-title" style="margin-top:12px;">Composition</div>
+        <label><input type="checkbox" class="filter-check" data-cat="comp" value="architectural elevation"> architectural elevation</label>
+        <label><input type="checkbox" class="filter-check" data-cat="comp" value="close view"> close view</label>
+        <label><input type="checkbox" class="filter-check" data-cat="comp" value="context view"> context view</label>
+        <label><input type="checkbox" class="filter-check" data-cat="comp" value="detail view"> detail view</label>
+        <label><input type="checkbox" class="filter-check" data-cat="comp" value="elevated view"> elevated view</label>
+        <label><input type="checkbox" class="filter-check" data-cat="comp" value="frontal view"> frontal view</label>
+        <label><input type="checkbox" class="filter-check" data-cat="comp" value="oblique view"> oblique view</label>
+        <label><input type="checkbox" class="filter-check" data-cat="comp" value="street view"> street view</label>
+        <label><input type="checkbox" class="filter-check" data-cat="comp" value="upward perspective"> upward perspective</label>
+        <label><input type="checkbox" class="filter-check" data-cat="comp" value="wide view"> wide view</label>
+      </div>
+
+      <!-- SEKCJA 3: PRZESTRZEŃ PUBLICZNA I PROGRAM (A-Z) -->
+      <div class="acc-head" data-target="acc-public-use">
+        <span class="section-label" style="margin:0;">3. Public Realm & Program</span><span style="font-size:10px;color:#6B6B6B;">＋</span>
+      </div>
+      <div class="acc-body" id="acc-public-use">
+        <div class="sub-category-title">Public Realm Elements</div>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="amenity deck"> amenity deck</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="arcade"> arcade</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="awning"> awning</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="balcony"> balcony</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="bench"> bench</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="bike lane"> bike lane</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="bollard"> bollard</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="bus lane"> bus lane</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="bus stop"> bus stop</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="canopy"> canopy</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="crane"> crane</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="crossing"> crossing</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="door"> door</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="entry"> entry</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="fence"> fence</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="footpath"> footpath</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="fountain"> fountain</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="garden bed"> garden bed</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="gate"> gate</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="graffiti"> graffiti</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="handrail"> handrail</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="hoarding art"> hoarding art</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="kerb"> kerb</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="lawn"> lawn</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="median"> median</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="monument"> monument</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="mural"> mural</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="outdoor dining"> outdoor dining</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="pavement"> pavement</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="pedestrian zone"> pedestrian zone</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="planting"> planting</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="playground"> playground</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="pool"> pool</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="public art"> public art</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="rail infrastructure"> rail infrastructure</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="ramp"> ramp</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="roof"> roof</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="scaffolding"> scaffolding</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="seat"> seat</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="shade structure"> shade structure</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="shared zone"> shared zone</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="signage"> signage</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="site hoarding"> site hoarding</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="sports court"> sports court</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="stairs"> stairs</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="street light"> street light</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="street trading"> street trading</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="table"> table</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="temporary fencing"> temporary fencing</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="traffic light"> traffic light</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="tree"> tree</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="veranda"> veranda</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="wall"> wall</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="wayfinding"> wayfinding</label>
+        <label><input type="checkbox" class="filter-check" data-cat="publicRealm" value="window"> window</label>
+
+        <div class="sub-category-title" style="margin-top:12px;">Use / Program</div>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="aquatic centre"> aquatic centre</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="arena"> arena</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="bar"> bar</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="bus station"> bus station</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="cafe"> cafe</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="cinema"> cinema</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="clinic"> clinic</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="commercial"> commercial</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="community centre"> community centre</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="community use"> community use</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="concert hall"> concert hall</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="courthouse"> courthouse</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="education"> education</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="exhibition space"> exhibition space</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="ferry terminal"> ferry terminal</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="food hall"> food hall</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="gallery"> gallery</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="government"> government</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="health"> health</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="hospital"> hospital</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="hospitality"> hospitality</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="hotel"> hotel</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="library"> library</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="market"> market</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="mixed use"> mixed use</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="museum"> museum</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="nightclub"> nightclub</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="office"> office</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="parking"> parking</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="performance venue"> performance venue</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="place of worship"> place of worship</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="pub"> pub</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="public use"> public use</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="recreation"> recreation</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="residential"> residential</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="restaurant"> restaurant</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="retail"> retail</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="school"> school</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="shopping centre"> shopping centre</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="showroom"> showroom</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="sports facility"> sports facility</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="stadium"> stadium</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="supermarket"> supermarket</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="theatre"> theatre</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="train station"> train station</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="transport"> transport</label>
+        <label><input type="checkbox" class="filter-check" data-cat="useProg" value="university"> university</label>
+      </div>
+
+      <!-- SEKCJA 4: KONTEKST, STATUS I OLYMPIC (A-Z) -->
+      <div class="acc-head" data-target="acc-context-status">
+        <span class="section-label" style="margin:0;">4. Transformation & Status</span><span style="font-size:10px;color:#6B6B6B;">＋</span>
+      </div>
+      <div class="acc-body" id="acc-context-status">
+        <div class="sub-category-title">Urban Transformation Context</div>
+        <label><input type="checkbox" class="filter-check" data-cat="context" value="commercial strip"> commercial strip</label>
+        <label><input type="checkbox" class="filter-check" data-cat="context" value="construction impact"> construction impact</label>
+        <label><input type="checkbox" class="filter-check" data-cat="context" value="flood resilience"> flood resilience</label>
+        <label><input type="checkbox" class="filter-check" data-cat="context" value="high density"> high density</label>
+        <label><input type="checkbox" class="filter-check" data-cat="context" value="infrastructure"> infrastructure</label>
+        <label><input type="checkbox" class="filter-check" data-cat="context" value="night economy"> night economy</label>
+        <label><input type="checkbox" class="filter-check" data-cat="context" value="public realm"> public realm</label>
+        <label><input type="checkbox" class="filter-check" data-cat="context" value="riverfront"> riverfront</label>
+        <label><input type="checkbox" class="filter-check" data-cat="context" value="street activation"> street activation</label>
+        <label><input type="checkbox" class="filter-check" data-cat="context" value="transport corridor"> transport corridor</label>
+        <label><input type="checkbox" class="filter-check" data-cat="context" value="urban consolidation"> urban consolidation</label>
+        <label><input type="checkbox" class="filter-check" data-cat="context" value="urban development"> urban development</label>
+        <label><input type="checkbox" class="filter-check" data-cat="context" value="urban intensification"> urban intensification</label>
+        <label><input type="checkbox" class="filter-check" data-cat="context" value="urban renewal"> urban renewal</label>
+        <label><input type="checkbox" class="filter-check" data-cat="context" value="waterfront"> waterfront</label>
+
+        <div class="sub-category-title" style="margin-top:12px;">Physical Status</div>
+        <label><input type="checkbox" class="filter-check" data-cat="status" value="after change"> after change</label>
+        <label><input type="checkbox" class="filter-check" data-cat="status" value="before change"> before change</label>
+        <label><input type="checkbox" class="filter-check" data-cat="status" value="completed development"> completed development</label>
+        <label><input type="checkbox" class="filter-check" data-cat="status" value="demolition in progress"> demolition in progress</label>
+        <label><input type="checkbox" class="filter-check" data-cat="status" value="development site"> development site</label>
+        <label><input type="checkbox" class="filter-check" data-cat="status" value="existing condition"> existing condition</label>
+        <label><input type="checkbox" class="filter-check" data-cat="status" value="ongoing change"> ongoing change</label>
+        <label><input type="checkbox" class="filter-check" data-cat="status" value="post demolition"> post demolition</label>
+        <label><input type="checkbox" class="filter-check" data-cat="status" value="pre construction"> pre construction</label>
+        <label><input type="checkbox" class="filter-check" data-cat="status" value="scheduled demolition"> scheduled demolition</label>
+        <label><input type="checkbox" class="filter-check" data-cat="status" value="threatened building"> threatened building</label>
+        <label><input type="checkbox" class="filter-check" data-cat="status" value="under construction"> under construction</label>
+        <label><input type="checkbox" class="filter-check" data-cat="status" value="vacant site"> vacant site</label>
+
+        <div class="sub-category-title" style="margin-top:12px;">Brisbane 2032 (Olympic)</div>
+        <label><input type="checkbox" class="filter-check" data-cat="olympic" value="athlete village"> athlete village</label>
+        <label><input type="checkbox" class="filter-check" data-cat="olympic" value="legacy project"> legacy project</label>
+        <label><input type="checkbox" class="filter-check" data-cat="olympic" value="olympic infrastructure"> olympic infrastructure</label>
+        <label><input type="checkbox" class="filter-check" data-cat="olympic" value="olympic precinct"> olympic precinct</label>
+        <label><input type="checkbox" class="filter-check" data-cat="olympic" value="olympic venue"> olympic venue</label>
+        <label><input type="checkbox" class="filter-check" data-cat="olympic" value="temporary structure"> temporary structure</label>
+        <label><input type="checkbox" class="filter-check" data-cat="olympic" value="transport upgrade"> transport upgrade</label>
+      </div>
 
     </div>
 
     <div id="index-group">
       <div id="list-wrap"></div>
-      <div id="footer-row"></div>
+      <div id="footer-row">Loading archive statistics...</div>
     </div>
-
   </div>
 
   <div id="map-wrap" class="mobile-hidden">
     <div id="map"></div>
-    <div id="debug"><b>State (open console for detail)</b><br>searchState → filters list + dots + PhotoDeck ?search=<br>layerState → polygon visibility only</div>
   </div>
-
 </div>
 
 <script>
 mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
 
-/* --- DEMO DATA — replace with real archive + GeoJSON before shipping --- */
-var locations = [
-  { ref: 'PX.26.00184', street: 'Gregory Terrace', suburb: 'Herston', year: '2026', buildingType: 'heritage-building', count: 6, coords: [153.028, -27.457] },
-  { ref: 'PX.26.00191', street: 'Victoria Park Road', suburb: 'Kelvin Grove', year: '2026', buildingType: 'residential-tower', count: 4, coords: [153.017, -27.458] },
-  { ref: 'PX.26.00203', street: 'Kelvin Grove Road', suburb: 'Kelvin Grove', year: '2026', buildingType: 'mixed-use-building', count: 9, coords: [153.019, -27.456] },
-  { ref: 'PX.27.00012', street: 'Enoggera Terrace', suburb: 'Kelvin Grove', year: '2027', buildingType: 'apartment-building', count: 3, coords: [153.015, -27.455] },
-  { ref: 'PX.27.00045', street: 'Bowen Bridge Road', suburb: 'Herston', year: '2027', buildingType: 'commercial-building', count: 5, coords: [153.030, -27.454] },
-  { ref: 'PX.26.00210', street: 'Herston Road', suburb: 'Herston', year: '2026', buildingType: 'construction-site', count: 2, coords: [153.026, -27.453] }
-];
+var locations = [];
+var projects = { type: 'FeatureCollection', features: [] };
 
-var projects = {
-  type: 'FeatureCollection',
-  features: [
-    { type: 'Feature', properties: { status: 'proposed' }, geometry: { type: 'Polygon', coordinates: [[[153.026,-27.459],[153.028,-27.4585],[153.0275,-27.4575],[153.0255,-27.458],[153.026,-27.459]]] } },
-    { type: 'Feature', properties: { status: 'construction' }, geometry: { type: 'Polygon', coordinates: [[[153.019,-27.4565],[153.021,-27.456],[153.0215,-27.455],[153.0195,-27.4545],[153.018,-27.455],[153.019,-27.4565]]] } },
-    { type: 'Feature', properties: { status: 'proposed' }, geometry: { type: 'Polygon', coordinates: [[[153.015,-27.459],[153.017,-27.4585],[153.0175,-27.4575],[153.0155,-27.458],[153.015,-27.459]]] } }
-  ]
-};
-/* --- end demo data --- */
-
-// where a documented location's coordinates fall inside a project's
-// footprint, cross-reference them so the popup can say so — the two
-// layers describe the same physical spot, so a click there shouldn't
-// have to guess which of the two competing facts to show.
-projects.features.forEach(function (feature) {
-  var match = locations.find(function (loc) {
-    return turf.booleanPointInPolygon(turf.point(loc.coords), feature);
-  });
-  if (match) {
-    feature.properties.documentedRef = match.ref;
-    feature.properties.documentedStreet = match.street;
-    match.projectStatus = feature.properties.status;
-  }
-});
-
-function statusLabel(status) {
-  return status === 'construction' ? 'Under construction' : status.charAt(0).toUpperCase() + status.slice(1);
-}
-
-var searchState = { years: ['2026'], suburb: 'Kelvin Grove', buildingTypes: [], advanced: [] };
-var layerState = { proposed: true, construction: true, approved: true };
+var searchState = { suburb: '', extraFilters: [] };
+var layerState = { proposed: true, under_construction: true, approved: true };
 
 var map = new mapboxgl.Map({
   container: 'map',
   style: 'mapbox://styles/mapbox/light-v11',
-  center: [153.020, -27.4575],
-  zoom: 12.5
+  center: [153.0307, -27.4598],
+  zoom: 13
 });
 map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
 
@@ -273,25 +460,18 @@ var geocoder = new MapboxGeocoder({
   marker: false,
   placeholder: 'Search address or place…',
   countries: 'au',
-  bbox: [152.85, -27.65, 153.25, -27.25], // Brisbane metro only — nothing outside this box suggests
+  bbox: [152.85, -27.65, 153.25, -27.25],
   types: 'address,poi,place,locality,neighborhood',
   flyTo: false
 });
 document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
-// this box only moves the map to a real-world address or place — it never
-// touches searchState and never filters the list. narrowing the archive
-// itself happens exclusively by clicking the filters below.
 
 function frameArea(center, bbox) {
-  // 13 is the ceiling — this style stops drawing the suburb-name label
-  // somewhere around zoom 13–14, so no matter how tight the bounding box
-  // is, fitBounds is never allowed to push past the point where the name
-  // itself disappears from the map it's supposed to be labelling.
   if (bbox) {
-    map.fitBounds(bbox, { padding: 60, duration: 800, maxZoom: 13 });
+    map.fitBounds(bbox, { padding: 60, duration: 800, maxZoom: 14.5 });
   } else {
-    var buffered = turf.buffer(turf.point(center), 0.7, { units: 'kilometers' });
-    map.fitBounds(turf.bbox(buffered), { padding: 60, duration: 800, maxZoom: 13 });
+    var buffered = turf.buffer(turf.point(center), 0.2, { units: 'kilometers' });
+    map.fitBounds(turf.bbox(buffered), { padding: 60, duration: 800, maxZoom: 14.5 });
   }
 }
 
@@ -300,190 +480,253 @@ geocoder.on('result', function (e) {
   var isSuburb = result.place_type && result.place_type.some(function (t) { return t === 'place' || t === 'locality' || t === 'neighborhood'; });
   if (isSuburb) {
     frameArea(result.center, result.bbox);
-
-    // selecting a suburb from the dropdown is a click, not free typing,
-    // so it's allowed to check the matching Suburb filter automatically —
-    // otherwise you land on the suburb but still see zero photographed
-    // locations until you go tick the box yourself.
     var suburbName = result.text || '';
     var matchedBox = null;
     document.querySelectorAll('.suburb-check').forEach(function (cb) {
       if (cb.value.toLowerCase() === suburbName.toLowerCase()) matchedBox = cb;
     });
-    if (matchedBox && !matchedBox.checked) {
-      matchedBox.checked = true; // radio group unchecks the previous suburb on its own
+    if (matchedBox) {
+      matchedBox.checked = true;
       searchState.suburb = matchedBox.value;
+      updatePhotoDeckLink();
       applySearchState();
-    } else if (!matchedBox) {
-      console.log('→ "' + suburbName + '" has no matching option yet — this demo only wires up Kelvin Grove and Herston.');
     }
   } else {
-    // single address or POI — just a point, go in close. does not touch
-    // any filter, per the rule: search only navigates, never narrows.
     map.flyTo({ center: result.center, zoom: 16 });
   }
 });
 
-map.on('load', function () {
-  // force every layer in the base style to black / white / grays, no exceptions.
-  // covers fills (parks, water, buildings), lines (roads, borders), symbols
-  // (labels, road shields), and the background — not just the handful of
-  // obviously-coloured ones from before.
-  var style = map.getStyle();
-  style.layers.forEach(function (l) {
-    try {
-      if (l.type === 'background') {
-        map.setPaintProperty(l.id, 'background-color', '#F7F7F5');
-      } else if (l.type === 'fill') {
-        var isWater = /water/i.test(l.id);
-        map.setPaintProperty(l.id, 'fill-color', isWater ? '#E4E4E0' : '#EFEFEA');
-        if (map.getPaintProperty(l.id, 'fill-outline-color') !== undefined) {
-          map.setPaintProperty(l.id, 'fill-outline-color', '#DADADA');
-        }
-      } else if (l.type === 'fill-extrusion') {
-        map.setPaintProperty(l.id, 'fill-extrusion-color', '#E4E4E0');
-      } else if (l.type === 'line') {
-        var isMajorRoad = /motorway|trunk|primary/i.test(l.id);
-        map.setPaintProperty(l.id, 'line-color', isMajorRoad ? '#6B6B6B' : '#DADADA');
-      } else if (l.type === 'symbol') {
-        if (map.getPaintProperty(l.id, 'text-color') !== undefined) {
-          map.setPaintProperty(l.id, 'text-color', '#6B6B6B');
-          map.setPaintProperty(l.id, 'text-halo-color', '#F7F7F5');
-          map.setPaintProperty(l.id, 'text-halo-width', 1);
-        }
-        if (map.getPaintProperty(l.id, 'icon-color') !== undefined) {
-          map.setPaintProperty(l.id, 'icon-opacity', 0); // no decorative POI icons, per system rule
-        }
+Promise.all([
+  fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/locations.csv?t=' + Date.now()).then(r => r.text()).catch(() => ''),
+  fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban/main/brisbane-development.geojson?t=' + Date.now()).then(r => r.json()).catch(() => ({ type: 'FeatureCollection', features: [] }))
+]).then(function ([csvText, geojson]) {
+  if (csvText) {
+    var lines = csvText.trim().split('\n');
+    var headers = lines[0].split(',');
+    locations = lines.slice(1).map(line => {
+      var cols = [];
+      let cur = '', inQ = false;
+      for (let c of line) {
+        if (c === '"') inQ = !inQ;
+        else if (c === ',' && !inQ) { cols.push(cur); cur = ''; }
+        else cur += c;
       }
-    } catch (e) { /* layer doesn't support this property, skip it */ }
-  });
+      cols.push(cur);
+      var row = {};
+      headers.forEach((h, i) => row[h.trim()] = (cols[i] || '').trim());
 
-  map.addSource('projects', { type: 'geojson', data: projects });
+      return {
+        ref: row.ref || 'PX.26.000',
+        street: row.address || row.street || 'Unnamed location',
+        suburb: row.suburb || 'Brisbane',
+        count: row.count ? parseInt(row.count) : 1,
+        coords: [parseFloat(row.lng), parseFloat(row.lat)],
+        archiveUrl: row.archiveUrl || '#'
+      };
+    }).filter(l => !isNaN(l.coords[0]) && !isNaN(l.coords[1]));
+  }
 
-  map.addLayer({
-    id: 'projects-fill',
-    type: 'fill',
-    source: 'projects',
-    minzoom: 13, // <-- this is the fix for the "invisible at city scale" problem
-    paint: {
-      'fill-color': ['match', ['get', 'status'],
-        'approved', '#111111',
-        'construction', '#6B6B6B',
-        'proposed', '#F7F7F5',
-        '#F7F7F5'],
-      'fill-opacity': ['match', ['get', 'status'], 'proposed', 0, 0.55]
+  if (geojson && geojson.features) {
+    projects = geojson;
+  }
+
+  projects.features.forEach(function (feature) {
+    var match = locations.find(function (loc) {
+      return turf.booleanPointInPolygon(turf.point(loc.coords), feature);
+    });
+    if (match) {
+      feature.properties.documentedRef = match.ref;
+      feature.properties.documentedStreet = match.street;
+      match.projectStatus = feature.properties.status;
     }
   });
-  map.addLayer({
-    id: 'projects-line',
-    type: 'line',
-    source: 'projects',
-    minzoom: 13,
-    paint: { 'line-color': ['match', ['get', 'status'], 'proposed', '#DADADA', '#6B6B6B'], 'line-width': 1 }
-  });
 
-  var activePopup = null;
-  var lastMarkerClickAt = 0;
-  function closeAllPopups() {
-    if (activePopup) { activePopup.remove(); activePopup = null; }
-  }
-  function showPopup(popup, lngLat) {
-    closeAllPopups();
-    popup.setLngLat(lngLat).addTo(map);
-    activePopup = popup;
-  }
-  window.piCloseAllPopups = closeAllPopups; // reachable from filter listeners outside this closure
-  window.piShowPopup = showPopup;
-
-  locations.forEach(function (loc) {
-    var el = document.createElement('div');
-    el.style.width = '8px'; el.style.height = '8px'; el.style.background = '#111111'; el.style.borderRadius = '0'; el.style.cursor = 'pointer';
-
-    var popupHtml =
-      '<div style="font-family:Inter,system-ui,sans-serif;padding:2px 2px 4px;min-width:180px;">' +
-        '<div style="font-size:13px;color:#111111;margin-bottom:4px;">' + loc.street + '</div>' +
-        '<div style="font-size:10px;color:#6B6B6B;margin-bottom:8px;">' + loc.count + (loc.count === 1 ? ' photo documented' : ' photos documented') + '</div>' +
-        '<div style="font-size:10px;color:#6B6B6B;border-top:1px solid #DADADA;padding-top:6px;">' + loc.suburb + ' · ' + loc.year + ' · ' + loc.buildingType + '</div>' +
-        (loc.projectStatus ? '<div style="font-size:10px;color:#111111;border-top:1px solid #DADADA;padding-top:6px;margin-top:6px;">This spot also sits inside a development project — ' + statusLabel(loc.projectStatus) + '</div>' : '') +
-      '</div>';
-
-    loc.popup = new mapboxgl.Popup({ offset: 14, closeButton: true, className: 'pi-popup' }).setHTML(popupHtml);
-    loc.marker = new mapboxgl.Marker({ element: el }).setLngLat(loc.coords).addTo(map);
-    el.addEventListener('click', function (ev) {
-      ev.stopPropagation();
-      lastMarkerClickAt = Date.now(); // tells the polygon handler below "this click already had an owner"
-      showPopup(loc.popup, loc.coords);
-    });
-  });
-
-  map.on('mouseenter', 'projects-fill', function () { map.getCanvas().style.cursor = 'pointer'; });
-  map.on('mouseleave', 'projects-fill', function () { map.getCanvas().style.cursor = ''; });
-
-  map.on('click', 'projects-fill', function (e) {
-    if (Date.now() - lastMarkerClickAt < 80) return; // a marker sitting inside this polygon just handled this same click
-    var props = e.features[0].properties;
-    var html =
-      '<div style="font-family:Inter,system-ui,sans-serif;padding:2px 2px 4px;min-width:180px;">' +
-        '<div style="font-size:10px;letter-spacing:0.08em;color:#6B6B6B;margin-bottom:4px;">Development project</div>' +
-        '<div style="font-size:13px;color:#111111;margin-bottom:8px;">' + statusLabel(props.status) + '</div>' +
-        '<div style="font-size:10px;color:#6B6B6B;border-top:1px solid #DADADA;padding-top:6px;">Demo data — no council reference wired yet.</div>' +
-        (props.documentedRef ? '<div style="font-size:10px;color:#111111;border-top:1px solid #DADADA;padding-top:6px;margin-top:6px;">A documented photo exists within this footprint — ' + props.documentedRef + ', ' + props.documentedStreet + '</div>' : '') +
-      '</div>';
-    showPopup(new mapboxgl.Popup({ offset: 8, closeButton: true, className: 'pi-popup' }).setHTML(html), e.lngLat);
-  });
-
-  renderList();
-  applySearchState();
-  applyLayerState();
+  initMapEverything();
+  var loadingEl = document.getElementById('page-loading');
+  if (loadingEl) loadingEl.style.display = 'none';
 });
+
+function statusLabel(status) {
+  if (status === 'under_construction') return 'Under construction';
+  return status ? status.charAt(0).toUpperCase() + status.slice(1) : 'Proposed';
+}
+
+function initMapEverything() {
+  map.on('load', function () {
+    var style = map.getStyle();
+    style.layers.forEach(function (l) {
+      try {
+        if (l.type === 'background') {
+          map.setPaintProperty(l.id, 'background-color', '#F7F7F5');
+        } else if (l.type === 'fill') {
+          var isWater = /water/i.test(l.id);
+          map.setPaintProperty(l.id, 'fill-color', isWater ? '#E4E4E0' : '#EFEFEA');
+          if (map.getPaintProperty(l.id, 'fill-outline-color') !== undefined) {
+            map.setPaintProperty(l.id, 'fill-outline-color', '#DADADA');
+          }
+        } else if (l.type === 'fill-extrusion') {
+          map.setPaintProperty(l.id, 'fill-extrusion-color', '#E4E4E0');
+        } else if (l.type === 'line') {
+          var isMajorRoad = /motorway|trunk|primary/i.test(l.id);
+          map.setPaintProperty(l.id, 'line-color', isMajorRoad ? '#6B6B6B' : '#DADADA');
+        } else if (l.type === 'symbol') {
+          if (map.getPaintProperty(l.id, 'text-color') !== undefined) {
+            map.setPaintProperty(l.id, 'text-color', '#6B6B6B');
+            map.setPaintProperty(l.id, 'text-halo-color', '#F7F7F5');
+            map.setPaintProperty(l.id, 'text-halo-width', 1);
+          }
+          if (map.getPaintProperty(l.id, 'icon-color') !== undefined) {
+            map.setPaintProperty(l.id, 'icon-opacity', 0);
+          }
+        }
+      } catch (e) {}
+    });
+
+    map.addSource('projects', { type: 'geojson', data: projects });
+
+    map.addLayer({
+      id: 'projects-fill',
+      type: 'fill',
+      source: 'projects',
+      minzoom: 13,
+      paint: {
+        'fill-color': ['match', ['get', 'status'],
+          'approved', '#111111',
+          'under_construction', '#6B6B6B',
+          'proposed', '#F7F7F5',
+          '#F7F7F5'],
+        'fill-opacity': ['match', ['get', 'status'], 'proposed', 0, 0.55]
+      }
+    });
+    map.addLayer({
+      id: 'projects-line',
+      type: 'line',
+      source: 'projects',
+      minzoom: 13,
+      paint: { 
+        'line-color': ['match', ['get', 'status'], 'proposed', '#DADADA', '#6B6B6B'], 
+        'line-width': 1 
+      }
+    });
+
+    var activePopup = null;
+    var lastMarkerClickAt = 0;
+    function closeAllPopups() {
+      if (activePopup) { activePopup.remove(); activePopup = null; }
+    }
+    window.piCloseAllPopups = closeAllPopups;
+    window.piShowPopup = function(popup, lngLat) {
+      closeAllPopups();
+      popup.setLngLat(lngLat).addTo(map);
+      activePopup = popup;
+    };
+
+    locations.forEach(function (loc) {
+      var el = document.createElement('div');
+      el.style.width = '8px'; el.style.height = '8px'; el.style.background = '#111111'; el.style.borderRadius = '0'; el.style.cursor = 'pointer';
+
+      var popupHtml =
+        '<div style="font-family:Inter,system-ui,sans-serif;padding:2px 2px 4px;min-width:180px;">' +
+          '<div style="font-size:13px;color:#111111;margin-bottom:4px;">' + loc.street + '</div>' +
+          '<div style="font-size:10px;color:#6B6B6B;margin-bottom:8px;">' + loc.count + (loc.count === 1 ? ' photo documented' : ' photos documented') + '</div>' +
+          '<a href="' + loc.archiveUrl + '" target="_blank" style="display:block;text-align:center;background:#111;color:#fff;padding:6px;font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;">View photos →</a>' +
+          '<div style="font-size:10px;color:#6B6B6B;border-top:1px solid #DADADA;padding-top:6px;">' + loc.suburb + '</div>' +
+        '</div>';
+
+      loc.popup = new mapboxgl.Popup({ offset: 14, closeButton: true, className: 'pi-popup' }).setHTML(popupHtml);
+      loc.marker = new mapboxgl.Marker({ element: el }).setLngLat(loc.coords).addTo(map);
+      el.addEventListener('click', function (ev) {
+        ev.stopPropagation();
+        lastMarkerClickAt = Date.now();
+        window.piShowPopup(loc.popup, loc.coords);
+      });
+    });
+
+    map.on('mouseenter', 'projects-fill', function () { map.getCanvas().style.cursor = 'pointer'; });
+    map.on('mouseleave', 'projects-fill', function () { map.getCanvas().style.cursor = ''; });
+
+    map.on('click', 'projects-fill', function (e) {
+      if (Date.now() - lastMarkerClickAt < 80) return;
+      var props = e.features[0].properties;
+      var html =
+        '<div style="font-family:Inter,system-ui,sans-serif;padding:2px 2px 4px;min-width:180px;">' +
+          '<div style="font-size:10px;letter-spacing:0.08em;color:#6B6B6B;margin-bottom:4px;">Development project</div>' +
+          '<div style="font-size:13px;color:#111111;margin-bottom:8px;">' + statusLabel(props.status) + (props.name ? ' — ' + props.name : '') + '</div>' +
+          (props.documentedRef ? '<div style="font-size:10px;color:#111111;border-top:1px solid #DADADA;padding-top:6px;margin-top:6px;">Documented photo within footprint: ' + props.documentedRef + '</div>' : '') +
+        '</div>';
+      window.piShowPopup(new mapboxgl.Popup({ offset: 8, closeButton: true, className: 'pi-popup' }).setHTML(html), e.lngLat);
+    });
+
+    renderList();
+    applySearchState();
+    applyLayerState();
+  });
+}
 
 function applyLayerState() {
   var expr = ['any'];
   Object.keys(layerState).forEach(function (k) {
     if (layerState[k]) expr.push(['==', ['get', 'status'], k]);
   });
-  map.setFilter('projects-fill', expr.length > 1 ? expr : ['==', ['get', 'status'], '__none__']);
-  map.setFilter('projects-line', expr.length > 1 ? expr : ['==', ['get', 'status'], '__none__']);
-
-  ['proposed', 'construction', 'approved'].forEach(function (s) {
+  if (map.getLayer('projects-fill')) {
+    map.setFilter('projects-fill', expr.length > 1 ? expr : ['==', ['get', 'status'], '__none__']);
+    map.setFilter('projects-line', expr.length > 1 ? expr : ['==', ['get', 'status'], '__none__']);
+  }
+  ['proposed', 'under_construction', 'approved'].forEach(function (s) {
     var n = projects.features.filter(function (f) { return f.properties.status === s; }).length;
-    document.getElementById('count-' + s).textContent = n;
+    var el = document.getElementById('count-' + s);
+    if (el) el.textContent = n;
   });
+}
+
+function updatePhotoDeckLink() {
+  var allTerms = [];
+  if (searchState.suburb) allTerms.push(searchState.suburb);
+  if (searchState.extraFilters && searchState.extraFilters.length) {
+    allTerms = allTerms.concat(searchState.extraFilters);
+  }
+  var queryStr = allTerms.join(' ');
+  var btn = document.getElementById('search-archive-btn');
+  if (btn) {
+    if (queryStr) {
+      btn.href = 'https://photoindex.photodeck.com/?search=' + encodeURIComponent(queryStr);
+    } else {
+      btn.href = 'https://photoindex.photodeck.com/';
+    }
+  }
 }
 
 function applySearchState() {
   var visibleLocs = locations.filter(function (loc) {
-    var matchesYear = searchState.years.indexOf(loc.year) !== -1;
-    var matchesSuburb = !searchState.suburb || loc.suburb === searchState.suburb;
-    var matchesBuilding = searchState.buildingTypes.length === 0 || searchState.buildingTypes.indexOf(loc.buildingType) !== -1;
-    return matchesYear && matchesSuburb && matchesBuilding;
+    var matchesSuburb = !searchState.suburb || loc.suburb.toLowerCase() === searchState.suburb.toLowerCase();
+    return matchesSuburb;
   });
 
   locations.forEach(function (loc) {
     var visible = visibleLocs.indexOf(loc) !== -1;
-    loc.marker.getElement().style.display = visible ? '' : 'none';
+    if (loc.marker) loc.marker.getElement().style.display = visible ? '' : 'none';
   });
 
   renderList(visibleLocs);
   renderChips();
-  document.getElementById('footer-row').textContent = visibleLocs.length + ' locations documented · last updated 28 June 2026';
+  updatePhotoDeckLink();
 
-  // this is the line that would become a real PhotoDeck fetch:
-  var searchParam = [searchState.years.join(','), searchState.suburb, searchState.buildingTypes.join(','), searchState.advanced.join(',')].filter(Boolean).join(' ');
-  console.log('→ would fetch PhotoDeck with ?search=' + encodeURIComponent(searchParam));
+  var footer = document.getElementById('footer-row');
+  if (footer) footer.textContent = visibleLocs.length + ' of ' + locations.length + ' locations documented · active archive';
 }
 
 function renderList(items) {
   items = items || locations;
   var wrap = document.getElementById('list-wrap');
+  if (!wrap) return;
   wrap.innerHTML = '';
-  items.forEach(function (loc) {
+  items.slice(0, 100).forEach(function (loc) {
     var row = document.createElement('div');
     row.className = 'list-row';
     row.innerHTML = '<div><div class="list-ref">' + loc.ref + '</div><div class="list-street">' + loc.street + '</div></div>';
     row.addEventListener('click', function () {
       map.flyTo({ center: loc.coords, zoom: 15 });
-      window.piShowPopup(loc.popup, loc.coords);
+      if (loc.popup) window.piShowPopup(loc.popup, loc.coords);
     });
     wrap.appendChild(row);
   });
@@ -491,17 +734,16 @@ function renderList(items) {
 
 function renderChips() {
   var chips = [];
-  searchState.years.forEach(function (y) { chips.push({ label: y, clear: function () { toggleValue(searchState.years, y); syncCheckbox('.year-check', y, false); applySearchState(); } }); });
-  if (searchState.suburb) chips.push({ label: searchState.suburb, clear: function () { searchState.suburb = ''; document.querySelectorAll('.suburb-check').forEach(function (cb) { cb.checked = false; }); applySearchState(); } });
-  searchState.buildingTypes.forEach(function (b) { chips.push({ label: b, clear: function () { toggleValue(searchState.buildingTypes, b); syncCheckbox('.building-check', b, false); applySearchState(); } }); });
-  searchState.advanced.forEach(function (a) { chips.push({ label: a, clear: function () { toggleValue(searchState.advanced, a); syncCheckbox('.adv-check', a, false); applySearchState(); } }); });
+  if (searchState.suburb) chips.push({ label: searchState.suburb, clear: function () { searchState.suburb = ''; document.querySelectorAll('.suburb-check').forEach(function (cb) { cb.checked = (cb.value === ''); }); applySearchState(); } });
+  searchState.extraFilters.forEach(function (f) { chips.push({ label: f, clear: function () { toggleValue(searchState.extraFilters, f); syncCheckbox('.filter-check[value="' + f + '"]', f, false); applySearchState(); } }); });
 
   var host = document.getElementById('chips-here');
+  if (!host) return;
   host.innerHTML = '';
   chips.forEach(function (c) {
     var span = document.createElement('span');
     span.className = 'chip';
-    span.textContent = c.label + ' ×';
+    span.innerHTML = '<span>' + c.label + '</span><span>×</span>';
     span.addEventListener('click', c.clear);
     host.appendChild(span);
   });
@@ -526,21 +768,26 @@ document.querySelectorAll('.filter-row').forEach(function (row) {
 
 document.querySelectorAll('.acc-head').forEach(function (h) {
   h.addEventListener('click', function () {
-    document.getElementById(h.getAttribute('data-target')).classList.toggle('open');
+    var targetId = h.getAttribute('data-target');
+    var body = document.getElementById(targetId);
+    if (body) body.classList.toggle('open');
   });
 });
 
-
-document.querySelectorAll('.year-check').forEach(function (cb) {
-  cb.addEventListener('change', function () { toggleValue(searchState.years, cb.value); applySearchState(); });
+document.querySelectorAll('.filter-check').forEach(function (cb) {
+  cb.addEventListener('change', function () {
+    toggleValue(searchState.extraFilters, cb.value);
+    applySearchState();
+  });
 });
+
 function flyToSuburb(name) {
   var url = 'https://api.mapbox.com/geocoding/v5/mapbox.places/' + encodeURIComponent(name + ', Brisbane, Australia') + '.json?access_token=' + mapboxgl.accessToken + '&country=au&types=place,locality,neighborhood&limit=1';
   fetch(url).then(function (r) { return r.json(); }).then(function (data) {
     var feature = data.features && data.features[0];
     if (!feature) return;
     frameArea(feature.center, feature.bbox);
-  }).catch(function (err) { console.log('→ suburb geocoding lookup failed', err); });
+  }).catch(function (err) { console.log('→ suburb lookup failed', err); });
 }
 
 document.querySelectorAll('.suburb-check').forEach(function (cb) {
@@ -548,36 +795,10 @@ document.querySelectorAll('.suburb-check').forEach(function (cb) {
     if (window.piCloseAllPopups) window.piCloseAllPopups();
     searchState.suburb = cb.value;
     applySearchState();
-    flyToSuburb(cb.value); // same geocoding call the top search bar uses, so the map behaves identically either way
+    if (cb.value) flyToSuburb(cb.value);
   });
 });
-document.querySelectorAll('.building-check').forEach(function (cb) {
-  cb.addEventListener('change', function () { toggleValue(searchState.buildingTypes, cb.value); applySearchState(); });
-});
-function closeAdvPanel() {
-  document.getElementById('adv-panel').style.display = 'none';
-  var advBtn = document.getElementById('adv-btn');
-  advBtn.style.background = '#111111'; advBtn.style.color = '#F7F7F5';
-}
-document.getElementById('adv-btn').addEventListener('click', function () {
-  var panel = document.getElementById('adv-panel');
-  var open = panel.style.display !== 'none';
-  panel.style.display = open ? 'none' : 'block';
-  this.style.background = open ? '#111111' : '#F7F7F5';
-  this.style.color = open ? '#F7F7F5' : '#111111';
-});
-document.getElementById('adv-clear').addEventListener('click', function () {
-  document.querySelectorAll('.adv-check').forEach(function (cb) { cb.checked = false; });
-  searchState.advanced = [];
-  closeAdvPanel();
-  applySearchState();
-});
-document.getElementById('adv-apply').addEventListener('click', function () {
-  var chosen = Array.prototype.slice.call(document.querySelectorAll('.adv-check:checked')).map(function (cb) { return cb.value; });
-  searchState.advanced = chosen;
-  closeAdvPanel();
-  applySearchState();
-});
+
 var mobileTabs = {
   index: { btn: document.getElementById('tab-index'), group: document.getElementById('index-group') },
   filters: { btn: document.getElementById('tab-filters'), group: document.getElementById('filters-group') },
@@ -592,8 +813,6 @@ Object.keys(mobileTabs).forEach(function (key) {
     if (key === 'map') setTimeout(function () { map.resize(); }, 50);
   });
 });
-
-
 </script>
 
 </body>
