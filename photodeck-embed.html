@@ -24,7 +24,10 @@
   #search-archive-btn { height: 36px; padding: 0 16px; border: 1px solid #111111; background: #111111; color: #FFFFFF; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 6px; text-decoration: none; flex-shrink: 0; }
   #search-archive-btn:hover { background: #333333; }
 
+  /* Pasek wyszukiwania widoczny tylko wtedy, gdy są aktywne filtry */
   #chip-row { display: flex; align-items: center; padding: 10px 20px; flex-wrap: wrap; min-height: 20px; background: #FFFFFF; border-bottom: 1px solid #111111; }
+  #chip-row:not(.has-search) { display: none !important; }
+  
   #chip-label { font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6B6B6B; margin-right: 12px; }
   .chip { display: inline-flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #111111; padding: 3px 8px; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #111111; cursor: pointer; background: #FFFFFF; margin: 0 6px 6px 0; line-height: 1.2; }
   .chip:hover { background: #F0F0F0; }
@@ -85,7 +88,7 @@
   .last-updated-badge { font-weight: 500; color: #111111; letter-spacing: 0.08em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 4px; }
   .last-updated-badge::before { content: "●"; font-size: 8px; color: #111111; }
 
-  /* Nowy styl markerów: duży hitbox (44x44px) + czytelny czarny kwadracik z białym numerem */
+  /* Markery: wygodny hitbox 44x44px + czarny kwadracik z liczbą zdjęć */
   .custom-marker-hitbox {
     width: 44px;
     height: 44px;
@@ -149,14 +152,14 @@
 </div>
 
 <div class="mobile-tabs">
-  <button class="mobile-tab active" id="tab-index" data-tab="index">Index</button>
+  <button class="mobile-tab" id="tab-index" data-tab="index">Index</button>
   <button class="mobile-tab" id="tab-filters" data-tab="filters">Filters</button>
-  <button class="mobile-tab" id="tab-map" data-tab="map">Map</button>
+  <button class="mobile-tab active" id="tab-map" data-tab="map">Map</button>
 </div>
 
 <div id="layout">
-  <div id="index-panel">
-    <div class="panel-section-container" id="filters-group">
+  <div id="index-panel" style="display: none;">
+    <div class="panel-section-container" id="filters-group" style="display: none;">
       
       <!-- Warstwy projektów deweloperskich -->
       <div class="section">
@@ -456,7 +459,7 @@
         <label><input type="checkbox" class="filter-check" data-cat="status" value="development site"> development site</label>
         <label><input type="checkbox" class="filter-check" data-cat="status" value="existing condition"> existing condition</label>
         <label><input type="checkbox" class="filter-check" data-cat="status" value="ongoing change"> ongoing change</label>
-        <label><input type="checkbox" class="filter-check" data-cat="status" value="post demolition"> post demolition</label>
+        <label><input type="checkbox" class="filter-check" data-cat="filter-check" data-cat="status" value="post demolition"> post demolition</label>
         <label><input type="checkbox" class="filter-check" data-cat="status" value="pre construction"> pre construction</label>
         <label><input type="checkbox" class="filter-check" data-cat="status" value="scheduled demolition"> scheduled demolition</label>
         <label><input type="checkbox" class="filter-check" data-cat="status" value="threatened building"> threatened building</label>
@@ -484,7 +487,7 @@
     </div>
   </div>
 
-  <div id="map-wrap">
+  <div id="map-wrap" style="display: block;">
     <div id="map"></div>
   </div>
 </div>
@@ -670,18 +673,29 @@ function initMapEverything() {
     });
 
     var activePopup = null;
-    var lastMarkerClickAt = 0;
+    var activeTargetId = null;
+
     function closeAllPopups() {
-      if (activePopup) { activePopup.remove(); activePopup = null; }
+      if (activePopup) { 
+        activePopup.remove(); 
+        activePopup = null; 
+        activeTargetId = null;
+      }
     }
     window.piCloseAllPopups = closeAllPopups;
-    window.piShowPopup = function(popup, lngLat) {
+
+    window.piShowPopup = function(popup, lngLat, targetId) {
+      if (activePopup && activeTargetId === targetId) {
+        closeAllPopups();
+        return;
+      }
       closeAllPopups();
       popup.setLngLat(lngLat).addTo(map);
       activePopup = popup;
+      activeTargetId = targetId;
     };
 
-    locations.forEach(function (loc) {
+    locations.forEach(function (loc, index) {
       var el = document.createElement('div');
       el.className = 'custom-marker-hitbox';
       el.innerHTML = '<div class="custom-marker-visual">' + loc.count + '</div>';
@@ -696,10 +710,12 @@ function initMapEverything() {
 
       loc.popup = new mapboxgl.Popup({ offset: 14, closeButton: true, className: 'pi-popup' }).setHTML(popupHtml);
       loc.marker = new mapboxgl.Marker({ element: el }).setLngLat(loc.coords).addTo(map);
+      
+      var markerId = 'loc-' + index;
       el.addEventListener('click', function (ev) {
         ev.stopPropagation();
         lastMarkerClickAt = Date.now();
-        window.piShowPopup(loc.popup, loc.coords);
+        window.piShowPopup(loc.popup, loc.coords, markerId);
       });
     });
 
@@ -708,14 +724,18 @@ function initMapEverything() {
 
     map.on('click', 'projects-fill', function (e) {
       if (Date.now() - lastMarkerClickAt < 80) return;
-      var props = e.features[0].properties;
+      var feature = e.features[0];
+      var props = feature.properties;
+      var polygonId = 'poly-' + (feature.id !== undefined ? feature.id : (e.lngLat.lng.toFixed(4) + ',' + e.lngLat.lat.toFixed(4)));
+
       var html =
         '<div style="font-family:Inter,system-ui,sans-serif;padding:2px 2px 4px;min-width:180px;">' +
           '<div style="font-size:10px;letter-spacing:0.08em;color:#6B6B6B;margin-bottom:4px;">Development project</div>' +
           '<div style="font-size:13px;color:#111111;margin-bottom:8px;">' + statusLabel(props.status) + (props.name ? ' — ' + props.name : '') + '</div>' +
           (props.documentedStreet ? '<div style="font-size:10px;color:#111111;border-top:1px solid #111111;padding-top:6px;margin-top:6px;">Documented photo within footprint: ' + props.documentedStreet + '</div>' : '') +
         '</div>';
-      window.piShowPopup(new mapboxgl.Popup({ offset: 8, closeButton: true, className: 'pi-popup' }).setHTML(html), e.lngLat);
+      
+      window.piShowPopup(new mapboxgl.Popup({ offset: 8, closeButton: true, className: 'pi-popup' }).setHTML(html), e.lngLat, polygonId);
     });
 
     renderList();
@@ -802,15 +822,22 @@ function renderChips() {
   searchState.extraFilters.forEach(function (f) { chips.push({ label: f, clear: function () { toggleValue(searchState.extraFilters, f); syncCheckbox('.filter-check[value="' + f + '"]', f, false); applySearchState(); } }); });
 
   var host = document.getElementById('chips-here');
-  if (!host) return;
+  var chipRow = document.getElementById('chip-row');
+  if (!host || !chipRow) return;
+
   host.innerHTML = '';
-  chips.forEach(function (c) {
-    var span = document.createElement('span');
-    span.className = 'chip';
-    span.innerHTML = '<span>' + c.label + '</span><span>×</span>';
-    span.addEventListener('click', c.clear);
-    host.appendChild(span);
-  });
+  if (chips.length > 0) {
+    chipRow.classList.add('has-search');
+    chips.forEach(function (c) {
+      var span = document.createElement('span');
+      span.className = 'chip';
+      span.innerHTML = '<span>' + c.label + '</span><span>×</span>';
+      span.addEventListener('click', c.clear);
+      host.appendChild(span);
+    });
+  } else {
+    chipRow.classList.remove('has-search');
+  }
 }
 
 function toggleValue(arr, val) {
@@ -905,8 +932,8 @@ Object.keys(mobileTabConfigs).forEach(function(key) {
 });
 
 if (window.innerWidth <= 720) {
-  document.getElementById('filters-group').style.display = 'none';
-  document.getElementById('index-group').style.display = 'flex';
+  var mapTab = document.getElementById('tab-map');
+  if (mapTab) mapTab.click();
 }
 </script>
 
