@@ -188,8 +188,8 @@
 </div>
 
 <div id="layout">
-  <div id="index-panel" style="display: none;">
-    <div class="panel-section-container" id="filters-group" style="display: none;">
+  <div id="index-panel">
+    <div class="panel-section-container" id="filters-group">
       
       <!-- Warstwy projektów deweloperskich -->
       <div class="section">
@@ -517,7 +517,7 @@
     </div>
   </div>
 
-  <div id="map-wrap" style="display: block;">
+  <div id="map-wrap">
     <div id="map"></div>
   </div>
 </div>
@@ -628,7 +628,6 @@ Promise.all([
 
   initMapEverything();
   
-  // Płynne wygaszanie ekranu ładowania (Fade-out)
   var loadingEl = document.getElementById('page-loading');
   if (loadingEl) {
     loadingEl.classList.add('fade-out');
@@ -645,7 +644,6 @@ function statusLabel(status) {
 
 function initMapEverything() {
   map.on('load', function () {
-    // Płynne rozjaśnienie mapy po załadowaniu stylu
     document.getElementById('map').classList.add('loaded');
 
     var style = map.getStyle();
