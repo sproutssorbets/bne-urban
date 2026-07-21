@@ -775,7 +775,17 @@ function initMap(){
     /* Map style and initial tiles are ready — the placeholder that covered
        the blank white area while everything loaded is no longer needed. */
     const loadingEl = document.getElementById('map-loading');
-    if(loadingEl) loadingEl.classList.add('hidden');
+    if(loadingEl) {
+      // 1. Nadajemy płynną animację bezpośrednio na elemencie (omijając złośliwe klasy CSS)
+      loadingEl.style.transition = 'opacity 0.8s ease-in-out, visibility 0.8s ease-in-out';
+      
+      // 2. Rozpoczynamy płynne ściemnianie
+      loadingEl.style.opacity = '0';
+      loadingEl.style.visibility = 'hidden';
+      
+      // 3. Po 800 milisekundach (gdy animacja się skończy) całkowicie wyłączamy element, by nie blokował klikania w mapę
+      setTimeout(() => { loadingEl.style.display = 'none'; }, 800);
+    }
 
     /* Desaturate all base map layers, keep data layers coloured.
        Previous values (#F0EFEB, #E8E8E4, #CACAC6) had a slight warm tint —
