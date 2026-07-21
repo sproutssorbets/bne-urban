@@ -13,6 +13,36 @@
      version — same hashes, same behaviour, same controlled vocabulary.
      Only this wrapper (head/body, page-level margin) is new. -->
 
+<script>
+  /* Defined here, before the stylesheet link below, on purpose. The link's
+     onload="revealWidget()" can fire the moment that CSS file finishes
+     downloading — which, on a fast connection, can happen before the
+     parser reaches a <script> placed further down the page. When that
+     race was lost, onload called a function that didn't exist yet and
+     threw ReferenceError: revealWidget is not defined, so the widget
+     never got its visibility:visible and stayed hidden behind #page-
+     loading indefinitely (the setTimeout(revealWidget,4000) fallback
+     below still caught it after 4s, but the first paint was needlessly
+     delayed and the console carried a real error).
+
+     Two-stage loading, not one. Stage 1: before the widget's own
+     stylesheet has loaded, #pi-map-search-widget stays visibility:hidden
+     to avoid a flash of unstyled content — but that leaves a completely
+     blank white page during this stage, since even the widget's own
+     "Loading map…" placeholder lives inside the hidden element. #page-
+     loading below sits outside that hidden wrapper and is styled with
+     plain inline attributes only, so it needs no external CSS to render
+     — it shows immediately, then this same function hides it the moment
+     the widget itself becomes visible (stage 2, where the widget's own
+     Mapbox loading indicator takes over). */
+  function revealWidget(){
+    var w = document.getElementById('pi-map-search-widget');
+    var p = document.getElementById('page-loading');
+    if(w) w.style.visibility = 'visible';
+    if(p) p.style.display = 'none';
+  }
+  setTimeout(revealWidget, 4000);
+</script>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://api.mapbox.com">
@@ -142,25 +172,6 @@
   .pi-map-search-widget .recent-row-meta{font-family:Inter,sans-serif;font-size:10px;color:var(--muted)}
   @media(max-width:1024px){.pi-map-search-widget #recent-locations{display:none}}
 </style>
-<script>
-  /* Two-stage loading, not one. Stage 1: before the widget's own
-     stylesheet has loaded, #pi-map-search-widget stays visibility:hidden
-     to avoid a flash of unstyled content — but that leaves a completely
-     blank white page during this stage, since even the widget's own
-     "Loading map…" placeholder lives inside the hidden element. #page-
-     loading below sits outside that hidden wrapper and is styled with
-     plain inline attributes only, so it needs no external CSS to render
-     — it shows immediately, then this same function hides it the moment
-     the widget itself becomes visible (stage 2, where the widget's own
-     Mapbox loading indicator takes over). */
-  function revealWidget(){
-    var w = document.getElementById('pi-map-search-widget');
-    var p = document.getElementById('page-loading');
-    if(w) w.style.visibility = 'visible';
-    if(p) p.style.display = 'none';
-  }
-  setTimeout(revealWidget, 4000);
-</script>
 </head>
 <body>
 
