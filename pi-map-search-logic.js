@@ -1125,7 +1125,12 @@ document.addEventListener('DOMContentLoaded', () => {
 /* Dajemy przeglądarce (szczególnie Chrome) 100 milisekund oddechu 
      na wyrenderowanie struktury strony, zanim uderzymy w silnik mapy */
   setTimeout(() => {
-    initMap();
+ // 1. Odpalamy czystą mapę natychmiast
+  initMap();
+  
+  // 2. Dane lokalizacji i projekty deweloperskie ładujemy z lekkim opóźnieniem (300ms),
+  // dzięki czemu Chrome ma czas na wyrenderowanie kontenera WebGL bez "zawiechy"
+  setTimeout(() => {
     loadLocations();
-  }, 100);
+  }, 300);
 });
