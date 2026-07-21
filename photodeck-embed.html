@@ -83,6 +83,24 @@
        linią przycisku "Show all filters", bez żadnej funkcji. Zerowanie
        tylko padding-top, reszta (lewy/prawy/dolny) zostaje bez zmian. */
     .pi-map-search-widget #refine-section{padding-top:0}
+    /* Przycisk "Show all filters"/"Hide filters" na mobile: gdy panel jest
+       otwarty (.is-open), przykleja się do dołu ekranu, żeby zostawał
+       osiągalny podczas przewijania długiej listy kategorii, zamiast
+       znikać z widoku zaraz po pierwszym scrollu. #refine-top (pasek z
+       wybranymi filtrami) też przykleja się do dołu, ale tylko gdy
+       użytkownik coś już wybrał — --pi-refine-top-h, ustawiane w skrypcie
+       niżej, przesuwa wtedy ten przycisk wyżej dokładnie o wysokość tamtego
+       paska, żeby oba stały jeden nad drugim, nigdy na sobie. */
+    .pi-map-search-widget #filters-toggle-all.is-open{
+      position:fixed;left:0;right:0;bottom:var(--pi-refine-top-h,0px);
+      z-index:150;width:100%;margin:0;transition:bottom 0.15s ease;
+    }
+    /* Rezerwuje na dole listy filtrów tyle miejsca, ile realnie zajmuje
+       przyklejony przycisk (plus pasek nad nim, jeśli widoczny), żeby
+       ostatnia pozycja na liście nie chowała się pod żadnym z nich.
+       Wysokość ustawia skrypt niżej, tu tylko włączam sam element,
+       bazowa reguła w tym pliku ma go domyślnie ukrytego. */
+    .pi-map-search-widget #filters-toggle-all-spacer{display:block}
   }
   /* PhotoDeck-only: the shared CSS sets overscroll-behavior-y:none on
      html/body to stop rubber-band bounce revealing content under the
@@ -359,23 +377,29 @@
        the outer page stays exactly where it was. */
 
     if(!isCurrentlyOpen){
-      /* Opening: reveal immediately, then scroll the (sticky) button to
-         the top so the newly-unfolded filters appear below it, instead
-         of staying off-screen under the map above. */
+      /* Opening: reveal immediately, then scroll so the newly-unfolded
+         filters appear right at the top of the screen. Scrolling to
+         wide.offsetTop rather than the button's own offsetTop —
+         once .is-open is added (line above) the button becomes
+         position:fixed and leaves the normal document flow, so its own
+         offsetTop no longer describes a meaningful on-page position.
+         #filters-wide stays in flow throughout and immediately shifts up
+         into the button's old spot once it's removed from flow, so its
+         offsetTop is the correct, stable target either way. */
       wide.classList.add('all-open');
       toggleBtn.classList.add('is-open');
       if(label) label.textContent = 'Hide filters';
-      window.scrollTo({top: toggleBtn.offsetTop, behavior:'smooth'});
+      window.scrollTo({top: wide.offsetTop, behavior:'smooth'});
     } else {
       /* Closing: scroll to the top FIRST, then collapse the filter list
          only once that scroll has had time to finish. Collapsing first
          would shrink the page height out from under the current scroll
          position — with nothing left to scroll to, the browser just
          clamps the position instantly, which reads as a jarring jump
-         rather than the same smooth motion opening has. Since the
-         button is fixed to the bottom of the viewport regardless of
-         scroll position, scrolling to its own offsetTop always brings
-         it (and this view) to the very top. */
+         rather than the same smooth motion opening has. window.scrollTo(0)
+         targets the absolute top of this document regardless of where the
+         button currently sits on screen, fixed or not, so it works the
+         same whether or not #refine-top is also visible below it. */
      window.scrollTo({top: 0, behavior:'smooth'});
       setTimeout(function(){
         wide.classList.remove('all-open');
@@ -389,6 +413,34 @@
     var toggleBtn = document.getElementById('filters-toggle-all');
     if(toggleBtn) toggleBtn.addEventListener('click', toggleAllFilters);
   });
+
+  /* PhotoDeck-only: utrzymuje przyklejony "Hide filters" i przyklejony
+     #refine-top (pasek z wybranymi filtrami, z pliku wspólnego) nad sobą,
+     bez nachodzenia. Mierzy realną wysokość #refine-top za każdym razem,
+     gdy się pokazuje/chowa albo zmienia rozmiar (np. gdy przybywa tagów
+     wybranych filtrów i pasek robi się wyższy), i zapisuje ją jako zmienną
+     CSS, z której korzysta reguła #filters-toggle-all.is-open powyżej.
+     Ten sam pomiar ustawia też wysokość spacera na dole listy filtrów. */
+  (function(){
+    var refineTop = document.getElementById('refine-top');
+    var toggleBtn = document.getElementById('filters-toggle-all');
+    var spacer = document.getElementById('filters-toggle-all-spacer');
+    if(!refineTop || !toggleBtn || !spacer) return;
+    function sync(){
+      var isOpen = toggleBtn.classList.contains('is-open');
+      var refineH = refineTop.classList.contains('is-visible') ? refineTop.offsetHeight : 0;
+      document.documentElement.style.setProperty('--pi-refine-top-h', refineH + 'px');
+      spacer.style.height = isOpen ? (toggleBtn.offsetHeight + refineH) + 'px' : '0px';
+    }
+    if(window.ResizeObserver){
+      new ResizeObserver(sync).observe(refineTop);
+      new ResizeObserver(sync).observe(toggleBtn);
+    }
+    new MutationObserver(sync).observe(refineTop, {attributes:true, attributeFilter:['class']});
+    new MutationObserver(sync).observe(toggleBtn, {attributes:true, attributeFilter:['class']});
+    window.addEventListener('resize', sync);
+    sync();
+  })();
 
   /* PhotoDeck-only: "Recently added" panel. Reads the shared `locations`
      array and mapReadyFlag/locationsReadyFlag/mapForDataLayers globals from
