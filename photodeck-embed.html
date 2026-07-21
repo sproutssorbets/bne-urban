@@ -85,7 +85,7 @@
   .last-updated-badge { font-weight: 500; color: #111111; letter-spacing: 0.08em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 4px; }
   .last-updated-badge::before { content: "●"; font-size: 8px; color: #111111; }
 
-  /* Hitbox dla wygody klikania palcem na mobile (44x44px) */
+  /* Nowy styl markerów: duży hitbox (44x44px) + czytelny czarny kwadracik z białym numerem */
   .custom-marker-hitbox {
     width: 44px;
     height: 44px;
@@ -95,23 +95,26 @@
     cursor: pointer;
     transform: translate(-22px, -22px);
   }
-
-  /* Wizualny kwadracik: dodajemy białe tło, czarną ramkę 1px oraz płynną animację */
   .custom-marker-visual {
-    width: 10px;
-    height: 10px;
-    background: #FFFFFF;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 4px;
+    background: #111111;
+    color: #FFFFFF;
     border: 1px solid #111111;
     border-radius: 0 !important;
-    transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease, background-color 0.15s ease;
   }
-
-  /* Efekt interaktywności po najechaniu / dotknięciu (zmienia się w pełny czarny kwadrat z powiększeniem) */
   .custom-marker-hitbox:hover .custom-marker-visual,
   .custom-marker-hitbox:active .custom-marker-visual {
-    transform: scale(1.5);
-    background: #111111;
-    border-color: #111111;
+    transform: scale(1.15);
+    background: #333333;
   }
 
   #map-wrap { flex: 1; position: relative; background: #FFFFFF; }
@@ -679,10 +682,9 @@ function initMapEverything() {
     };
 
     locations.forEach(function (loc) {
-      // Zastosowanie hitboxa UX (44x44px) wokół małego kwadracika (8x8px)
       var el = document.createElement('div');
       el.className = 'custom-marker-hitbox';
-      el.innerHTML = '<div class="custom-marker-visual"></div>';
+      el.innerHTML = '<div class="custom-marker-visual">' + loc.count + '</div>';
 
       var popupHtml =
         '<div style="font-family:Inter,system-ui,sans-serif;padding:2px 2px 4px;min-width:180px;">' +
@@ -866,7 +868,6 @@ document.querySelectorAll('.suburb-check').forEach(function (cb) {
   });
 });
 
-// Zunifikowana obsługa zakładek mobilnych z obsługą dotyku
 var mobileTabConfigs = {
   index: { btn: document.getElementById('tab-index') },
   filters: { btn: document.getElementById('tab-filters') },
