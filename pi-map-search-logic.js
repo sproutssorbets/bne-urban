@@ -769,7 +769,19 @@ function initMap(){
       }
     }, {capture:true, passive:false});
   }
+/* Definiujemy stan początkowy ekranu ładowania (pełna widoczność) i dodajemy płynne przejście */
+#map-loading {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.8s ease-in-out, visibility 0.8s ease-in-out;
+}
 
+/* Kiedy skrypt mapy doda klasę .hidden, ekran ładowania płynnie zniknie */
+#map-loading.hidden {
+  display: block !important; /* Nadpisujemy ew. display: none ze starego kodu, by animacja mogła zadziałać */
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
   map.on('load', () => {
     /* Map style and initial tiles are ready — the placeholder that covered
        the blank white area while everything loaded is no longer needed. */
