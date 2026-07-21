@@ -121,7 +121,16 @@
   }
 
   #map-wrap { flex: 1; position: relative; background: #FFFFFF; }
-  #map { position: absolute; inset: 0; }
+  #map { 
+    position: absolute; 
+    inset: 0; 
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  #map.loaded {
+    opacity: 1;
+  }
+
   .mapboxgl-ctrl-logo, .mapboxgl-ctrl-attrib { font-family: 'Inter', system-ui, sans-serif !important; }
   .mapboxgl-ctrl-attrib a { color: #6B6B6B !important; }
   .mapboxgl-ctrl-group button { border-radius: 0 !important; }
@@ -131,7 +140,28 @@
   .pi-popup .mapboxgl-popup-close-button:hover { color: #111111; }
   .pi-popup a:focus, .pi-popup a:focus-visible, .pi-popup button:focus { outline: none !important; box-shadow: none !important; }
   input[type="checkbox"], input[type="radio"] { accent-color: #111111; }
-  #page-loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #FFFFFF; font-family: sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #6B6B6B; z-index: 9999; }
+  
+  /* Ekran ładowania z płynnym wygaszaniem */
+  #page-loading { 
+    position: fixed; 
+    inset: 0; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    background: #FFFFFF; 
+    font-family: sans-serif; 
+    font-size: 11px; 
+    font-weight: 500; 
+    letter-spacing: 0.14em; 
+    text-transform: uppercase; 
+    color: #6B6B6B; 
+    z-index: 9999; 
+    transition: opacity 0.4s ease;
+  }
+  #page-loading.fade-out {
+    opacity: 0;
+    pointer-events: none;
+  }
 </style>
 </head>
 <body>
@@ -459,7 +489,7 @@
         <label><input type="checkbox" class="filter-check" data-cat="status" value="development site"> development site</label>
         <label><input type="checkbox" class="filter-check" data-cat="status" value="existing condition"> existing condition</label>
         <label><input type="checkbox" class="filter-check" data-cat="status" value="ongoing change"> ongoing change</label>
-        <label><input type="checkbox" class="filter-check" data-cat="filter-check" data-cat="status" value="post demolition"> post demolition</label>
+        <label><input type="checkbox" class="filter-check" data-cat="status" value="post demolition"> post demolition</label>
         <label><input type="checkbox" class="filter-check" data-cat="status" value="pre construction"> pre construction</label>
         <label><input type="checkbox" class="filter-check" data-cat="status" value="scheduled demolition"> scheduled demolition</label>
         <label><input type="checkbox" class="filter-check" data-cat="status" value="threatened building"> threatened building</label>
@@ -523,10 +553,10 @@ document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
 
 function frameArea(center, bbox) {
   if (bbox) {
-    map.fitBounds(bbox, { padding: 60, duration: 800, maxZoom: 14.5 });
+    map.fitBounds(bbox, { padding: 60, duration: 1200, maxZoom: 14.5, essential: true });
   } else {
     var buffered = turf.buffer(turf.point(center), 0.2, { units: 'kilometers' });
-    map.fitBounds(turf.bbox(buffered), { padding: 60, duration: 800, maxZoom: 14.5 });
+    map.fitBounds(turf.bbox(buffered), { padding: 60, duration: 1200, maxZoom: 14.5, essential: true });
   }
 }
 
@@ -597,8 +627,15 @@ Promise.all([
   });
 
   initMapEverything();
+  
+  // Płynne wygaszanie ekranu ładowania (Fade-out)
   var loadingEl = document.getElementById('page-loading');
-  if (loadingEl) loadingEl.style.display = 'none';
+  if (loadingEl) {
+    loadingEl.classList.add('fade-out');
+    setTimeout(function() {
+      loadingEl.style.display = 'none';
+    }, 400);
+  }
 });
 
 function statusLabel(status) {
@@ -608,6 +645,9 @@ function statusLabel(status) {
 
 function initMapEverything() {
   map.on('load', function () {
+    // Płynne rozjaśnienie mapy po załadowaniu stylu
+    document.getElementById('map').classList.add('loaded');
+
     var style = map.getStyle();
     style.layers.forEach(function (l) {
       try {
