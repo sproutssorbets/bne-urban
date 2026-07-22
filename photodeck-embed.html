@@ -28,7 +28,6 @@
   #geocoder .mapboxgl-ctrl-geocoder input { height: 36px; font-size: 13px; color: #111111; font-family: 'Inter', system-ui, sans-serif; background: #FFFFFF; padding-left: 32px; }
   #geocoder .mapboxgl-ctrl-geocoder--icon-search { fill: #111111; top: 9px; left: 6px; }
   
-  /* DYNAMICZNY PRZYCISK: STRZAŁKA LUB TEKST */
   /* PRZYCISK Z WYRAŹNĄ STRZAŁKĄ SYSTEMOWĄ */
   #search-archive-btn { 
     height: 36px; 
@@ -52,23 +51,12 @@
   }
   #search-archive-btn:hover { background: #333333; }
 
-  /* DEDYKOWANA WEKTOROWA STRZAŁKA */
- 
-
-  @media (max-width: 720px) {
-    /* IDEALNY KWADRAT 36px x 36px NA TELEFONIE */
-    #search-archive-btn { 
-      width: 36px !important; 
-      height: 36px !important;
-      padding: 0 !important; 
-    }
-    #search-archive-text { display: none !important; }
-    
-    .search-archive-icon {
-      width: 16px; /* Lekko powiększona strzałka na mobile */
-      height: 16px;
-      stroke-width: 2.5px; /* Wyraźna grubość na ekranach o wysokiej gęstości pikseli */
-    }
+  .search-archive-icon {
+    width: 14px;
+    height: 14px;
+    stroke: #FFFFFF;
+    stroke-width: 2.2px;
+    flex-shrink: 0;
   }
 
   #context-bar {
@@ -100,9 +88,9 @@
     #map-wrap { display: none; }
     #map-wrap.mobile-active { display: block !important; }
     
-    /* NA MOBILE PRZYCISK ZMIENIA SIĘ W ZWIĘZŁĄ, SYSTEMOWĄ STRZAŁKĘ KWADRATOWĄ */
-    #search-archive-btn { width: 36px; padding: 0; }
-  
+    #search-archive-btn { width: 36px !important; height: 36px !important; padding: 0 !important; }
+    #search-archive-text { display: none !important; }
+    .search-archive-icon { width: 16px; height: 16px; stroke-width: 2.5px; }
     #context-bar { display: none; }
   }
 
@@ -161,21 +149,21 @@
   .acc-body label { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 4px 0; font-size: 12px; }
   .acc-body input[type="checkbox"], .acc-body input[type="radio"] { margin: 0; flex-shrink: 0; accent-color: #111111; width: 14px; height: 14px; }
 
- #index-group { 
-  display: flex; 
-  flex-direction: column; 
-  background: #FFFFFF; 
-  min-height: 0;
-}
+  #index-group { 
+    display: flex; 
+    flex-direction: column; 
+    background: #FFFFFF; 
+    min-height: 0;
+  }
   #filters-group { display: flex; flex-direction: column; }
 
   @media (max-width: 720px) { #filters-group { display: none; } }
 
- #list-wrap { 
-  flex: 0 1 auto; /* Przetrzymuje listę przy górze zamiast sztucznie rozciągać */
-  background: #FFFFFF; 
-  overflow-y: auto; 
-}
+  #list-wrap { 
+    flex: 0 1 auto;
+    background: #FFFFFF; 
+    overflow-y: auto; 
+  }
   .list-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid #111111; cursor: pointer; background: #FFFFFF; transition: background 0.15s ease, padding-left 0.15s ease; }
   .list-row:hover { background: #F4F4F4; padding-left: 24px; }
   .list-street { font-size: 12px; color: #111111; font-weight: 500; }
@@ -199,14 +187,14 @@
   #page-loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #FFFFFF; font-family: 'Inter', system-ui, sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #111111; z-index: 9999; transition: opacity 0.5s ease-in-out; }
   #page-loading.fade-out { opacity: 0; pointer-events: none; }
 
- #recent-strip { 
-  display: none; 
-  flex-direction: column; 
-  background: #FFFFFF; 
-  border-bottom: 1px solid #111111; 
-  flex-shrink: 0; 
-  padding: 16px 20px; 
-}
+  #recent-strip { 
+    display: none; 
+    flex-direction: column; 
+    background: #FFFFFF; 
+    border-bottom: 1px solid #111111; 
+    flex-shrink: 0; 
+    padding: 16px 20px; 
+  }
   #recent-strip.has-photos { display: flex; }
   #recent-label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #666666; margin-bottom: 10px; }
   #recent-track { display: flex; flex-direction: column; gap: 8px; }
@@ -225,7 +213,9 @@
     <div id="geocoder"></div>
     <a id="search-archive-btn" href="https://photoindex.photodeck.com/" target="_top">
       <span id="search-archive-text">FULL ARCHIVE</span>
-      <span id="search-archive-icon">↗</span>
+      <svg class="search-archive-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square">
+        <path d="M4 12L12 4M12 4H5M12 4V12"/>
+      </svg>
     </a>
   </div>
   <div id="context-bar">
@@ -244,30 +234,26 @@
 </div>
 
 <div id="layout">
- <div id="index-panel">
-  
-  <div class="panel-section-container" id="filters-group">
-    <!-- Tutaj cała sekcja filtrów bez zmian -->
-  </div>
-
-  <div id="index-group" style="display:none; flex:1; overflow-y:auto; flex-direction:column; background:#FFFFFF;">
-    <!-- LISTA ZMIEJSZA SIĘ DO ILOŚCI POZYCJI -->
-    <div id="list-wrap"></div>
+  <div id="index-panel">
     
-    <!-- STOPKA PRZYLEGA BEZPOŚREDNIO DO LISTY -->
-    <div id="footer-row">
-      <span id="archive-count">Loading...</span>
-      <span class="last-updated-badge">BNE URBAN</span>
-    </div>
-
-    <!-- RECENT POJAWIA SIĘ ZARAZ POD STOPKĄ -->
-    <div id="recent-strip">
-      <div id="recent-label">RECENT</div>
-      <div id="recent-track"></div>
-    </div>
-  </div>
-
-</div>
+    <!-- GRUPA FILTRÓW -->
+    <div class="panel-section-container" id="filters-group">
+      <!-- MAP LAYERS -->
+      <div class="section">
+        <div class="section-label">Map Layers (Planning Status)</div>
+        <div class="filter-row" data-status="proposed">
+          <div style="display:flex;align-items:center;gap:9px;"><span class="swatch" style="background:#D1D1D1; border:1px solid #6B6B6B;"></span><span class="filter-label">Proposed</span></div>
+          <span class="filter-count" id="count-proposed">–</span>
+        </div>
+        <div class="filter-row" data-status="under_construction">
+          <div style="display:flex;align-items:center;gap:9px;"><span class="swatch" style="background:#6B6B6B;"></span><span class="filter-label">Under Construction</span></div>
+          <span class="filter-count" id="count-under_construction">–</span>
+        </div>
+        <div class="filter-row" data-status="approved">
+          <div style="display:flex;align-items:center;gap:9px;"><span class="swatch" style="background:#111111;"></span><span class="filter-label">Approved</span></div>
+          <span class="filter-count" id="count-approved">–</span>
+        </div>
+      </div>
 
       <!-- 1. LOCATION -->
       <div class="acc-head" data-target="acc-location">
@@ -358,18 +344,19 @@
       </div>
     </div>
 
+    <!-- GRUPA LISTY (INDEX) -->
     <div id="index-group" style="display:none; flex:1; overflow-y:auto; flex-direction:column; background:#FFFFFF;">
-      <div id="list-wrap" style="flex:1;"></div>
+      <div id="list-wrap"></div>
       <div id="footer-row">
         <span id="archive-count">Loading...</span>
         <span class="last-updated-badge">BNE URBAN</span>
       </div>
+      <div id="recent-strip">
+        <div id="recent-label">RECENT</div>
+        <div id="recent-track"></div>
+      </div>
     </div>
 
-    <div id="recent-strip">
-      <div id="recent-label">RECENT</div>
-      <div id="recent-track"></div>
-    </div>
   </div>
 
   <div id="map-wrap">
