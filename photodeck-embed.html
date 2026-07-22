@@ -49,8 +49,9 @@
   }
 
   /* ==========================================
-     PORZĄDEK WIZUALNY PANELU BOCZNEGO (INDEX PANEL)
+     PERFEKCYJNE ODWZOROWANIE DESIGNU PANELU
      ========================================== */
+
   #index-panel { 
     width: 380px; 
     position: absolute; 
@@ -65,50 +66,128 @@
     scrollbar-width: none; 
     -ms-overflow-style: none; 
     z-index: 3; 
-    counter-reset: acc-section;
   }
   #index-panel::-webkit-scrollbar { display: none; }
   .panel-section-container { display: flex; flex-direction: column; }
   
-  /* 1. SEKCJA MAP LAYERS */
-  .section { padding: 14px 20px; border-bottom: 1px solid #111111; background: #FFFFFF; flex-shrink: 0; }
-  .section-label { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #111111; margin-bottom: 12px; }
-
-  .filter-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; margin: 0 -10px; cursor: pointer; user-select: none; transition: background 0.15s ease; }
-  .filter-row:hover { background: #F4F4F4; }
-  .filter-row.off { opacity: 0.35; }
-  .swatch { width: 10px; height: 10px; flex-shrink: 0; }
-  .filter-label { font-size: 11px; font-weight: 500; color: #111111; }
-  .filter-count { font-size: 10px; font-weight: 600; color: #111111; }
-
-  /* 2. NAGŁÓWKI AKORDEONÓW (Automatyczna numeracja) */
-  .acc-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid #111111; cursor: pointer; user-select: none; background: #FFFFFF; flex-shrink: 0; transition: background 0.15s ease; }
-  .acc-head:hover { background: #F9F9F9; }
+  /* 0. SEKCJA MAP LAYERS */
+  .section { 
+    padding: 20px 24px 16px 24px; 
+    border-bottom: 1px solid #111111; 
+    background: #FFFFFF; 
+    flex-shrink: 0; 
+  }
   
-  .acc-head::before {
-    counter-increment: acc-section;
-    content: counter(acc-section) ". ";
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    margin-right: 6px;
-    color: #111111;
+  .section-label { 
+    font-size: 11px; 
+    font-weight: 600; 
+    letter-spacing: 0.12em; 
+    text-transform: uppercase; 
+    color: #666666; 
+    margin-bottom: 16px; 
   }
 
-  .acc-title { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #111111; flex: 1; }
-  .acc-icon { font-size: 12px; color: #111111; font-weight: 600; transition: transform 0.2s ease; }
+  .filter-row { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    padding: 6px 0; 
+    cursor: pointer; 
+    user-select: none; 
+    transition: opacity 0.15s ease;
+  }
+  .filter-row.off { opacity: 0.35; }
+  
+  .swatch { 
+    width: 12px; 
+    height: 12px; 
+    flex-shrink: 0; 
+    border-radius: 0 !important;
+  }
+  
+  .filter-label { 
+    font-size: 13px; 
+    font-weight: 400; 
+    color: #111111; 
+  }
+  
+  .filter-count { 
+    font-size: 13px; 
+    font-weight: 400; 
+    color: #777777; 
+  }
+
+  /* NAGŁÓWKI AKORDEONÓW */
+  .acc-head { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 18px 24px; 
+    border-bottom: 1px solid #111111; 
+    cursor: pointer; 
+    user-select: none; 
+    background: #FFFFFF; 
+    flex-shrink: 0; 
+    transition: background 0.15s ease;
+  }
+  .acc-head:hover { 
+    background: #FAFAFA; 
+  }
+
+  .acc-title { 
+    font-size: 12px; 
+    font-weight: 600; 
+    letter-spacing: 0.14em; 
+    text-transform: uppercase; 
+    color: #111111; 
+  }
+  
+  .acc-icon { 
+    font-size: 16px; 
+    color: #111111; 
+    font-weight: 300; 
+    line-height: 1;
+    transition: transform 0.2s ease; 
+  }
   .acc-head.open .acc-icon { transform: rotate(45deg); }
   
-  /* 3. ZAWARTOŚĆ AKORDEONÓW */
-  .acc-body { display: none; padding: 12px 20px 16px 20px; border-bottom: 1px solid #111111; font-size: 11px; color: #111111; background: #FAFAFA; }
+  /* ZAWARTOŚĆ AKORDEONU */
+  .acc-body { 
+    display: none; 
+    padding: 16px 24px; 
+    border-bottom: 1px solid #111111; 
+    font-size: 12px; 
+    color: #111111; 
+    background: #FFFFFF; 
+  }
   .acc-body.open { display: block; }
   
-  .sub-category-title { font-size: 9px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #666666; margin: 16px 0 6px 0; padding-bottom: 4px; border-bottom: 1px dashed #DDDDDD; }
-  .sub-category-title:first-child { margin-top: 2px; }
+  .sub-category-title { 
+    font-size: 10px; 
+    font-weight: 600; 
+    letter-spacing: 0.14em; 
+    text-transform: uppercase; 
+    color: #666666; 
+    margin: 16px 0 8px 0; 
+  }
+  .sub-category-title:first-child { margin-top: 0; }
   
-  .acc-body label { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 6px 8px; margin: 0 -8px; font-size: 11px; font-weight: 400; transition: background 0.12s ease; }
-  .acc-body label:hover { background: #EFEFEF; font-weight: 500; }
-  .acc-body input[type="checkbox"], .acc-body input[type="radio"] { margin: 0; flex-shrink: 0; accent-color: #111111; width: 14px; height: 14px; cursor: pointer; }
+  .acc-body label { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    cursor: pointer; 
+    padding: 5px 0; 
+    font-size: 12px;
+  }
+  .acc-body input[type="checkbox"], 
+  .acc-body input[type="radio"] { 
+    margin: 0; 
+    flex-shrink: 0; 
+    accent-color: #111111; 
+    width: 14px; 
+    height: 14px; 
+  }
 
   #index-group { display: flex; flex: 1; overflow-y: auto; flex-direction: column; background: #FFFFFF; }
   #filters-group { display: flex; flex-direction: column; }
@@ -117,7 +196,6 @@
     #filters-group { display: none; }
   }
 
-  /* 4. LISTA LOKALIZACJI NA DOLE PANELU */
   #list-wrap { flex: 1; background: #FFFFFF; overflow-y: auto; }
   .list-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid #111111; cursor: pointer; background: #FFFFFF; transition: background 0.15s ease, padding-left 0.15s ease; }
   .list-row:hover { background: #F4F4F4; padding-left: 24px; }
@@ -143,26 +221,26 @@
   #page-loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #FFFFFF; font-family: sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #111111; z-index: 9999; transition: opacity 0.5s ease-in-out; }
   #page-loading.fade-out { opacity: 0; pointer-events: none; }
 
- /* ==========================================
-     RECENTLY ADDED — JASNE TŁO I SUBTELNY STYL
+  /* ==========================================
+     RECENTLY ADDED — JASNY I SUBTELNY STYL
      ========================================== */
   #recent-strip { 
     display: none; 
     flex-direction: column; 
-    background: #FFFFFF; /* Zmiana z czarnego na białe tło */
-    border-top: 1px solid #111111; /* Delikatne odcięcie od góry */
+    background: #FFFFFF; 
+    border-top: 1px solid #111111; 
     border-bottom: 1px solid #111111; 
     flex-shrink: 0; 
-    padding: 14px 20px; 
+    padding: 18px 24px; 
   }
   #recent-strip.has-photos { display: flex; }
   
   #recent-label { 
     font-size: 11px; 
     font-weight: 600; 
-    letter-spacing: 0.14em; 
+    letter-spacing: 0.12em; 
     text-transform: uppercase; 
-    color: #111111; /* Ciemny tekst nagłówka */
+    color: #666666; 
     margin-bottom: 12px; 
   }
   
@@ -172,28 +250,26 @@
     display: block; 
     cursor: pointer; 
     text-decoration: none; 
-    padding: 4px 0;
+    padding: 2px 0;
   }
-  .recent-row:hover .recent-headline { 
-    color: #666666; /* Subtelne podświetlenie przy najechaniu */
-  }
+  .recent-row:hover .recent-headline { color: #666666; }
   
   .recent-headline { 
     font-size: 12px; 
     color: #111111; 
-    font-weight: 400; /* Usunięty BOLD (normalna grubość) */
+    font-weight: 400; 
     margin-bottom: 2px; 
     line-height: 1.3;
   }
   
   .recent-date { 
     font-size: 10px; 
-    color: #777777; /* Subtelny, szary odcień daty */
+    color: #777777; 
     letter-spacing: 0.02em; 
   }
 
   @media (max-width: 720px) {
-    #recent-label { font-size: 9px; }
+    #recent-label { font-size: 10px; }
   }
 </style>
 </head>
@@ -216,15 +292,15 @@
 
 <div class="mobile-tabs">
   <button class="mobile-tab" id="tab-index" data-tab="index">Index</button>
-  <button class="mobile-tab active" id="tab-filters" data-tab="filters">Filters</button>
-  <button class="mobile-tab" id="tab-map" data-tab="map">Map</button>
+  <button class="mobile-tab" id="tab-filters" data-tab="filters">Filters</button>
+  <button class="mobile-tab active" id="tab-map" data-tab="map">Map</button>
 </div>
 
 <div id="layout">
   <div id="index-panel">
     
     <div class="panel-section-container" id="filters-group">
-      <!-- 0. MAP LAYERS (Planning status) -->
+      <!-- MAP LAYERS (PLANNING STATUS) -->
       <div class="section">
         <div class="section-label">Map Layers (Planning Status)</div>
         <div class="filter-row" data-status="proposed">
@@ -243,7 +319,7 @@
 
       <!-- 1. LOCATION -->
       <div class="acc-head" data-target="acc-location">
-        <span class="acc-title">Location</span><span class="acc-icon">＋</span>
+        <span class="acc-title">1. Location</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-location">
         <label><input type="radio" name="suburb-group" class="suburb-check" value="" checked> All Locations</label>
@@ -274,15 +350,26 @@
 
       <!-- 2. YEAR -->
       <div class="acc-head" data-target="acc-year">
-        <span class="acc-title">Year</span><span class="acc-icon">＋</span>
+        <span class="acc-title">2. Year</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-year">
         <label><input type="checkbox" class="filter-check" data-cat="year" value="2026"> 2026</label>
       </div>
 
-      <!-- 3. TYPOLOGY -->
+      <!-- 3. DEVELOPMENT STATUS -->
+      <div class="acc-head" data-target="acc-status">
+        <span class="acc-title">3. Development Status</span><span class="acc-icon">+</span>
+      </div>
+      <div class="acc-body" id="acc-status">
+        <label><input type="checkbox" class="filter-check" value="Existing"> Existing</label>
+        <label><input type="checkbox" class="filter-check" value="Threatened / Scheduled"> Threatened / Scheduled</label>
+        <label><input type="checkbox" class="filter-check" value="Under Construction"> Under Construction</label>
+        <label><input type="checkbox" class="filter-check" value="Completed"> Completed</label>
+      </div>
+
+      <!-- 4. TYPOLOGY -->
       <div class="acc-head" data-target="acc-typology">
-        <span class="acc-title">Typology</span><span class="acc-icon">＋</span>
+        <span class="acc-title">4. Typology</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-typology">
         <label><input type="checkbox" class="filter-check" data-cat="typology" value="Residential"> Residential</label>
@@ -300,9 +387,9 @@
         <label><input type="checkbox" class="filter-check" data-cat="typology" value="stone facade"> stone facade</label>
       </div>
 
-      <!-- 4. URBAN CONTEXT -->
+      <!-- 5. URBAN CONTEXT -->
       <div class="acc-head" data-target="acc-urban">
-        <span class="acc-title">Urban Context</span><span class="acc-icon">＋</span>
+        <span class="acc-title">5. Urban Context</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-urban">
         <div class="sub-category-title">Transformation & 2032</div>
@@ -380,7 +467,7 @@ fetch(RECENT_PHOTOS_URL + '?t=' + Date.now())
     });
     if (!photos.length) return;
 
-    // --- WYCENTROWANIE MAPY DLA MOBILAEK NA NAJNOWSZYCH LOKALIZACJACH ---
+    // --- WYCENTROWANIE MAPY NA MOBILCE DLA OSTATNIO DODANYCH LOKALIZACJI ---
     if (window.innerWidth <= 720) {
       var recentCoords = [];
       photos.forEach(p => {
@@ -401,7 +488,6 @@ fetch(RECENT_PHOTOS_URL + '?t=' + Date.now())
         map.fitBounds(bounds, { padding: 50, maxZoom: 15, duration: 0 });
       }
     }
-    // -------------------------------------------------------------------
 
     var track = document.getElementById('recent-track');
     var strip = document.getElementById('recent-strip');
@@ -811,6 +897,7 @@ Object.keys(tabs).forEach(tabId => {
   });
 });
 
+/* DOMYŚLNE OTWIERANIE MAPY NA MOBILKACH */
 if (window.innerWidth <= 720) {
   var tm = document.getElementById('tab-map');
   if (tm) tm.click();
