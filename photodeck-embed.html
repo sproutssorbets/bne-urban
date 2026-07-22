@@ -88,14 +88,14 @@
 
   #mobile-bottom-bar { display: none !important; }
 
-  /* PANEL BOCZNY DESKTOP */
+  /* PANEL BOCZNY DESKTOP - Bez !important na display! */
   #index-panel { 
     width: 340px; 
     flex-shrink: 0;
     position: relative; 
     height: 100%; 
     border-right: 1px solid #111111; 
-    display: flex !important; 
+    display: flex; 
     flex-direction: column; 
     background: #FFFFFF; 
     overflow-y: auto; 
@@ -204,7 +204,7 @@
   /* BEZPIECZNY TRYB MOBILNY */
   @media (max-width: 720px) {
     body {
-      padding-bottom: 48px !important; /* Rezerwacja miejsca na przycisk u dołu ekranu */
+      padding-bottom: 48px !important;
       box-sizing: border-box !important;
     }
 
@@ -220,7 +220,18 @@
       flex-direction: column !important;
     }
 
-    #index-panel { width: 100% !important; height: 100% !important; border-right: none !important; border-bottom: none !important; }
+    #index-panel { 
+      width: 100% !important; 
+      height: 100% !important; 
+      border-right: none !important; 
+      border-bottom: none !important; 
+      display: none; /* Domyślnie schowany na mobilce */
+    }
+
+    #index-panel.mobile-active {
+      display: flex !important; /* Pokazuj tylko gdy wybrany jest Index lub Filters */
+    }
+
     #map-wrap { display: none; }
     #map-wrap.mobile-active { display: block !important; }
 
@@ -245,7 +256,6 @@
       border-top: 1px solid #111111 !important;
     }
 
-    /* Dopasowanie kontrolek Mapbox do paska mobilnego */
     .mapboxgl-ctrl-bottom-right, .mapboxgl-ctrl-bottom-left {
       bottom: 12px !important;
     }
@@ -890,6 +900,7 @@ document.querySelectorAll('.suburb-check').forEach(cb => {
   });
 });
 
+/* POPRAWIONA LOGIKA ZAKŁADEK DLA MOBILKI */
 var tabs = { 'tab-index': 'index-group', 'tab-filters': 'filters-group', 'tab-map': 'map-wrap' };
 Object.keys(tabs).forEach(tabId => {
   var btn = document.getElementById(tabId);
@@ -899,7 +910,12 @@ Object.keys(tabs).forEach(tabId => {
     this.classList.add('active');
 
     var isMap = tabId === 'tab-map';
-    document.getElementById('index-panel').style.display = isMap ? 'none' : 'flex';
+    var indexPanel = document.getElementById('index-panel');
+    
+    /* Przełączamy klasę pozwalającą wyświetlać panel na mobilce */
+    indexPanel.classList.toggle('mobile-active', !isMap);
+    indexPanel.style.display = isMap ? 'none' : 'flex';
+
     document.getElementById('map-wrap').classList.toggle('mobile-active', isMap);
     
     if (!isMap) {
