@@ -68,8 +68,13 @@
 
   #layout { width: 100%; flex: 1; min-height: 0; background: #FFFFFF; position: relative; overflow: hidden; }
 
-  /* ZAKŁADKI MOBILNE */
-  .mobile-tabs { display: none; background: #FFFFFF; flex-shrink: 0; }
+  /* ZAKŁADKI MOBILNE z DOLNĄ LINIĄ (BORDER-BOTTOM) */
+  .mobile-tabs { 
+    display: none; 
+    background: #FFFFFF; 
+    flex-shrink: 0; 
+    border-bottom: 1px solid #111111; 
+  }
   .mobile-tab { flex: 1; height: 40px; border: none; border-right: 1px solid #111111; background: #FFFFFF; color: #111111; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: 'Inter', system-ui, sans-serif; cursor: pointer; }
   .mobile-tab:last-child { border-right: none; }
   .mobile-tab.active { background: #111111; color: #FFFFFF; }
@@ -832,9 +837,14 @@ document.querySelectorAll('.acc-head').forEach(h => {
   });
 });
 
+/* DZIAŁANIE Z CHOWANIEM KLAWIATURY MOBILNEJ (.blur) */
 document.querySelectorAll('.filter-check').forEach(cb => {
   cb.addEventListener('change', function () {
-    if (geocoder) geocoder.clear();
+    if (geocoder) {
+      geocoder.clear();
+      const input = document.querySelector('.mapboxgl-ctrl-geocoder input');
+      if (input) input.blur();
+    }
     if (this.getAttribute('data-cat') === 'year') toggleValue(searchState.years, this.value);
     else toggleValue(searchState.extraFilters, this.value);
     applySearchState();
@@ -843,7 +853,11 @@ document.querySelectorAll('.filter-check').forEach(cb => {
 
 document.querySelectorAll('.suburb-check').forEach(cb => {
   cb.addEventListener('change', function () {
-    if (geocoder) geocoder.clear();
+    if (geocoder) {
+      geocoder.clear();
+      const input = document.querySelector('.mapboxgl-ctrl-geocoder input');
+      if (input) input.blur();
+    }
     if (window.piCloseAllPopups) window.piCloseAllPopups();
     searchState.suburb = this.value;
     applySearchState();
