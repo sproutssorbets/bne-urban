@@ -106,17 +106,17 @@
   #page-loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #FFFFFF; font-family: sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #6B6B6B; z-index: 9999; transition: opacity 0.5s ease-in-out; }
   #page-loading.fade-out { opacity: 0; pointer-events: none; }
 
-  #recent-strip { display: none; align-items: center; height: 68px; border-top: 1px solid #111111; background: #FFFFFF; flex-shrink: 0; overflow: hidden; }
+  #recent-strip { display: none; flex-direction: column; border-top: 1px solid #111111; background: #FFFFFF; flex-shrink: 0; overflow: hidden; }
   #recent-strip.has-photos { display: flex; }
-  #recent-label { font-size: 9px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #6B6B6B; padding: 0 14px; flex-shrink: 0; border-right: 1px solid #111111; height: 100%; display: flex; align-items: center; white-space: nowrap; }
-  #recent-track { flex: 1; height: 100%; display: flex; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; }
+  #recent-label { font-size: 10px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #6B6B6B; padding: 10px 20px 8px; flex-shrink: 0; }
+  #recent-track { flex-shrink: 0; height: 68px; display: flex; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; border-top: 1px solid #111111; }
   .recent-thumb { flex-shrink: 0; width: 68px; height: 68px; border-right: 1px solid #111111; background-color: #E4E4E0; background-size: cover; background-position: center; cursor: pointer; text-decoration: none; display: block; transition: opacity 0.15s; }
   .recent-thumb:hover { opacity: 0.8; }
 
   @media (max-width: 720px) {
-    #recent-label { padding: 0 10px; font-size: 8px; }
+    #recent-label { padding: 8px 20px 6px; font-size: 9px; }
     .recent-thumb { width: 56px; height: 56px; }
-    #recent-strip { height: 56px; }
+    #recent-track { height: 56px; }
   }
 </style>
 </head>
@@ -165,20 +165,12 @@
       </div>
 
       <!-- 1. LOCATION -->
-      <div class="acc-head open" data-target="acc-location">
+      <div class="acc-head" data-target="acc-location">
         <span class="acc-title">1. Location</span><span class="acc-icon">＋</span>
       </div>
-      <div class="acc-body open" id="acc-location">
+      <div class="acc-body" id="acc-location">
         <label><input type="radio" name="suburb-group" class="suburb-check" value="" checked> All Locations</label>
 
- <!-- 2. YEAR -->
-      <div class="acc-head" data-target="acc-year">
-        <span class="acc-title">2. Year</span><span class="acc-icon">＋</span>
-      </div>
-      <div class="acc-body" id="acc-year">
-        <label><input type="checkbox" class="filter-check" data-cat="year" value="2026"> 2026</label>
-       </div>
-       
         <div class="sub-category-title">Inner North & CBD</div>
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Brisbane City"> Brisbane City</label>
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Spring Hill"> Spring Hill</label>
@@ -203,7 +195,13 @@
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Woolloongabba"> Woolloongabba</label>
       </div>
 
-     
+      <!-- 2. YEAR -->
+      <div class="acc-head" data-target="acc-year">
+        <span class="acc-title">2. Year</span><span class="acc-icon">＋</span>
+      </div>
+      <div class="acc-body" id="acc-year">
+        <label><input type="checkbox" class="filter-check" data-cat="year" value="2026"> 2026</label>
+      </div>
 
       <!-- 4. TYPOLOGY -->
       <div class="acc-head" data-target="acc-typology">
@@ -253,7 +251,7 @@
     </div>
 
     <div id="recent-strip">
-      <div id="recent-label">Recently<br>added</div>
+      <div id="recent-label">Recently Added</div>
       <div id="recent-track"></div>
     </div>
   </div>
