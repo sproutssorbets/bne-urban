@@ -21,14 +21,14 @@
   html, body { margin: 0; padding: 0; width: 100%; height: 100%; height: 100dvh; overflow: hidden; font-family: 'Inter', system-ui, sans-serif; background: #FFFFFF; color: #111111; }
   body { display: flex; flex-direction: column; }
 
-  #topbar { border-bottom: 1px solid #111111; background: #FFFFFF; flex-shrink: 0; }
-  #search-row { display: flex; align-items: center; height: 50px; padding: 0 16px; gap: 8px; }
-  #geocoder { flex: 1; }
+  #topbar { border-bottom: 1px solid #111111; background: #FFFFFF; flex-shrink: 0; z-index: 10; }
+  #search-row { display: flex; align-items: center; height: 50px; padding: 0 16px; gap: 8px; border-bottom: 1px solid #111111; }
+  #geocoder { flex: 1; width: 100%; }
   #geocoder .mapboxgl-ctrl-geocoder { width: 100%; max-width: none; font-family: 'Inter', system-ui, sans-serif; box-shadow: none; background: #FFFFFF; }
   #geocoder .mapboxgl-ctrl-geocoder input { height: 36px; font-size: 13px; color: #111111; font-family: 'Inter', system-ui, sans-serif; background: #FFFFFF; padding-left: 32px; }
   #geocoder .mapboxgl-ctrl-geocoder--icon-search { fill: #111111; top: 9px; left: 6px; }
   
-  /* PRZYCISK TEKSTOWY BEZ IKON */
+  /* PRZYCISK DESKTOPOWY */
   #search-archive-btn { 
     height: 36px; 
     padding: 0 14px; 
@@ -55,12 +55,12 @@
     font-size: 10px;
     color: #666666;
     letter-spacing: 0.05em;
-    border-bottom: 1px solid #111111;
+    border-top: 1px solid #111111;
     background: #FAFAFA;
     text-transform: uppercase;
   }
 
-  #chip-row { display: flex; align-items: center; padding: 8px 16px; flex-wrap: wrap; min-height: 20px; background: #FFFFFF; border-bottom: 1px solid #111111; }
+  #chip-row { display: flex; align-items: center; padding: 8px 16px; flex-wrap: wrap; min-height: 20px; background: #FFFFFF; border-top: 1px solid #111111; }
   #chip-row:not(.has-search) { display: none !important; }
   
   #chip-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #111111; margin-right: 10px; }
@@ -69,19 +69,47 @@
   #layout { width: 100%; flex: 1; min-height: 0; background: #FFFFFF; position: relative; overflow: hidden; }
 
   /* ZAKŁADKI MOBILNE */
-  .mobile-tabs { display: none; border-bottom: 1px solid #111111; background: #FFFFFF; flex-shrink: 0; }
+  .mobile-tabs { display: none; background: #FFFFFF; flex-shrink: 0; }
   .mobile-tab { flex: 1; height: 40px; border: none; border-right: 1px solid #111111; background: #FFFFFF; color: #111111; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: 'Inter', system-ui, sans-serif; cursor: pointer; }
   .mobile-tab:last-child { border-right: none; }
   .mobile-tab.active { background: #111111; color: #FFFFFF; }
 
+  /* PRZYCISK PRZYPIĘTY NA DOLE MOBILNYM (THUMB BAR) */
+  #mobile-bottom-bar { display: none; }
+
   @media (max-width: 720px) {
+    #topbar { border-bottom: none; }
+    #search-row { border-bottom: 1px solid #111111; padding: 0 12px; }
+    
+    /* UKRYWAMY PRZYCISK Z GÓRY NA MOBILE */
+    #search-archive-btn { display: none !important; }
+    
     .mobile-tabs { display: flex !important; }
     #index-panel { width: 100% !important; height: 100% !important; border-right: none !important; border-bottom: none !important; }
     #map-wrap { display: none; }
     #map-wrap.mobile-active { display: block !important; }
-    
-    #search-archive-btn { padding: 0 10px !important; }
     #context-bar { display: none; }
+
+    /* POKAZUJEMY PRZYCISK DOKOWANY NA DOLE EKRANU */
+    #mobile-bottom-bar {
+      display: flex;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 46px;
+      background: #111111;
+      color: #FFFFFF;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      text-decoration: none;
+      z-index: 999;
+      border-top: 1px solid #111111;
+    }
   }
 
   /* PANEL BOCZNY */
@@ -147,7 +175,10 @@
   }
   #filters-group { display: flex; flex-direction: column; }
 
-  @media (max-width: 720px) { #filters-group { display: none; } }
+  @media (max-width: 720px) { 
+    #filters-group { display: none; padding-bottom: 50px; }
+    #index-group { padding-bottom: 50px; }
+  }
 
   #list-wrap { 
     flex: 0 1 auto;
@@ -206,7 +237,7 @@
     </a>
   </div>
 
-  <!-- ZAKŁADKI MOBILNE WEWNĄTRZ TOPBARA -->
+  <!-- ZAKŁADKI MOBILNE WEWNĄTRZ TOPBARA Z CZYSTĄ RAMKĄ -->
   <div class="mobile-tabs">
     <button class="mobile-tab" id="tab-index" data-tab="index">Index</button>
     <button class="mobile-tab" id="tab-filters" data-tab="filters">Filters</button>
@@ -352,6 +383,11 @@
     <div id="map"></div>
   </div>
 </div>
+
+<!-- PRZYCISK DOLNY MOBILNY -->
+<a id="mobile-bottom-bar" href="https://photoindex.photodeck.com/" target="_top">
+  FULL ARCHIVE
+</a>
 
 <script>
 mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
@@ -702,18 +738,21 @@ function updatePhotoDeckLink() {
   });
 
   var queryStr = queryParts.join(' ');
-  var btn = document.getElementById('search-archive-btn');
-  var txt = document.getElementById('search-archive-text');
-  var isMobile = window.innerWidth <= 720;
+  var btnDesktop = document.getElementById('search-archive-btn');
+  var txtDesktop = document.getElementById('search-archive-text');
+  var btnMobile = document.getElementById('mobile-bottom-bar');
   
-  if (btn) {
-    if (queryStr) {
-      btn.href = 'https://photoindex.photodeck.com/?search=' + encodeURIComponent(queryStr);
-      if (txt) txt.textContent = isMobile ? 'VIEW' : 'VIEW SELECTION';
-    } else {
-      btn.href = 'https://photoindex.photodeck.com/';
-      if (txt) txt.textContent = isMobile ? 'SEARCH' : 'FULL ARCHIVE';
-    }
+  var targetUrl = queryStr ? 'https://photoindex.photodeck.com/?search=' + encodeURIComponent(queryStr) : 'https://photoindex.photodeck.com/';
+  var textValue = queryStr ? 'VIEW SELECTION' : 'FULL ARCHIVE';
+
+  if (btnDesktop) {
+    btnDesktop.href = targetUrl;
+    if (txtDesktop) txtDesktop.textContent = textValue;
+  }
+
+  if (btnMobile) {
+    btnMobile.href = targetUrl;
+    btnMobile.textContent = textValue;
   }
 }
 
