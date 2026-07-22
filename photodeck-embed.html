@@ -29,6 +29,7 @@
   #geocoder .mapboxgl-ctrl-geocoder--icon-search { fill: #111111; top: 9px; left: 6px; }
   
   /* DYNAMICZNY PRZYCISK: STRZAŁKA LUB TEKST */
+  /* PRZYCISK Z WYRAŹNĄ STRZAŁKĄ SYSTEMOWĄ */
   #search-archive-btn { 
     height: 36px; 
     padding: 0 14px; 
@@ -44,12 +45,31 @@
     display: flex; 
     align-items: center; 
     justify-content: center;
-    gap: 6px; 
+    gap: 8px; 
     text-decoration: none; 
     flex-shrink: 0; 
     transition: background 0.15s; 
   }
   #search-archive-btn:hover { background: #333333; }
+
+  /* DEDYKOWANA WEKTOROWA STRZAŁKA */
+ 
+
+  @media (max-width: 720px) {
+    /* IDEALNY KWADRAT 36px x 36px NA TELEFONIE */
+    #search-archive-btn { 
+      width: 36px !important; 
+      height: 36px !important;
+      padding: 0 !important; 
+    }
+    #search-archive-text { display: none !important; }
+    
+    .search-archive-icon {
+      width: 16px; /* Lekko powiększona strzałka na mobile */
+      height: 16px;
+      stroke-width: 2.5px; /* Wyraźna grubość na ekranach o wysokiej gęstości pikseli */
+    }
+  }
 
   #context-bar {
     padding: 6px 16px;
@@ -82,7 +102,7 @@
     
     /* NA MOBILE PRZYCISK ZMIENIA SIĘ W ZWIĘZŁĄ, SYSTEMOWĄ STRZAŁKĘ KWADRATOWĄ */
     #search-archive-btn { width: 36px; padding: 0; }
-    #search-archive-text { display: none; }
+  
     #context-bar { display: none; }
   }
 
