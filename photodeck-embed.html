@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,7 +13,6 @@
 <style>
   * { box-sizing: border-box; border-radius: 0 !important; box-shadow: none !important; -webkit-tap-highlight-color: transparent; }
   
-  /* USUNIĘCIE NIEBIESKIEJ OBWOLUTY FOCUS */
   *:focus, *:focus-visible, a:focus, button:focus, input:focus {
     outline: none !important;
   }
@@ -29,7 +27,6 @@
   #geocoder .mapboxgl-ctrl-geocoder input { height: 36px; font-size: 13px; color: #111111; font-family: 'Inter', system-ui, sans-serif; background: #FFFFFF; padding-left: 32px; }
   #geocoder .mapboxgl-ctrl-geocoder--icon-search { fill: #111111; top: 9px; left: 6px; }
   
-  /* PRZYCISK DESKTOPOWY */
   #search-archive-btn { 
     height: 36px; 
     padding: 0 14px; 
@@ -67,11 +64,15 @@
   #chip-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #111111; margin-right: 10px; }
   .chip { display: inline-flex; align-items: center; justify-content: space-between; gap: 8px; border: 1px solid #111111; padding: 3px 8px; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #111111; cursor: pointer; background: #FFFFFF; margin: 0 4px 4px 0; }
 
- #layout {
-      height: calc(100dvh - 50px - 40px - 48px) !important;
-      flex: 1 1 auto !important;
+  #layout { 
+    width: 100%; 
+    flex: 1; 
+    min-height: 0; 
+    background: #FFFFFF; 
+    position: relative; 
+    overflow: hidden; 
+  }
 
-  /* ZAKŁADKI MOBILNE z DOLNĄ LINIĄ (BORDER-BOTTOM) */
   .mobile-tabs { 
     display: none; 
     background: #FFFFFF; 
@@ -82,20 +83,23 @@
   .mobile-tab:last-child { border-right: none; }
   .mobile-tab.active { background: #111111; color: #FFFFFF; }
 
-  /* PRZYCISK PRZYPIĘTY NA DOLE MOBILNYM (THUMB BAR) */
- 
+  #mobile-bottom-bar { display: none !important; }
 
   @media (max-width: 720px) {
     #topbar { border-bottom: none; }
     #search-row { border-bottom: 1px solid #111111; padding: 0 12px; }
-    
     #search-archive-btn { display: none !important; }
-    
     .mobile-tabs { display: flex; }
+    #context-bar { display: none; }
+
+    #layout {
+      height: calc(100dvh - 50px - 40px - 48px) !important;
+      flex: 1 1 auto !important;
+    }
+
     #index-panel { width: 100% !important; height: 100% !important; border-right: none !important; border-bottom: none !important; }
     #map-wrap { display: none; }
     #map-wrap.mobile-active { display: block !important; }
-    #context-bar { display: none; }
 
     #mobile-bottom-bar {
       display: flex !important;
@@ -117,9 +121,12 @@
       z-index: 999999 !important;
       border-top: 1px solid #111111 !important;
     }
+
+    #filters-group, #index-group { 
+      padding-bottom: 60px !important; 
+    }
   }
 
-  /* PANEL BOCZNY */
   #index-panel { 
     width: 380px; 
     position: absolute; 
@@ -172,7 +179,6 @@
   .sub-category-title { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #666666; margin: 18px 0 8px 0; }
   .sub-category-title:first-child { margin-top: 4px; }
   
-  /* ERGONOMIA PUNKTY DOTYKOWE (TOUCH TARGETS) */
   .acc-body label { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 8px 0; font-size: 13px; }
   .acc-body input[type="checkbox"], .acc-body input[type="radio"] { margin: 0; flex-shrink: 0; accent-color: #111111; width: 16px; height: 16px; }
 
@@ -183,11 +189,6 @@
     min-height: 0;
   }
   #filters-group { display: flex; flex-direction: column; }
-
-  @media (max-width: 720px) { 
-    #filters-group { display: none; padding-bottom: 50px; }
-    #index-group { padding-bottom: 50px; }
-  }
 
   #list-wrap { 
     flex: 0 1 auto;
@@ -447,7 +448,7 @@ fetch(RECENT_PHOTOS_URL + '?t=' + Date.now())
       a.className = 'recent-row';
       a.href = p.archiveUrl || 'https://photoindex.photodeck.com/';
       var dateStr = '';
-      var m = p.url.match(/PX-(\d{4})(\d{2})(\d{2})/);
+      var m = p.url ? p.url.match(/PX-(\d{4})(\d{2})(\d{2})/) : null;
       if (m) {
         var d = new Date(+m[1], +m[2] - 1, +m[3]);
         dateStr = d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -841,7 +842,6 @@ document.querySelectorAll('.acc-head').forEach(h => {
   });
 });
 
-/* DZIAŁANIE Z CHOWANIEM KLAWIATURY MOBILNEJ (.blur) */
 document.querySelectorAll('.filter-check').forEach(cb => {
   cb.addEventListener('change', function () {
     if (geocoder) {
