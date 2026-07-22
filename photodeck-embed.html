@@ -3,168 +3,148 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>PhotoIndex — Archive & Map Explorer</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<title>PhotoIndex — Spatial Archive & Explorer</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet">
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
 <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" rel="stylesheet">
 <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
-<!-- PapaParse do niezawodnego parsowania CSV -->
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <style>
-  * { box-sizing: border-box; border-radius: 0 !important; box-shadow: none !important; -webkit-tap-highlight-color: transparent; }
+  * { box-sizing: border-box; border-radius: 0 !important; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Inter', system-ui, sans-serif; background: #FFFFFF; color: #111111; }
 
-  #topbar { border-bottom: 1px solid #111111; background: #FFFFFF; flex-shrink: 0; }
-  #search-row { display: flex; align-items: center; height: 56px; padding: 0 20px; border-bottom: 1px solid #111111; gap: 12px; }
+  #app-root { display: flex; flex-direction: column; width: 100vw; height: 100vh; }
+
+  /* PASEK GÓRNY (TOPBAR) Z WYSZUKIWARKĄ */
+  #topbar { display: flex; align-items: center; height: 56px; padding: 0 20px; border-bottom: 1px solid #111111; gap: 12px; background: #FFFFFF; flex-shrink: 0; z-index: 30; }
   #geocoder { flex: 1; }
   #geocoder .mapboxgl-ctrl-geocoder { width: 100%; max-width: none; font-family: inherit; box-shadow: none; background: #FFFFFF; }
   #geocoder .mapboxgl-ctrl-geocoder input { height: 36px; font-size: 13px; color: #111111; font-family: inherit; background: #FFFFFF; }
   #geocoder .mapboxgl-ctrl-geocoder--icon-search { fill: #6B6B6B; top: 9px; }
-  
+
   #search-archive-btn { height: 36px; padding: 0 16px; border: 1px solid #111111; background: #111111; color: #FFFFFF; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 6px; text-decoration: none; flex-shrink: 0; }
   #search-archive-btn:hover { background: #333333; }
 
-  #chip-row { display: flex; align-items: center; padding: 10px 20px; flex-wrap: wrap; min-height: 20px; background: #FFFFFF; border-bottom: 1px solid #111111; }
-  #chip-row:not(.has-search) { display: none !important; }
+  /* KONTENER GŁÓWNY */
+  #main-layout { display: flex; flex: 1; position: relative; overflow: hidden; }
+
+  /* PANEL BOCZNY — FASETONY */
+  #sidebar { width: 340px; border-right: 1px solid #111111; display: flex; flex-direction: column; background: #FFFFFF; z-index: 10; overflow-y: auto; flex-shrink: 0; }
+  .sidebar-header { padding: 14px 20px; border-bottom: 1px solid #111111; font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; background: #FFFFFF; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+  .scale-badge { font-size: 8px; padding: 2px 6px; background: #111111; color: #FFFFFF; letter-spacing: 0.1em; }
+
+  .facet-group { border-bottom: 1px solid #111111; padding: 14px 20px; flex-shrink: 0; }
+  .facet-title { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: #6B6B6B; margin-bottom: 10px; }
   
-  #chip-label { font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6B6B6B; margin-right: 12px; }
-  .chip { display: inline-flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #111111; padding: 3px 8px; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #111111; cursor: pointer; background: #FFFFFF; margin: 0 6px 6px 0; line-height: 1.2; }
-  .chip:hover { background: #F0F0F0; }
+  .facet-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .facet-tag { font-size: 10px; padding: 4px 8px; border: 1px solid #111111; cursor: pointer; text-transform: uppercase; letter-spacing: 0.08em; transition: all 0.15s ease; background: #FFFFFF; }
+  .facet-tag:hover { background: #F0F0F0; }
+  .facet-tag.active { background: #111111; color: #FFFFFF; }
+  .facet-tag.disabled { opacity: 0.25; pointer-events: none; border-color: #CCCCCC; }
 
-  #layout { display: flex; width: 100%; height: calc(100% - 106px); background: #FFFFFF; position: relative; overflow: hidden; }
+  #micro-facets-wrapper { transition: opacity 0.3s ease; }
+  body:not(.micro-scale) #micro-facets-wrapper { opacity: 0.4; pointer-events: none; }
+  body:not(.micro-scale) #micro-notice { display: block; font-size: 9px; color: #6B6B6B; margin-top: 6px; font-style: italic; }
+  #micro-notice { display: none; }
 
-  .mobile-tabs { display: none; border-bottom: 1px solid #111111; background: #FFFFFF; flex-shrink: 0; }
-  .mobile-tab { flex: 1; height: 44px; border: none; border-right: 1px solid #111111; background: #FFFFFF; color: #111111; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; cursor: pointer; }
-  .mobile-tab:last-child { border-right: none; }
-  .mobile-tab.active { background: #111111; color: #FFFFFF; }
-
-  @media (max-width: 720px) {
-    .mobile-tabs { display: flex; }
-    #layout { height: calc(100% - 150px); }
-    #index-panel { width: 100% !important; border-right: none !important; height: 100% !important; position: absolute; inset: 0; z-index: 3; }
-    #map-wrap { width: 100% !important; height: 100% !important; position: absolute; inset: 0; z-index: 2; display: none; }
-    #map-wrap.mobile-active { display: block !important; }
-    #search-archive-btn { width: 36px; padding: 0; justify-content: center; font-size: 14px; letter-spacing: normal; }
-    #search-archive-text { display: none; }
-  }
-
-  #index-panel { width: 380px; flex-shrink: 0; border-right: 1px solid #111111; display: flex; flex-direction: column; background: #FFFFFF; overflow: hidden; }
-  .panel-section-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
-  
-  .section-label { font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: #6B6B6B; margin-bottom: 10px; }
-  .acc-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid #111111; cursor: pointer; user-select: none; background: #FFFFFF; flex-shrink: 0; }
-  .acc-head:hover { background: #F0F0F0; }
-  .acc-body { display: none; padding: 14px 20px; border-bottom: 1px solid #111111; font-size: 11px; color: #111111; background: #FFFFFF; }
-  .acc-body.open { display: block; }
-  
-  .acc-body label { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px 0; }
-  .acc-body input[type="checkbox"], .acc-body input[type="radio"] { margin: 0; flex-shrink: 0; accent-color: #111111; }
-
-  #index-group { display: flex; flex: 1; overflow-y: auto; flex-direction: column; background: #FFFFFF; }
-  #filters-group { display: flex; flex-direction: column; flex: 1; overflow-y: auto; }
-
-  @media (max-width: 720px) {
-    #filters-group { display: none; }
-  }
-
-  #list-wrap { flex: 1; background: #FFFFFF; overflow-y: auto; }
-  .list-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid #111111; cursor: pointer; background: #FFFFFF; }
-  .list-row:hover { background: #F0F0F0; }
-  .list-street { font-size: 12px; color: #111111; font-weight: 400; }
-
-  #footer-row { padding: 12px 20px; font-size: 10px; letter-spacing: 0.06em; color: #6B6B6B; border-top: 1px solid #111111; background: #FFFFFF; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
-  .last-updated-badge { font-weight: 500; color: #111111; letter-spacing: 0.08em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 4px; }
-  .last-updated-badge::before { content: "●"; font-size: 8px; color: #111111; }
-
-  .custom-marker-hitbox { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; transform: translate(-22px, -22px); }
-  .custom-marker-visual { min-width: 20px; height: 20px; padding: 0 4px; background: #111111; color: #FFFFFF; border: 1px solid #111111; border-radius: 0 !important; font-family: 'Inter', system-ui, sans-serif; font-size: 10px; font-weight: 500; display: flex; align-items: center; justify-content: center; transition: transform 0.15s ease, background-color 0.15s ease; }
-  .custom-marker-hitbox:hover .custom-marker-visual { transform: scale(1.15); background: #333333; }
-
-  #map-wrap { flex: 1; position: relative; background: #FFFFFF; }
+  /* MAPA */
+  #map-container { flex: 1; position: relative; background: #FFFFFF; }
   #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.6s ease; }
   #map.loaded { opacity: 1; }
 
-  .pi-popup .mapboxgl-popup-content { background: #FFFFFF; border: 1px solid #111111; padding: 14px; font-family: 'Inter', system-ui, sans-serif; }
-  .pi-popup .mapboxgl-popup-close-button { font-size: 16px; color: #6B6B6B; padding: 4px 8px; outline: none; border: none; background: transparent; cursor: pointer; }
-  .pi-popup .mapboxgl-popup-close-button:hover { color: #111111; }
+  /* DRAWER Z MINIATURAMI */
+  #media-drawer { position: absolute; bottom: 0; left: 0; right: 0; height: 250px; background: #FFFFFF; border-top: 1px solid #111111; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); z-index: 20; display: flex; flex-direction: column; }
+  #media-drawer.open { transform: translateY(0); }
+  
+  .drawer-header { padding: 10px 20px; border-bottom: 1px solid #111111; display: flex; justify-content: space-between; align-items: center; background: #FFFFFF; }
+  .drawer-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; }
+  .close-drawer { cursor: pointer; font-size: 16px; font-weight: bold; padding: 0 4px; color: #6B6B6B; }
+  .close-drawer:hover { color: #111111; }
+
+  .drawer-content { flex: 1; overflow-x: auto; display: flex; padding: 14px 20px; gap: 16px; align-items: center; }
+  .media-card { flex: 0 0 180px; height: 170px; border: 1px solid #111111; display: flex; flex-direction: column; background: #FFFFFF; text-decoration: none; color: inherit; overflow: hidden; transition: border-color 0.15s ease; }
+  .media-card:hover { border-color: #6B6B6B; }
+  .media-card img { width: 100%; height: 100px; object-fit: cover; border-bottom: 1px solid #111111; background: #F0F0F0; }
+  .media-card-info { padding: 8px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+  .media-card-title { font-size: 10px; font-weight: 600; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .media-card-action { font-size: 9px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.1em; color: #6B6B6B; }
 
   #page-loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #FFFFFF; font-family: sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #6B6B6B; z-index: 9999; transition: opacity 0.4s ease; }
   #page-loading.fade-out { opacity: 0; pointer-events: none; }
+
+  @media (max-width: 720px) {
+    #main-layout { flex-direction: column-reverse; }
+    #sidebar { width: 100%; height: 40vh; border-right: none; border-top: 1px solid #111111; }
+    #search-archive-text { display: none; }
+  }
 </style>
 </head>
 <body>
 
-<div id="page-loading">Loading media archive...</div>
+<div id="page-loading">Loading spatial archive...</div>
 
-<div id="topbar">
-  <div id="search-row">
+<div id="app-root">
+  
+  <!-- TOPBAR Z WYSZUKIWARKĄ -->
+  <div id="topbar">
     <div id="geocoder"></div>
     <a id="search-archive-btn" href="https://photoindex.photodeck.com/" target="_top">
       <span id="search-archive-text">Search archive</span> →
     </a>
   </div>
-  <div id="chip-row">
-    <span id="chip-label">Your search</span>
-    <span id="chips-here"></span>
-  </div>
-</div>
 
-<div class="mobile-tabs">
-  <button class="mobile-tab" id="tab-index" data-tab="index">Index</button>
-  <button class="mobile-tab" id="tab-filters" data-tab="filters">Filters</button>
-  <button class="mobile-tab active" id="tab-map" data-tab="map">Map</button>
-</div>
-
-<div id="layout">
-  <div id="index-panel">
-    <div class="panel-section-container" id="filters-group">
-      
-      <!-- LOKALIZACJA WYCIĄGANA DYNAMICZNIE -->
-      <div class="acc-head" data-target="acc-location">
-        <span class="section-label" style="margin:0;">Location</span><span style="font-size:10px;color:#111111;">＋</span>
-      </div>
-      <div class="acc-body open" id="acc-location">
-        <label><input type="radio" name="location-group" class="location-check" value="" checked> All Locations</label>
-        <div id="dynamic-locations"></div>
+  <div id="main-layout">
+    <!-- PANEL BOCZNY -->
+    <div id="sidebar">
+      <div class="sidebar-header">
+        <span>Faceted Filters</span>
+        <span class="scale-badge" id="scale-indicator">MACRO VIEW</span>
       </div>
 
-      <!-- TAGI WYCIĄGANE DYNAMICZNIE Z KEYWORDS -->
-      <div class="acc-head" data-target="acc-keywords">
-        <span class="section-label" style="margin:0;">Keywords & Tags</span><span style="font-size:10px;color:#111111;">＋</span>
-      </div>
-      <div class="acc-body" id="acc-keywords">
-        <div id="dynamic-keywords">Loading tags from CSV...</div>
+      <!-- MAKRO FASETY -->
+      <div class="facet-group">
+        <div class="facet-title">Location / Suburb</div>
+        <div class="facet-list" id="suburb-facets"></div>
       </div>
 
+      <!-- MIKRO FASETY -->
+      <div class="facet-group" id="micro-facets-wrapper">
+        <div class="facet-title">Micro Spatial Tags</div>
+        <div class="facet-list" id="micro-facets"></div>
+        <span id="micro-notice">Zoom in closer to street level to activate micro-tags</span>
+      </div>
     </div>
 
-    <div id="index-group" style="display:none; flex:1; overflow-y:auto; flex-direction:column; background:#FFFFFF;">
-      <div id="list-wrap" style="flex:1;"></div>
-      <div id="footer-row" style="border-top:1px solid #111111;">
-        <span id="archive-count">Loading statistics...</span>
-        <span class="last-updated-badge">MEDIA.CSV DRIVEN</span>
+    <!-- MAPA -->
+    <div id="map-container">
+      <div id="map"></div>
+
+      <!-- INLINE DRAWER PODGLĄDU -->
+      <div id="media-drawer">
+        <div class="drawer-header">
+          <span class="drawer-title" id="drawer-location-title">Select a location</span>
+          <span class="close-drawer" onclick="closeDrawer()">×</span>
+        </div>
+        <div class="drawer-content" id="drawer-gallery"></div>
       </div>
     </div>
   </div>
 
-  <div id="map-wrap">
-    <div id="map"></div>
-  </div>
 </div>
 
 <script>
 mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
 
-var mediaRecords = [];
-var searchState = { location: '', extraFilters: [] };
-var activePopup = null;
+var mediaArchive = [];
+var activeFilters = { suburb: null, micro: [], search: '' };
+var markersMap = [];
 
 var map = new mapboxgl.Map({
   container: 'map',
   style: 'mapbox://styles/mapbox/light-v11',
-  center: [153.0307, -27.4598],
-  zoom: 12
+  center: [153.0281, -27.4580],
+  zoom: 12.5
 });
 map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
 
@@ -172,48 +152,48 @@ var geocoder = new MapboxGeocoder({
   accessToken: mapboxgl.accessToken,
   mapboxgl: mapboxgl,
   marker: false,
-  placeholder: 'Search location or keyword…',
+  placeholder: 'Search address, place or keyword…',
+  countries: 'au',
   flyTo: true
 });
 document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
 
-geocoder.on('result', function (e) {
-  if (window.innerWidth <= 720) {
-    var mapTab = document.getElementById('tab-map');
-    if (mapTab) mapTab.click();
+geocoder.on('result', function(e) {
+  if (e.result && e.result.text) {
+    activeFilters.search = e.result.text.toLowerCase();
+    applyFacetedFilter();
   }
 });
 
-// Ładowanie pliku media.csv przez PapaParse
+geocoder.on('clear', function() {
+  activeFilters.search = '';
+  applyFacetedFilter();
+});
+
+// Wczytywanie danych media.csv przez PapaParse
 Papa.parse('media.csv', {
   download: true,
   header: true,
-  delimiter: ';', // Upewnij się, że używasz odpowiedniego separatora (zazwyczaj ; lub ,)
+  delimiter: ';',
   skipEmptyLines: true,
   complete: function(results) {
-    var rawData = results.data;
-    
-    mediaRecords = rawData.map((row, index) => {
-      // Bezpieczne rozbicie tagów po przecinku (z uwzględnieniem pustych)
-      var rawKw = row.keywords ? row.keywords.split(',').map(k => k.trim()).filter(Boolean) : [];
-      
-      // Prosty fallback na współrzędne, jeśli w pliku media.csv nie ma kolumn "lat" i "lng"
-      var lat = parseFloat(row.lat);
+    mediaArchive = results.data.map((row, idx) => {
+      var rawTags = row.keywords ? row.keywords.split(',').map(t => t.trim()).filter(Boolean) : [];
       var lng = parseFloat(row.lng);
-      var coords = (!isNaN(lng) && !isNaN(lat)) ? [lng, lat] : getFallbackCoords(row.location || row.city);
-
+      var lat = parseFloat(row.lat);
+      
       return {
-        id: row.uuid || 'id-' + index,
-        title: row.title || row.file_name || 'Unnamed media',
-        location: row.location || row.city || 'Brisbane',
-        keywords: rawKw,
-        coords: coords,
-        archiveUrl: 'https://photoindex.photodeck.com/'
+        id: row.uuid || 'rec-' + idx,
+        title: row.title || row.file_name || 'Documented Space',
+        suburb: row.location || row.city || 'Brisbane City',
+        tags: rawTags,
+        coords: (!isNaN(lng) && !isNaN(lat)) ? [lng, lat] : getFallbackCoords(row.location || row.city),
+        thumb: row.thumb_url || 'https://via.placeholder.com/180x100/111111/FFFFFF?text=PhotoIndex',
+        url: 'https://photoindex.photodeck.com/'
       };
     }).filter(r => r.coords !== null);
 
-    initDynamicFilters();
-    initMapEverything();
+    initFacetedSystem();
 
     var loadingEl = document.getElementById('page-loading');
     if (loadingEl) {
@@ -224,47 +204,36 @@ Papa.parse('media.csv', {
 });
 
 function getFallbackCoords(locStr) {
-  // Jeśli na razie nie masz dokładnych GPSów w media.csv, wrzucamy je do domyślnego punktu
-  if (!locStr) return [153.03, -27.46];
-  if (locStr.toLowerCase().includes('valley')) return [153.033, -27.456];
-  if (locStr.toLowerCase().includes('milton')) return [153.004, -27.469];
-  return [153.03, -27.46]; // Default Brisbane
+  if (!locStr) return [153.0281, -27.4580];
+  var s = locStr.toLowerCase();
+  if (s.includes('valley')) return [153.035, -27.456];
+  if (s.includes('south')) return [153.020, -27.475];
+  if (s.includes('west end')) return [153.012, -27.482];
+  return [153.0281, -27.4580];
 }
 
-function initDynamicFilters() {
-  // Generowanie listy lokalizacji
-  var locationsSet = [...new Set(mediaRecords.map(r => r.location))].sort();
-  var locContainer = document.getElementById('dynamic-locations');
-  locContainer.innerHTML = locationsSet.map(loc => 
-    `<label><input type="radio" name="location-group" class="location-check" value="${loc}"> ${loc}</label>`
-  ).join('');
+function initFacetedSystem() {
+  buildFacetedUI();
 
-  // Generowanie 40 najpopularniejszych tagów (możesz też wyciągać te ze specjalnym prefiksem np. arch:)
-  var allKeywords = {};
-  mediaRecords.forEach(r => {
-    r.keywords.forEach(kw => {
-      allKeywords[kw] = (allKeywords[kw] || 0) + 1;
-    });
-  });
-
-  var topKeywords = Object.keys(allKeywords).sort((a,b) => allKeywords[b] - allKeywords[a]).slice(0, 40);
-  var kwContainer = document.getElementById('dynamic-keywords');
-  kwContainer.innerHTML = topKeywords.map(kw => 
-    `<label><input type="checkbox" class="filter-check" value="${kw}"> ${kw} <span style="color:#6B6B6B; font-size:9px;">(${allKeywords[kw]})</span></label>`
-  ).join('');
-
-  attachFilterEvents();
-}
-
-function initMapEverything() {
   function setupMap() {
     document.getElementById('map').classList.add('loaded');
-    renderMarkers(mediaRecords);
-    renderList(mediaRecords);
-    updateStats(mediaRecords.length, mediaRecords.length);
+    renderMarkers(mediaArchive);
+
+    map.on('zoom', function() {
+      var z = map.getZoom();
+      var indicator = document.getElementById('scale-indicator');
+      if (z >= 14) {
+        document.body.classList.add('micro-scale');
+        indicator.textContent = 'MICRO / STREET';
+      } else {
+        document.body.classList.remove('micro-scale');
+        indicator.textContent = 'MACRO VIEW';
+      }
+    });
+
+    map.on('moveend', updateAvailableFacets);
   }
 
-  // Rozwiązanie problemu Race Condition Mapboxa
   if (map.loaded()) {
     setupMap();
   } else {
@@ -272,191 +241,124 @@ function initMapEverything() {
   }
 }
 
+function buildFacetedUI() {
+  var suburbs = [...new Set(mediaArchive.map(m => m.suburb))].sort();
+  var suburbContainer = document.getElementById('suburb-facets');
+  suburbContainer.innerHTML = suburbs.map(sub => 
+    `<div class="facet-tag" data-suburb="${sub}" onclick="toggleSuburb('${sub}')">${sub}</div>`
+  ).join('');
+
+  var allTags = [...new Set(mediaArchive.flatMap(m => m.tags))].sort();
+  var microContainer = document.getElementById('micro-facets');
+  microContainer.innerHTML = allTags.slice(0, 20).map(tag => 
+    `<div class="facet-tag" data-micro="${tag}" onclick="toggleMicro('${tag}')">${tag}</div>`
+  ).join('');
+}
+
 function renderMarkers(items) {
-  // Usuwanie starych markerów (przy aktualizacji)
-  mediaRecords.forEach(item => {
-    if (item.marker) item.marker.remove();
-  });
+  markersMap.forEach(m => m.remove());
+  markersMap = [];
 
   items.forEach(item => {
     var el = document.createElement('div');
-    el.className = 'custom-marker-hitbox';
-    el.innerHTML = '<div class="custom-marker-visual">1</div>'; // Tutaj można dodać grupowanie, jeśli jest np. 5 zdjęć na jednych koordynatach
+    el.style.width = '10px';
+    el.style.height = '10px';
+    el.style.backgroundColor = '#111111';
+    el.style.cursor = 'pointer';
+    el.style.border = '1px solid #FFFFFF';
 
-    var popupHtml = 
-      '<div style="font-family:Inter,system-ui,sans-serif;padding:2px;min-width:180px;">' +
-        '<div style="font-size:13px;color:#111111;margin-bottom:4px;font-weight:500;">' + item.title + '</div>' +
-        '<div style="font-size:10px;color:#6B6B6B;margin-bottom:8px;">' + item.location + '</div>' +
-        '<a href="' + item.archiveUrl + '" target="_top" style="display:block;text-align:center;background:#111;color:#fff;padding:8px 6px;font-size:10px;font-weight:500;text-decoration:none;">VIEW MEDIA →</a>' +
-      '</div>';
+    var marker = new mapboxgl.Marker(el)
+      .setLngLat(item.coords)
+      .addTo(map);
 
-    item.popup = new mapboxgl.Popup({ offset: 14, closeButton: true, className: 'pi-popup' }).setHTML(popupHtml);
-    item.marker = new mapboxgl.Marker({ element: el }).setLngLat(item.coords).addTo(map);
-    
-    el.addEventListener('click', (ev) => {
-      ev.stopPropagation();
-      if (activePopup) activePopup.remove();
-      item.popup.setLngLat(item.coords).addTo(map);
-      activePopup = item.popup;
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openDrawerForLocation(item.suburb, item.coords);
     });
+
+    markersMap.push(marker);
   });
 }
 
-function renderList(items) {
-  var wrap = document.getElementById('list-wrap');
-  wrap.innerHTML = '';
-  items.slice(0, 100).forEach(item => {
-    var row = document.createElement('div');
-    row.className = 'list-row';
-    row.innerHTML = `<div class="list-street">${item.title} <span style="color:#6B6B6B;font-size:10px;">(${item.location})</span></div>`;
-    row.addEventListener('click', () => {
-      if (window.innerWidth <= 720) {
-        document.getElementById('tab-map').click();
-      }
-      map.flyTo({ center: item.coords, zoom: 15 });
-      if (activePopup) activePopup.remove();
-      item.popup.setLngLat(item.coords).addTo(map);
-      activePopup = item.popup;
-    });
-    wrap.appendChild(row);
+function toggleSuburb(suburb) {
+  activeFilters.suburb = (activeFilters.suburb === suburb) ? null : suburb;
+  document.querySelectorAll('#suburb-facets .facet-tag').forEach(el => {
+    el.classList.toggle('active', el.getAttribute('data-suburb') === activeFilters.suburb);
+  });
+  applyFacetedFilter();
+}
+
+function toggleMicro(tag) {
+  var idx = activeFilters.micro.indexOf(tag);
+  if (idx > -1) activeFilters.micro.splice(idx, 1);
+  else activeFilters.micro.push(tag);
+
+  document.querySelectorAll('#micro-facets .facet-tag').forEach(el => {
+    var val = el.getAttribute('data-micro');
+    el.classList.toggle('active', activeFilters.micro.includes(val));
+  });
+
+  applyFacetedFilter();
+}
+
+function applyFacetedFilter() {
+  var filtered = mediaArchive.filter(item => {
+    var matchSub = !activeFilters.suburb || item.suburb === activeFilters.suburb;
+    var matchMicro = activeFilters.micro.length === 0 || activeFilters.micro.every(t => item.tags.includes(t));
+    var matchSearch = !activeFilters.search || 
+      item.title.toLowerCase().includes(activeFilters.search) ||
+      item.suburb.toLowerCase().includes(activeFilters.search) ||
+      item.tags.some(t => t.toLowerCase().includes(activeFilters.search));
+
+    return matchSub && matchMicro && matchSearch;
+  });
+
+  renderMarkers(filtered);
+  updateAvailableFacets();
+}
+
+function updateAvailableFacets() {
+  var bounds = map.getBounds();
+  var visibleMedia = mediaArchive.filter(m => bounds.contains(m.coords));
+  var visibleSuburbs = new Set(visibleMedia.map(m => m.suburb));
+  var visibleTags = new Set(visibleMedia.flatMap(m => m.tags));
+
+  document.querySelectorAll('#suburb-facets .facet-tag').forEach(el => {
+    var sub = el.getAttribute('data-suburb');
+    el.classList.toggle('disabled', !visibleSuburbs.has(sub));
+  });
+
+  document.querySelectorAll('#micro-facets .facet-tag').forEach(el => {
+    var tag = el.getAttribute('data-micro');
+    el.classList.toggle('disabled', !visibleTags.has(tag));
   });
 }
 
-function attachFilterEvents() {
-  // Rozwijanie akordeonów
-  document.querySelectorAll('.acc-head').forEach(function (h) {
-    h.addEventListener('click', function () {
-      var targetId = h.getAttribute('data-target');
-      var body = document.getElementById(targetId);
-      if (body) body.classList.toggle('open');
-    });
-  });
+function openDrawerForLocation(suburbName, coords) {
+  var drawer = document.getElementById('media-drawer');
+  var title = document.getElementById('drawer-location-title');
+  var gallery = document.getElementById('drawer-gallery');
 
-  // Reagowanie na zmiany lokalizacji
-  document.querySelectorAll('.location-check').forEach(cb => {
-    cb.addEventListener('change', (e) => {
-      searchState.location = e.target.value;
-      applyFilters();
-    });
-  });
-
-  // Reagowanie na zmiany tagów (Keywords)
-  document.querySelectorAll('.filter-check').forEach(cb => {
-    cb.addEventListener('change', (e) => {
-      var val = e.target.value;
-      var i = searchState.extraFilters.indexOf(val);
-      if (i === -1) searchState.extraFilters.push(val);
-      else searchState.extraFilters.splice(i, 1);
-      applyFilters();
-    });
-  });
-}
-
-function applyFilters() {
-  var filtered = mediaRecords.filter(item => {
-    var matchesLoc = !searchState.location || item.location === searchState.location;
-    var matchesKw = searchState.extraFilters.length === 0 || searchState.extraFilters.every(f => item.keywords.includes(f));
-    return matchesLoc && matchesKw;
-  });
-
-  // Ukrywanie/pokazywanie markerów na mapie
-  mediaRecords.forEach(item => {
-    var visible = filtered.includes(item);
-    if (item.marker) item.marker.getElement().style.display = visible ? '' : 'none';
-  });
-
-  renderList(filtered);
-  updateStats(filtered.length, mediaRecords.length);
-  renderChips();
-}
-
-function renderChips() {
-  var chips = [];
-  if (searchState.location) chips.push({ 
-    label: searchState.location, 
-    clear: function () { 
-      searchState.location = ''; 
-      document.querySelectorAll('.location-check').forEach(cb => { cb.checked = (cb.value === ''); }); 
-      applyFilters(); 
-    } 
-  });
+  var matches = mediaArchive.filter(m => m.suburb === suburbName);
+  title.textContent = `${suburbName} — ${matches.length} Media Records`;
   
-  searchState.extraFilters.forEach(f => { 
-    chips.push({ 
-      label: f, 
-      clear: function () { 
-        searchState.extraFilters.splice(searchState.extraFilters.indexOf(f), 1); 
-        document.querySelectorAll(`.filter-check[value="${f}"]`).forEach(cb => cb.checked = false); 
-        applyFilters(); 
-      } 
-    }); 
-  });
+  gallery.innerHTML = matches.map(m => `
+    <a href="${m.url}" target="_top" class="media-card">
+      <img src="${m.thumb}" alt="${m.title}">
+      <div class="media-card-info">
+        <div class="media-card-title">${m.title}</div>
+        <div class="media-card-action">View Archive →</div>
+      </div>
+    </a>
+  `).join('');
 
-  var host = document.getElementById('chips-here');
-  var chipRow = document.getElementById('chip-row');
-  if (!host || !chipRow) return;
-
-  host.innerHTML = '';
-  if (chips.length > 0) {
-    chipRow.classList.add('has-search');
-    chips.forEach(c => {
-      var span = document.createElement('span');
-      span.className = 'chip';
-      span.innerHTML = '<span>' + c.label + '</span><span>×</span>';
-      span.addEventListener('click', c.clear);
-      host.appendChild(span);
-    });
-  } else {
-    chipRow.classList.remove('has-search');
-  }
+  drawer.classList.add('open');
+  map.flyTo({ center: coords, zoom: 15 });
 }
 
-function updateStats(filtered, total) {
-  document.getElementById('archive-count').textContent = `${filtered} of ${total} media records`;
-}
-
-// Logika dla mobilnych zakładek (Tabs)
-var mobileTabConfigs = {
-  index: { btn: document.getElementById('tab-index') },
-  filters: { btn: document.getElementById('tab-filters') },
-  map: { btn: document.getElementById('tab-map') }
-};
-
-Object.keys(mobileTabConfigs).forEach(function(key) {
-  var conf = mobileTabConfigs[key];
-  if (!conf.btn) return;
-  conf.btn.addEventListener('click', function() {
-    document.querySelectorAll('.mobile-tabs .mobile-tab').forEach(function(t) { t.classList.remove('active'); });
-    this.classList.add('active');
-
-    var indexPanel = document.getElementById('index-panel');
-    var indexGroup = document.getElementById('index-group');
-    var filtersGroup = document.getElementById('filters-group');
-    var mapWrap = document.getElementById('map-wrap');
-
-    if (key === 'map') {
-      indexPanel.style.display = 'none';
-      mapWrap.classList.add('mobile-active');
-      setTimeout(function() { map.resize(); }, 50);
-    } else {
-      indexPanel.style.display = 'flex';
-      mapWrap.classList.remove('mobile-active');
-      if (key === 'index') {
-        indexGroup.style.display = 'flex';
-        filtersGroup.style.display = 'none';
-      } else if (key === 'filters') {
-        indexGroup.style.display = 'none';
-        filtersGroup.style.display = 'flex';
-      }
-    }
-  });
-});
-
-if (window.innerWidth <= 720) {
-  var mapTab = document.getElementById('tab-map');
-  if (mapTab) mapTab.click();
+function closeDrawer() {
+  document.getElementById('media-drawer').classList.remove('open');
 }
 </script>
-
 </body>
 </html>
