@@ -16,7 +16,6 @@
 
   #app-root { display: flex; flex-direction: column; width: 100vw; height: 100vh; }
 
-  /* PASEK GÓRNY (TOPBAR) Z WYSZUKIWARKĄ */
   #topbar { display: flex; align-items: center; height: 56px; padding: 0 20px; border-bottom: 1px solid #111111; gap: 12px; background: #FFFFFF; flex-shrink: 0; z-index: 30; }
   #geocoder { flex: 1; }
   #geocoder .mapboxgl-ctrl-geocoder { width: 100%; max-width: none; font-family: inherit; box-shadow: none; background: #FFFFFF; }
@@ -26,10 +25,8 @@
   #search-archive-btn { height: 36px; padding: 0 16px; border: 1px solid #111111; background: #111111; color: #FFFFFF; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 6px; text-decoration: none; flex-shrink: 0; }
   #search-archive-btn:hover { background: #333333; }
 
-  /* KONTENER GŁÓWNY */
   #main-layout { display: flex; flex: 1; position: relative; overflow: hidden; }
 
-  /* PANEL BOCZNY — FASETONY */
   #sidebar { width: 340px; border-right: 1px solid #111111; display: flex; flex-direction: column; background: #FFFFFF; z-index: 10; overflow-y: auto; flex-shrink: 0; }
   .sidebar-header { padding: 14px 20px; border-bottom: 1px solid #111111; font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; background: #FFFFFF; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
   .scale-badge { font-size: 8px; padding: 2px 6px; background: #111111; color: #FFFFFF; letter-spacing: 0.1em; }
@@ -48,12 +45,10 @@
   body:not(.micro-scale) #micro-notice { display: block; font-size: 9px; color: #6B6B6B; margin-top: 6px; font-style: italic; }
   #micro-notice { display: none; }
 
-  /* MAPA */
   #map-container { flex: 1; position: relative; background: #FFFFFF; }
   #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.6s ease; }
   #map.loaded { opacity: 1; }
 
-  /* DRAWER Z MINIATURAMI */
   #media-drawer { position: absolute; bottom: 0; left: 0; right: 0; height: 250px; background: #FFFFFF; border-top: 1px solid #111111; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); z-index: 20; display: flex; flex-direction: column; }
   #media-drawer.open { transform: translateY(0); }
   
@@ -85,8 +80,6 @@
 <div id="page-loading">Loading spatial archive...</div>
 
 <div id="app-root">
-  
-  <!-- TOPBAR Z WYSZUKIWARKĄ -->
   <div id="topbar">
     <div id="geocoder"></div>
     <a id="search-archive-btn" href="https://photoindex.photodeck.com/" target="_top">
@@ -95,20 +88,17 @@
   </div>
 
   <div id="main-layout">
-    <!-- PANEL BOCZNY -->
     <div id="sidebar">
       <div class="sidebar-header">
         <span>Faceted Filters</span>
         <span class="scale-badge" id="scale-indicator">MACRO VIEW</span>
       </div>
 
-      <!-- MAKRO FASETY -->
       <div class="facet-group">
         <div class="facet-title">Location / Suburb</div>
         <div class="facet-list" id="suburb-facets"></div>
       </div>
 
-      <!-- MIKRO FASETY -->
       <div class="facet-group" id="micro-facets-wrapper">
         <div class="facet-title">Micro Spatial Tags</div>
         <div class="facet-list" id="micro-facets"></div>
@@ -116,11 +106,9 @@
       </div>
     </div>
 
-    <!-- MAPA -->
     <div id="map-container">
       <div id="map"></div>
 
-      <!-- INLINE DRAWER PODGLĄDU -->
       <div id="media-drawer">
         <div class="drawer-header">
           <span class="drawer-title" id="drawer-location-title">Select a location</span>
@@ -130,7 +118,6 @@
       </div>
     </div>
   </div>
-
 </div>
 
 <script>
@@ -170,38 +157,53 @@ geocoder.on('clear', function() {
   applyFacetedFilter();
 });
 
-// Wczytywanie danych media.csv przez PapaParse
+// Zabezpieczony mechanizm ładowania danych
 Papa.parse('media.csv', {
   download: true,
   header: true,
   delimiter: ';',
   skipEmptyLines: true,
   complete: function(results) {
-    mediaArchive = results.data.map((row, idx) => {
-      var rawTags = row.keywords ? row.keywords.split(',').map(t => t.trim()).filter(Boolean) : [];
-      var lng = parseFloat(row.lng);
-      var lat = parseFloat(row.lat);
-      
-      return {
-        id: row.uuid || 'rec-' + idx,
-        title: row.title || row.file_name || 'Documented Space',
-        suburb: row.location || row.city || 'Brisbane City',
-        tags: rawTags,
-        coords: (!isNaN(lng) && !isNaN(lat)) ? [lng, lat] : getFallbackCoords(row.location || row.city),
-        thumb: row.thumb_url || 'https://via.placeholder.com/180x100/111111/FFFFFF?text=PhotoIndex',
-        url: 'https://photoindex.photodeck.com/'
-      };
-    }).filter(r => r.coords !== null);
-
-    initFacetedSystem();
-
-    var loadingEl = document.getElementById('page-loading');
-    if (loadingEl) {
-      loadingEl.classList.add('fade-out');
-      setTimeout(() => loadingEl.style.display = 'none', 400);
+    if (results.data && results.data.length > 0) {
+      mediaArchive = processRawData(results.data);
+    } else {
+      loadFallbackDemoData();
     }
+    startApp();
+  },
+  error: function() {
+    console.warn("Plik media.csv niedostępny bezpośrednio. Uruchamianie danych demonstracyjnych.");
+    loadFallbackDemoData();
+    startApp();
   }
 });
+
+function processRawData(data) {
+  return data.map((row, idx) => {
+    var rawTags = row.keywords ? row.keywords.split(',').map(t => t.trim()).filter(Boolean) : [];
+    var lng = parseFloat(row.lng);
+    var lat = parseFloat(row.lat);
+    var loc = row.location || row.city || row.suburb || 'Brisbane City';
+    
+    return {
+      id: row.uuid || 'rec-' + idx,
+      title: row.title || row.file_name || 'Documented Space',
+      suburb: loc,
+      tags: rawTags,
+      coords: (!isNaN(lng) && !isNaN(lat)) ? [lng, lat] : getFallbackCoords(loc),
+      thumb: row.thumb_url || 'https://via.placeholder.com/180x100/111111/FFFFFF?text=PhotoIndex',
+      url: 'https://photoindex.photodeck.com/'
+    };
+  });
+}
+
+function loadFallbackDemoData() {
+  mediaArchive = [
+    { id: 'd1', title: '300 North Quay Project', suburb: 'Brisbane City', tags: ['concrete facade', 'under construction', 'residential tower'], coords: [153.021, -27.468], thumb: 'https://via.placeholder.com/180x100/111111/FFFFFF?text=North+Quay', url: 'https://photoindex.photodeck.com/' },
+    { id: 'd2', title: 'Ann Street Commercial Development', suburb: 'Fortitude Valley', tags: ['glass facade', 'pedestrian zone', 'commercial'], coords: [153.035, -27.456], thumb: 'https://via.placeholder.com/180x100/111111/FFFFFF?text=Ann+Street', url: 'https://photoindex.photodeck.com/' },
+    { id: 'd3', title: 'South Bank Public Realm Expansion', suburb: 'South Brisbane', tags: ['public art', 'pedestrian zone', 'riverfront'], coords: [153.020, -27.475], thumb: 'https://via.placeholder.com/180x100/111111/FFFFFF?text=South+Bank', url: 'https://photoindex.photodeck.com/' }
+  ];
+}
 
 function getFallbackCoords(locStr) {
   if (!locStr) return [153.0281, -27.4580];
@@ -210,6 +212,15 @@ function getFallbackCoords(locStr) {
   if (s.includes('south')) return [153.020, -27.475];
   if (s.includes('west end')) return [153.012, -27.482];
   return [153.0281, -27.4580];
+}
+
+function startApp() {
+  initFacetedSystem();
+  var loadingEl = document.getElementById('page-loading');
+  if (loadingEl) {
+    loadingEl.classList.add('fade-out');
+    setTimeout(() => loadingEl.style.display = 'none', 400);
+  }
 }
 
 function initFacetedSystem() {
@@ -261,8 +272,8 @@ function renderMarkers(items) {
 
   items.forEach(item => {
     var el = document.createElement('div');
-    el.style.width = '10px';
-    el.style.height = '10px';
+    el.style.width = '12px';
+    el.style.height = '12px';
     el.style.backgroundColor = '#111111';
     el.style.cursor = 'pointer';
     el.style.border = '1px solid #FFFFFF';
