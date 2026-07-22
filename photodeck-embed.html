@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>PhotoIndex — Archive & Map Explorer</title>
+<title>PHOTOINDEX</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet">
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
@@ -25,6 +25,16 @@
   #search-archive-btn { height: 36px; padding: 0 16px; border: 1px solid #111111; background: #111111; color: #FFFFFF; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: 'Inter', system-ui, sans-serif; cursor: pointer; display: flex; align-items: center; gap: 6px; text-decoration: none; flex-shrink: 0; transition: background 0.15s; }
   #search-archive-btn:hover { background: #333333; }
 
+  #context-bar {
+    padding: 7px 20px;
+    font-size: 10px;
+    color: #666666;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid #111111;
+    background: #FAFAFA;
+    text-transform: uppercase;
+  }
+
   #chip-row { display: flex; align-items: center; padding: 10px 20px; flex-wrap: wrap; min-height: 20px; background: #FFFFFF; border-bottom: 1px solid #111111; }
   #chip-row:not(.has-search) { display: none !important; }
   
@@ -44,14 +54,12 @@
     #index-panel { width: 100% !important; height: 100% !important; border-right: none !important; border-bottom: none !important; }
     #map-wrap { display: none; }
     #map-wrap.mobile-active { display: block !important; }
-    #search-archive-btn { width: 36px; padding: 0; justify-content: center; font-size: 14px; letter-spacing: normal; }
-    #search-archive-text { display: none; }
+    #search-archive-btn { padding: 0 10px; font-size: 11px; }
+    #search-archive-text { display: inline; }
+    #context-bar { display: none; }
   }
 
-  /* ==========================================
-     PERFEKCYJNE ODWZOROWANIE DESIGNU PANELU
-     ========================================== */
-
+  /* PANEL BOCZNY */
   #index-panel { 
     width: 380px; 
     position: absolute; 
@@ -70,79 +78,19 @@
   #index-panel::-webkit-scrollbar { display: none; }
   .panel-section-container { display: flex; flex-direction: column; }
   
-  /* MAP LAYERS */
-  .section { 
-    padding: 20px 24px 16px 24px; 
-    border-bottom: 1px solid #111111; 
-    background: #FFFFFF; 
-    flex-shrink: 0; 
-  }
-  
-  .section-label { 
-    font-size: 11px; 
-    font-weight: 600; 
-    letter-spacing: 0.12em; 
-    text-transform: uppercase; 
-    color: #666666; 
-    margin-bottom: 16px; 
-  }
+  .section { padding: 20px 24px 16px 24px; border-bottom: 1px solid #111111; background: #FFFFFF; flex-shrink: 0; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #666666; margin-bottom: 16px; }
 
-  .filter-row { 
-    display: flex; 
-    align-items: center; 
-    justify-content: space-between; 
-    padding: 6px 0; 
-    cursor: pointer; 
-    user-select: none; 
-    transition: opacity 0.15s ease;
-  }
+  .filter-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; cursor: pointer; user-select: none; transition: opacity 0.15s ease; }
   .filter-row.off { opacity: 0.35; }
-  
-  .swatch { 
-    width: 12px; 
-    height: 12px; 
-    flex-shrink: 0; 
-    border-radius: 0 !important;
-  }
-  
-  .filter-label { 
-    font-size: 13px; 
-    font-weight: 400; 
-    color: #111111; 
-  }
-  
-  .filter-count { 
-    font-size: 13px; 
-    font-weight: 400; 
-    color: #777777; 
-  }
+  .swatch { width: 12px; height: 12px; flex-shrink: 0; border-radius: 0 !important; }
+  .filter-label { font-size: 13px; font-weight: 400; color: #111111; }
+  .filter-count { font-size: 13px; font-weight: 400; color: #777777; }
 
-  /* NAGŁÓWKI AKORDEONÓW */
-  .acc-head { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    padding: 18px 24px; 
-    border-bottom: 1px solid #111111; 
-    cursor: pointer; 
-    user-select: none; 
-    background: #FFFFFF; 
-    flex-shrink: 0; 
-    transition: background 0.15s ease;
-  }
-  .acc-head:hover { 
-    background: #FAFAFA; 
-  }
-
-  .acc-title { 
-    font-size: 12px; 
-    font-weight: 400; 
-    letter-spacing: 0.14em; 
-    text-transform: uppercase; 
-    color: #111111; 
-  }
+  .acc-head { display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid #111111; cursor: pointer; user-select: none; background: #FFFFFF; flex-shrink: 0; transition: background 0.15s ease; }
+  .acc-head:hover { background: #FAFAFA; }
+  .acc-title { font-size: 12px; font-weight: 400; letter-spacing: 0.14em; text-transform: uppercase; color: #111111; }
   
-  /* PLUSIK W FONCIE INTER */
   .acc-icon { 
     font-family: 'Inter', system-ui, sans-serif;
     font-size: 18px; 
@@ -157,55 +105,19 @@
     opacity: 0.8;
     transition: transform 0.2s ease, opacity 0.2s ease; 
   }
-  .acc-head.open .acc-icon { 
-    transform: rotate(45deg); 
-    opacity: 1;
-  }
+  .acc-head.open .acc-icon { transform: rotate(45deg); opacity: 1; }
   
-  /* ZAWARTOŚĆ AKORDEONU */
-  .acc-body { 
-    display: none; 
-    padding: 16px 24px; 
-    border-bottom: 1px solid #111111; 
-    font-size: 12px; 
-    color: #111111; 
-    background: #FFFFFF; 
-  }
+  .acc-body { display: none; padding: 16px 24px; border-bottom: 1px solid #111111; font-size: 12px; color: #111111; background: #FFFFFF; }
   .acc-body.open { display: block; }
-  
-  .sub-category-title { 
-    font-size: 10px; 
-    font-weight: 600; 
-    letter-spacing: 0.14em; 
-    text-transform: uppercase; 
-    color: #666666; 
-    margin: 16px 0 8px 0; 
-  }
+  .sub-category-title { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #666666; margin: 16px 0 8px 0; }
   .sub-category-title:first-child { margin-top: 0; }
-  
-  .acc-body label { 
-    display: flex; 
-    align-items: center; 
-    gap: 10px; 
-    cursor: pointer; 
-    padding: 5px 0; 
-    font-size: 12px;
-  }
-  .acc-body input[type="checkbox"], 
-  .acc-body input[type="radio"] { 
-    margin: 0; 
-    flex-shrink: 0; 
-    accent-color: #111111; 
-    width: 14px; 
-    height: 14px; 
-  }
+  .acc-body label { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px 0; font-size: 12px; }
+  .acc-body input[type="checkbox"], .acc-body input[type="radio"] { margin: 0; flex-shrink: 0; accent-color: #111111; width: 14px; height: 14px; }
 
   #index-group { display: flex; flex: 1; overflow-y: auto; flex-direction: column; background: #FFFFFF; }
   #filters-group { display: flex; flex-direction: column; }
 
-  @media (max-width: 720px) {
-    #filters-group { display: none; }
-  }
+  @media (max-width: 720px) { #filters-group { display: none; } }
 
   #list-wrap { flex: 1; background: #FFFFFF; overflow-y: auto; }
   .list-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid #111111; cursor: pointer; background: #FFFFFF; transition: background 0.15s ease, padding-left 0.15s ease; }
@@ -224,76 +136,59 @@
   #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.8s ease-in-out; }
   #map.loaded { opacity: 1; }
 
+  #mobile-map-filter-btn {
+    display: none;
+    position: absolute;
+    bottom: 24px;
+    right: 20px;
+    z-index: 10;
+    background: #111111;
+    color: #FFFFFF;
+    border: 1px solid #111111;
+    padding: 10px 16px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  @media (max-width: 720px) {
+    #mobile-map-filter-btn { display: flex; align-items: center; gap: 6px; }
+  }
+
   .pi-popup .mapboxgl-popup-content { background: #FFFFFF; border: 1px solid #111111; padding: 16px; font-family: 'Inter', system-ui, sans-serif; border-radius: 0; box-shadow: none; }
   .pi-popup .mapboxgl-popup-tip { border-top-color: #FFFFFF !important; border-bottom-color: #FFFFFF !important; }
   .pi-popup .mapboxgl-popup-close-button { font-size: 18px; color: #111111; padding: 4px 8px; outline: none; border: none; background: transparent; cursor: pointer; }
-  .pi-popup .mapboxgl-popup-close-button:hover { color: #111111; }
   
   #page-loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #FFFFFF; font-family: 'Inter', system-ui, sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #111111; z-index: 9999; transition: opacity 0.5s ease-in-out; }
   #page-loading.fade-out { opacity: 0; pointer-events: none; }
 
-  /* RECENTLY ADDED */
-  #recent-strip { 
-    display: none; 
-    flex-direction: column; 
-    background: #FFFFFF; 
-    border-bottom: 1px solid #111111; 
-    flex-shrink: 0; 
-    padding: 18px 24px; 
-  }
+  #recent-strip { display: none; flex-direction: column; background: #FFFFFF; border-bottom: 1px solid #111111; flex-shrink: 0; padding: 18px 24px; }
   #recent-strip.has-photos { display: flex; }
-  
-  #recent-label { 
-    font-size: 11px; 
-    font-weight: 400; 
-    letter-spacing: 0.12em; 
-    text-transform: uppercase; 
-    color: #666666; 
-    margin-bottom: 12px; 
-  }
-  
+  #recent-label { font-size: 11px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; color: #666666; margin-bottom: 12px; }
   #recent-track { display: flex; flex-direction: column; gap: 10px; }
-  
-  .recent-row { 
-    display: block; 
-    cursor: pointer; 
-    text-decoration: none; 
-    padding: 2px 0;
-  }
+  .recent-row { display: block; cursor: pointer; text-decoration: none; padding: 2px 0; }
   .recent-row:hover .recent-headline { color: #666666; }
-  
-  .recent-headline { 
-    font-size: 12px; 
-    color: #111111; 
-    font-weight: 400; 
-    margin-bottom: 2px; 
-    line-height: 1.3;
-  }
-  
-  .recent-date { 
-    font-size: 10px; 
-    color: #777777; 
-    letter-spacing: 0.02em; 
-  }
-
-  @media (max-width: 720px) {
-    #recent-label { font-size: 10px; }
-  }
+  .recent-headline { font-size: 12px; color: #111111; font-weight: 400; margin-bottom: 2px; line-height: 1.3; }
+  .recent-date { font-size: 10px; color: #777777; letter-spacing: 0.02em; }
 </style>
 </head>
 <body>
 
-<div id="page-loading">Loading archive data...</div>
+<div id="page-loading">LOADING MAP INDEX...</div>
 
 <div id="topbar">
   <div id="search-row">
     <div id="geocoder"></div>
     <a id="search-archive-btn" href="https://photoindex.photodeck.com/" target="_top">
-      <span id="search-archive-text">Search archive</span> →
+      <span id="search-archive-text">FULL ARCHIVE</span> →
     </a>
   </div>
+  <div id="context-bar">
+    SPATIAL INDEX — SELECT A PIN OR FILTER TO OPEN ALBUM
+  </div>
   <div id="chip-row">
-    <span id="chip-label">Filters</span>
+    <span id="chip-label">ACTIVE FILTERS</span>
     <span id="chips-here"></span>
   </div>
 </div>
@@ -308,7 +203,7 @@
   <div id="index-panel">
     
     <div class="panel-section-container" id="filters-group">
-      <!-- MAP LAYERS (PLANNING STATUS) -->
+      <!-- MAP LAYERS -->
       <div class="section">
         <div class="section-label">Map Layers (Planning Status)</div>
         <div class="filter-row" data-status="proposed">
@@ -417,19 +312,20 @@
     <div id="index-group" style="display:none; flex:1; overflow-y:auto; flex-direction:column; background:#FFFFFF;">
       <div id="list-wrap" style="flex:1;"></div>
       <div id="footer-row">
-        <span id="archive-count">Loading statistics...</span>
+        <span id="archive-count">Loading...</span>
         <span class="last-updated-badge">BNE URBAN</span>
       </div>
     </div>
 
     <div id="recent-strip">
-      <div id="recent-label">Recently Added</div>
+      <div id="recent-label">RECENT</div>
       <div id="recent-track"></div>
     </div>
   </div>
 
   <div id="map-wrap">
     <div id="map"></div>
+    <button id="mobile-map-filter-btn">⚙ FILTERS & LIST</button>
   </div>
 </div>
 
@@ -554,7 +450,7 @@ var geocoder = new MapboxGeocoder({
   accessToken: mapboxgl.accessToken,
   mapboxgl: mapboxgl,
   marker: false,
-  placeholder: 'Search address or place…',
+  placeholder: 'Search address or location…',
   countries: 'au',
   bbox: [152.85, -27.65, 153.25, -27.25],
   flyTo: false
@@ -698,8 +594,8 @@ function initMapEverything() {
       var popupHtml =
         '<div style="min-width:180px;">' +
           '<div style="font-size:14px;color:#111111;margin-bottom:4px;font-weight:600;">' + loc.street + '</div>' +
-          '<div style="font-size:11px;color:#111111;margin-bottom:12px;">' + loc.count + (loc.count === 1 ? ' photo documented' : ' photos documented') + '</div>' +
-          '<a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:#111;color:#fff;padding:10px;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;">VIEW PHOTOS →</a>' +
+          '<div style="font-size:11px;color:#666666;margin-bottom:12px;">' + loc.count + (loc.count === 1 ? ' PHOTO' : ' PHOTOS') + '</div>' +
+          '<a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:#111;color:#fff;padding:10px;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;">OPEN ALBUM →</a>' +
         '</div>';
 
       loc.popup = new mapboxgl.Popup({ offset: 14, closeButton: true, className: 'pi-popup' }).setHTML(popupHtml);
@@ -722,9 +618,9 @@ function initMapEverything() {
 
       var html =
         '<div style="min-width:180px;">' +
-          '<div style="font-size:11px;font-weight:500;letter-spacing:0.14em;color:#111111;text-transform:uppercase;margin-bottom:4px;">Map Layer Object</div>' +
+          '<div style="font-size:11px;font-weight:500;letter-spacing:0.14em;color:#111111;text-transform:uppercase;margin-bottom:4px;">STATUS</div>' +
           '<div style="font-size:14px;color:#111111;font-weight:600;margin-bottom:8px;">' + statusFormatted + (props.name ? ' — ' + props.name : '') + '</div>' +
-          (props.documentedStreet ? '<div style="font-size:11px;color:#111111;border-top:1px solid #111111;padding-top:8px;margin-top:8px;">Photos linked: ' + props.documentedStreet + '</div>' : '') +
+          (props.documentedStreet ? '<div style="font-size:11px;color:#111111;border-top:1px solid #111111;padding-top:8px;margin-top:8px;">Linked: ' + props.documentedStreet + '</div>' : '') +
         '</div>';
       
       window.piCloseAllPopups();
@@ -762,6 +658,7 @@ function applyLayerState() {
   });
 }
 
+/* DYNAMICZNY PRZYCISK: FULL ARCHIVE vs VIEW SELECTION */
 function updatePhotoDeckLink() {
   var queryParts = [];
   
@@ -781,7 +678,17 @@ function updatePhotoDeckLink() {
 
   var queryStr = queryParts.join(' ');
   var btn = document.getElementById('search-archive-btn');
-  if (btn) btn.href = queryStr ? 'https://photoindex.photodeck.com/?search=' + encodeURIComponent(queryStr) : 'https://photoindex.photodeck.com/';
+  var txt = document.getElementById('search-archive-text');
+  
+  if (btn) {
+    if (queryStr) {
+      btn.href = 'https://photoindex.photodeck.com/?search=' + encodeURIComponent(queryStr);
+      if (txt) txt.textContent = 'VIEW SELECTION';
+    } else {
+      btn.href = 'https://photoindex.photodeck.com/';
+      if (txt) txt.textContent = 'FULL ARCHIVE';
+    }
+  }
 }
 
 function applySearchState() {
@@ -792,7 +699,7 @@ function applySearchState() {
   renderList(visibleLocs);
   renderChips();
   updatePhotoDeckLink();
-  document.getElementById('archive-count').textContent = visibleLocs.length + ' locations displayed';
+  document.getElementById('archive-count').textContent = visibleLocs.length + ' LOCATIONS';
 }
 
 function renderList(items) {
@@ -862,8 +769,10 @@ document.querySelectorAll('.acc-head').forEach(h => {
   });
 });
 
+/* AUTOMATYCZNE CZYSZCZENIE GEOCODERA PRZY KORZYSTANIU Z FILTRÓW */
 document.querySelectorAll('.filter-check').forEach(cb => {
   cb.addEventListener('change', function () {
+    if (geocoder) geocoder.clear();
     if (this.getAttribute('data-cat') === 'year') toggleValue(searchState.years, this.value);
     else toggleValue(searchState.extraFilters, this.value);
     applySearchState();
@@ -872,6 +781,7 @@ document.querySelectorAll('.filter-check').forEach(cb => {
 
 document.querySelectorAll('.suburb-check').forEach(cb => {
   cb.addEventListener('change', function () {
+    if (geocoder) geocoder.clear();
     if (window.piCloseAllPopups) window.piCloseAllPopups();
     searchState.suburb = this.value;
     applySearchState();
@@ -903,6 +813,14 @@ Object.keys(tabs).forEach(tabId => {
     }
   });
 });
+
+var mobileFilterBtn = document.getElementById('mobile-map-filter-btn');
+if (mobileFilterBtn) {
+  mobileFilterBtn.addEventListener('click', function() {
+    var filterTab = document.getElementById('tab-filters');
+    if (filterTab) filterTab.click();
+  });
+}
 
 if (window.innerWidth <= 720) {
   var tm = document.getElementById('tab-map');
