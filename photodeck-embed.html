@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -107,16 +108,17 @@
   #page-loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #FFFFFF; font-family: sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #6B6B6B; z-index: 9999; transition: opacity 0.5s ease-in-out; }
   #page-loading.fade-out { opacity: 0; pointer-events: none; }
 
-  #recent-strip { display: none; flex-direction: column; border-top: 1px solid #111111; background: #FFFFFF; flex-shrink: 0; overflow: hidden; }
+  #recent-strip { display: none; flex-direction: column; background: #F2F2F0; border-bottom: 1px solid #111111; flex-shrink: 0; padding: 14px 20px; }
   #recent-strip.has-photos { display: flex; }
-  #recent-label { font-size: 10px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #6B6B6B; padding: 10px 20px 8px; flex-shrink: 0; }
-  #recent-track { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid #111111; }
-  .recent-thumb { width: 100%; aspect-ratio: 1 / 1; border-right: 1px solid #111111; border-bottom: 1px solid #111111; background-color: #E4E4E0; background-size: cover; background-position: center; cursor: pointer; text-decoration: none; display: block; transition: opacity 0.15s; }
-  .recent-thumb:hover { opacity: 0.8; }
+  #recent-label { font-size: 10px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #6B6B6B; margin-bottom: 10px; }
+  #recent-track { display: flex; flex-direction: column; gap: 12px; }
+  .recent-row { display: block; cursor: pointer; text-decoration: none; }
+  .recent-row:hover .recent-headline { text-decoration: underline; }
+  .recent-headline { font-size: 14px; color: #111111; font-weight: 600; margin-bottom: 2px; }
+  .recent-date { font-size: 10px; color: #6B6B6B; letter-spacing: 0.04em; }
 
   @media (max-width: 720px) {
-    #recent-label { padding: 8px 20px 6px; font-size: 9px; }
-    #recent-track { grid-template-columns: repeat(5, 1fr); }
+    #recent-label { font-size: 9px; }
   }
 </style>
 </head>
@@ -298,16 +300,42 @@ fetch(RECENT_PHOTOS_URL + '?t=' + Date.now())
   .catch(() => [])
   .then(photos => {
     if (!photos || !photos.length) return;
+    var seenStreets = {};
+    photos = photos.filter(p => {
+      var key = (p.street || '').toLowerCase().trim();
+      if (!key || seenStreets[key]) return false;
+      seenStreets[key] = true;
+      return true;
+    });
+    if (!photos.length) return;
     var track = document.getElementById('recent-track');
     var strip = document.getElementById('recent-strip');
     if (!track || !strip) return;
     photos.slice(0, 30).forEach(p => {
       var a = document.createElement('a');
-      a.className = 'recent-thumb';
-      a.style.backgroundImage = 'url(' + p.url + ')';
+      a.className = 'recent-row';
       a.href = p.archiveUrl || 'https://photoindex.photodeck.com/';
-      a.target = '_top';
-      a.title = p.street || '';
+      var dateStr = '';
+      var m = p.url.match(/PX-(\d{4})(\d{2})(\d{2})/);
+      if (m) {
+        var d = new Date(+m[1], +m[2] - 1, +m[3]);
+        dateStr = d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+      }
+      a.innerHTML = '<div class="recent-headline">' + (p.street || '') + '</div>' + (dateStr ? '<div class="recent-date">' + dateStr + '</div>' : '');
+      a.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        var match = locations.find(loc => loc.street && p.street && loc.street.toLowerCase() === p.street.toLowerCase());
+        if (!match) {
+          match = locations.find(loc => loc.street && p.street && (loc.street.toLowerCase().indexOf(p.street.toLowerCase()) !== -1 || p.street.toLowerCase().indexOf(loc.street.toLowerCase()) !== -1));
+        }
+        if (match) {
+          if (window.innerWidth <= 720) { var mapTab = document.getElementById('tab-map'); if (mapTab) mapTab.click(); }
+          map.flyTo({ center: match.coords, zoom: 15 });
+          if (window.piOpenPopup && match.popup) window.piOpenPopup(match.popup, match.coords);
+        } else if (p.archiveUrl) {
+          window.top.location.href = p.archiveUrl;
+        }
+      });
       track.appendChild(a);
     });
     strip.classList.add('has-photos');
@@ -462,6 +490,11 @@ function initMapEverything() {
     window.piCloseAllPopups = function() {
       if (activePopup) { activePopup.remove(); activePopup = null; }
     };
+    window.piOpenPopup = function(popup, coords) {
+      window.piCloseAllPopups();
+      popup.setLngLat(coords).addTo(map);
+      activePopup = popup;
+    };
 
     locations.forEach((loc, index) => {
       var el = document.createElement('div');
@@ -481,9 +514,7 @@ function initMapEverything() {
       el.addEventListener('click', (ev) => {
         ev.stopPropagation();
         lastMarkerClickAt = Date.now();
-        window.piCloseAllPopups();
-        loc.popup.setLngLat(loc.coords).addTo(map);
-        activePopup = loc.popup;
+        window.piOpenPopup(loc.popup, loc.coords);
       });
     });
 
@@ -582,8 +613,7 @@ function renderList(items) {
     row.addEventListener('click', () => {
       if (window.innerWidth <= 720) document.getElementById('tab-map').click();
       map.flyTo({ center: loc.coords, zoom: 15 });
-      if (window.piCloseAllPopups) window.piCloseAllPopups();
-      if (loc.popup) loc.popup.setLngLat(loc.coords).addTo(map);
+      if (window.piOpenPopup && loc.popup) window.piOpenPopup(loc.popup, loc.coords);
     });
     wrap.appendChild(row);
   });
