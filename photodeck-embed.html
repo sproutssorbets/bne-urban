@@ -379,6 +379,30 @@ fetch(RECENT_PHOTOS_URL + '?t=' + Date.now())
       return true;
     });
     if (!photos.length) return;
+
+    // --- WYCENTROWANIE MAPY DLA MOBILAEK NA NAJNOWSZYCH LOKALIZACJACH ---
+    if (window.innerWidth <= 720) {
+      var recentCoords = [];
+      photos.forEach(p => {
+        var match = locations.find(loc => 
+          (p.locationRef && loc.ref && loc.ref.toLowerCase() === p.locationRef.toLowerCase()) ||
+          (loc.street && p.street && loc.street.toLowerCase() === p.street.toLowerCase())
+        );
+        if (match && match.coords) {
+          recentCoords.push(match.coords);
+        }
+      });
+
+      if (recentCoords.length > 0) {
+        var bounds = recentCoords.reduce(function(b, coord) {
+          return b.extend(coord);
+        }, new mapboxgl.LngLatBounds(recentCoords[0], recentCoords[0]));
+
+        map.fitBounds(bounds, { padding: 50, maxZoom: 15, duration: 0 });
+      }
+    }
+    // -------------------------------------------------------------------
+
     var track = document.getElementById('recent-track');
     var strip = document.getElementById('recent-strip');
     if (!track || !strip) return;
