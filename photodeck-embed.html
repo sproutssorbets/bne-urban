@@ -64,7 +64,7 @@
   #chip-row:not(.has-search) { display: none !important; }
   
   #chip-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #111111; margin-right: 10px; }
-  .chip { display: inline-flex; align-items: center; justify-content: space-between; gap: 8px; border: 1px solid #111111; padding: 2px 6px; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #111111; cursor: pointer; background: #FFFFFF; margin: 0 4px 4px 0; }
+  .chip { display: inline-flex; align-items: center; justify-content: space-between; gap: 8px; border: 1px solid #111111; padding: 3px 8px; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #111111; cursor: pointer; background: #FFFFFF; margin: 0 4px 4px 0; }
 
   #layout { width: 100%; flex: 1; min-height: 0; background: #FFFFFF; position: relative; overflow: hidden; }
 
@@ -81,7 +81,6 @@
     #topbar { border-bottom: none; }
     #search-row { border-bottom: 1px solid #111111; padding: 0 12px; }
     
-    /* UKRYWAMY PRZYCISK Z GÓRY NA MOBILE */
     #search-archive-btn { display: none !important; }
     
     .mobile-tabs { display: flex !important; }
@@ -90,14 +89,13 @@
     #map-wrap.mobile-active { display: block !important; }
     #context-bar { display: none; }
 
-    /* POKAZUJEMY PRZYCISK DOKOWANY NA DOLE EKRANU */
     #mobile-bottom-bar {
       display: flex;
       position: fixed;
       bottom: 0;
       left: 0;
       width: 100%;
-      height: 46px;
+      height: 48px;
       background: #111111;
       color: #FFFFFF;
       align-items: center;
@@ -134,10 +132,10 @@
   .section { padding: 18px 20px 14px 20px; border-bottom: 1px solid #111111; background: #FFFFFF; flex-shrink: 0; }
   .section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #666666; margin-bottom: 14px; }
 
-  .filter-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; cursor: pointer; user-select: none; transition: opacity 0.15s ease; }
+  .filter-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; cursor: pointer; user-select: none; transition: opacity 0.15s ease; }
   .filter-row.off { opacity: 0.35; }
   .swatch { width: 12px; height: 12px; flex-shrink: 0; border-radius: 0 !important; }
-  .filter-label { font-size: 12px; font-weight: 400; color: #111111; }
+  .filter-label { font-size: 13px; font-weight: 400; color: #111111; }
   .filter-count { font-size: 12px; font-weight: 400; color: #777777; }
 
   .acc-head { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #111111; cursor: pointer; user-select: none; background: #FFFFFF; flex-shrink: 0; transition: background 0.15s ease; }
@@ -160,18 +158,14 @@
   }
   .acc-head.open .acc-icon { transform: rotate(45deg); opacity: 1; }
   
-  .acc-body { display: none; padding: 14px 20px; border-bottom: 1px solid #111111; font-size: 12px; color: #111111; background: #FFFFFF; }
+  .acc-body { display: none; padding: 14px 20px; border-bottom: 1px solid #111111; font-size: 13px; color: #111111; background: #FFFFFF; }
   .acc-body.open { display: block; }
- .sub-category-title {
-  margin: 18px 0 8px 0 !important; /* Lepszy oddech przed podkategoriami */
-}
-  .sub-category-title:first-child { margin-top: 0; }
-  .acc-body label {   padding: 8px 0 !important; /* Większy obszar kliknięcia dla palca */   font-size: 13px !important; /* Lekko czytelniejsza czcionka opcji */ } { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 4px 0; font-size: 12px; }
- .acc-body input[type="checkbox"], 
-.acc-body input[type="radio"] {
-  width: 16px !important;  /* Zwiększone kropki i kwadraty */
-  height: 16px !important;
-}
+  .sub-category-title { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #666666; margin: 18px 0 8px 0; }
+  .sub-category-title:first-child { margin-top: 4px; }
+  
+  /* ERGONOMIA PUNKTY DOTYKOWE (TOUCH TARGETS) */
+  .acc-body label { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 8px 0; font-size: 13px; }
+  .acc-body input[type="checkbox"], .acc-body input[type="radio"] { margin: 0; flex-shrink: 0; accent-color: #111111; width: 16px; height: 16px; }
 
   #index-group { 
     display: flex; 
@@ -191,9 +185,9 @@
     background: #FFFFFF; 
     overflow-y: auto; 
   }
-  .list-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid #111111; cursor: pointer; background: #FFFFFF; transition: background 0.15s ease, padding-left 0.15s ease; }
+  .list-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid #111111; cursor: pointer; background: #FFFFFF; transition: background 0.15s ease, padding-left 0.15s ease; }
   .list-row:hover { background: #F4F4F4; padding-left: 24px; }
-  .list-street { font-size: 12px; color: #111111; font-weight: 500; }
+  .list-street { font-size: 13px; color: #111111; font-weight: 500; }
 
   #footer-row { padding: 12px 20px; font-size: 10px; letter-spacing: 0.06em; color: #111111; border-top: 1px solid #111111; background: #FFFFFF; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
   .last-updated-badge { font-weight: 600; color: #111111; letter-spacing: 0.08em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 4px; }
@@ -243,7 +237,6 @@
     </a>
   </div>
 
-  <!-- ZAKŁADKI MOBILNE WEWNĄTRZ TOPBARA Z CZYSTĄ RAMKĄ -->
   <div class="mobile-tabs">
     <button class="mobile-tab" id="tab-index" data-tab="index">Index</button>
     <button class="mobile-tab" id="tab-filters" data-tab="filters">Filters</button>
@@ -676,7 +669,6 @@ function initMapEverything() {
     applySearchState();
     applyLayerState();
 
-    /* AUTOCENTROWANIE MOBILNE PO WROTWIE DO MAPY */
     if (window.innerWidth <= 720 && recentPhotosData.length > 0) {
       var recentCoords = [];
       recentPhotosData.forEach(p => {
