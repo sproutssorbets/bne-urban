@@ -142,14 +142,20 @@
     color: #111111; 
   }
   
+  /* SUBTELNY, SMUKŁY PLUSIK */
   .acc-icon { 
-    font-size: 16px; 
+    font-size: 15px; 
     color: #111111; 
-    font-weight: 300; 
+    font-weight: 300; /* Zmniejszona grubość */
+    font-family: Arial, sans-serif; /* Lżejsze renderowanie znaku + */
     line-height: 1;
+    display: inline-block;
+    transform-origin: center;
     transition: transform 0.2s ease; 
   }
-  .acc-head.open .acc-icon { transform: rotate(45deg); }
+  .acc-head.open .acc-icon { 
+    transform: rotate(45deg); 
+  }
   
   /* ZAWARTOŚĆ AKORDEONU */
   .acc-body { 
