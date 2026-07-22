@@ -13,6 +13,7 @@
 <style>
   * { box-sizing: border-box; border-radius: 0 !important; box-shadow: none !important; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Inter', system-ui, sans-serif; background: #FFFFFF; color: #111111; }
+  body { display: flex; flex-direction: column; }
 
   #topbar { border-bottom: 1px solid #111111; background: #FFFFFF; flex-shrink: 0; }
   #search-row { display: flex; align-items: center; height: 56px; padding: 0 20px; border-bottom: 1px solid #111111; gap: 12px; }
@@ -31,7 +32,7 @@
   .chip { display: inline-flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #111111; padding: 3px 8px; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #111111; cursor: pointer; background: #FFFFFF; margin: 0 6px 6px 0; }
   .chip:hover { background: #F0F0F0; }
 
-  #layout { display: flex; width: 100%; height: calc(100% - 106px); background: #FFFFFF; position: relative; overflow: hidden; }
+  #layout { display: flex; width: 100%; flex: 1; min-height: 0; background: #FFFFFF; position: relative; overflow: hidden; }
 
   .mobile-tabs { display: none; border-bottom: 1px solid #111111; background: #FFFFFF; flex-shrink: 0; }
   .mobile-tab { flex: 1; height: 44px; border: none; border-right: 1px solid #111111; background: #FFFFFF; color: #111111; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; cursor: pointer; }
@@ -40,7 +41,6 @@
 
   @media (max-width: 720px) {
     .mobile-tabs { display: flex; }
-    #layout { height: calc(100% - 150px); }
     #index-panel { width: 100% !important; border-right: none !important; height: 100% !important; position: absolute; inset: 0; z-index: 3; }
     #map-wrap { width: 100% !important; height: 100% !important; position: absolute; inset: 0; z-index: 2; display: none; }
     #map-wrap.mobile-active { display: block !important; }
@@ -105,6 +105,19 @@
   
   #page-loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #FFFFFF; font-family: sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #6B6B6B; z-index: 9999; transition: opacity 0.5s ease-in-out; }
   #page-loading.fade-out { opacity: 0; pointer-events: none; }
+
+  #recent-strip { display: none; align-items: center; height: 68px; border-top: 1px solid #111111; background: #FFFFFF; flex-shrink: 0; overflow: hidden; }
+  #recent-strip.has-photos { display: flex; }
+  #recent-label { font-size: 9px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #6B6B6B; padding: 0 14px; flex-shrink: 0; border-right: 1px solid #111111; height: 100%; display: flex; align-items: center; white-space: nowrap; }
+  #recent-track { flex: 1; height: 100%; display: flex; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; }
+  .recent-thumb { flex-shrink: 0; width: 68px; height: 68px; border-right: 1px solid #111111; background-color: #E4E4E0; background-size: cover; background-position: center; cursor: pointer; text-decoration: none; display: block; transition: opacity 0.15s; }
+  .recent-thumb:hover { opacity: 0.8; }
+
+  @media (max-width: 720px) {
+    #recent-label { padding: 0 10px; font-size: 8px; }
+    .recent-thumb { width: 56px; height: 56px; }
+    #recent-strip { height: 56px; }
+  }
 </style>
 </head>
 <body>
@@ -238,6 +251,11 @@
         <span class="last-updated-badge">BNE URBAN</span>
       </div>
     </div>
+
+    <div id="recent-strip">
+      <div id="recent-label">Recently<br>added</div>
+      <div id="recent-track"></div>
+    </div>
   </div>
 
   <div id="map-wrap">
@@ -271,6 +289,31 @@ const filterMapping = {
   
   'pedestrian zone': ['pedestrian zone'], 'arcade': ['arcade'], 'public art': ['public art'], 'outdoor dining': ['outdoor dining']
 };
+
+// PASEK "RECENTLY ADDED" — niezależny od mapy, ładuje się osobno
+// Oczekiwany format pliku JSON: [{ "url": "...jpg", "street": "309 North Quay", "archiveUrl": "https://photoindex.photodeck.com/..." }, ...]
+// Podmień URL poniżej na docelowy plik z miniaturami, hostowany tak samo jak locations.csv / geojson.
+var RECENT_PHOTOS_URL = 'https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/recent-photos.json';
+
+fetch(RECENT_PHOTOS_URL + '?t=' + Date.now())
+  .then(r => r.ok ? r.json() : [])
+  .catch(() => [])
+  .then(photos => {
+    if (!photos || !photos.length) return;
+    var track = document.getElementById('recent-track');
+    var strip = document.getElementById('recent-strip');
+    if (!track || !strip) return;
+    photos.slice(0, 30).forEach(p => {
+      var a = document.createElement('a');
+      a.className = 'recent-thumb';
+      a.style.backgroundImage = 'url(' + p.url + ')';
+      a.href = p.archiveUrl || 'https://photoindex.photodeck.com/';
+      a.target = '_top';
+      a.title = p.street || '';
+      track.appendChild(a);
+    });
+    strip.classList.add('has-photos');
+  });
 
 var locations = [];
 var projects = { type: 'FeatureCollection', features: [] };
