@@ -28,7 +28,7 @@
   #geocoder .mapboxgl-ctrl-geocoder input { height: 36px; font-size: 13px; color: #111111; font-family: 'Inter', system-ui, sans-serif; background: #FFFFFF; padding-left: 32px; }
   #geocoder .mapboxgl-ctrl-geocoder--icon-search { fill: #111111; top: 9px; left: 6px; }
   
-  /* PRZYCISK Z WYRAŹNĄ STRZAŁKĄ SYSTEMOWĄ */
+  /* PRZYCISK TEKSTOWY BEZ IKON */
   #search-archive-btn { 
     height: 36px; 
     padding: 0 14px; 
@@ -44,20 +44,11 @@
     display: flex; 
     align-items: center; 
     justify-content: center;
-    gap: 8px; 
     text-decoration: none; 
     flex-shrink: 0; 
     transition: background 0.15s; 
   }
   #search-archive-btn:hover { background: #333333; }
-
-  .search-archive-icon {
-    width: 14px;
-    height: 14px;
-    stroke: #FFFFFF;
-    stroke-width: 2.2px;
-    flex-shrink: 0;
-  }
 
   #context-bar {
     padding: 6px 16px;
@@ -89,9 +80,7 @@
     #map-wrap { display: none; }
     #map-wrap.mobile-active { display: block !important; }
     
-    #search-archive-btn { width: 36px !important; height: 36px !important; padding: 0 !important; }
-    #search-archive-text { display: none !important; }
-    .search-archive-icon { width: 16px; height: 16px; stroke-width: 2.5px; }
+    #search-archive-btn { padding: 0 10px !important; }
     #context-bar { display: none; }
   }
 
@@ -214,9 +203,6 @@
     <div id="geocoder"></div>
     <a id="search-archive-btn" href="https://photoindex.photodeck.com/" target="_top">
       <span id="search-archive-text">FULL ARCHIVE</span>
-      <svg class="search-archive-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square">
-        <path d="M4 12L12 4M12 4H5M12 4V12"/>
-      </svg>
     </a>
   </div>
 
@@ -394,6 +380,7 @@ const filterMapping = {
 };
 
 var RECENT_PHOTOS_URL = 'https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/recent-photos.json';
+var recentPhotosData = [];
 
 fetch(RECENT_PHOTOS_URL + '?t=' + Date.now())
   .then(r => r.ok ? r.json() : [])
@@ -401,39 +388,17 @@ fetch(RECENT_PHOTOS_URL + '?t=' + Date.now())
   .then(photos => {
     if (!photos || !photos.length) return;
     var seenStreets = {};
-    photos = photos.filter(p => {
+    recentPhotosData = photos.filter(p => {
       var key = (p.street || '').toLowerCase().trim();
       if (!key || seenStreets[key]) return false;
       seenStreets[key] = true;
       return true;
     });
-    if (!photos.length) return;
-
-    if (window.innerWidth <= 720) {
-      var recentCoords = [];
-      photos.forEach(p => {
-        var match = locations.find(loc => 
-          (p.locationRef && loc.ref && loc.ref.toLowerCase() === p.locationRef.toLowerCase()) ||
-          (loc.street && p.street && loc.street.toLowerCase() === p.street.toLowerCase())
-        );
-        if (match && match.coords) {
-          recentCoords.push(match.coords);
-        }
-      });
-
-      if (recentCoords.length > 0) {
-        var bounds = recentCoords.reduce(function(b, coord) {
-          return b.extend(coord);
-        }, new mapboxgl.LngLatBounds(recentCoords[0], recentCoords[0]));
-
-        map.fitBounds(bounds, { padding: 50, maxZoom: 15, duration: 0 });
-      }
-    }
 
     var track = document.getElementById('recent-track');
     var strip = document.getElementById('recent-strip');
     if (!track || !strip) return;
-    photos.slice(0, 30).forEach(p => {
+    recentPhotosData.slice(0, 30).forEach(p => {
       var a = document.createElement('a');
       a.className = 'recent-row';
       a.href = p.archiveUrl || 'https://photoindex.photodeck.com/';
@@ -669,6 +634,29 @@ function initMapEverything() {
     applySearchState();
     applyLayerState();
 
+    /* AUTOCENTROWANIE MOBILNE PO WROTWIE DO MAPY */
+    if (window.innerWidth <= 720 && recentPhotosData.length > 0) {
+      var recentCoords = [];
+      recentPhotosData.forEach(p => {
+        var match = locations.find(loc => 
+          (p.locationRef && loc.ref && loc.ref.toLowerCase() === p.locationRef.toLowerCase()) ||
+          (loc.street && p.street && loc.street.toLowerCase() === p.street.toLowerCase())
+        );
+        if (match && match.coords) recentCoords.push(match.coords);
+      });
+
+      if (recentCoords.length > 0) {
+        var bounds = recentCoords.reduce(function(b, coord) {
+          return b.extend(coord);
+        }, new mapboxgl.LngLatBounds(recentCoords[0], recentCoords[0]));
+
+        setTimeout(() => {
+          map.resize();
+          map.fitBounds(bounds, { padding: 50, maxZoom: 15, duration: 0 });
+        }, 100);
+      }
+    }
+
     map.once('idle', () => {
       document.getElementById('map').classList.add('loaded');
       var loadingEl = document.getElementById('page-loading');
@@ -716,14 +704,15 @@ function updatePhotoDeckLink() {
   var queryStr = queryParts.join(' ');
   var btn = document.getElementById('search-archive-btn');
   var txt = document.getElementById('search-archive-text');
+  var isMobile = window.innerWidth <= 720;
   
   if (btn) {
     if (queryStr) {
       btn.href = 'https://photoindex.photodeck.com/?search=' + encodeURIComponent(queryStr);
-      if (txt) txt.textContent = 'VIEW SELECTION';
+      if (txt) txt.textContent = isMobile ? 'VIEW' : 'VIEW SELECTION';
     } else {
       btn.href = 'https://photoindex.photodeck.com/';
-      if (txt) txt.textContent = 'FULL ARCHIVE';
+      if (txt) txt.textContent = isMobile ? 'SEARCH' : 'FULL ARCHIVE';
     }
   }
 }
