@@ -56,7 +56,7 @@
 
   .filter-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; cursor: pointer; user-select: none; }
   .filter-row.off { opacity: 0.35; }
-  .swatch { width: 12px; height: 12px; flex-shrink: 0; border: 1px solid #111111; }
+  .swatch { width: 8px; height: 8px; flex-shrink: 0; }
   .filter-count { font-size: 10px; color: #6B6B6B; }
   .filter-label { font-size: 11px; color: #111111; }
 
@@ -134,28 +134,19 @@
   <div id="index-panel">
     
     <div class="panel-section-container" id="filters-group">
-      <!-- 0. MAP LAYERS -->
+      <!-- 0. MAP LAYERS (Planning status) -->
       <div class="section">
         <div class="section-label">Map Layers (Planning Status)</div>
         <div class="filter-row" data-status="proposed">
-          <div style="display:flex;align-items:center;gap:9px;">
-            <span class="swatch" style="background: radial-gradient(#111111 1px, transparent 1.5px); background-size: 4px 4px; background-position: 0 0, 2px 2px;"></span>
-            <span class="filter-label">Proposed</span>
-          </div>
+          <div style="display:flex;align-items:center;gap:9px;"><span class="swatch" style="background:#D1D1D1; border:1px solid #6B6B6B;"></span><span class="filter-label">Proposed</span></div>
           <span class="filter-count" id="count-proposed">–</span>
         </div>
         <div class="filter-row" data-status="under_construction">
-          <div style="display:flex;align-items:center;gap:9px;">
-            <span class="swatch" style="background: repeating-linear-gradient(45deg, #111111, #111111 1px, transparent 1px, transparent 4px);"></span>
-            <span class="filter-label">Under Construction</span>
-          </div>
+          <div style="display:flex;align-items:center;gap:9px;"><span class="swatch" style="background:#6B6B6B;"></span><span class="filter-label">Under Construction</span></div>
           <span class="filter-count" id="count-under_construction">–</span>
         </div>
         <div class="filter-row" data-status="approved">
-          <div style="display:flex;align-items:center;gap:9px;">
-            <span class="swatch" style="background: repeating-linear-gradient(0deg, transparent, transparent 3px, #111111 3px, #111111 4px);"></span>
-            <span class="filter-label">Approved</span>
-          </div>
+          <div style="display:flex;align-items:center;gap:9px;"><span class="swatch" style="background:#111111;"></span><span class="filter-label">Approved</span></div>
           <span class="filter-count" id="count-approved">–</span>
         </div>
       </div>
@@ -206,7 +197,7 @@
         <label><input type="checkbox" class="filter-check" data-cat="year" value="2033"> 2033</label>
       </div>
 
-      <!-- 3. DEVELOPMENT STATUS -->
+      <!-- 3. DEVELOPMENT STATUS (Photos) -->
       <div class="acc-head" data-target="acc-status">
         <span class="acc-title">3. Development Status</span><span class="acc-icon">＋</span>
       </div>
@@ -273,6 +264,7 @@
 <script>
 mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
 
+// SŁOWNIK MAPOWANIA (Filter Dictionary)
 const filterMapping = {
   'Existing': ['existing condition', 'before change'],
   'Threatened / Scheduled': ['threatened building', 'scheduled demolition', 'pre construction', 'development site', 'vacant site'],
@@ -399,46 +391,6 @@ Promise.all([
   initMapEverything();
 });
 
-// CANVAS GENERATOR DLA WZORÓW ARCHITEKTONICZNYCH
-function createPatternCanvas(type) {
-  var size = 16;
-  var canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
-  var ctx = canvas.getContext('2d');
-  
-  ctx.fillStyle = 'rgba(255,255,255,1)'; // Białe tło pod wzorem
-  ctx.fillRect(0, 0, size, size);
-  
-  ctx.strokeStyle = '#111111';
-  ctx.fillStyle = '#111111';
-  ctx.lineWidth = 1;
-
-  if (type === 'proposed') { // Kropki
-    ctx.beginPath();
-    ctx.arc(4, 4, 1, 0, Math.PI * 2);
-    ctx.arc(12, 12, 1, 0, Math.PI * 2);
-    ctx.fill();
-  } else if (type === 'under_construction') { // Ukośne linie
-    ctx.beginPath();
-    ctx.moveTo(0, size);
-    ctx.lineTo(size, 0);
-    ctx.moveTo(-size/2, size/2);
-    ctx.lineTo(size/2, -size/2);
-    ctx.moveTo(size/2, size*1.5);
-    ctx.lineTo(size*1.5, size/2);
-    ctx.stroke();
-  } else if (type === 'approved') { // Poziome linie
-    ctx.beginPath();
-    ctx.moveTo(0, 4);
-    ctx.lineTo(size, 4);
-    ctx.moveTo(0, 12);
-    ctx.lineTo(size, 12);
-    ctx.stroke();
-  }
-  return canvas;
-}
-
 function initMapEverything() {
   function setupMap() {
     var style = map.getStyle();
@@ -468,22 +420,16 @@ function initMapEverything() {
     map.addLayer({
       id: 'projects-fill', type: 'fill', source: 'projects', minzoom: 13.5,
       paint: {
-        'fill-pattern': [
-          'match', ['get', 'status'],
-          'approved', 'pattern-approved',
-          'under_construction', 'pattern-construction',
-          'proposed', 'pattern-proposed',
-          'pattern-proposed'
-        ],
-        'fill-opacity': 0.85
+        'fill-color': ['match', ['get', 'status'], 'approved', '#111111', 'under_construction', '#6B6B6B', 'proposed', '#D1D1D1', '#D1D1D1'],
+        'fill-opacity': ['match', ['get', 'status'], 'approved', 0.65, 'under_construction', 0.50, 'proposed', 0.35, 0.35]
       }
     });
     
     map.addLayer({
       id: 'projects-line', type: 'line', source: 'projects', minzoom: 13.5,
       paint: { 
-        'line-color': '#111111', 
-        'line-width': 1
+        'line-color': ['match', ['get', 'status'], 'approved', '#111111', 'under_construction', '#6B6B6B', 'proposed', '#6B6B6B', '#6B6B6B'], 
+        'line-width': 1 
       }
     });
 
@@ -539,6 +485,7 @@ function initMapEverything() {
     applySearchState();
     applyLayerState();
 
+    // PŁYNNY EFEKT ŁADOWANIA (Smooth Fade-In)
     map.once('idle', () => {
       document.getElementById('map').classList.add('loaded');
       var loadingEl = document.getElementById('page-loading');
@@ -549,24 +496,7 @@ function initMapEverything() {
     });
   }
 
-  // Prawidłowa rejestracja wzorów w zdarzeniu 'load' mapy
-  map.on('load', () => {
-    map.addImage('pattern-proposed', createPatternCanvas('proposed'));
-    map.addImage('pattern-construction', createPatternCanvas('under_construction'));
-    map.addImage('pattern-approved', createPatternCanvas('approved'));
-    
-    setupMap();
-  });
-
-  if (map.loaded()) {
-    // Jeśli z jakiegoś powodu załadowała się wcześniej
-    if (!map.hasImage('pattern-proposed')) {
-      map.addImage('pattern-proposed', createPatternCanvas('proposed'));
-      map.addImage('pattern-construction', createPatternCanvas('under_construction'));
-      map.addImage('pattern-approved', createPatternCanvas('approved'));
-    }
-    setupMap();
-  }
+  if (map.loaded()) setupMap(); else map.on('load', setupMap);
 }
 
 function applyLayerState() {
