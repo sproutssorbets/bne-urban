@@ -95,7 +95,7 @@
   .custom-marker-hitbox:hover .custom-marker-visual, .custom-marker-hitbox:active .custom-marker-visual { transform: scale(1.15); background: #333333; }
 
   #map-wrap { flex: 1; position: relative; background: #FFFFFF; }
-  #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.6s ease; }
+  #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.8s ease-in-out; }
   #map.loaded { opacity: 1; }
 
   .pi-popup .mapboxgl-popup-content { background: #FFFFFF; border: 1px solid #111111; padding: 16px; font-family: 'Inter', system-ui, sans-serif; border-radius: 0; box-shadow: none; }
@@ -103,7 +103,7 @@
   .pi-popup .mapboxgl-popup-close-button { font-size: 18px; color: #6B6B6B; padding: 4px 8px; outline: none; border: none; background: transparent; cursor: pointer; }
   .pi-popup .mapboxgl-popup-close-button:hover { color: #111111; }
   
-  #page-loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #FFFFFF; font-family: sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #6B6B6B; z-index: 9999; transition: opacity 0.4s ease; }
+  #page-loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #FFFFFF; font-family: sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #6B6B6B; z-index: 9999; transition: opacity 0.5s ease-in-out; }
   #page-loading.fade-out { opacity: 0; pointer-events: none; }
 </style>
 </head>
@@ -389,18 +389,10 @@ Promise.all([
   });
 
   initMapEverything();
-  
-  var loadingEl = document.getElementById('page-loading');
-  if (loadingEl) {
-    loadingEl.classList.add('fade-out');
-    setTimeout(() => loadingEl.style.display = 'none', 400);
-  }
 });
 
 function initMapEverything() {
   function setupMap() {
-    document.getElementById('map').classList.add('loaded');
-
     var style = map.getStyle();
     style.layers.forEach(l => {
       try {
@@ -492,6 +484,16 @@ function initMapEverything() {
     renderList();
     applySearchState();
     applyLayerState();
+
+    // PŁYNNY EFEKT ŁADOWANIA (Smooth Fade-In)
+    map.once('idle', () => {
+      document.getElementById('map').classList.add('loaded');
+      var loadingEl = document.getElementById('page-loading');
+      if (loadingEl) {
+        loadingEl.classList.add('fade-out');
+        setTimeout(() => loadingEl.style.display = 'none', 500);
+      }
+    });
   }
 
   if (map.loaded()) setupMap(); else map.on('load', setupMap);
