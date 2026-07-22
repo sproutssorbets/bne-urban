@@ -88,7 +88,7 @@
 
   #mobile-bottom-bar { display: none !important; }
 
-  /* PANEL BOCZNY DESKTOP - Bez !important na display! */
+  /* PANEL BOCZNY DESKTOP */
   #index-panel { 
     width: 340px; 
     flex-shrink: 0;
@@ -201,7 +201,7 @@
   .recent-headline { font-size: 12px; color: #111111; font-weight: 400; margin-bottom: 2px; line-height: 1.3; }
   .recent-date { font-size: 10px; color: #777777; letter-spacing: 0.02em; }
 
-  /* BEZPIECZNY TRYB MOBILNY */
+  /* TRYB MOBILNY */
   @media (max-width: 720px) {
     body {
       padding-bottom: 48px !important;
@@ -225,11 +225,11 @@
       height: 100% !important; 
       border-right: none !important; 
       border-bottom: none !important; 
-      display: none; /* Domyślnie schowany na mobilce */
+      display: none; 
     }
 
     #index-panel.mobile-active {
-      display: flex !important; /* Pokazuj tylko gdy wybrany jest Index lub Filters */
+      display: flex !important; 
     }
 
     #map-wrap { display: none; }
@@ -281,7 +281,7 @@
   </div>
 
   <div id="context-bar">
-    SPATIAL INDEX — SELECT A PIN OR FILTER TO OPEN ALBUM
+    SELECT A PIN OR A FILTER TO OPEN A RECORD
   </div>
   <div id="chip-row">
     <span id="chip-label">ACTIVE FILTERS</span>
@@ -355,10 +355,9 @@
         <span class="acc-title">3. Development Status</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-status">
-        <label><input type="checkbox" class="filter-check" value="Existing"> Existing</label>
-        <label><input type="checkbox" class="filter-check" value="Threatened / Scheduled"> Threatened / Scheduled</label>
+        <label><input type="checkbox" class="filter-check" value="Proposed"> Proposed</label>
         <label><input type="checkbox" class="filter-check" value="Under Construction"> Under Construction</label>
-        <label><input type="checkbox" class="filter-check" value="Completed"> Completed</label>
+        <label><input type="checkbox" class="filter-check" value="Approved"> Approved</label>
       </div>
 
       <!-- 4. TYPOLOGY -->
@@ -405,7 +404,7 @@
       <div id="list-wrap"></div>
       <div id="footer-row">
         <span id="archive-count">Loading...</span>
-        <span class="last-updated-badge">BNE URBAN</span>
+        <span class="last-updated-badge">Last Updated</span>
       </div>
       <div id="recent-strip">
         <div id="recent-label">RECENT</div>
@@ -429,10 +428,9 @@
 mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
 
 const filterMapping = {
-  'Existing': ['existing condition', 'before change'],
-  'Threatened / Scheduled': ['threatened building', 'scheduled demolition', 'pre construction', 'development site', 'vacant site'],
+  'Proposed': ['proposed', 'proposed development', 'planning application'],
   'Under Construction': ['under construction', 'demolition in progress', 'ongoing change'],
-  'Completed': ['completed development', 'post demolition', 'after change'],
+  'Approved': ['approved', 'approved development', 'development permit'],
   
   'Residential': ['residential building', 'residential tower', 'apartment building', 'mixed use building', 'social housing', 'student housing'],
   'Heritage & Traditional Housing': ['heritage building', 'queenslander', 'highset house', 'lowset house', 'workers cottage', 'post war house', 'terrace house', 'duplex'],
@@ -670,7 +668,7 @@ function initMapEverything() {
         '<div style="min-width:180px;">' +
           '<div style="font-size:14px;color:#111111;margin-bottom:4px;font-weight:600;">' + loc.street + '</div>' +
           '<div style="font-size:11px;color:#666666;margin-bottom:12px;">' + loc.count + (loc.count === 1 ? ' PHOTO' : ' PHOTOS') + '</div>' +
-          '<a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:#111;color:#fff;padding:10px;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;">OPEN ALBUM →</a>' +
+          '<a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:#111;color:#fff;padding:10px;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;">OPEN RECORD →</a>' +
         '</div>';
 
       loc.popup = new mapboxgl.Popup({ offset: 14, closeButton: true, className: 'pi-popup' }).setHTML(popupHtml);
@@ -689,7 +687,8 @@ function initMapEverything() {
     map.on('click', 'projects-fill', (e) => {
       if (Date.now() - lastMarkerClickAt < 80) return;
       var props = e.features[0].properties;
-      var statusFormatted = props.status === 'under_construction' ? 'Under construction' : (props.status ? props.status.charAt(0).toUpperCase() + props.status.slice(1) : 'Proposed');
+      var rawStatus = props.status ? props.status.toLowerCase() : 'proposed';
+      var statusFormatted = rawStatus === 'under_construction' ? 'Under Construction' : (rawStatus === 'approved' ? 'Approved' : 'Proposed');
 
       var html =
         '<div style="min-width:180px;">' +
@@ -900,7 +899,7 @@ document.querySelectorAll('.suburb-check').forEach(cb => {
   });
 });
 
-/* POPRAWIONA LOGIKA ZAKŁADEK DLA MOBILKI */
+/* LOGIKA ZAKŁADEK MOBILNYCH */
 var tabs = { 'tab-index': 'index-group', 'tab-filters': 'filters-group', 'tab-map': 'map-wrap' };
 Object.keys(tabs).forEach(tabId => {
   var btn = document.getElementById(tabId);
@@ -912,7 +911,6 @@ Object.keys(tabs).forEach(tabId => {
     var isMap = tabId === 'tab-map';
     var indexPanel = document.getElementById('index-panel');
     
-    /* Przełączamy klasę pozwalającą wyświetlać panel na mobilce */
     indexPanel.classList.toggle('mobile-active', !isMap);
     indexPanel.style.display = isMap ? 'none' : 'flex';
 
