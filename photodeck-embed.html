@@ -3,135 +3,303 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>PhotoIndex — Spatial Archive & Explorer</title>
+<title>PhotoIndex — Archive & Map Explorer</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet">
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
 <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" rel="stylesheet">
 <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 <style>
-  * { box-sizing: border-box; border-radius: 0 !important; -webkit-tap-highlight-color: transparent; }
+  * { box-sizing: border-box; border-radius: 0 !important; box-shadow: none !important; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Inter', system-ui, sans-serif; background: #FFFFFF; color: #111111; }
 
-  #app-root { display: flex; flex-direction: column; width: 100vw; height: 100vh; }
-
-  #topbar { display: flex; align-items: center; height: 56px; padding: 0 20px; border-bottom: 1px solid #111111; gap: 12px; background: #FFFFFF; flex-shrink: 0; z-index: 30; }
+  #topbar { border-bottom: 1px solid #111111; background: #FFFFFF; flex-shrink: 0; }
+  #search-row { display: flex; align-items: center; height: 56px; padding: 0 20px; border-bottom: 1px solid #111111; gap: 12px; }
   #geocoder { flex: 1; }
   #geocoder .mapboxgl-ctrl-geocoder { width: 100%; max-width: none; font-family: inherit; box-shadow: none; background: #FFFFFF; }
   #geocoder .mapboxgl-ctrl-geocoder input { height: 36px; font-size: 13px; color: #111111; font-family: inherit; background: #FFFFFF; }
   #geocoder .mapboxgl-ctrl-geocoder--icon-search { fill: #6B6B6B; top: 9px; }
-
-  #search-archive-btn { height: 36px; padding: 0 16px; border: 1px solid #111111; background: #111111; color: #FFFFFF; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 6px; text-decoration: none; flex-shrink: 0; }
+  
+  #search-archive-btn { height: 36px; padding: 0 16px; border: 1px solid #111111; background: #111111; color: #FFFFFF; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 6px; text-decoration: none; flex-shrink: 0; transition: background 0.15s; }
   #search-archive-btn:hover { background: #333333; }
 
-  #main-layout { display: flex; flex: 1; position: relative; overflow: hidden; }
-
-  #sidebar { width: 340px; border-right: 1px solid #111111; display: flex; flex-direction: column; background: #FFFFFF; z-index: 10; overflow-y: auto; flex-shrink: 0; }
-  .sidebar-header { padding: 14px 20px; border-bottom: 1px solid #111111; font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; background: #FFFFFF; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
-  .scale-badge { font-size: 8px; padding: 2px 6px; background: #111111; color: #FFFFFF; letter-spacing: 0.1em; }
-
-  .facet-group { border-bottom: 1px solid #111111; padding: 14px 20px; flex-shrink: 0; }
-  .facet-title { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: #6B6B6B; margin-bottom: 10px; }
+  #chip-row { display: flex; align-items: center; padding: 10px 20px; flex-wrap: wrap; min-height: 20px; background: #FFFFFF; border-bottom: 1px solid #111111; }
+  #chip-row:not(.has-search) { display: none !important; }
   
-  .facet-list { display: flex; flex-wrap: wrap; gap: 6px; }
-  .facet-tag { font-size: 10px; padding: 4px 8px; border: 1px solid #111111; cursor: pointer; text-transform: uppercase; letter-spacing: 0.08em; transition: all 0.15s ease; background: #FFFFFF; }
-  .facet-tag:hover { background: #F0F0F0; }
-  .facet-tag.active { background: #111111; color: #FFFFFF; }
-  .facet-tag.disabled { opacity: 0.25; pointer-events: none; border-color: #CCCCCC; }
+  #chip-label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #6B6B6B; margin-right: 12px; }
+  .chip { display: inline-flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #111111; padding: 3px 8px; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #111111; cursor: pointer; background: #FFFFFF; margin: 0 6px 6px 0; }
+  .chip:hover { background: #F0F0F0; }
 
-  #micro-facets-wrapper { transition: opacity 0.3s ease; }
-  body:not(.micro-scale) #micro-facets-wrapper { opacity: 0.4; pointer-events: none; }
-  body:not(.micro-scale) #micro-notice { display: block; font-size: 9px; color: #6B6B6B; margin-top: 6px; font-style: italic; }
-  #micro-notice { display: none; }
+  #layout { display: flex; width: 100%; height: calc(100% - 106px); background: #FFFFFF; position: relative; overflow: hidden; }
 
-  #map-container { flex: 1; position: relative; background: #FFFFFF; }
+  .mobile-tabs { display: none; border-bottom: 1px solid #111111; background: #FFFFFF; flex-shrink: 0; }
+  .mobile-tab { flex: 1; height: 44px; border: none; border-right: 1px solid #111111; background: #FFFFFF; color: #111111; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; cursor: pointer; }
+  .mobile-tab:last-child { border-right: none; }
+  .mobile-tab.active { background: #111111; color: #FFFFFF; }
+
+  @media (max-width: 720px) {
+    .mobile-tabs { display: flex; }
+    #layout { height: calc(100% - 150px); }
+    #index-panel { width: 100% !important; border-right: none !important; height: 100% !important; position: absolute; inset: 0; z-index: 3; }
+    #map-wrap { width: 100% !important; height: 100% !important; position: absolute; inset: 0; z-index: 2; display: none; }
+    #map-wrap.mobile-active { display: block !important; }
+    #search-archive-btn { width: 36px; padding: 0; justify-content: center; font-size: 14px; letter-spacing: normal; }
+    #search-archive-text { display: none; }
+  }
+
+  #index-panel { width: 380px; flex-shrink: 0; border-right: 1px solid #111111; display: flex; flex-direction: column; background: #FFFFFF; overflow: hidden; }
+  .panel-section-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; padding-bottom: 20px; }
+  
+  .section { padding: 14px 20px; border-bottom: 1px solid #111111; background: #FFFFFF; flex-shrink: 0; }
+  .section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #6B6B6B; margin-bottom: 10px; }
+
+  .filter-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; cursor: pointer; user-select: none; }
+  .filter-row.off { opacity: 0.35; }
+  .swatch { width: 8px; height: 8px; flex-shrink: 0; }
+  .filter-count { font-size: 10px; color: #6B6B6B; }
+  .filter-label { font-size: 11px; color: #111111; }
+
+  .acc-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid #111111; cursor: pointer; user-select: none; background: #FFFFFF; flex-shrink: 0; }
+  .acc-head:hover { background: #F0F0F0; }
+  .acc-title { font-size: 10px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #111111; }
+  .acc-icon { font-size: 12px; color: #111111; font-weight: 400; transition: transform 0.2s; }
+  .acc-head.open .acc-icon { transform: rotate(45deg); }
+  
+  .acc-body { display: none; padding: 14px 20px; border-bottom: 1px solid #111111; font-size: 11px; color: #111111; background: #FFFFFF; }
+  .acc-body.open { display: block; }
+  
+  .sub-category-title { font-size: 9px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #6B6B6B; margin: 12px 0 6px 0; }
+  .sub-category-title:first-child { margin-top: 0; }
+  .acc-body label { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 5px 0; }
+  .acc-body input[type="checkbox"], .acc-body input[type="radio"] { margin: 0; flex-shrink: 0; accent-color: #111111; width: 14px; height: 14px; }
+
+  #index-group { display: flex; flex: 1; overflow-y: auto; flex-direction: column; background: #FFFFFF; }
+  #filters-group { display: flex; flex-direction: column; flex: 1; overflow-y: auto; }
+
+  @media (max-width: 720px) {
+    #filters-group { display: none; }
+  }
+
+  #list-wrap { flex: 1; background: #FFFFFF; overflow-y: auto; }
+  .list-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid #111111; cursor: pointer; background: #FFFFFF; transition: background 0.1s; }
+  .list-row:hover { background: #F0F0F0; }
+  .list-street { font-size: 12px; color: #111111; font-weight: 500; }
+
+  #footer-row { padding: 12px 20px; font-size: 10px; letter-spacing: 0.06em; color: #6B6B6B; border-top: 1px solid #111111; background: #FFFFFF; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+  .last-updated-badge { font-weight: 600; color: #111111; letter-spacing: 0.08em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 4px; }
+  .last-updated-badge::before { content: "●"; font-size: 8px; color: #111111; }
+
+  .custom-marker-hitbox { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; transform: translate(-22px, -22px); }
+  .custom-marker-visual { min-width: 22px; height: 22px; padding: 0 4px; background: #111111; color: #FFFFFF; border: 1px solid #111111; font-family: 'Inter', system-ui, sans-serif; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; transition: transform 0.15s ease, background-color 0.15s ease; }
+  .custom-marker-hitbox:hover .custom-marker-visual, .custom-marker-hitbox:active .custom-marker-visual { transform: scale(1.15); background: #333333; }
+
+  #map-wrap { flex: 1; position: relative; background: #FFFFFF; }
   #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.6s ease; }
   #map.loaded { opacity: 1; }
 
-  #media-drawer { position: absolute; bottom: 0; left: 0; right: 0; height: 250px; background: #FFFFFF; border-top: 1px solid #111111; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); z-index: 20; display: flex; flex-direction: column; }
-  #media-drawer.open { transform: translateY(0); }
+  .pi-popup .mapboxgl-popup-content { background: #FFFFFF; border: 1px solid #111111; padding: 16px; font-family: 'Inter', system-ui, sans-serif; border-radius: 0; box-shadow: none; }
+  .pi-popup .mapboxgl-popup-tip { border-top-color: #FFFFFF !important; border-bottom-color: #FFFFFF !important; }
+  .pi-popup .mapboxgl-popup-close-button { font-size: 18px; color: #6B6B6B; padding: 4px 8px; outline: none; border: none; background: transparent; cursor: pointer; }
+  .pi-popup .mapboxgl-popup-close-button:hover { color: #111111; }
   
-  .drawer-header { padding: 10px 20px; border-bottom: 1px solid #111111; display: flex; justify-content: space-between; align-items: center; background: #FFFFFF; }
-  .drawer-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; }
-  .close-drawer { cursor: pointer; font-size: 16px; font-weight: bold; padding: 0 4px; color: #6B6B6B; }
-  .close-drawer:hover { color: #111111; }
-
-  .drawer-content { flex: 1; overflow-x: auto; display: flex; padding: 14px 20px; gap: 16px; align-items: center; }
-  .media-card { flex: 0 0 180px; height: 170px; border: 1px solid #111111; display: flex; flex-direction: column; background: #FFFFFF; text-decoration: none; color: inherit; overflow: hidden; transition: border-color 0.15s ease; }
-  .media-card:hover { border-color: #6B6B6B; }
-  .media-card img { width: 100%; height: 100px; object-fit: cover; border-bottom: 1px solid #111111; background: #F0F0F0; }
-  .media-card-info { padding: 8px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-  .media-card-title { font-size: 10px; font-weight: 600; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-  .media-card-action { font-size: 9px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.1em; color: #6B6B6B; }
-
-  #page-loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #FFFFFF; font-family: sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #6B6B6B; z-index: 9999; transition: opacity 0.4s ease; }
+  #page-loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #FFFFFF; font-family: sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #6B6B6B; z-index: 9999; transition: opacity 0.4s ease; }
   #page-loading.fade-out { opacity: 0; pointer-events: none; }
-
-  @media (max-width: 720px) {
-    #main-layout { flex-direction: column-reverse; }
-    #sidebar { width: 100%; height: 40vh; border-right: none; border-top: 1px solid #111111; }
-    #search-archive-text { display: none; }
-  }
 </style>
 </head>
 <body>
 
-<div id="page-loading">Loading spatial archive...</div>
+<div id="page-loading">Loading archive data...</div>
 
-<div id="app-root">
-  <div id="topbar">
+<div id="topbar">
+  <div id="search-row">
     <div id="geocoder"></div>
     <a id="search-archive-btn" href="https://photoindex.photodeck.com/" target="_top">
       <span id="search-archive-text">Search archive</span> →
     </a>
   </div>
+  <div id="chip-row">
+    <span id="chip-label">Filters</span>
+    <span id="chips-here"></span>
+  </div>
+</div>
 
-  <div id="main-layout">
-    <div id="sidebar">
-      <div class="sidebar-header">
-        <span>Faceted Filters</span>
-        <span class="scale-badge" id="scale-indicator">MACRO VIEW</span>
-      </div>
+<div class="mobile-tabs">
+  <button class="mobile-tab" id="tab-index" data-tab="index">Index</button>
+  <button class="mobile-tab active" id="tab-filters" data-tab="filters">Filters</button>
+  <button class="mobile-tab" id="tab-map" data-tab="map">Map</button>
+</div>
 
-      <div class="facet-group">
-        <div class="facet-title">Location / Suburb</div>
-        <div class="facet-list" id="suburb-facets"></div>
-      </div>
-
-      <div class="facet-group" id="micro-facets-wrapper">
-        <div class="facet-title">Micro Spatial Tags</div>
-        <div class="facet-list" id="micro-facets"></div>
-        <span id="micro-notice">Zoom in closer to street level to activate micro-tags</span>
-      </div>
-    </div>
-
-    <div id="map-container">
-      <div id="map"></div>
-
-      <div id="media-drawer">
-        <div class="drawer-header">
-          <span class="drawer-title" id="drawer-location-title">Select a location</span>
-          <span class="close-drawer" onclick="closeDrawer()">×</span>
+<div id="layout">
+  <div id="index-panel">
+    
+    <div class="panel-section-container" id="filters-group">
+      <!-- 0. MAP LAYERS (Planning status) -->
+      <div class="section">
+        <div class="section-label">Map Layers (Planning Status)</div>
+        <div class="filter-row" data-status="proposed">
+          <div style="display:flex;align-items:center;gap:9px;"><span class="swatch" style="background:#D1D1D1; border:1px solid #6B6B6B;"></span><span class="filter-label">Proposed</span></div>
+          <span class="filter-count" id="count-proposed">–</span>
         </div>
-        <div class="drawer-content" id="drawer-gallery"></div>
+        <div class="filter-row" data-status="under_construction">
+          <div style="display:flex;align-items:center;gap:9px;"><span class="swatch" style="background:#6B6B6B;"></span><span class="filter-label">Under Construction</span></div>
+          <span class="filter-count" id="count-under_construction">–</span>
+        </div>
+        <div class="filter-row" data-status="approved">
+          <div style="display:flex;align-items:center;gap:9px;"><span class="swatch" style="background:#111111;"></span><span class="filter-label">Approved</span></div>
+          <span class="filter-count" id="count-approved">–</span>
+        </div>
+      </div>
+
+      <!-- 1. LOCATION -->
+      <div class="acc-head open" data-target="acc-location">
+        <span class="acc-title">1. Location</span><span class="acc-icon">＋</span>
+      </div>
+      <div class="acc-body open" id="acc-location">
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="" checked> All Locations</label>
+        
+        <div class="sub-category-title">Inner North & CBD</div>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Brisbane City"> Brisbane City</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Spring Hill"> Spring Hill</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Fortitude Valley"> Fortitude Valley</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Newstead"> Newstead</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Teneriffe"> Teneriffe</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="New Farm"> New Farm</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Bowen Hills"> Bowen Hills</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Herston"> Herston</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Albion"> Albion</label>
+
+        <div class="sub-category-title">Inner West</div>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Milton"> Milton</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Paddington"> Paddington</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Red Hill"> Red Hill</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Kelvin Grove"> Kelvin Grove</label>
+
+        <div class="sub-category-title">Inner South</div>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="South Brisbane"> South Brisbane</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="West End"> West End</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Kangaroo Point"> Kangaroo Point</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Woolloongabba"> Woolloongabba</label>
+      </div>
+
+      <!-- 2. YEAR -->
+      <div class="acc-head" data-target="acc-year">
+        <span class="acc-title">2. Year</span><span class="acc-icon">＋</span>
+      </div>
+      <div class="acc-body" id="acc-year">
+        <label><input type="checkbox" class="filter-check" data-cat="year" value="2026"> 2026</label>
+        <label><input type="checkbox" class="filter-check" data-cat="year" value="2027"> 2027</label>
+        <label><input type="checkbox" class="filter-check" data-cat="year" value="2028"> 2028</label>
+        <label><input type="checkbox" class="filter-check" data-cat="year" value="2029"> 2029</label>
+        <label><input type="checkbox" class="filter-check" data-cat="year" value="2030"> 2030</label>
+        <label><input type="checkbox" class="filter-check" data-cat="year" value="2031"> 2031</label>
+        <label><input type="checkbox" class="filter-check" data-cat="year" value="2032"> 2032</label>
+        <label><input type="checkbox" class="filter-check" data-cat="year" value="2033"> 2033</label>
+      </div>
+
+      <!-- 3. DEVELOPMENT STATUS (Photos) -->
+      <div class="acc-head" data-target="acc-status">
+        <span class="acc-title">3. Development Status</span><span class="acc-icon">＋</span>
+      </div>
+      <div class="acc-body" id="acc-status">
+        <label><input type="checkbox" class="filter-check" data-cat="status" value="Existing"> Existing</label>
+        <label><input type="checkbox" class="filter-check" data-cat="status" value="Threatened / Scheduled"> Threatened / Scheduled</label>
+        <label><input type="checkbox" class="filter-check" data-cat="status" value="Under Construction"> Under Construction</label>
+        <label><input type="checkbox" class="filter-check" data-cat="status" value="Completed"> Completed</label>
+      </div>
+
+      <!-- 4. TYPOLOGY -->
+      <div class="acc-head" data-target="acc-typology">
+        <span class="acc-title">4. Typology</span><span class="acc-icon">＋</span>
+      </div>
+      <div class="acc-body" id="acc-typology">
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Residential"> Residential</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Heritage & Traditional Housing"> Heritage & Traditional Housing</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Commercial & Retail"> Commercial & Retail</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Public & Civic"> Public & Civic</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Industrial"> Industrial</label>
+
+        <div class="sub-category-title">Facade Material</div>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="glass facade"> glass facade</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="brick facade"> brick facade</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="concrete facade"> concrete facade</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="timber facade"> timber facade</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="metal facade"> metal facade</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="stone facade"> stone facade</label>
+      </div>
+
+      <!-- 5. URBAN CONTEXT -->
+      <div class="acc-head" data-target="acc-urban">
+        <span class="acc-title">5. Urban Context</span><span class="acc-icon">＋</span>
+      </div>
+      <div class="acc-body" id="acc-urban">
+        <div class="sub-category-title">Transformation & 2032</div>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="Urban Renewal"> Urban Renewal</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="Construction Impact"> Construction Impact</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="Riverfront"> Riverfront</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="Brisbane 2032"> Brisbane 2032</label>
+
+        <div class="sub-category-title">Public Elements</div>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="pedestrian zone"> pedestrian zone</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="arcade"> arcade</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="public art"> public art</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="outdoor dining"> outdoor dining</label>
       </div>
     </div>
+
+    <div id="index-group" style="display:none; flex:1; overflow-y:auto; flex-direction:column; background:#FFFFFF;">
+      <div id="list-wrap" style="flex:1;"></div>
+      <div id="footer-row">
+        <span id="archive-count">Loading statistics...</span>
+        <span class="last-updated-badge">BNE URBAN</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="map-wrap">
+    <div id="map"></div>
   </div>
 </div>
 
 <script>
 mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
 
-var mediaArchive = [];
-var activeFilters = { suburb: null, micro: [], search: '' };
-var markersMap = [];
+// SŁOWNIK MAPOWANIA (Filter Dictionary)
+const filterMapping = {
+  'Existing': ['existing condition', 'before change'],
+  'Threatened / Scheduled': ['threatened building', 'scheduled demolition', 'pre construction', 'development site', 'vacant site'],
+  'Under Construction': ['under construction', 'demolition in progress', 'ongoing change'],
+  'Completed': ['completed development', 'post demolition', 'after change'],
+  
+  'Residential': ['residential building', 'residential tower', 'apartment building', 'mixed use building', 'social housing', 'student housing'],
+  'Heritage & Traditional Housing': ['heritage building', 'queenslander', 'highset house', 'lowset house', 'workers cottage', 'post war house', 'terrace house', 'duplex'],
+  'Commercial & Retail': ['commercial building', 'retail building', 'office building', 'hospitality building'],
+  'Public & Civic': ['public building', 'civic building'],
+  'Industrial': ['industrial building', 'warehouse', 'parking structure'],
+  
+  'glass facade': ['glass facade'], 'brick facade': ['brick facade'], 'concrete facade': ['concrete facade'], 
+  'timber facade': ['timber facade'], 'metal facade': ['metal facade'], 'stone facade': ['stone facade'],
+  
+  'Urban Renewal': ['urban renewal', 'urban development', 'urban intensification', 'urban consolidation'],
+  'Construction Impact': ['construction impact', 'site hoarding', 'temporary fencing', 'scaffolding'],
+  'Riverfront': ['riverfront', 'waterfront'],
+  'Brisbane 2032': ['olympic venue', 'olympic precinct', 'olympic infrastructure', 'athlete village', 'transport upgrade', 'legacy project', 'temporary structure'],
+  
+  'pedestrian zone': ['pedestrian zone'], 'arcade': ['arcade'], 'public art': ['public art'], 'outdoor dining': ['outdoor dining']
+};
+
+var locations = [];
+var projects = { type: 'FeatureCollection', features: [] };
+var lastMarkerClickAt = 0;
+
+var searchState = { suburb: '', years: [], extraFilters: [] };
+var layerState = { proposed: true, under_construction: true, approved: true };
 
 var map = new mapboxgl.Map({
   container: 'map',
   style: 'mapbox://styles/mapbox/light-v11',
-  center: [153.0281, -27.4580],
-  zoom: 12.5
+  center: [153.0307, -27.4598],
+  zoom: 13
 });
 map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
 
@@ -139,237 +307,358 @@ var geocoder = new MapboxGeocoder({
   accessToken: mapboxgl.accessToken,
   mapboxgl: mapboxgl,
   marker: false,
-  placeholder: 'Search address, place or keyword…',
+  placeholder: 'Search address or place…',
   countries: 'au',
-  flyTo: true
+  bbox: [152.85, -27.65, 153.25, -27.25],
+  flyTo: false
 });
 document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
 
-geocoder.on('result', function(e) {
-  if (e.result && e.result.text) {
-    activeFilters.search = e.result.text.toLowerCase();
-    applyFacetedFilter();
+function frameArea(center, bbox) {
+  if (bbox) {
+    map.fitBounds(bbox, { padding: 60, duration: 1200, maxZoom: 14.5, essential: true });
+  } else {
+    var buffered = turf.buffer(turf.point(center), 0.2, { units: 'kilometers' });
+    map.fitBounds(turf.bbox(buffered), { padding: 60, duration: 1200, maxZoom: 14.5, essential: true });
   }
-});
+}
 
-geocoder.on('clear', function() {
-  activeFilters.search = '';
-  applyFacetedFilter();
-});
-
-// Zabezpieczony mechanizm ładowania danych
-Papa.parse('media.csv', {
-  download: true,
-  header: true,
-  delimiter: ';',
-  skipEmptyLines: true,
-  complete: function(results) {
-    if (results.data && results.data.length > 0) {
-      mediaArchive = processRawData(results.data);
-    } else {
-      loadFallbackDemoData();
+geocoder.on('result', function (e) {
+  if (window.innerWidth <= 720) {
+    var mapTab = document.getElementById('tab-map');
+    if (mapTab) mapTab.click();
+  }
+  
+  if (e.result.place_type && e.result.place_type.some(t => t === 'place' || t === 'locality' || t === 'neighborhood')) {
+    frameArea(e.result.center, e.result.bbox);
+    var suburbName = e.result.text || '';
+    var matchedBox = null;
+    document.querySelectorAll('.suburb-check').forEach(cb => {
+      if (cb.value.toLowerCase() === suburbName.toLowerCase()) matchedBox = cb;
+    });
+    if (matchedBox) {
+      matchedBox.checked = true;
+      searchState.suburb = matchedBox.value;
+      updatePhotoDeckLink();
+      applySearchState();
     }
-    startApp();
-  },
-  error: function() {
-    console.warn("Plik media.csv niedostępny bezpośrednio. Uruchamianie danych demonstracyjnych.");
-    loadFallbackDemoData();
-    startApp();
+  } else {
+    map.flyTo({ center: e.result.center, zoom: 16 });
   }
 });
 
-function processRawData(data) {
-  return data.map((row, idx) => {
-    var rawTags = row.keywords ? row.keywords.split(',').map(t => t.trim()).filter(Boolean) : [];
-    var lng = parseFloat(row.lng);
-    var lat = parseFloat(row.lat);
-    var loc = row.location || row.city || row.suburb || 'Brisbane City';
-    
-    return {
-      id: row.uuid || 'rec-' + idx,
-      title: row.title || row.file_name || 'Documented Space',
-      suburb: loc,
-      tags: rawTags,
-      coords: (!isNaN(lng) && !isNaN(lat)) ? [lng, lat] : getFallbackCoords(loc),
-      thumb: row.thumb_url || 'https://via.placeholder.com/180x100/111111/FFFFFF?text=PhotoIndex',
-      url: 'https://photoindex.photodeck.com/'
-    };
+Promise.all([
+  fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/locations.csv?t=' + Date.now()).then(r => r.text()).catch(() => ''),
+  fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban/main/brisbane-development.geojson?t=' + Date.now()).then(r => r.json()).catch(() => ({ type: 'FeatureCollection', features: [] }))
+]).then(function ([csvText, geojson]) {
+  if (csvText) {
+    var lines = csvText.trim().split('\n');
+    var headers = lines[0].split(',');
+    locations = lines.slice(1).map(line => {
+      var cols = [];
+      let cur = '', inQ = false;
+      for (let c of line) {
+        if (c === '"') inQ = !inQ;
+        else if (c === ',' && !inQ) { cols.push(cur); cur = ''; }
+        else cur += c;
+      }
+      cols.push(cur);
+      var row = {};
+      headers.forEach((h, i) => row[h.trim()] = (cols[i] || '').trim());
+
+      return {
+        ref: row.ref || 'PX.26.000',
+        street: row.address || row.street || 'Unnamed location',
+        suburb: row.suburb || 'Brisbane City',
+        count: row.count ? parseInt(row.count) : 1,
+        coords: [parseFloat(row.lng), parseFloat(row.lat)],
+        archiveUrl: row.archiveUrl || '#'
+      };
+    }).filter(l => !isNaN(l.coords[0]) && !isNaN(l.coords[1]));
+  }
+
+  if (geojson && geojson.features) projects = geojson;
+
+  projects.features.forEach(feature => {
+    var matches = locations.filter(loc => turf.booleanPointInPolygon(turf.point(loc.coords), feature));
+    if (matches.length > 0) {
+      feature.properties.documentedRef = matches.map(m => m.ref).join(', ');
+      feature.properties.documentedStreet = [...new Set(matches.map(m => m.street))].join(' & ');
+      matches.forEach(match => { match.projectStatus = feature.properties.status; });
+    }
   });
-}
 
-function loadFallbackDemoData() {
-  mediaArchive = [
-    { id: 'd1', title: '300 North Quay Project', suburb: 'Brisbane City', tags: ['concrete facade', 'under construction', 'residential tower'], coords: [153.021, -27.468], thumb: 'https://via.placeholder.com/180x100/111111/FFFFFF?text=North+Quay', url: 'https://photoindex.photodeck.com/' },
-    { id: 'd2', title: 'Ann Street Commercial Development', suburb: 'Fortitude Valley', tags: ['glass facade', 'pedestrian zone', 'commercial'], coords: [153.035, -27.456], thumb: 'https://via.placeholder.com/180x100/111111/FFFFFF?text=Ann+Street', url: 'https://photoindex.photodeck.com/' },
-    { id: 'd3', title: 'South Bank Public Realm Expansion', suburb: 'South Brisbane', tags: ['public art', 'pedestrian zone', 'riverfront'], coords: [153.020, -27.475], thumb: 'https://via.placeholder.com/180x100/111111/FFFFFF?text=South+Bank', url: 'https://photoindex.photodeck.com/' }
-  ];
-}
-
-function getFallbackCoords(locStr) {
-  if (!locStr) return [153.0281, -27.4580];
-  var s = locStr.toLowerCase();
-  if (s.includes('valley')) return [153.035, -27.456];
-  if (s.includes('south')) return [153.020, -27.475];
-  if (s.includes('west end')) return [153.012, -27.482];
-  return [153.0281, -27.4580];
-}
-
-function startApp() {
-  initFacetedSystem();
+  initMapEverything();
+  
   var loadingEl = document.getElementById('page-loading');
   if (loadingEl) {
     loadingEl.classList.add('fade-out');
     setTimeout(() => loadingEl.style.display = 'none', 400);
   }
-}
+});
 
-function initFacetedSystem() {
-  buildFacetedUI();
-
+function initMapEverything() {
   function setupMap() {
     document.getElementById('map').classList.add('loaded');
-    renderMarkers(mediaArchive);
 
-    map.on('zoom', function() {
-      var z = map.getZoom();
-      var indicator = document.getElementById('scale-indicator');
-      if (z >= 14) {
-        document.body.classList.add('micro-scale');
-        indicator.textContent = 'MICRO / STREET';
-      } else {
-        document.body.classList.remove('micro-scale');
-        indicator.textContent = 'MACRO VIEW';
+    var style = map.getStyle();
+    style.layers.forEach(l => {
+      try {
+        if (l.type === 'background') map.setPaintProperty(l.id, 'background-color', '#FFFFFF');
+        else if (l.type === 'fill') {
+          map.setPaintProperty(l.id, 'fill-color', /water/i.test(l.id) ? '#E4E4E0' : '#FFFFFF');
+          if (map.getPaintProperty(l.id, 'fill-outline-color') !== undefined) map.setPaintProperty(l.id, 'fill-outline-color', '#111111');
+        } else if (l.type === 'fill-extrusion') {
+          map.setPaintProperty(l.id, 'fill-extrusion-color', '#E4E4E0');
+        } else if (l.type === 'line') {
+          map.setPaintProperty(l.id, 'line-color', /motorway|trunk|primary/i.test(l.id) ? '#111111' : '#DADADA');
+        } else if (l.type === 'symbol') {
+          if (map.getPaintProperty(l.id, 'text-color') !== undefined) {
+            map.setPaintProperty(l.id, 'text-color', '#111111');
+            map.setPaintProperty(l.id, 'text-halo-color', '#FFFFFF');
+            map.setPaintProperty(l.id, 'text-halo-width', 1);
+          }
+          if (map.getPaintProperty(l.id, 'icon-color') !== undefined) map.setPaintProperty(l.id, 'icon-opacity', 0);
+        }
+      } catch (e) {}
+    });
+
+    map.addSource('projects', { type: 'geojson', data: projects });
+
+    map.addLayer({
+      id: 'projects-fill', type: 'fill', source: 'projects', minzoom: 13.5,
+      paint: {
+        'fill-color': ['match', ['get', 'status'], 'approved', '#111111', 'under_construction', '#6B6B6B', 'proposed', '#D1D1D1', '#D1D1D1'],
+        'fill-opacity': ['match', ['get', 'status'], 'approved', 0.65, 'under_construction', 0.50, 'proposed', 0.35, 0.35]
+      }
+    });
+    
+    map.addLayer({
+      id: 'projects-line', type: 'line', source: 'projects', minzoom: 13.5,
+      paint: { 
+        'line-color': ['match', ['get', 'status'], 'approved', '#111111', 'under_construction', '#6B6B6B', 'proposed', '#6B6B6B', '#6B6B6B'], 
+        'line-width': 1 
       }
     });
 
-    map.on('moveend', updateAvailableFacets);
-  }
+    var activePopup = null;
+    window.piCloseAllPopups = function() {
+      if (activePopup) { activePopup.remove(); activePopup = null; }
+    };
 
-  if (map.loaded()) {
-    setupMap();
-  } else {
-    map.on('load', setupMap);
-  }
-}
+    locations.forEach((loc, index) => {
+      var el = document.createElement('div');
+      el.className = 'custom-marker-hitbox';
+      el.innerHTML = '<div class="custom-marker-visual">' + loc.count + '</div>';
 
-function buildFacetedUI() {
-  var suburbs = [...new Set(mediaArchive.map(m => m.suburb))].sort();
-  var suburbContainer = document.getElementById('suburb-facets');
-  suburbContainer.innerHTML = suburbs.map(sub => 
-    `<div class="facet-tag" data-suburb="${sub}" onclick="toggleSuburb('${sub}')">${sub}</div>`
-  ).join('');
+      var popupHtml =
+        '<div style="min-width:180px;">' +
+          '<div style="font-size:14px;color:#111111;margin-bottom:4px;font-weight:600;">' + loc.street + '</div>' +
+          '<div style="font-size:11px;color:#6B6B6B;margin-bottom:12px;">' + loc.count + (loc.count === 1 ? ' photo documented' : ' photos documented') + '</div>' +
+          '<a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:#111;color:#fff;padding:10px;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;">VIEW PHOTOS →</a>' +
+        '</div>';
 
-  var allTags = [...new Set(mediaArchive.flatMap(m => m.tags))].sort();
-  var microContainer = document.getElementById('micro-facets');
-  microContainer.innerHTML = allTags.slice(0, 20).map(tag => 
-    `<div class="facet-tag" data-micro="${tag}" onclick="toggleMicro('${tag}')">${tag}</div>`
-  ).join('');
-}
-
-function renderMarkers(items) {
-  markersMap.forEach(m => m.remove());
-  markersMap = [];
-
-  items.forEach(item => {
-    var el = document.createElement('div');
-    el.style.width = '12px';
-    el.style.height = '12px';
-    el.style.backgroundColor = '#111111';
-    el.style.cursor = 'pointer';
-    el.style.border = '1px solid #FFFFFF';
-
-    var marker = new mapboxgl.Marker(el)
-      .setLngLat(item.coords)
-      .addTo(map);
-
-    el.addEventListener('click', (e) => {
-      e.stopPropagation();
-      openDrawerForLocation(item.suburb, item.coords);
+      loc.popup = new mapboxgl.Popup({ offset: 14, closeButton: true, className: 'pi-popup' }).setHTML(popupHtml);
+      loc.marker = new mapboxgl.Marker({ element: el }).setLngLat(loc.coords).addTo(map);
+      
+      el.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        lastMarkerClickAt = Date.now();
+        window.piCloseAllPopups();
+        loc.popup.setLngLat(loc.coords).addTo(map);
+        activePopup = loc.popup;
+      });
     });
 
-    markersMap.push(marker);
+    map.on('mouseenter', 'projects-fill', () => map.getCanvas().style.cursor = 'pointer');
+    map.on('mouseleave', 'projects-fill', () => map.getCanvas().style.cursor = '');
+
+    map.on('click', 'projects-fill', (e) => {
+      if (Date.now() - lastMarkerClickAt < 80) return;
+      var props = e.features[0].properties;
+      var statusFormatted = props.status === 'under_construction' ? 'Under construction' : (props.status ? props.status.charAt(0).toUpperCase() + props.status.slice(1) : 'Proposed');
+
+      var html =
+        '<div style="min-width:180px;">' +
+          '<div style="font-size:10px;letter-spacing:0.08em;color:#6B6B6B;text-transform:uppercase;margin-bottom:4px;">Map Layer Object</div>' +
+          '<div style="font-size:14px;color:#111111;font-weight:600;margin-bottom:8px;">' + statusFormatted + (props.name ? ' — ' + props.name : '') + '</div>' +
+          (props.documentedStreet ? '<div style="font-size:11px;color:#111111;border-top:1px solid #111111;padding-top:8px;margin-top:8px;">Photos linked: ' + props.documentedStreet + '</div>' : '') +
+        '</div>';
+      
+      window.piCloseAllPopups();
+      activePopup = new mapboxgl.Popup({ offset: 8, closeButton: true, className: 'pi-popup' }).setLngLat(e.lngLat).setHTML(html).addTo(map);
+    });
+
+    renderList();
+    applySearchState();
+    applyLayerState();
+  }
+
+  if (map.loaded()) setupMap(); else map.on('load', setupMap);
+}
+
+function applyLayerState() {
+  var expr = ['any'];
+  Object.keys(layerState).forEach(k => { if (layerState[k]) expr.push(['==', ['get', 'status'], k]); });
+  if (map.getLayer('projects-fill')) {
+    map.setFilter('projects-fill', expr.length > 1 ? expr : ['==', ['get', 'status'], '__none__']);
+    map.setFilter('projects-line', expr.length > 1 ? expr : ['==', ['get', 'status'], '__none__']);
+  }
+  ['proposed', 'under_construction', 'approved'].forEach(s => {
+    var n = projects.features.filter(f => f.properties.status === s).length;
+    var el = document.getElementById('count-' + s);
+    if (el) el.textContent = n;
   });
 }
 
-function toggleSuburb(suburb) {
-  activeFilters.suburb = (activeFilters.suburb === suburb) ? null : suburb;
-  document.querySelectorAll('#suburb-facets .facet-tag').forEach(el => {
-    el.classList.toggle('active', el.getAttribute('data-suburb') === activeFilters.suburb);
-  });
-  applyFacetedFilter();
-}
-
-function toggleMicro(tag) {
-  var idx = activeFilters.micro.indexOf(tag);
-  if (idx > -1) activeFilters.micro.splice(idx, 1);
-  else activeFilters.micro.push(tag);
-
-  document.querySelectorAll('#micro-facets .facet-tag').forEach(el => {
-    var val = el.getAttribute('data-micro');
-    el.classList.toggle('active', activeFilters.micro.includes(val));
-  });
-
-  applyFacetedFilter();
-}
-
-function applyFacetedFilter() {
-  var filtered = mediaArchive.filter(item => {
-    var matchSub = !activeFilters.suburb || item.suburb === activeFilters.suburb;
-    var matchMicro = activeFilters.micro.length === 0 || activeFilters.micro.every(t => item.tags.includes(t));
-    var matchSearch = !activeFilters.search || 
-      item.title.toLowerCase().includes(activeFilters.search) ||
-      item.suburb.toLowerCase().includes(activeFilters.search) ||
-      item.tags.some(t => t.toLowerCase().includes(activeFilters.search));
-
-    return matchSub && matchMicro && matchSearch;
-  });
-
-  renderMarkers(filtered);
-  updateAvailableFacets();
-}
-
-function updateAvailableFacets() {
-  var bounds = map.getBounds();
-  var visibleMedia = mediaArchive.filter(m => bounds.contains(m.coords));
-  var visibleSuburbs = new Set(visibleMedia.map(m => m.suburb));
-  var visibleTags = new Set(visibleMedia.flatMap(m => m.tags));
-
-  document.querySelectorAll('#suburb-facets .facet-tag').forEach(el => {
-    var sub = el.getAttribute('data-suburb');
-    el.classList.toggle('disabled', !visibleSuburbs.has(sub));
-  });
-
-  document.querySelectorAll('#micro-facets .facet-tag').forEach(el => {
-    var tag = el.getAttribute('data-micro');
-    el.classList.toggle('disabled', !visibleTags.has(tag));
-  });
-}
-
-function openDrawerForLocation(suburbName, coords) {
-  var drawer = document.getElementById('media-drawer');
-  var title = document.getElementById('drawer-location-title');
-  var gallery = document.getElementById('drawer-gallery');
-
-  var matches = mediaArchive.filter(m => m.suburb === suburbName);
-  title.textContent = `${suburbName} — ${matches.length} Media Records`;
+function updatePhotoDeckLink() {
+  var queryParts = [];
   
-  gallery.innerHTML = matches.map(m => `
-    <a href="${m.url}" target="_top" class="media-card">
-      <img src="${m.thumb}" alt="${m.title}">
-      <div class="media-card-info">
-        <div class="media-card-title">${m.title}</div>
-        <div class="media-card-action">View Archive →</div>
-      </div>
-    </a>
-  `).join('');
+  if (searchState.suburb) queryParts.push('"' + searchState.suburb + '"');
+  if (searchState.years.length > 0) queryParts.push('(' + searchState.years.join(' OR ') + ')');
+  
+  searchState.extraFilters.forEach(f => {
+    var mappedTags = filterMapping[f];
+    if (mappedTags && mappedTags.length > 1) {
+      queryParts.push('("' + mappedTags.join('" OR "') + '")');
+    } else if (mappedTags && mappedTags.length === 1) {
+      queryParts.push('"' + mappedTags[0] + '"');
+    } else {
+      queryParts.push('"' + f + '"');
+    }
+  });
 
-  drawer.classList.add('open');
-  map.flyTo({ center: coords, zoom: 15 });
+  var queryStr = queryParts.join(' ');
+  var btn = document.getElementById('search-archive-btn');
+  if (btn) btn.href = queryStr ? 'https://photoindex.photodeck.com/?search=' + encodeURIComponent(queryStr) : 'https://photoindex.photodeck.com/';
 }
 
-function closeDrawer() {
-  document.getElementById('media-drawer').classList.remove('open');
+function applySearchState() {
+  var visibleLocs = locations.filter(loc => !searchState.suburb || loc.suburb.toLowerCase() === searchState.suburb.toLowerCase());
+  locations.forEach(loc => {
+    if (loc.marker) loc.marker.getElement().style.display = visibleLocs.includes(loc) ? '' : 'none';
+  });
+  renderList(visibleLocs);
+  renderChips();
+  updatePhotoDeckLink();
+  document.getElementById('archive-count').textContent = visibleLocs.length + ' locations displayed';
+}
+
+function renderList(items) {
+  var wrap = document.getElementById('list-wrap');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  (items || locations).slice(0, 100).forEach(loc => {
+    var row = document.createElement('div');
+    row.className = 'list-row';
+    row.innerHTML = '<div class="list-street">' + loc.street + '</div>';
+    row.addEventListener('click', () => {
+      if (window.innerWidth <= 720) document.getElementById('tab-map').click();
+      map.flyTo({ center: loc.coords, zoom: 15 });
+      if (window.piCloseAllPopups) window.piCloseAllPopups();
+      if (loc.popup) loc.popup.setLngLat(loc.coords).addTo(map);
+    });
+    wrap.appendChild(row);
+  });
+}
+
+function renderChips() {
+  var chips = [];
+  if (searchState.suburb) chips.push({ label: searchState.suburb, clear: () => { searchState.suburb = ''; document.querySelectorAll('.suburb-check').forEach(cb => cb.checked = (cb.value === '')); applySearchState(); } });
+  searchState.years.forEach(y => chips.push({ label: y, clear: () => { toggleValue(searchState.years, y); syncCheckbox(`.filter-check[data-cat="year"]`, y, false); applySearchState(); } }));
+  searchState.extraFilters.forEach(f => chips.push({ label: f, clear: () => { toggleValue(searchState.extraFilters, f); syncCheckbox(`.filter-check:not([data-cat="year"])`, f, false); applySearchState(); } }));
+
+  var host = document.getElementById('chips-here');
+  var chipRow = document.getElementById('chip-row');
+  if (!host || !chipRow) return;
+
+  host.innerHTML = '';
+  if (chips.length > 0) {
+    chipRow.classList.add('has-search');
+    chips.forEach(c => {
+      var span = document.createElement('span');
+      span.className = 'chip';
+      span.innerHTML = '<span>' + c.label + '</span><span>×</span>';
+      span.addEventListener('click', c.clear);
+      host.appendChild(span);
+    });
+  } else {
+    chipRow.classList.remove('has-search');
+  }
+}
+
+function toggleValue(arr, val) {
+  var i = arr.indexOf(val);
+  if (i === -1) arr.push(val); else arr.splice(i, 1);
+}
+function syncCheckbox(sel, val, checked) {
+  document.querySelectorAll(sel).forEach(cb => { if (cb.value === val) cb.checked = checked; });
+}
+
+document.querySelectorAll('.filter-row').forEach(row => {
+  row.addEventListener('click', function () {
+    var status = this.getAttribute('data-status');
+    layerState[status] = !layerState[status];
+    this.classList.toggle('off', !layerState[status]);
+    applyLayerState();
+  });
+});
+
+document.querySelectorAll('.acc-head').forEach(h => {
+  h.addEventListener('click', function () {
+    this.classList.toggle('open');
+    var body = document.getElementById(this.getAttribute('data-target'));
+    if (body) body.classList.toggle('open');
+  });
+});
+
+document.querySelectorAll('.filter-check').forEach(cb => {
+  cb.addEventListener('change', function () {
+    if (this.getAttribute('data-cat') === 'year') toggleValue(searchState.years, this.value);
+    else toggleValue(searchState.extraFilters, this.value);
+    applySearchState();
+  });
+});
+
+document.querySelectorAll('.suburb-check').forEach(cb => {
+  cb.addEventListener('change', function () {
+    if (window.piCloseAllPopups) window.piCloseAllPopups();
+    searchState.suburb = this.value;
+    applySearchState();
+    if (this.value) {
+      fetch('https://api.mapbox.com/geocoding/v5/mapbox.places/' + encodeURIComponent(this.value + ', Brisbane, Australia') + '.json?access_token=' + mapboxgl.accessToken + '&country=au&types=place,locality,neighborhood&limit=1')
+        .then(r => r.json()).then(data => { if (data.features && data.features[0]) frameArea(data.features[0].center, data.features[0].bbox); });
+      if (window.innerWidth <= 720) document.getElementById('tab-map').click();
+    }
+  });
+});
+
+var tabs = { 'tab-index': 'index-group', 'tab-filters': 'filters-group', 'tab-map': 'map-wrap' };
+Object.keys(tabs).forEach(tabId => {
+  var btn = document.getElementById(tabId);
+  if (!btn) return;
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.mobile-tabs .mobile-tab').forEach(t => t.classList.remove('active'));
+    this.classList.add('active');
+
+    var isMap = tabId === 'tab-map';
+    document.getElementById('index-panel').style.display = isMap ? 'none' : 'flex';
+    document.getElementById('map-wrap').classList.toggle('mobile-active', isMap);
+    
+    if (!isMap) {
+      document.getElementById('index-group').style.display = tabId === 'tab-index' ? 'flex' : 'none';
+      document.getElementById('filters-group').style.display = tabId === 'tab-filters' ? 'flex' : 'none';
+    } else {
+      setTimeout(() => map.resize(), 50);
+    }
+  });
+});
+
+if (window.innerWidth <= 720) {
+  var tf = document.getElementById('tab-filters');
+  if (tf) tf.click();
 }
 </script>
+
 </body>
 </html>
