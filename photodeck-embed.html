@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>PhotoIndex — Archive & Map Explorer</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet">
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
 <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" rel="stylesheet">
@@ -18,11 +18,11 @@
   #topbar { border-bottom: 1px solid #111111; background: #FFFFFF; flex-shrink: 0; }
   #search-row { display: flex; align-items: center; height: 56px; padding: 0 20px; gap: 12px; }
   #geocoder { flex: 1; }
-  #geocoder .mapboxgl-ctrl-geocoder { width: 100%; max-width: none; font-family: inherit; box-shadow: none; background: #FFFFFF; }
-  #geocoder .mapboxgl-ctrl-geocoder input { height: 36px; font-size: 13px; color: #111111; font-family: inherit; background: #FFFFFF; }
+  #geocoder .mapboxgl-ctrl-geocoder { width: 100%; max-width: none; font-family: 'Inter', system-ui, sans-serif; box-shadow: none; background: #FFFFFF; }
+  #geocoder .mapboxgl-ctrl-geocoder input { height: 36px; font-size: 13px; color: #111111; font-family: 'Inter', system-ui, sans-serif; background: #FFFFFF; }
   #geocoder .mapboxgl-ctrl-geocoder--icon-search { fill: #111111; top: 9px; }
   
-  #search-archive-btn { height: 36px; padding: 0 16px; border: 1px solid #111111; background: #111111; color: #FFFFFF; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 6px; text-decoration: none; flex-shrink: 0; transition: background 0.15s; }
+  #search-archive-btn { height: 36px; padding: 0 16px; border: 1px solid #111111; background: #111111; color: #FFFFFF; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: 'Inter', system-ui, sans-serif; cursor: pointer; display: flex; align-items: center; gap: 6px; text-decoration: none; flex-shrink: 0; transition: background 0.15s; }
   #search-archive-btn:hover { background: #333333; }
 
   #chip-row { display: flex; align-items: center; padding: 10px 20px; flex-wrap: wrap; min-height: 20px; background: #FFFFFF; border-bottom: 1px solid #111111; }
@@ -35,7 +35,7 @@
   #layout { width: 100%; flex: 1; min-height: 0; background: #FFFFFF; position: relative; overflow: hidden; }
 
   .mobile-tabs { display: none; border-bottom: 1px solid #111111; background: #FFFFFF; flex-shrink: 0; }
-  .mobile-tab { flex: 1; height: 44px; border: none; border-right: 1px solid #111111; background: #FFFFFF; color: #111111; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; cursor: pointer; }
+  .mobile-tab { flex: 1; height: 44px; border: none; border-right: 1px solid #111111; background: #FFFFFF; color: #111111; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: 'Inter', system-ui, sans-serif; cursor: pointer; }
   .mobile-tab:last-child { border-right: none; }
   .mobile-tab.active { background: #111111; color: #FFFFFF; }
 
@@ -70,7 +70,7 @@
   #index-panel::-webkit-scrollbar { display: none; }
   .panel-section-container { display: flex; flex-direction: column; }
   
-  /* 0. SEKCJA MAP LAYERS */
+  /* MAP LAYERS */
   .section { 
     padding: 20px 24px 16px 24px; 
     border-bottom: 1px solid #111111; 
@@ -142,19 +142,24 @@
     color: #111111; 
   }
   
-  /* SUBTELNY, SMUKŁY PLUSIK */
+  /* PLUSIK W FONCIE INTER */
   .acc-icon { 
-    font-size: 15px; 
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 18px; 
+    font-weight: 300;
     color: #111111; 
-    font-weight: 300; /* Zmniejszona grubość */
-    font-family: Arial, sans-serif; /* Lżejsze renderowanie znaku + */
     line-height: 1;
-    display: inline-block;
-    transform-origin: center;
-    transition: transform 0.2s ease; 
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    opacity: 0.8;
+    transition: transform 0.2s ease, opacity 0.2s ease; 
   }
   .acc-head.open .acc-icon { 
     transform: rotate(45deg); 
+    opacity: 1;
   }
   
   /* ZAWARTOŚĆ AKORDEONU */
@@ -224,12 +229,10 @@
   .pi-popup .mapboxgl-popup-close-button { font-size: 18px; color: #111111; padding: 4px 8px; outline: none; border: none; background: transparent; cursor: pointer; }
   .pi-popup .mapboxgl-popup-close-button:hover { color: #111111; }
   
-  #page-loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #FFFFFF; font-family: sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #111111; z-index: 9999; transition: opacity 0.5s ease-in-out; }
+  #page-loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #FFFFFF; font-family: 'Inter', system-ui, sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #111111; z-index: 9999; transition: opacity 0.5s ease-in-out; }
   #page-loading.fade-out { opacity: 0; pointer-events: none; }
 
-  /* ==========================================
-     RECENTLY ADDED — JASNY I SUBTELNY STYL
-     ========================================== */
+  /* RECENTLY ADDED */
   #recent-strip { 
     display: none; 
     flex-direction: column; 
@@ -472,7 +475,6 @@ fetch(RECENT_PHOTOS_URL + '?t=' + Date.now())
     });
     if (!photos.length) return;
 
-    // --- WYCENTROWANIE MAPY NA MOBILCE DLA OSTATNIO DODANYCH LOKALIZACJI ---
     if (window.innerWidth <= 720) {
       var recentCoords = [];
       photos.forEach(p => {
@@ -902,7 +904,6 @@ Object.keys(tabs).forEach(tabId => {
   });
 });
 
-/* DOMYŚLNE OTWIERANIE MAPY NA MOBILKACH */
 if (window.innerWidth <= 720) {
   var tm = document.getElementById('tab-map');
   if (tm) tm.click();
