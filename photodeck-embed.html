@@ -82,37 +82,33 @@
   /* PRZYCISK PRZYPIĘTY NA DOLE MOBILNYM (THUMB BAR) */
   #mobile-bottom-bar { display: none; }
 
-  @media (max-width: 720px) {
-    #topbar { border-bottom: none; }
-    #search-row { border-bottom: 1px solid #111111; padding: 0 12px; }
-    
-    #search-archive-btn { display: none !important; }
-    
-    .mobile-tabs { display: flex !important; }
-    #index-panel { width: 100% !important; height: 100% !important; border-right: none !important; border-bottom: none !important; }
-    #map-wrap { display: none; }
-    #map-wrap.mobile-active { display: block !important; }
-    #context-bar { display: none; }
+ /* Czarny pasek domyślnie ukryty na desktopie */
+#mobile-bottom-bar { 
+  display: none !important; 
+}
 
-    #mobile-bottom-bar {
-      display: flex;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 48px;
-      background: #111111;
-      color: #FFFFFF;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      text-decoration: none;
-      z-index: 999;
-      border-top: 1px solid #111111;
-    }
+/* Pojawia się TYLKO na ekranach smartfonów (do 720px) */
+@media (max-width: 720px) {
+  #mobile-bottom-bar {
+    display: flex !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 48px;
+    background: #111111;
+    color: #FFFFFF;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    z-index: 9999;
+    border-top: 1px solid #111111;
+  }
+}
   }
 
   /* PANEL BOCZNY */
