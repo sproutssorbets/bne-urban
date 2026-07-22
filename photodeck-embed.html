@@ -77,13 +77,14 @@
 
   #layout { width: 100%; flex: 1; min-height: 0; background: #FFFFFF; position: relative; overflow: hidden; }
 
+  /* ZAKŁADKI MOBILNE */
   .mobile-tabs { display: none; border-bottom: 1px solid #111111; background: #FFFFFF; flex-shrink: 0; }
   .mobile-tab { flex: 1; height: 40px; border: none; border-right: 1px solid #111111; background: #FFFFFF; color: #111111; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: 'Inter', system-ui, sans-serif; cursor: pointer; }
   .mobile-tab:last-child { border-right: none; }
   .mobile-tab.active { background: #111111; color: #FFFFFF; }
 
   @media (max-width: 720px) {
-    .mobile-tabs { display: flex; }
+    .mobile-tabs { display: flex !important; }
     #index-panel { width: 100% !important; height: 100% !important; border-right: none !important; border-bottom: none !important; }
     #map-wrap { display: none; }
     #map-wrap.mobile-active { display: block !important; }
@@ -218,6 +219,14 @@
       </svg>
     </a>
   </div>
+
+  <!-- ZAKŁADKI MOBILNE WEWNĄTRZ TOPBARA -->
+  <div class="mobile-tabs">
+    <button class="mobile-tab" id="tab-index" data-tab="index">Index</button>
+    <button class="mobile-tab" id="tab-filters" data-tab="filters">Filters</button>
+    <button class="mobile-tab active" id="tab-map" data-tab="map">Map</button>
+  </div>
+
   <div id="context-bar">
     SPATIAL INDEX — SELECT A PIN OR FILTER TO OPEN ALBUM
   </div>
@@ -225,12 +234,6 @@
     <span id="chip-label">ACTIVE FILTERS</span>
     <span id="chips-here"></span>
   </div>
-</div>
-
-<div class="mobile-tabs">
-  <button class="mobile-tab" id="tab-index" data-tab="index">Index</button>
-  <button class="mobile-tab" id="tab-filters" data-tab="filters">Filters</button>
-  <button class="mobile-tab active" id="tab-map" data-tab="map">Map</button>
 </div>
 
 <div id="layout">
