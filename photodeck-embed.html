@@ -17,7 +17,7 @@
     outline: none !important;
   }
 
-  html, body { margin: 0; padding: 0; width: 100%; height: 100%; height: 100dvh; overflow: hidden; font-family: 'Inter', system-ui, sans-serif; background: #FFFFFF; color: #111111; }
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Inter', system-ui, sans-serif; background: #FFFFFF; color: #111111; }
   body { display: flex; flex-direction: column; }
 
   #topbar { border-bottom: 1px solid #111111; background: #FFFFFF; flex-shrink: 0; z-index: 10; }
@@ -64,10 +64,10 @@
   #chip-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #111111; margin-right: 10px; }
   .chip { display: inline-flex; align-items: center; justify-content: space-between; gap: 8px; border: 1px solid #111111; padding: 3px 8px; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #111111; cursor: pointer; background: #FFFFFF; margin: 0 4px 4px 0; }
 
-  /* UKŁAD DESKTOP */
+  /* DESKTOP LAYOUT */
   #layout { 
     width: 100%; 
-    flex: 1; 
+    flex: 1 1 auto; 
     min-height: 0; 
     background: #FFFFFF; 
     position: relative; 
@@ -76,7 +76,6 @@
     overflow: hidden; 
   }
 
-  /* ZAKŁADKI MOBILNE - UKRYTE NA DESKTOPIE */
   .mobile-tabs { 
     display: none !important; 
     background: #FFFFFF; 
@@ -170,7 +169,7 @@
   .custom-marker-hitbox:hover .custom-marker-visual, .custom-marker-hitbox:active .custom-marker-visual { transform: scale(1.15); background: #333333; }
 
   #map-wrap { 
-    flex: 1; 
+    flex: 1 1 auto; 
     position: relative; 
     height: 100%; 
     background: #FFFFFF; 
@@ -202,8 +201,13 @@
   .recent-headline { font-size: 12px; color: #111111; font-weight: 400; margin-bottom: 2px; line-height: 1.3; }
   .recent-date { font-size: 10px; color: #777777; letter-spacing: 0.02em; }
 
-  /* TRYB MOBILNY */
+  /* BEZPIECZNY TRYB MOBILNY */
   @media (max-width: 720px) {
+    body {
+      padding-bottom: 48px !important; /* Rezerwacja miejsca na przycisk u dołu ekranu */
+      box-sizing: border-box !important;
+    }
+
     #topbar { border-bottom: none; }
     #search-row { border-bottom: 1px solid #111111; padding: 0 12px; }
     #search-archive-btn { display: none !important; }
@@ -211,7 +215,7 @@
     #context-bar { display: none; }
 
     #layout {
-      height: calc(100dvh - 50px - 40px - 48px) !important;
+      height: 100% !important;
       flex: 1 1 auto !important;
       flex-direction: column !important;
     }
@@ -237,12 +241,13 @@
       letter-spacing: 0.14em !important;
       text-transform: uppercase !important;
       text-decoration: none !important;
-      z-index: 999999 !important;
+      z-index: 99999999 !important;
       border-top: 1px solid #111111 !important;
     }
 
-    #filters-group, #index-group { 
-      padding-bottom: 60px !important; 
+    /* Dopasowanie kontrolek Mapbox do paska mobilnego */
+    .mapboxgl-ctrl-bottom-right, .mapboxgl-ctrl-bottom-left {
+      bottom: 12px !important;
     }
   }
 </style>
