@@ -342,17 +342,9 @@
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Woolloongabba"> Woolloongabba</label>
       </div>
 
-      <!-- 2. YEAR -->
-      <div class="acc-head" data-target="acc-year">
-        <span class="acc-title">2. Year</span><span class="acc-icon">+</span>
-      </div>
-      <div class="acc-body" id="acc-year">
-        <label><input type="checkbox" class="filter-check" data-cat="year" value="2026"> 2026</label>
-      </div>
-
-      <!-- 3. DEVELOPMENT STATUS -->
+      <!-- 2. DEVELOPMENT STATUS -->
       <div class="acc-head" data-target="acc-status">
-        <span class="acc-title">3. Development Status</span><span class="acc-icon">+</span>
+        <span class="acc-title">2. Development Status</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-status">
         <label><input type="checkbox" class="filter-check" value="Proposed"> Proposed</label>
@@ -360,42 +352,50 @@
         <label><input type="checkbox" class="filter-check" value="Approved"> Approved</label>
       </div>
 
-      <!-- 4. TYPOLOGY -->
+      <!-- 3. TYPOLOGY & ARCHITECTURE -->
       <div class="acc-head" data-target="acc-typology">
-        <span class="acc-title">4. Typology</span><span class="acc-icon">+</span>
+        <span class="acc-title">3. Typology & Architecture</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-typology">
         <label><input type="checkbox" class="filter-check" data-cat="typology" value="Residential"> Residential</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Heritage & Traditional Housing"> Heritage & Traditional Housing</label>
         <label><input type="checkbox" class="filter-check" data-cat="typology" value="Commercial & Retail"> Commercial & Retail</label>
         <label><input type="checkbox" class="filter-check" data-cat="typology" value="Public & Civic"> Public & Civic</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Heritage & Traditional"> Heritage & Traditional</label>
         <label><input type="checkbox" class="filter-check" data-cat="typology" value="Industrial"> Industrial</label>
 
         <div class="sub-category-title">Facade Material</div>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="glass facade"> glass facade</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="brick facade"> brick facade</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="concrete facade"> concrete facade</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="timber facade"> timber facade</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="metal facade"> metal facade</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="stone facade"> stone facade</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Glass"> Glass</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Brick"> Brick</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Concrete"> Concrete</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Timber"> Timber</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Metal"> Metal</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Stone"> Stone</label>
       </div>
 
-      <!-- 5. URBAN CONTEXT -->
+      <!-- 4. URBAN CONTEXT -->
       <div class="acc-head" data-target="acc-urban">
-        <span class="acc-title">5. Urban Context</span><span class="acc-icon">+</span>
+        <span class="acc-title">4. Urban Context</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-urban">
-        <div class="sub-category-title">Transformation & 2032</div>
+        <div class="sub-category-title">Process & Transformation</div>
         <label><input type="checkbox" class="filter-check" data-cat="urban" value="Urban Renewal"> Urban Renewal</label>
         <label><input type="checkbox" class="filter-check" data-cat="urban" value="Construction Impact"> Construction Impact</label>
         <label><input type="checkbox" class="filter-check" data-cat="urban" value="Riverfront"> Riverfront</label>
         <label><input type="checkbox" class="filter-check" data-cat="urban" value="Brisbane 2032"> Brisbane 2032</label>
 
-        <div class="sub-category-title">Public Elements</div>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="pedestrian zone"> pedestrian zone</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="arcade"> arcade</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="public art"> public art</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="outdoor dining"> outdoor dining</label>
+        <div class="sub-category-title">Public Realm & Streetscape</div>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="Pedestrian Zones"> Pedestrian Zones</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="Arcades & Passages"> Arcades & Passages</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="Public Art"> Public Art</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="Outdoor Dining"> Outdoor Dining</label>
+      </div>
+
+      <!-- 5. TIME -->
+      <div class="acc-head" data-target="acc-year">
+        <span class="acc-title">5. Time</span><span class="acc-icon">+</span>
+      </div>
+      <div class="acc-body" id="acc-year">
+        <label><input type="checkbox" class="filter-check" data-cat="year" value="2026"> 2026</label>
       </div>
     </div>
 
@@ -433,20 +433,20 @@ const filterMapping = {
   'Approved': ['approved', 'approved development', 'development permit'],
   
   'Residential': ['residential building', 'residential tower', 'apartment building', 'mixed use building', 'social housing', 'student housing'],
-  'Heritage & Traditional Housing': ['heritage building', 'queenslander', 'highset house', 'lowset house', 'workers cottage', 'post war house', 'terrace house', 'duplex'],
   'Commercial & Retail': ['commercial building', 'retail building', 'office building', 'hospitality building'],
   'Public & Civic': ['public building', 'civic building'],
+  'Heritage & Traditional': ['heritage building', 'queenslander', 'highset house', 'lowset house', 'workers cottage', 'post war house', 'terrace house', 'duplex'],
   'Industrial': ['industrial building', 'warehouse', 'parking structure'],
   
-  'glass facade': ['glass facade'], 'brick facade': ['brick facade'], 'concrete facade': ['concrete facade'], 
-  'timber facade': ['timber facade'], 'metal facade': ['metal facade'], 'stone facade': ['stone facade'],
+  'Glass': ['glass facade'], 'Brick': ['brick facade'], 'Concrete': ['concrete facade'], 
+  'Timber': ['timber facade'], 'Metal': ['metal facade'], 'Stone': ['stone facade'],
   
   'Urban Renewal': ['urban renewal', 'urban development', 'urban intensification', 'urban consolidation'],
   'Construction Impact': ['construction impact', 'site hoarding', 'temporary fencing', 'scaffolding'],
   'Riverfront': ['riverfront', 'waterfront'],
   'Brisbane 2032': ['olympic venue', 'olympic precinct', 'olympic infrastructure', 'athlete village', 'transport upgrade', 'legacy project', 'temporary structure'],
   
-  'pedestrian zone': ['pedestrian zone'], 'arcade': ['arcade'], 'public art': ['public art'], 'outdoor dining': ['outdoor dining']
+  'Pedestrian Zones': ['pedestrian zone'], 'Arcades & Passages': ['arcade'], 'Public Art': ['public art'], 'Outdoor Dining': ['outdoor dining']
 };
 
 var RECENT_PHOTOS_URL = 'https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/recent-photos.json';
