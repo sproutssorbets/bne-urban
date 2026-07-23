@@ -427,26 +427,47 @@
 <script>
 mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
 
+/* ZAKTWALIZOWANA LOGIKA FILTER MAPPING (v5.2) */
 const filterMapping = {
-  'Proposed': ['proposed', 'proposed development', 'planning application'],
-  'Under Construction': ['under construction', 'demolition in progress', 'ongoing change'],
-  'Approved': ['approved', 'approved development', 'development permit'],
+  // Development Status
+  'Proposed': ['Proposed'],
+  'Under Construction': ['Under Construction'],
+  'Approved': ['Approved'],
   
-  'Residential': ['residential building', 'residential tower', 'apartment building', 'mixed use building', 'social housing', 'student housing'],
-  'Commercial & Retail': ['commercial building', 'retail building', 'office building', 'hospitality building'],
-  'Public & Civic': ['public building', 'civic building'],
-  'Heritage & Traditional': ['heritage building', 'queenslander', 'highset house', 'lowset house', 'workers cottage', 'post war house', 'terrace house', 'duplex'],
-  'Industrial': ['industrial building', 'warehouse', 'parking structure'],
+  // Physical Condition
+  'Existing Condition': ['Existing Condition'],
+  'Vacant & Development Site': ['Vacant & Development Site'],
+  'Demolition & Site Works': ['Demolition & Site Works'],
+  'Active Construction Site': ['Active Construction Site'],
+  'Completed Development': ['Completed Development'],
   
-  'Glass': ['glass facade'], 'Brick': ['brick facade'], 'Concrete': ['concrete facade'], 
-  'Timber': ['timber facade'], 'Metal': ['metal facade'], 'Stone': ['stone facade'],
+  // Typology
+  'Residential': ['residential', 'apartment', 'residential tower', 'social housing', 'student housing'],
+  'Commercial & Retail': ['commercial', 'office', 'retail', 'hospitality', 'shopfront', 'showroom', 'market', 'supermarket', 'shopping centre', 'cafe', 'restaurant', 'bar', 'pub', 'hotel'],
+  'Public & Civic': ['public', 'civic', 'education', 'university', 'school', 'health', 'hospital', 'clinic', 'government', 'place of worship', 'community centre', 'library', 'museum', 'gallery', 'theatre', 'performance venue', 'stadium', 'arena'],
+  'Heritage & Traditional': ['heritage', 'heritage architecture', 'queenslander', 'highset house', 'lowset house', 'workers cottage', 'post war house', 'terrace house', 'duplex', 'adaptive reuse'],
+  'Industrial': ['industrial', 'warehouse', 'parking structure', 'industrial architecture'],
   
-  'Urban Renewal': ['urban renewal', 'urban development', 'urban intensification', 'urban consolidation'],
-  'Construction Impact': ['construction impact', 'site hoarding', 'temporary fencing', 'scaffolding'],
-  'Riverfront': ['riverfront', 'waterfront'],
-  'Brisbane 2032': ['olympic venue', 'olympic precinct', 'olympic infrastructure', 'athlete village', 'transport upgrade', 'legacy project', 'temporary structure'],
+  // Materials
+  'Glass': ['glass'],
+  'Brick': ['brick', 'face brick', 'painted brick'],
+  'Concrete': ['concrete'],
+  'Timber': ['timber'],
+  'Metal': ['metal'],
+  'Stone': ['stone'],
+  'Rendered Finish': ['rendered finish'],
   
-  'Pedestrian Zones': ['pedestrian zone'], 'Arcades & Passages': ['arcade'], 'Public Art': ['public art'], 'Outdoor Dining': ['outdoor dining']
+  // Urban Context
+  'Urban Renewal': ['urban renewal', 'urban development', 'urban intensification', 'urban consolidation', 'high density'],
+  'Construction Impact': ['construction impact'],
+  'Riverfront': ['riverfront'],
+  'Brisbane 2032': ['olympic venue', 'olympic precinct', 'olympic infrastructure', 'transport upgrade', 'athlete village', 'temporary structure', 'legacy project'],
+  
+  // Public Realm
+  'Pedestrian Zones': ['pedestrian zone'],
+  'Arcades & Passages': ['arcade', 'passage'],
+  'Public Art': ['public art', 'mural'],
+  'Outdoor Dining': ['outdoor dining']
 };
 
 var RECENT_PHOTOS_URL = 'https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/recent-photos.json';
