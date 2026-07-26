@@ -106,8 +106,9 @@
   #index-panel::-webkit-scrollbar { display: none; }
   .panel-section-container { display: flex; flex-direction: column; }
   
-  .section { padding: 18px 20px 14px 20px; border-bottom: 1px solid #DADADA; background: #FFFFFF; flex-shrink: 0; }
-  .section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #6B6B6B; margin-bottom: 14px; }
+  .section { padding: 18px 20px 14px 20px; border-bottom: 1px solid #DADADA; flex-shrink: 0; }
+  .section.map-legend { background: #FAFAFA; border-bottom: 2px solid #111111; }
+  .section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #111111; margin-bottom: 14px; }
 
   .filter-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; cursor: pointer; user-select: none; transition: opacity 0.15s ease; }
   .filter-row.off { opacity: 0.35; }
@@ -160,7 +161,7 @@
   .list-row:hover { background: #FAFAFA; padding-left: 24px; }
   .list-street { font-size: 13px; color: #111111; font-weight: 500; }
 
-  /* NOWA STYLIZACJA STOPKI v5.2 */
+  /* STOPKA PHOTOINDEX */
   #pi-footer {
     padding: 16px 20px;
     background: #FFFFFF;
@@ -380,11 +381,10 @@
 <div id="layout">
   <div id="index-panel">
     
-    <!-- GRUPA FILTRÓW -->
     <div class="panel-section-container" id="filters-group">
-      <!-- MAP LAYERS -->
-      <div class="section">
-        <div class="section-label">Map Layers (Planning Status)</div>
+      <!-- MAP LAYERS LEGEND (Wizualnie odcięta dla jasności ról) -->
+      <div class="section map-legend">
+        <div class="section-label">Map Controls: Pin Visibility</div>
         <div class="filter-row" data-status="proposed">
           <div style="display:flex;align-items:center;gap:9px;"><span class="swatch" style="background:#D1D1D1; border:1px solid #6B6B6B;"></span><span class="filter-label">Proposed</span></div>
           <span class="filter-count" id="count-proposed">–</span>
@@ -430,19 +430,32 @@
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Woolloongabba"> Woolloongabba</label>
       </div>
 
-      <!-- 2. DEVELOPMENT STATUS -->
+      <!-- 2. DEVELOPMENT STATUS (ARCHIVE FILTER) -->
       <div class="acc-head" data-target="acc-status">
         <span class="acc-title">2. Development Status</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-status">
+        <div class="sub-category-title" style="margin-top:0;">Filter Image Archive</div>
         <label><input type="checkbox" class="filter-check" value="Proposed"> Proposed</label>
         <label><input type="checkbox" class="filter-check" value="Under Construction"> Under Construction</label>
         <label><input type="checkbox" class="filter-check" value="Approved"> Approved</label>
       </div>
 
-      <!-- 3. TYPOLOGY & ARCHITECTURE -->
+      <!-- 3. PHYSICAL CONDITION (PRZYWRÓCONE) -->
+      <div class="acc-head" data-target="acc-condition">
+        <span class="acc-title">3. Physical Condition</span><span class="acc-icon">+</span>
+      </div>
+      <div class="acc-body" id="acc-condition">
+        <label><input type="checkbox" class="filter-check" data-cat="condition" value="Existing Condition"> Existing Condition</label>
+        <label><input type="checkbox" class="filter-check" data-cat="condition" value="Vacant & Development Site"> Vacant & Development Site</label>
+        <label><input type="checkbox" class="filter-check" data-cat="condition" value="Demolition & Site Works"> Demolition & Site Works</label>
+        <label><input type="checkbox" class="filter-check" data-cat="condition" value="Active Construction Site"> Active Construction Site</label>
+        <label><input type="checkbox" class="filter-check" data-cat="condition" value="Completed Development"> Completed Development</label>
+      </div>
+
+      <!-- 4. TYPOLOGY & ARCHITECTURE -->
       <div class="acc-head" data-target="acc-typology">
-        <span class="acc-title">3. Typology & Architecture</span><span class="acc-icon">+</span>
+        <span class="acc-title">4. Typology & Architecture</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-typology">
         <label><input type="checkbox" class="filter-check" data-cat="typology" value="Residential"> Residential</label>
@@ -450,6 +463,11 @@
         <label><input type="checkbox" class="filter-check" data-cat="typology" value="Public & Civic"> Public & Civic</label>
         <label><input type="checkbox" class="filter-check" data-cat="typology" value="Heritage & Traditional"> Heritage & Traditional</label>
         <label><input type="checkbox" class="filter-check" data-cat="typology" value="Industrial"> Industrial</label>
+
+        <div class="sub-category-title">Form & Style</div>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="High Rise"> High Rise</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Mid Rise"> Mid Rise</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Low Rise"> Low Rise</label>
 
         <div class="sub-category-title">Facade Material</div>
         <label><input type="checkbox" class="filter-check" data-cat="typology" value="Glass"> Glass</label>
@@ -460,27 +478,30 @@
         <label><input type="checkbox" class="filter-check" data-cat="typology" value="Stone"> Stone</label>
       </div>
 
-      <!-- 4. URBAN CONTEXT -->
+      <!-- 5. URBAN CONTEXT -->
       <div class="acc-head" data-target="acc-urban">
-        <span class="acc-title">4. Urban Context</span><span class="acc-icon">+</span>
+        <span class="acc-title">5. Urban Context</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-urban">
         <div class="sub-category-title">Process & Transformation</div>
         <label><input type="checkbox" class="filter-check" data-cat="urban" value="Urban Renewal"> Urban Renewal</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="High Density"> High Density</label>
         <label><input type="checkbox" class="filter-check" data-cat="urban" value="Construction Impact"> Construction Impact</label>
         <label><input type="checkbox" class="filter-check" data-cat="urban" value="Riverfront"> Riverfront</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="Brisbane 2032"> Brisbane 2032</label>
 
         <div class="sub-category-title">Public Realm & Streetscape</div>
         <label><input type="checkbox" class="filter-check" data-cat="urban" value="Pedestrian Zones"> Pedestrian Zones</label>
         <label><input type="checkbox" class="filter-check" data-cat="urban" value="Arcades & Passages"> Arcades & Passages</label>
         <label><input type="checkbox" class="filter-check" data-cat="urban" value="Public Art"> Public Art</label>
         <label><input type="checkbox" class="filter-check" data-cat="urban" value="Outdoor Dining"> Outdoor Dining</label>
+        
+        <div class="sub-category-title">Brisbane 2032</div>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="Brisbane 2032"> Brisbane 2032</label>
       </div>
 
-      <!-- 5. TIME -->
+      <!-- 6. TIME -->
       <div class="acc-head" data-target="acc-year">
-        <span class="acc-title">5. Time</span><span class="acc-icon">+</span>
+        <span class="acc-title">6. Time</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-year">
         <label><input type="checkbox" class="filter-check" data-cat="year" value="2026"> 2026</label>
@@ -491,7 +512,7 @@
     <div id="index-group" style="display:none; flex:1; overflow-y:auto; flex-direction:column; background:#FFFFFF;">
       <div id="list-wrap"></div>
       
-      <!-- NOWA DEDYKOWANA STOPKA PHOTOINDEX -->
+      <!-- STOPKA PHOTOINDEX -->
       <footer id="pi-footer">
         <div class="pi-footer-top">
           <span class="pi-brand">PHOTOINDEX</span>
@@ -499,14 +520,12 @@
         </div>
         
         <div class="pi-footer-grid">
-          <!-- Kolumna 1: Statystyki -->
           <div class="pi-footer-col">
             <div class="pi-footer-label">Status</div>
             <div class="pi-footer-stat"><span class="pi-dot">●</span> <span id="archive-count">LOADING...</span></div>
             <div class="pi-footer-stat"><span class="pi-dot">●</span> UPDATED: 23 JUL 2026</div>
           </div>
 
-          <!-- Kolumna 2: Nawigacja -->
           <div class="pi-footer-col">
             <div class="pi-footer-label">Archive</div>
             <a href="https://photoindex.photodeck.com/" target="_top" class="pi-footer-link">Full Database ↗</a>
@@ -533,7 +552,6 @@
   </div>
 </div>
 
-<!-- PRZYCISK DOLNY MOBILNY -->
 <a id="mobile-bottom-bar" href="https://photoindex.photodeck.com/" target="_top">
   FULL ARCHIVE
 </a>
@@ -562,6 +580,11 @@ const filterMapping = {
   'Heritage & Traditional': ['heritage', 'heritage architecture', 'queenslander', 'highset house', 'lowset house', 'workers cottage', 'post war house', 'terrace house', 'duplex', 'adaptive reuse'],
   'Industrial': ['industrial', 'warehouse', 'parking structure', 'industrial architecture'],
   
+  // Form & Style
+  'High Rise': ['high rise', 'tower'],
+  'Mid Rise': ['mid rise'],
+  'Low Rise': ['low rise'],
+  
   // Materials
   'Glass': ['glass'],
   'Brick': ['brick', 'face brick', 'painted brick'],
@@ -572,7 +595,8 @@ const filterMapping = {
   'Rendered Finish': ['rendered finish'],
   
   // Urban Context
-  'Urban Renewal': ['urban renewal', 'urban development', 'urban intensification', 'urban consolidation', 'high density'],
+  'Urban Renewal': ['urban renewal', 'urban development', 'urban intensification', 'urban consolidation'],
+  'High Density': ['high density'],
   'Construction Impact': ['construction impact'],
   'Riverfront': ['riverfront'],
   'Brisbane 2032': ['olympic venue', 'olympic precinct', 'olympic infrastructure', 'transport upgrade', 'athlete village', 'temporary structure', 'legacy project'],
@@ -674,7 +698,6 @@ function frameArea(center, bbox) {
   }
 }
 
-/* ZAKTUALIZOWANA OBSŁUGA GEOCODERA (OBSŁUGA ULIC I DZIELNIC) */
 geocoder.on('result', function (e) {
   if (window.innerWidth <= 720) {
     var mapTab = document.getElementById('tab-map');
@@ -685,12 +708,10 @@ geocoder.on('result', function (e) {
   var placeType = result.place_type || [];
   var targetSuburb = '';
 
-  // 1. Sprawdzamy czy wybrano bezpośrednio dzielnicę/obszar
   if (placeType.some(t => t === 'place' || t === 'locality' || t === 'neighborhood')) {
     frameArea(result.center, result.bbox);
     targetSuburb = result.text || '';
   } else {
-    // 2. Jeśli wybrano ulicę/adres -> Lecimy mapą i szukamy nadrzędnej dzielnicy w 'context'
     map.flyTo({ center: result.center, zoom: 16 });
     
     if (result.context && Array.isArray(result.context)) {
@@ -701,7 +722,6 @@ geocoder.on('result', function (e) {
     }
   }
 
-  // 3. Jeśli znaleźliśmy dzielnicę, dopasowujemy ją do radio buttonów i aktualizujemy stan
   if (targetSuburb) {
     var matchedBox = null;
     document.querySelectorAll('.suburb-check').forEach(cb => {
@@ -1046,7 +1066,7 @@ document.querySelectorAll('.suburb-check').forEach(cb => {
       const input = document.querySelector('.mapboxgl-ctrl-geocoder input');
       if (input) input.blur();
     }
-    if (window.piCloseAllPopups) window.piCloseAllPopups();https://github.com/sproutssorbets/bne-urban/blob/main/photodeck-embed.html
+    if (window.piCloseAllPopups) window.piCloseAllPopups();
     searchState.suburb = this.value;
     applySearchState();
     if (this.value) {
@@ -1057,7 +1077,6 @@ document.querySelectorAll('.suburb-check').forEach(cb => {
   });
 });
 
-/* LOGIKA ZAKŁADEK MOBILNYCH */
 var tabs = { 'tab-index': 'index-group', 'tab-filters': 'filters-group', 'tab-map': 'map-wrap' };
 Object.keys(tabs).forEach(tabId => {
   var btn = document.getElementById(tabId);
