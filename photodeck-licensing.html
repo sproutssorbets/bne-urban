@@ -11,122 +11,170 @@
 .pi-pricing-embed {
   --bg: #FFFFFF;
   --text: #111111;
-  --muted: #6B6B6B;
-  --rule: #DADADA;
+  --muted: #767676;
+  --rule: #DDDDDD;
   --rule-strong: #111111;
 
   font-family: 'Inter', sans-serif;
   background: var(--bg);
   color: var(--text);
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.5;
   font-weight: 400;
-  padding: 32px 0 64px;
-  max-width: 800px;
+  padding: 40px 0 80px;
+  max-width: 900px;
   margin: 0 auto;
 }
 .pi-pricing-embed * { box-sizing: border-box; }
 
 /* Intro */
-.pi-pricing-embed .pi-intro { margin-bottom: 32px; }
+.pi-pricing-embed .pi-intro { margin-bottom: 40px; }
 .pi-pricing-embed .pi-intro p {
-  font-size: 14px; color: var(--muted); max-width: 600px; margin: 0 0 6px;
+  color: var(--muted); max-width: 600px; margin: 0 0 6px;
 }
 .pi-pricing-embed .pi-intro .pi-gst {
-  font-size: 11px; color: var(--muted); letter-spacing: 0.04em;
+  font-size: 11px; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase;
 }
 
-/* Finder / Quick Selector (Replaces redundant summary + finder duplication) */
-.pi-pricing-embed .finder { border-top: 1px solid var(--rule-strong); margin-bottom: 48px; }
-.pi-pricing-embed .finder-header {
-  display: grid; grid-template-columns: 1fr 180px 110px 24px;
-  border-bottom: 1px solid var(--rule); padding: 8px 0;
+/* Spec Table Container */
+.pi-pricing-embed .spec-table {
+  border-top: 1px solid var(--rule-strong);
+}
+
+/* Spec Group (Row item) */
+.pi-pricing-embed .spec-group {
+  border-bottom: 1px solid var(--rule);
+  transition: background 0.15s ease;
+}
+.pi-pricing-embed .spec-group:hover {
+  background: #FAFAFA;
+}
+
+/* Main Clickable Line (Matches architectural spec layout) */
+.pi-pricing-embed .spec-row {
+  display: grid;
+  grid-template-columns: 220px 1fr 120px 24px;
+  cursor: pointer;
   align-items: baseline;
+  padding: 16px 0;
 }
-.pi-pricing-embed .finder-hcell {
-  font-size: 11px; font-weight: 500; letter-spacing: 0.14em;
-  text-transform: uppercase; color: var(--muted); padding: 0 4px; line-height: 1;
+
+.pi-pricing-embed .spec-category {
+  font-weight: 500;
+  color: var(--text);
+  padding-right: 20px;
 }
-.pi-pricing-embed .finder-hcell:nth-child(3) {
+
+.pi-pricing-embed .spec-summary-desc {
+  color: var(--muted);
+  padding-right: 20px;
+}
+
+.pi-pricing-embed .spec-price {
+  font-weight: 500;
   text-align: right;
+  white-space: nowrap;
   padding-right: 16px;
 }
-.pi-pricing-embed .finder-row {
-  display: grid; grid-template-columns: 1fr 180px 110px 24px;
-  border-bottom: 1px solid var(--rule);
-  cursor: pointer; transition: background 0.12s; align-items: center;
+
+.pi-pricing-embed .spec-arrow {
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+  transition: transform 0.25s ease;
+}
+.pi-pricing-embed .spec-group.open .spec-arrow {
+  transform: rotate(180deg);
+  color: var(--text);
+}
+
+/* Expanded Technical Details */
+.pi-pricing-embed .spec-dropdown {
+  display: none;
+  padding: 0 0 20px 220px; /* Wstrzelone idealnie pod prawą kolumnę z zachowaniem siatki */
+}
+.pi-pricing-embed .spec-group.open .spec-dropdown {
+  display: block;
+}
+
+/* Sub-options inside spec */
+.pi-pricing-embed .spec-option-item {
+  display: grid;
+  grid-template-columns: 1fr 140px;
   padding: 12px 0;
-}
-.pi-pricing-embed .finder-row:hover,
-.pi-pricing-embed .finder-row.active { background: #FAFAFA; }
-.pi-pricing-embed .finder-context { padding: 0 12px 0 0; font-size: 13px; }
-.pi-pricing-embed .finder-cat { font-size: 13px; font-weight: 400; color: var(--text); padding: 0 4px; }
-.pi-pricing-embed .finder-price { font-size: 13px; font-weight: 400; color: var(--text); text-align: right; white-space: nowrap; padding-right: 16px; }
-.pi-pricing-embed .finder-arrow { font-size: 13px; color: var(--muted); text-align: center; }
-
-/* Accordion Sections */
-.pi-pricing-embed .acc-section { border-top: 1px solid var(--rule-strong); margin-bottom: 2px; }
-.pi-pricing-embed .acc-header {
-  display: grid; grid-template-columns: 1fr auto;
-  align-items: center; padding: 16px 0;
-  cursor: pointer; user-select: none;
-}
-.pi-pricing-embed .acc-header:hover .acc-title { color: var(--muted); }
-.pi-pricing-embed .acc-title { font-size: 12px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; line-height: 1; }
-.pi-pricing-embed .acc-meta { display: flex; align-items: center; gap: 20px; }
-.pi-pricing-embed .acc-preview { font-size: 12px; color: var(--muted); letter-spacing: 0.04em; }
-.pi-pricing-embed .acc-chevron { font-size: 13px; color: var(--muted); transition: transform 0.2s; display: inline-block; }
-.pi-pricing-embed .acc-section.open .acc-chevron { transform: rotate(180deg); }
-.pi-pricing-embed .acc-body { display: none; padding-bottom: 24px; }
-.pi-pricing-embed .acc-section.open .acc-body { display: block; }
-
-/* Minimalist Clean Option Rows Inside Accordion */
-.pi-pricing-embed .option-item {
-  display: grid; grid-template-columns: 1fr 120px;
   border-top: 1px solid var(--rule);
-  padding: 12px 0;
   align-items: baseline;
 }
-.pi-pricing-embed .option-item:first-child { border-top: 1px solid var(--rule); }
-.pi-pricing-embed .option-info .option-name { font-weight: 500; font-size: 13px; margin-bottom: 2px; }
-.pi-pricing-embed .option-info .option-desc { font-size: 13px; color: var(--muted); }
-.pi-pricing-embed .option-price { font-weight: 500; font-size: 13px; text-align: right; white-space: nowrap; }
+.pi-pricing-embed .spec-option-info .option-name {
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.pi-pricing-embed .spec-option-info .option-desc {
+  font-size: 12px;
+  color: var(--muted);
+}
+.pi-pricing-embed .spec-option-price {
+  font-weight: 500;
+  text-align: right;
+  white-space: nowrap;
+}
 
-/* Clean Rules Box (Allowed / Not allowed combined neatly) */
-.pi-pricing-embed .rules-box {
+/* Minimalist Rules Box */
+.pi-pricing-embed .spec-rules {
   margin-top: 16px;
-  background: #FAFAFA;
-  border: 1px solid var(--rule);
-  padding: 12px 16px;
+  border-top: 1px solid var(--rule);
+  padding-top: 14px;
   font-size: 12px;
   color: var(--muted);
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 24px;
 }
-.pi-pricing-embed .rules-box strong { color: var(--text); font-weight: 500; display: block; margin-bottom: 2px; }
+.pi-pricing-embed .spec-rules strong {
+  color: var(--text);
+  font-weight: 500;
+  display: inline-block;
+  margin-right: 4px;
+}
 
-/* Key Conditions — static, always visible */
-.pi-pricing-embed .key-conditions { border-top: 1px solid var(--rule-strong); margin-top: 40px; }
-.pi-pricing-embed .key-conditions-header { padding: 16px 0; font-size: 12px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; }
-.pi-pricing-embed .condition-row {
-  display: grid; grid-template-columns: 200px 1fr;
-  border-top: 1px solid var(--rule);
-  padding: 12px 0;
-  font-size: 13px;
+/* Key Conditions (Bottom section in same industrial style) */
+.pi-pricing-embed .key-conditions {
+  border-top: 1px solid var(--rule-strong);
+  margin-top: 60px;
 }
-.pi-pricing-embed .condition-title { font-weight: 500; padding-right: 16px; color: var(--text); }
-.pi-pricing-embed .condition-desc { color: var(--muted); }
+.pi-pricing-embed .key-conditions-header {
+  padding: 20px 0 12px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.pi-pricing-embed .condition-row {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  border-top: 1px solid var(--rule);
+  padding: 14px 0;
+}
+.pi-pricing-embed .condition-title {
+  font-weight: 500;
+  padding-right: 20px;
+  color: var(--text);
+}
+.pi-pricing-embed .condition-desc {
+  color: var(--muted);
+}
 
 /* Mobile adjustments */
-@media (max-width: 680px) {
+@media (max-width: 768px) {
   .pi-pricing-embed { padding: 20px 16px; }
-  .pi-pricing-embed .finder-header { display: none; }
-  .pi-pricing-embed .finder-row { grid-template-columns: 1fr auto; gap: 8px; }
-  .pi-pricing-embed .finder-cat, .pi-pricing-embed .finder-arrow { display: none; }
-  .pi-pricing-embed .option-item { grid-template-columns: 1fr; gap: 6px; }
-  .pi-pricing-embed .option-price { text-align: left; }
-  .pi-pricing-embed .rules-box { grid-template-columns: 1fr; gap: 10px; }
+  .pi-pricing-embed .spec-row { grid-template-columns: 1fr auto; gap: 8px; }
+  .pi-pricing-embed .spec-summary-desc, .pi-pricing-embed .spec-arrow { display: none; }
+  .pi-pricing-embed .spec-dropdown { padding-left: 0; }
+  .pi-pricing-embed .spec-option-item { grid-template-columns: 1fr; gap: 4px; }
+  .pi-pricing-embed .spec-option-price { text-align: left; }
+  .pi-pricing-embed .spec-rules { grid-template-columns: 1fr; gap: 12px; }
   .pi-pricing-embed .condition-row { grid-template-columns: 1fr; gap: 4px; }
 }
 </style>
@@ -136,248 +184,192 @@
 <div class="pi-pricing-embed">
 
   <div class="pi-intro">
-    <p>Licences are grouped by where the image will be used. Select your intended use case below to view details, or browse categories.</p>
+    <p>Licences are structured by intended use. Click any category row to review specific tier structures and terms.</p>
     <div class="pi-gst">All prices include GST.</div>
   </div>
 
-  <!-- UNIFIED FINDER & QUICK PRICING (Replaces separate Summary and duplicate Finder) -->
-  <div class="finder">
-    <div class="finder-header">
-      <div class="finder-hcell">Where will you use this image?</div>
-      <div class="finder-hcell">Licence Type</div>
-      <div class="finder-hcell" style="text-align:right">Price</div>
-      <div class="finder-hcell"></div>
-    </div>
+  <div class="spec-table">
     
-    <div class="finder-row" data-target="editorial">
-      <div class="finder-context">Magazine article, blog post, or broadcast piece</div>
-      <div class="finder-cat">Editorial</div>
-      <div class="finder-price">AU$45</div>
-      <div class="finder-arrow">↓</div>
+    <!-- EDITORIAL -->
+    <div class="spec-group">
+      <div class="spec-row">
+        <div class="spec-category">Editorial</div>
+        <div class="spec-summary-desc">Magazine article, blog post, or broadcast piece</div>
+        <div class="spec-price">AU$45</div>
+        <div class="spec-arrow">↓</div>
+      </div>
+      <div class="spec-dropdown">
+        <div class="spec-option-item">
+          <div class="spec-option-info">
+            <div class="option-name">Single image, one publication</div>
+            <div class="option-desc">One image, one named publication or broadcast piece — magazine article, blog post, news segment.</div>
+          </div>
+          <div class="spec-option-price">AU$45</div>
+        </div>
+        <div class="spec-rules">
+          <div><strong>Allowed:</strong> Use within the one named piece, in print or digital form, including social promotion of that specific piece.</div>
+          <div><strong>Not allowed:</strong> Use in advertising, on a cover, or in any piece other than the one named at purchase.</div>
+        </div>
+      </div>
     </div>
-    
-    <div class="finder-row" data-target="unpublished-use">
-      <div class="finder-context">Development Application, internal report, or research file</div>
-      <div class="finder-cat">Unpublished Use</div>
-      <div class="finder-price">From AU$70</div>
-      <div class="finder-arrow">↓</div>
-    </div>
-    
-    <div class="finder-row" data-target="single-listing-use">
-      <div class="finder-context">Single property listing, whole building, or suburb real estate campaign</div>
-      <div class="finder-cat">Single Listing Use</div>
-      <div class="finder-price">AU$90 – AU$450</div>
-      <div class="finder-arrow">↓</div>
-    </div>
-    
-    <div class="finder-row" data-target="project-campaign-use">
-      <div class="finder-context">Sales brochure, developer website, or full development campaign</div>
-      <div class="finder-cat">Project &amp; Campaign</div>
-      <div class="finder-price">From AU$450</div>
-      <div class="finder-arrow">↓</div>
-    </div>
-    
-    <div class="finder-row" data-target="public-institutional">
-      <div class="finder-context">Council, university, museum, or public consultation material</div>
-      <div class="finder-cat">Public &amp; Institutional</div>
-      <div class="finder-price">On enquiry</div>
-      <div class="finder-arrow">↓</div>
-    </div>
-    
-    <div class="finder-row" data-target="exclusive-commercial">
-      <div class="finder-context">Advertising, film, or national distribution requiring exclusivity</div>
-      <div class="finder-cat">Exclusive Commercial</div>
-      <div class="finder-price">From AU$3,500</div>
-      <div class="finder-arrow">↓</div>
-    </div>
-  </div>
 
-  <!-- ACCORDION SECTIONS -->
+    <!-- UNPUBLISHED USE -->
+    <div class="spec-group">
+      <div class="spec-row">
+        <div class="spec-category">Unpublished Use</div>
+        <div class="spec-summary-desc">Development Application, internal report, or research file</div>
+        <div class="spec-price">From AU$70</div>
+        <div class="spec-arrow">↓</div>
+      </div>
+      <div class="spec-dropdown">
+        <div class="spec-option-item">
+          <div class="spec-option-info">
+            <div class="option-name">Single document — 1 to 5 images</div>
+            <div class="option-desc">Development Application submissions, internal reports, research files, or planning working papers.</div>
+          </div>
+          <div class="spec-option-price">AU$100 / image</div>
+        </div>
+        <div class="spec-option-item">
+          <div class="spec-option-info">
+            <div class="option-name">Single document — 6 to 20 images</div>
+            <div class="option-desc">Discounted per-image rate for larger sets within a single document.</div>
+          </div>
+          <div class="spec-option-price">AU$70 / image</div>
+        </div>
+        <div class="spec-option-item">
+          <div class="spec-option-info">
+            <div class="option-name">Larger sets (> 20 images)</div>
+            <div class="option-desc">Custom pricing tailored to the exact scope of documentation.</div>
+          </div>
+          <div class="spec-option-price">On enquiry</div>
+        </div>
+        <div class="spec-rules">
+          <div><strong>Allowed:</strong> Internal circulation, submission to a government body, or inclusion in a research file.</div>
+          <div><strong>Not allowed:</strong> Public publication, marketing use, or reuse in a second document without a new licence.</div>
+        </div>
+      </div>
+    </div>
 
-  <!-- 01 — EDITORIAL -->
-  <div class="acc-section" id="editorial">
-    <div class="acc-header">
-      <span class="acc-title">Editorial</span>
-      <div class="acc-meta">
-        <span class="acc-preview">AU$45</span>
-        <span class="acc-chevron">↓</span>
+    <!-- SINGLE LISTING USE -->
+    <div class="spec-group">
+      <div class="spec-row">
+        <div class="spec-category">Single Listing Use</div>
+        <div class="spec-summary-desc">Single property listing, whole building, or suburb real estate campaign</div>
+        <div class="spec-price">AU$90 – AU$450</div>
+        <div class="spec-arrow">↓</div>
       </div>
-    </div>
-    <div class="acc-body">
-      <div class="option-item">
-        <div class="option-info">
-          <div class="option-name">Single image, one publication</div>
-          <div class="option-desc">One image, one named publication or broadcast piece — magazine article, blog post, news segment.</div>
+      <div class="spec-dropdown">
+        <div class="spec-option-item">
+          <div class="spec-option-info">
+            <div class="option-name">Single property listing</div>
+            <div class="option-desc">One image, one property listing, valid for the duration of the sale campaign.</div>
+          </div>
+          <div class="spec-option-price">AU$90</div>
         </div>
-        <div class="option-price">AU$45</div>
-      </div>
-      <div class="rules-box">
-        <div><strong>Allowed</strong> Use within the one named piece, in print or digital form, including social promotion of that specific piece.</div>
-        <div><strong>Not allowed</strong> Use in advertising, on a cover, or in any piece other than the one named at purchase.</div>
+        <div class="spec-option-item">
+          <div class="spec-option-info">
+            <div class="option-name">Building licence (12 months)</div>
+            <div class="option-desc">Full building coverage across all current listings within it over a 12-month period.</div>
+          </div>
+          <div class="spec-option-price">AU$350 / year</div>
+        </div>
+        <div class="spec-option-item">
+          <div class="spec-option-info">
+            <div class="option-name">Neighbourhood licence (12 months)</div>
+            <div class="option-desc">Multiple listings across an entire suburb over a 12-month period.</div>
+          </div>
+          <div class="spec-option-price">AU$450 / year</div>
+        </div>
+        <div class="spec-rules">
+          <div><strong>Allowed:</strong> Real estate marketing across portals, brochures, signboards, and social media.</div>
+          <div><strong>Not allowed:</strong> Use on listings outside the licensed property, building, or suburb. Sublicensing.</div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- 02 — UNPUBLISHED USE -->
-  <div class="acc-section" id="unpublished-use">
-    <div class="acc-header">
-      <span class="acc-title">Unpublished Use</span>
-      <div class="acc-meta">
-        <span class="acc-preview">From AU$70</span>
-        <span class="acc-chevron">↓</span>
+    <!-- PROJECT & CAMPAIGN USE -->
+    <div class="spec-group">
+      <div class="spec-row">
+        <div class="spec-category">Project &amp; Campaign</div>
+        <div class="spec-summary-desc">Sales brochure, developer website, or full development campaign</div>
+        <div class="spec-price">From AU$450</div>
+        <div class="spec-arrow">↓</div>
+      </div>
+      <div class="spec-dropdown">
+        <div class="spec-option-item">
+          <div class="spec-option-info">
+            <div class="option-name">Single development, one campaign</div>
+            <div class="option-desc">Full multi-channel campaign for one development project: website, brochure, signage, social.</div>
+          </div>
+          <div class="spec-option-price">AU$450</div>
+        </div>
+        <div class="spec-option-item">
+          <div class="spec-option-info">
+            <div class="spec-option-name">Multi-market or extended campaign</div>
+            <div class="option-desc">Campaigns running across multiple states or extending past 12 months.</div>
+          </div>
+          <div class="spec-option-price">On enquiry</div>
+        </div>
+        <div class="spec-rules">
+          <div><strong>Allowed:</strong> Use across stated channels for the named development during campaign duration.</div>
+          <div><strong>Not allowed:</strong> Use on a different development by the same client or unrelated advertising.</div>
+        </div>
       </div>
     </div>
-    <div class="acc-body">
-      <div class="option-item">
-        <div class="option-info">
-          <div class="option-name">Single document — 1 to 5 images</div>
-          <div class="option-desc">Development Application submissions, internal reports, research files, or planning working papers not published publicly.</div>
-        </div>
-        <div class="option-price">AU$100 / image</div>
-      </div>
-      <div class="option-item">
-        <div class="option-info">
-          <div class="option-name">Single document — 6 to 20 images</div>
-          <div class="option-desc">Same use as above, at the discounted per-image rate for larger sets within a single document.</div>
-        </div>
-        <div class="option-price">AU$70 / image</div>
-      </div>
-      <div class="option-item">
-        <div class="option-info">
-          <div class="option-name">Larger sets (> 20 images)</div>
-          <div class="option-desc">Custom pricing tailored to the exact scope of the documentation.</div>
-        </div>
-        <div class="option-price">On enquiry</div>
-      </div>
-      <div class="rules-box">
-        <div><strong>Allowed</strong> Internal circulation, submission to a government body, or inclusion in a research file.</div>
-        <div><strong>Not allowed</strong> Public publication, marketing use, or reuse in a second document without a new licence.</div>
-      </div>
-    </div>
-  </div>
 
-  <!-- 03 — SINGLE LISTING USE -->
-  <div class="acc-section" id="single-listing-use">
-    <div class="acc-header">
-      <span class="acc-title">Single Listing Use</span>
-      <div class="acc-meta">
-        <span class="acc-preview">AU$90 – AU$450</span>
-        <span class="acc-chevron">↓</span>
+    <!-- PUBLIC & INSTITUTIONAL -->
+    <div class="spec-group">
+      <div class="spec-row">
+        <div class="spec-category">Public &amp; Institutional</div>
+        <div class="spec-summary-desc">Council, university, museum, or public consultation material</div>
+        <div class="spec-price">On enquiry</div>
+        <div class="spec-arrow">↓</div>
+      </div>
+      <div class="spec-dropdown">
+        <div class="spec-option-item">
+          <div class="spec-option-info">
+            <div class="option-name">Single image communication</div>
+            <div class="option-desc">One image for a named public communication by a government body, university, or non-profit.</div>
+          </div>
+          <div class="spec-option-price">On enquiry</div>
+        </div>
+        <div class="spec-option-item">
+          <div class="spec-option-info">
+            <div class="option-name">Campaign set</div>
+            <div class="option-desc">Consultations, exhibitions, or educational resource packs spanning multiple channels.</div>
+          </div>
+          <div class="spec-option-price">On enquiry</div>
+        </div>
+        <div class="spec-rules">
+          <div><strong>Allowed:</strong> Non-commercial public communication by the named institution within stated scope.</div>
+          <div><strong>Not allowed:</strong> Resale, third-party contractor use without naming them, or scope creep.</div>
+        </div>
       </div>
     </div>
-    <div class="acc-body">
-      <div class="option-item">
-        <div class="option-info">
-          <div class="option-name">Single property listing</div>
-          <div class="option-desc">One image, one property listing, valid for the duration of the sale campaign.</div>
-        </div>
-        <div class="option-price">AU$90</div>
-      </div>
-      <div class="option-item">
-        <div class="option-info">
-          <div class="option-name">Building licence (12 months)</div>
-          <div class="option-desc">Full building coverage across all current listings within it over a 12-month period.</div>
-        </div>
-        <div class="option-price">AU$350 / year</div>
-      </div>
-      <div class="option-item">
-        <div class="option-info">
-          <div class="option-name">Neighbourhood licence (12 months)</div>
-          <div class="option-desc">Multiple listings across an entire suburb over a 12-month period.</div>
-        </div>
-        <div class="option-price">AU$450 / year</div>
-      </div>
-      <div class="rules-box">
-        <div><strong>Allowed</strong> Real estate marketing across portals, brochures, signboards, and social media.</div>
-        <div><strong>Not allowed</strong> Use on listings outside the licensed property, building, or suburb. Sublicensing.</div>
-      </div>
-    </div>
-  </div>
 
-  <!-- 04 — PROJECT & CAMPAIGN USE -->
-  <div class="acc-section" id="project-campaign-use">
-    <div class="acc-header">
-      <span class="acc-title">Project &amp; Campaign Use</span>
-      <div class="acc-meta">
-        <span class="acc-preview">From AU$450</span>
-        <span class="acc-chevron">↓</span>
+    <!-- EXCLUSIVE COMMERCIAL -->
+    <div class="spec-group">
+      <div class="spec-row">
+        <div class="spec-category">Exclusive Commercial</div>
+        <div class="spec-summary-desc">Advertising, film, or national distribution requiring exclusivity</div>
+        <div class="spec-price">From AU$3,500</div>
+        <div class="spec-arrow">↓</div>
+      </div>
+      <div class="spec-dropdown">
+        <div class="spec-option-item">
+          <div class="spec-option-info">
+            <div class="option-name">Exclusive licence (by negotiation)</div>
+            <div class="option-desc">Advertising, broadcast, film, national/international distribution, or full exclusivity requirements.</div>
+          </div>
+          <div class="spec-option-price">From AU$3,500</div>
+        </div>
+        <div class="spec-rules">
+          <div><strong>Allowed:</strong> As explicitly agreed in the custom contract terms and duration.</div>
+          <div><strong>Not allowed:</strong> Any use outside agreed contract terms. Not a self-serve option.</div>
+        </div>
       </div>
     </div>
-    <div class="acc-body">
-      <div class="option-item">
-        <div class="option-info">
-          <div class="option-name">Single development, one campaign</div>
-          <div class="option-desc">Full multi-channel campaign for one development project: website, brochure, signage, social media.</div>
-        </div>
-        <div class="option-price">AU$450</div>
-      </div>
-      <div class="option-item">
-        <div class="option-info">
-          <div class="option-name">Multi-market or extended campaign</div>
-          <div class="option-desc">Campaigns running across multiple states or extending past 12 months.</div>
-        </div>
-        <div class="option-price">On enquiry</div>
-      </div>
-      <div class="rules-box">
-        <div><strong>Allowed</strong> Use across stated channels for the named development during the campaign duration.</div>
-        <div><strong>Not allowed</strong> Use on a different development by the same client or unrelated advertising.</div>
-      </div>
-    </div>
-  </div>
 
-  <!-- 05 — PUBLIC & INSTITUTIONAL -->
-  <div class="acc-section" id="public-institutional">
-    <div class="acc-header">
-      <span class="acc-title">Public &amp; Institutional</span>
-      <div class="acc-meta">
-        <span class="acc-preview">On enquiry</span>
-        <span class="acc-chevron">↓</span>
-      </div>
-    </div>
-    <div class="acc-body">
-      <div class="option-item">
-        <div class="option-info">
-          <div class="option-name">Single image communication</div>
-          <div class="option-desc">One image for a named public communication by a government body, university, or non-profit.</div>
-        </div>
-        <div class="option-price">On enquiry</div>
-      </div>
-      <div class="option-item">
-        <div class="option-info">
-          <div class="option-name">Campaign set (5 to 20 images)</div>
-          <div class="option-desc">Consultations, exhibitions, or educational resource packs spanning multiple channels.</div>
-        </div>
-        <div class="option-price">On enquiry</div>
-      </div>
-      <div class="rules-box">
-        <div><strong>Allowed</strong> Non-commercial public communication by the named institution within stated scope.</div>
-        <div><strong>Not allowed</strong> Resale, third-party contractor use without naming them, or scope creep.</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 06 — EXCLUSIVE COMMERCIAL -->
-  <div class="acc-section" id="exclusive-commercial">
-    <div class="acc-header">
-      <span class="acc-title">Exclusive Commercial</span>
-      <div class="acc-meta">
-        <span class="acc-preview">From AU$3,500</span>
-        <span class="acc-chevron">↓</span>
-      </div>
-    </div>
-    <div class="acc-body">
-      <div class="option-item">
-        <div class="option-info">
-          <div class="option-name">Exclusive licence (by negotiation)</div>
-          <div class="option-desc">Advertising, broadcast, film, national/international distribution, or full exclusivity requirements.</div>
-        </div>
-        <div class="option-price">From AU$3,500</div>
-      </div>
-      <div class="rules-box">
-        <div><strong>Allowed</strong> As explicitly agreed in the custom contract terms and duration.</div>
-        <div><strong>Not allowed</strong> Any use outside agreed contract terms. Not a self-serve option.</div>
-      </div>
-    </div>
   </div>
 
   <!-- KEY CONDITIONS -->
@@ -417,28 +409,10 @@
   var root = document.querySelector('.pi-pricing-embed');
   if (!root) return;
 
-  function openSection(id) {
-    root.querySelectorAll('.acc-section').forEach(function (s) { s.classList.remove('open'); });
-    var target = root.querySelector('#' + id);
-    if (!target) return;
-    target.classList.add('open');
-    root.querySelectorAll('.finder-row').forEach(function (r) { r.classList.remove('active'); });
-    var finderRow = root.querySelector('.finder-row[data-target="' + id + '"]');
-    if (finderRow) finderRow.classList.add('active');
-    setTimeout(function () {
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 50);
-  }
-
-  root.querySelectorAll('.acc-header').forEach(function (header) {
-    header.addEventListener('click', function () {
-      this.closest('.acc-section').classList.toggle('open');
-    });
-  });
-
-  root.querySelectorAll('.finder-row').forEach(function (row) {
+  root.querySelectorAll('.spec-row').forEach(function (row) {
     row.addEventListener('click', function () {
-      openSection(this.getAttribute('data-target'));
+      var group = this.closest('.spec-group');
+      group.classList.toggle('open');
     });
   });
 })();
