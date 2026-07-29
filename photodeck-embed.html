@@ -359,7 +359,7 @@
   <div id="search-row">
     <div id="geocoder"></div>
     <a id="search-archive-btn" href="https://photoindex.photodeck.com/" target="_top">
-      <span id="search-archive-text">FULL ARCHIVE</span>
+      <span id="search-archive-text">SEARCH</span>
     </a>
   </div>
 
@@ -553,7 +553,7 @@
 </div>
 
 <a id="mobile-bottom-bar" href="https://photoindex.photodeck.com/" target="_top">
-  FULL ARCHIVE
+  SEARCH
 </a>
 
 <script>
@@ -953,7 +953,7 @@ function updatePhotoDeckLink() {
   var btnMobile = document.getElementById('mobile-bottom-bar');
   
   var targetUrl = queryStr ? 'https://photoindex.photodeck.com/?search=' + encodeURIComponent(queryStr) : 'https://photoindex.photodeck.com/';
-  var textValue = queryStr ? 'VIEW SELECTION' : 'FULL ARCHIVE';
+  var textValue = queryStr ? 'VIEW SELECTION' : 'SEARCH';
 
   if (btnDesktop) {
     btnDesktop.href = targetUrl;
