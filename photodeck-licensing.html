@@ -1,20 +1,18 @@
-<!--
-  PhotoIndex — Licensing
-  Namespaced under .pi-pricing-embed for safe embedding inside PhotoDeck's own page CSS.
-  Structure: summary table (not cards) → finder (use-case based) → accordion (6 categories) → static Key Conditions.
-  Colour vars matched to photodeck-embed.html (map): bg #FFFFFF, rule #DADADA, rule-strong/text #111111,
-  hover #FAFAFA. Typography stays Inter 400/500, sizes 11/13/14px (28px for price display) as before,
-  "tables not cards", duration lives in conditions text/title, never as its own column.
--->
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhotoIndex — Licensing</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap');
 
 .pi-pricing-embed {
-  --bg:    #FFFFFF;
-  --text:  #111111;
+  --bg: #FFFFFF;
+  --text: #111111;
   --muted: #6B6B6B;
-  --rule:  #DADADA;
+  --rule: #DADADA;
   --rule-strong: #111111;
 
   font-family: 'Inter', sans-serif;
@@ -24,196 +22,177 @@
   line-height: 1.5;
   font-weight: 400;
   padding: 32px 0 64px;
+  max-width: 800px;
+  margin: 0 auto;
 }
 .pi-pricing-embed * { box-sizing: border-box; }
 
 /* Intro */
-.pi-pricing-embed .pi-intro { margin-bottom: 40px; }
+.pi-pricing-embed .pi-intro { margin-bottom: 32px; }
 .pi-pricing-embed .pi-intro p {
-  font-size: 14px; color: var(--muted); max-width: 560px; margin: 0 0 6px;
+  font-size: 14px; color: var(--muted); max-width: 600px; margin: 0 0 6px;
 }
 .pi-pricing-embed .pi-intro .pi-gst {
   font-size: 11px; color: var(--muted); letter-spacing: 0.04em;
 }
 
-/* Summary table — replaces cards */
-.pi-pricing-embed .summary { border-top: 1px solid var(--rule-strong); margin-bottom: 40px; }
-.pi-pricing-embed .summary-intro {
-  font-size: 11px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase;
-  color: var(--muted); padding: 8px 0; line-height: 1;
-}
-.pi-pricing-embed .summary-row {
-  display: grid; grid-template-columns: 200px 1fr 140px;
-  border-bottom: 1px solid var(--rule);
-  padding: 12px 0; cursor: pointer; align-items: baseline;
-  transition: background 0.12s;
-}
-.pi-pricing-embed .summary-row:hover { background: #FAFAFA; }
-.pi-pricing-embed .summary-name { font-size: 13px; font-weight: 500; }
-.pi-pricing-embed .summary-desc { font-size: 13px; color: var(--muted); padding: 0 16px; }
-.pi-pricing-embed .summary-price { font-size: 13px; font-weight: 500; text-align: right; white-space: nowrap; }
-
-/* Finder */
+/* Finder / Quick Selector (Replaces redundant summary + finder duplication) */
 .pi-pricing-embed .finder { border-top: 1px solid var(--rule-strong); margin-bottom: 48px; }
 .pi-pricing-embed .finder-header {
-  display: grid; grid-template-columns: 1fr 200px 28px;
+  display: grid; grid-template-columns: 1fr 180px 110px 24px;
   border-bottom: 1px solid var(--rule); padding: 8px 0;
+  align-items: baseline;
 }
 .pi-pricing-embed .finder-hcell {
   font-size: 11px; font-weight: 500; letter-spacing: 0.14em;
   text-transform: uppercase; color: var(--muted); padding: 0 4px; line-height: 1;
 }
+.pi-pricing-embed .finder-hcell:nth-child(3) {
+  text-align: right;
+  padding-right: 16px;
+}
 .pi-pricing-embed .finder-row {
-  display: grid; grid-template-columns: 1fr 200px 28px;
+  display: grid; grid-template-columns: 1fr 180px 110px 24px;
   border-bottom: 1px solid var(--rule);
   cursor: pointer; transition: background 0.12s; align-items: center;
+  padding: 12px 0;
 }
 .pi-pricing-embed .finder-row:hover,
 .pi-pricing-embed .finder-row.active { background: #FAFAFA; }
-.pi-pricing-embed .finder-context { padding: 12px 4px 12px 0; font-size: 13px; }
-.pi-pricing-embed .finder-tags { padding: 12px 8px; }
-.pi-pricing-embed .ftag {
-  font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--text); border: 1px solid var(--rule); padding: 2px 8px; white-space: nowrap;
-}
-.pi-pricing-embed .finder-arrow { font-size: 13px; color: var(--muted); text-align: right; }
+.pi-pricing-embed .finder-context { padding: 0 12px 0 0; font-size: 13px; }
+.pi-pricing-embed .finder-cat { font-size: 13px; font-weight: 400; color: var(--text); padding: 0 4px; }
+.pi-pricing-embed .finder-price { font-size: 13px; font-weight: 400; color: var(--text); text-align: right; white-space: nowrap; padding-right: 16px; }
+.pi-pricing-embed .finder-arrow { font-size: 13px; color: var(--muted); text-align: center; }
 
-/* Accordion */
+/* Accordion Sections */
 .pi-pricing-embed .acc-section { border-top: 1px solid var(--rule-strong); margin-bottom: 2px; }
 .pi-pricing-embed .acc-header {
   display: grid; grid-template-columns: 1fr auto;
-  align-items: center; padding: 14px 0;
+  align-items: center; padding: 16px 0;
   cursor: pointer; user-select: none;
 }
 .pi-pricing-embed .acc-header:hover .acc-title { color: var(--muted); }
-.pi-pricing-embed .acc-title { font-size: 11px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; line-height: 1; }
+.pi-pricing-embed .acc-title { font-size: 12px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; line-height: 1; }
 .pi-pricing-embed .acc-meta { display: flex; align-items: center; gap: 20px; }
-.pi-pricing-embed .acc-preview { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
+.pi-pricing-embed .acc-preview { font-size: 12px; color: var(--muted); letter-spacing: 0.04em; }
 .pi-pricing-embed .acc-chevron { font-size: 13px; color: var(--muted); transition: transform 0.2s; display: inline-block; }
 .pi-pricing-embed .acc-section.open .acc-chevron { transform: rotate(180deg); }
-.pi-pricing-embed .acc-body { display: none; padding-bottom: 32px; }
+.pi-pricing-embed .acc-body { display: none; padding-bottom: 24px; }
 .pi-pricing-embed .acc-section.open .acc-body { display: block; }
 
-/* Tables (pricing + conditions) */
-.pi-pricing-embed .lic-table { border-top: 1px solid var(--rule); margin-bottom: 4px; }
-.pi-pricing-embed .lic-table + .lic-table { border-top: none; margin-bottom: 0; }
-.pi-pricing-embed .lic-row { display: grid; border-bottom: 1px solid var(--rule); align-items: start; }
-.pi-pricing-embed .lic-row.cols-3 { grid-template-columns: 220px 1fr 130px; }
-.pi-pricing-embed .lic-row.cols-2 { grid-template-columns: 160px 1fr; }
-.pi-pricing-embed .lic-cell { padding: 12px 16px 12px 0; font-size: 13px; }
-.pi-pricing-embed .lic-cell:first-child { padding-left: 0; }
-.pi-pricing-embed .lic-cell.label {
-  font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--muted); padding-top: 8px; padding-bottom: 8px; line-height: 1;
+/* Minimalist Clean Option Rows Inside Accordion */
+.pi-pricing-embed .option-item {
+  display: grid; grid-template-columns: 1fr 120px;
+  border-top: 1px solid var(--rule);
+  padding: 12px 0;
+  align-items: baseline;
 }
-.pi-pricing-embed .lic-cell.title { font-weight: 500; }
-.pi-pricing-embed .lic-cell.meta { color: var(--muted); }
-.pi-pricing-embed .lic-cell.price { text-align: right; white-space: nowrap; font-weight: 500; }
-.pi-pricing-embed .lic-cell.note { color: var(--muted); font-size: 13px; }
-.pi-pricing-embed .lic-row.header .lic-cell.label { padding-top: 0; }
+.pi-pricing-embed .option-item:first-child { border-top: 1px solid var(--rule); }
+.pi-pricing-embed .option-info .option-name { font-weight: 500; font-size: 13px; margin-bottom: 2px; }
+.pi-pricing-embed .option-info .option-desc { font-size: 13px; color: var(--muted); }
+.pi-pricing-embed .option-price { font-weight: 500; font-size: 13px; text-align: right; white-space: nowrap; }
+
+/* Clean Rules Box (Allowed / Not allowed combined neatly) */
+.pi-pricing-embed .rules-box {
+  margin-top: 16px;
+  background: #FAFAFA;
+  border: 1px solid var(--rule);
+  padding: 12px 16px;
+  font-size: 12px;
+  color: var(--muted);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.pi-pricing-embed .rules-box strong { color: var(--text); font-weight: 500; display: block; margin-bottom: 2px; }
 
 /* Key Conditions — static, always visible */
-.pi-pricing-embed .key-conditions { border-top: 1px solid var(--rule-strong); margin-top: 0; }
-.pi-pricing-embed .key-conditions-header { padding: 14px 0; }
+.pi-pricing-embed .key-conditions { border-top: 1px solid var(--rule-strong); margin-top: 40px; }
+.pi-pricing-embed .key-conditions-header { padding: 16px 0; font-size: 12px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; }
+.pi-pricing-embed .condition-row {
+  display: grid; grid-template-columns: 200px 1fr;
+  border-top: 1px solid var(--rule);
+  padding: 12px 0;
+  font-size: 13px;
+}
+.pi-pricing-embed .condition-title { font-weight: 500; padding-right: 16px; color: var(--text); }
+.pi-pricing-embed .condition-desc { color: var(--muted); }
 
-/* Mobile */
+/* Mobile adjustments */
 @media (max-width: 680px) {
-  .pi-pricing-embed { padding: 24px 0 48px; }
-  .pi-pricing-embed .summary-row { grid-template-columns: 1fr 90px; }
-  .pi-pricing-embed .summary-desc { display: none; }
+  .pi-pricing-embed { padding: 20px 16px; }
   .pi-pricing-embed .finder-header { display: none; }
-  .pi-pricing-embed .finder-row { grid-template-columns: 1fr auto; }
-  .pi-pricing-embed .finder-tags { display: none; }
-  .pi-pricing-embed .finder-context { padding: 12px 0; font-size: 13px; }
-  .pi-pricing-embed .finder-arrow { padding: 12px 0; }
-  .pi-pricing-embed .lic-row.cols-3 { grid-template-columns: 1fr 90px; }
-  .pi-pricing-embed .lic-row.cols-3 .lic-cell:nth-child(2) { grid-column: 1 / -1; padding-top: 0; }
-  .pi-pricing-embed .lic-row.cols-2 { grid-template-columns: 1fr; }
-  .pi-pricing-embed .acc-header { padding: 12px 0; }
-  .pi-pricing-embed .acc-body { padding-bottom: 20px; }
+  .pi-pricing-embed .finder-row { grid-template-columns: 1fr auto; gap: 8px; }
+  .pi-pricing-embed .finder-cat, .pi-pricing-embed .finder-arrow { display: none; }
+  .pi-pricing-embed .option-item { grid-template-columns: 1fr; gap: 6px; }
+  .pi-pricing-embed .option-price { text-align: left; }
+  .pi-pricing-embed .rules-box { grid-template-columns: 1fr; gap: 10px; }
+  .pi-pricing-embed .condition-row { grid-template-columns: 1fr; gap: 4px; }
 }
 </style>
+</head>
+<body>
 
 <div class="pi-pricing-embed">
 
   <div class="pi-intro">
-    <p>Licences are grouped by where the image will be used, not by who is buying it. Find your use case below, or browse the full list.</p>
+    <p>Licences are grouped by where the image will be used. Select your intended use case below to view details, or browse categories.</p>
     <div class="pi-gst">All prices include GST.</div>
   </div>
 
-  <!-- SUMMARY — table, not cards -->
-  <div class="summary">
-    <div class="summary-intro">All licences, lowest to highest</div>
-    <div class="summary-row" data-target="editorial">
-      <div class="summary-name">Editorial</div>
-      <div class="summary-desc">One image, one named publication or broadcast piece</div>
-      <div class="summary-price">AU$45</div>
-    </div>
-    <div class="summary-row" data-target="unpublished-use">
-      <div class="summary-name">Unpublished Use</div>
-      <div class="summary-desc">DA submissions, internal reports, research files</div>
-      <div class="summary-price">From AU$70</div>
-    </div>
-    <div class="summary-row" data-target="single-listing-use">
-      <div class="summary-name">Single Listing Use</div>
-      <div class="summary-desc">Property listing, building, or suburb package</div>
-      <div class="summary-price">AU$90 – AU$450</div>
-    </div>
-    <div class="summary-row" data-target="project-campaign-use">
-      <div class="summary-name">Project &amp; Campaign Use</div>
-      <div class="summary-desc">Sales campaigns and development marketing</div>
-      <div class="summary-price">From AU$450</div>
-    </div>
-    <div class="summary-row" data-target="public-institutional">
-      <div class="summary-name">Public &amp; Institutional</div>
-      <div class="summary-desc">Councils, universities, museums, non-profits</div>
-      <div class="summary-price">On enquiry</div>
-    </div>
-    <div class="summary-row" data-target="exclusive-commercial">
-      <div class="summary-name">Exclusive Commercial</div>
-      <div class="summary-desc">Advertising, broadcast, film, national distribution</div>
-      <div class="summary-price">From AU$3,500</div>
-    </div>
-  </div>
-
-  <!-- FINDER — use-case based, not profession based -->
+  <!-- UNIFIED FINDER & QUICK PRICING (Replaces separate Summary and duplicate Finder) -->
   <div class="finder">
     <div class="finder-header">
       <div class="finder-hcell">Where will you use this image?</div>
-      <div class="finder-hcell">Licence</div>
+      <div class="finder-hcell">Licence Type</div>
+      <div class="finder-hcell" style="text-align:right">Price</div>
       <div class="finder-hcell"></div>
     </div>
-    <div class="finder-row" data-target="unpublished-use">
-      <div class="finder-context">Development Application, internal report, or research file</div>
-      <div class="finder-tags"><span class="ftag">Unpublished Use</span></div>
-      <div class="finder-arrow">↓</div>
-    </div>
+    
     <div class="finder-row" data-target="editorial">
       <div class="finder-context">Magazine article, blog post, or broadcast piece</div>
-      <div class="finder-tags"><span class="ftag">Editorial</span></div>
+      <div class="finder-cat">Editorial</div>
+      <div class="finder-price">AU$45</div>
       <div class="finder-arrow">↓</div>
     </div>
+    
+    <div class="finder-row" data-target="unpublished-use">
+      <div class="finder-context">Development Application, internal report, or research file</div>
+      <div class="finder-cat">Unpublished Use</div>
+      <div class="finder-price">From AU$70</div>
+      <div class="finder-arrow">↓</div>
+    </div>
+    
     <div class="finder-row" data-target="single-listing-use">
       <div class="finder-context">Single property listing, whole building, or suburb real estate campaign</div>
-      <div class="finder-tags"><span class="ftag">Single Listing Use</span></div>
+      <div class="finder-cat">Single Listing Use</div>
+      <div class="finder-price">AU$90 – AU$450</div>
       <div class="finder-arrow">↓</div>
     </div>
+    
     <div class="finder-row" data-target="project-campaign-use">
       <div class="finder-context">Sales brochure, developer website, or full development campaign</div>
-      <div class="finder-tags"><span class="ftag">Project &amp; Campaign</span></div>
+      <div class="finder-cat">Project &amp; Campaign</div>
+      <div class="finder-price">From AU$450</div>
       <div class="finder-arrow">↓</div>
     </div>
+    
     <div class="finder-row" data-target="public-institutional">
       <div class="finder-context">Council, university, museum, or public consultation material</div>
-      <div class="finder-tags"><span class="ftag">Public &amp; Institutional</span></div>
+      <div class="finder-cat">Public &amp; Institutional</div>
+      <div class="finder-price">On enquiry</div>
       <div class="finder-arrow">↓</div>
     </div>
+    
     <div class="finder-row" data-target="exclusive-commercial">
       <div class="finder-context">Advertising, film, or national distribution requiring exclusivity</div>
-      <div class="finder-tags"><span class="ftag">Exclusive Commercial</span></div>
+      <div class="finder-cat">Exclusive Commercial</div>
+      <div class="finder-price">From AU$3,500</div>
       <div class="finder-arrow">↓</div>
     </div>
   </div>
+
+  <!-- ACCORDION SECTIONS -->
 
   <!-- 01 — EDITORIAL -->
   <div class="acc-section" id="editorial">
@@ -225,27 +204,16 @@
       </div>
     </div>
     <div class="acc-body">
-      <div class="lic-table">
-        <div class="lic-row cols-3 header">
-          <div class="lic-cell label">Licence</div>
-          <div class="lic-cell label">Use</div>
-          <div class="lic-cell label" style="text-align:right">Price</div>
+      <div class="option-item">
+        <div class="option-info">
+          <div class="option-name">Single image, one publication</div>
+          <div class="option-desc">One image, one named publication or broadcast piece — magazine article, blog post, news segment.</div>
         </div>
-        <div class="lic-row cols-3">
-          <div class="lic-cell title">Single image, one publication</div>
-          <div class="lic-cell meta">One image, one named publication or broadcast piece — magazine article, blog post, news segment.</div>
-          <div class="lic-cell price">AU$45</div>
-        </div>
+        <div class="option-price">AU$45</div>
       </div>
-      <div class="lic-table">
-        <div class="lic-row cols-2">
-          <div class="lic-cell label">Allowed</div>
-          <div class="lic-cell note">Use within the one named piece, in print or digital form, including social promotion of that specific piece.</div>
-        </div>
-        <div class="lic-row cols-2">
-          <div class="lic-cell label">Not allowed</div>
-          <div class="lic-cell note">Use in advertising, on a cover, or in any piece other than the one named at purchase.</div>
-        </div>
+      <div class="rules-box">
+        <div><strong>Allowed</strong> Use within the one named piece, in print or digital form, including social promotion of that specific piece.</div>
+        <div><strong>Not allowed</strong> Use in advertising, on a cover, or in any piece other than the one named at purchase.</div>
       </div>
     </div>
   </div>
@@ -260,37 +228,30 @@
       </div>
     </div>
     <div class="acc-body">
-      <div class="lic-table">
-        <div class="lic-row cols-3 header">
-          <div class="lic-cell label">Licence</div>
-          <div class="lic-cell label">Use</div>
-          <div class="lic-cell label" style="text-align:right">Price</div>
+      <div class="option-item">
+        <div class="option-info">
+          <div class="option-name">Single document — 1 to 5 images</div>
+          <div class="option-desc">Development Application submissions, internal reports, research files, or planning working papers not published publicly.</div>
         </div>
-        <div class="lic-row cols-3">
-          <div class="lic-cell title">Single document — 1 to 5 images</div>
-          <div class="lic-cell meta">One named document. Development Application submissions, internal reports, research files, or planning working papers not published to the public.</div>
-          <div class="lic-cell price">AU$100 / image</div>
-        </div>
-        <div class="lic-row cols-3">
-          <div class="lic-cell title">Single document — 6 to 20 images</div>
-          <div class="lic-cell meta">Same use as above, at the per-image rate that applies once a document draws on a larger set of images.</div>
-          <div class="lic-cell price">AU$70 / image</div>
-        </div>
-        <div class="lic-row cols-3">
-          <div class="lic-cell title">Larger sets, more than 20 images</div>
-          <div class="lic-cell meta">Priced to the scope of the document.</div>
-          <div class="lic-cell price">On enquiry</div>
-        </div>
+        <div class="option-price">AU$100 / image</div>
       </div>
-      <div class="lic-table">
-        <div class="lic-row cols-2">
-          <div class="lic-cell label">Allowed</div>
-          <div class="lic-cell note">Use within the one named document. Internal circulation, submission to a government body, or inclusion in a research file.</div>
+      <div class="option-item">
+        <div class="option-info">
+          <div class="option-name">Single document — 6 to 20 images</div>
+          <div class="option-desc">Same use as above, at the discounted per-image rate for larger sets within a single document.</div>
         </div>
-        <div class="lic-row cols-2">
-          <div class="lic-cell label">Not allowed</div>
-          <div class="lic-cell note">Publication to the public, marketing use, or reuse in a second document without a new licence.</div>
+        <div class="option-price">AU$70 / image</div>
+      </div>
+      <div class="option-item">
+        <div class="option-info">
+          <div class="option-name">Larger sets (> 20 images)</div>
+          <div class="option-desc">Custom pricing tailored to the exact scope of the documentation.</div>
         </div>
+        <div class="option-price">On enquiry</div>
+      </div>
+      <div class="rules-box">
+        <div><strong>Allowed</strong> Internal circulation, submission to a government body, or inclusion in a research file.</div>
+        <div><strong>Not allowed</strong> Public publication, marketing use, or reuse in a second document without a new licence.</div>
       </div>
     </div>
   </div>
@@ -305,37 +266,30 @@
       </div>
     </div>
     <div class="acc-body">
-      <div class="lic-table">
-        <div class="lic-row cols-3 header">
-          <div class="lic-cell label">Licence</div>
-          <div class="lic-cell label">Use</div>
-          <div class="lic-cell label" style="text-align:right">Price</div>
+      <div class="option-item">
+        <div class="option-info">
+          <div class="option-name">Single property listing</div>
+          <div class="option-desc">One image, one property listing, valid for the duration of the sale campaign.</div>
         </div>
-        <div class="lic-row cols-3">
-          <div class="lic-cell title">Single property listing</div>
-          <div class="lic-cell meta">One image, one property listing, for the duration of the sale campaign.</div>
-          <div class="lic-cell price">AU$90</div>
-        </div>
-        <div class="lic-row cols-3">
-          <div class="lic-cell title">Building licence, 12 months</div>
-          <div class="lic-cell meta">Full building coverage, for use across all current listings within it over a 12 month period. Listings opened within the period retain image rights until the property sells.</div>
-          <div class="lic-cell price">AU$350 / year</div>
-        </div>
-        <div class="lic-row cols-3">
-          <div class="lic-cell title">Neighbourhood licence, 12 months</div>
-          <div class="lic-cell meta">Multiple listings across one suburb over a 12 month period. Listings opened within the period retain image rights until the property sells.</div>
-          <div class="lic-cell price">AU$450 / year</div>
-        </div>
+        <div class="option-price">AU$90</div>
       </div>
-      <div class="lic-table">
-        <div class="lic-row cols-2">
-          <div class="lic-cell label">Allowed</div>
-          <div class="lic-cell note">Real estate marketing for the named listing, building, or suburb: portals, brochures, signboards, social media.</div>
+      <div class="option-item">
+        <div class="option-info">
+          <div class="option-name">Building licence (12 months)</div>
+          <div class="option-desc">Full building coverage across all current listings within it over a 12-month period.</div>
         </div>
-        <div class="lic-row cols-2">
-          <div class="lic-cell label">Not allowed</div>
-          <div class="lic-cell note">Use on a listing outside the licensed property, building, or suburb. Sublicensing to another agency.</div>
+        <div class="option-price">AU$350 / year</div>
+      </div>
+      <div class="option-item">
+        <div class="option-info">
+          <div class="option-name">Neighbourhood licence (12 months)</div>
+          <div class="option-desc">Multiple listings across an entire suburb over a 12-month period.</div>
         </div>
+        <div class="option-price">AU$450 / year</div>
+      </div>
+      <div class="rules-box">
+        <div><strong>Allowed</strong> Real estate marketing across portals, brochures, signboards, and social media.</div>
+        <div><strong>Not allowed</strong> Use on listings outside the licensed property, building, or suburb. Sublicensing.</div>
       </div>
     </div>
   </div>
@@ -350,32 +304,23 @@
       </div>
     </div>
     <div class="acc-body">
-      <div class="lic-table">
-        <div class="lic-row cols-3 header">
-          <div class="lic-cell label">Licence</div>
-          <div class="lic-cell label">Use</div>
-          <div class="lic-cell label" style="text-align:right">Price</div>
+      <div class="option-item">
+        <div class="option-info">
+          <div class="option-name">Single development, one campaign</div>
+          <div class="option-desc">Full multi-channel campaign for one development project: website, brochure, signage, social media.</div>
         </div>
-        <div class="lic-row cols-3">
-          <div class="lic-cell title">Single development, one campaign</div>
-          <div class="lic-cell meta">Full multi-channel campaign for one development project: website, brochure, signage, social media.</div>
-          <div class="lic-cell price">AU$450</div>
-        </div>
-        <div class="lic-row cols-3">
-          <div class="lic-cell title">Multi-market or extended campaign</div>
-          <div class="lic-cell meta">Campaigns running across more than one state, or longer than 12 months.</div>
-          <div class="lic-cell price">On enquiry</div>
-        </div>
+        <div class="option-price">AU$450</div>
       </div>
-      <div class="lic-table">
-        <div class="lic-row cols-2">
-          <div class="lic-cell label">Allowed</div>
-          <div class="lic-cell note">Use across the stated channels, for the named development, for the duration of the campaign.</div>
+      <div class="option-item">
+        <div class="option-info">
+          <div class="option-name">Multi-market or extended campaign</div>
+          <div class="option-desc">Campaigns running across multiple states or extending past 12 months.</div>
         </div>
-        <div class="lic-row cols-2">
-          <div class="lic-cell label">Not allowed</div>
-          <div class="lic-cell note">Use on a different development by the same client without a separate licence. Use in advertising unrelated to the named project.</div>
-        </div>
+        <div class="option-price">On enquiry</div>
+      </div>
+      <div class="rules-box">
+        <div><strong>Allowed</strong> Use across stated channels for the named development during the campaign duration.</div>
+        <div><strong>Not allowed</strong> Use on a different development by the same client or unrelated advertising.</div>
       </div>
     </div>
   </div>
@@ -390,32 +335,23 @@
       </div>
     </div>
     <div class="acc-body">
-      <div class="lic-table">
-        <div class="lic-row cols-3 header">
-          <div class="lic-cell label">Licence</div>
-          <div class="lic-cell label">Use</div>
-          <div class="lic-cell label" style="text-align:right">Price</div>
+      <div class="option-item">
+        <div class="option-info">
+          <div class="option-name">Single image communication</div>
+          <div class="option-desc">One image for a named public communication by a government body, university, or non-profit.</div>
         </div>
-        <div class="lic-row cols-3">
-          <div class="lic-cell title">Single image</div>
-          <div class="lic-cell meta">One image, for one named public communication by a government body, university, or non-profit institution. A single exhibition panel, a single social post, a single event listing.</div>
-          <div class="lic-cell price">On enquiry</div>
-        </div>
-        <div class="lic-row cols-3">
-          <div class="lic-cell title">Campaign set, 5 to 20 images</div>
-          <div class="lic-cell meta">Campaigns, consultations, or course resource packs spanning several channels, priced to the scope of the project.</div>
-          <div class="lic-cell price">On enquiry</div>
-        </div>
+        <div class="option-price">On enquiry</div>
       </div>
-      <div class="lic-table">
-        <div class="lic-row cols-2">
-          <div class="lic-cell label">Allowed</div>
-          <div class="lic-cell note">Non-commercial public communication by the named institution, within the stated scope.</div>
+      <div class="option-item">
+        <div class="option-info">
+          <div class="option-name">Campaign set (5 to 20 images)</div>
+          <div class="option-desc">Consultations, exhibitions, or educational resource packs spanning multiple channels.</div>
         </div>
-        <div class="lic-row cols-2">
-          <div class="lic-cell label">Not allowed</div>
-          <div class="lic-cell note">Resale, use by a third-party contractor without naming them at purchase, or use beyond the named campaign.</div>
-        </div>
+        <div class="option-price">On enquiry</div>
+      </div>
+      <div class="rules-box">
+        <div><strong>Allowed</strong> Non-commercial public communication by the named institution within stated scope.</div>
+        <div><strong>Not allowed</strong> Resale, third-party contractor use without naming them, or scope creep.</div>
       </div>
     </div>
   </div>
@@ -430,61 +366,47 @@
       </div>
     </div>
     <div class="acc-body">
-      <div class="lic-table">
-        <div class="lic-row cols-3 header">
-          <div class="lic-cell label">Licence</div>
-          <div class="lic-cell label">Use</div>
-          <div class="lic-cell label" style="text-align:right">Price</div>
+      <div class="option-item">
+        <div class="option-info">
+          <div class="option-name">Exclusive licence (by negotiation)</div>
+          <div class="option-desc">Advertising, broadcast, film, national/international distribution, or full exclusivity requirements.</div>
         </div>
-        <div class="lic-row cols-3">
-          <div class="lic-cell title">Exclusive licence, by negotiation</div>
-          <div class="lic-cell meta">Advertising, broadcast, film, national or international distribution, or any use requiring that an image not be licensed to anyone else.</div>
-          <div class="lic-cell price">From AU$3,500</div>
-        </div>
+        <div class="option-price">From AU$3,500</div>
       </div>
-      <div class="lic-table">
-        <div class="lic-row cols-2">
-          <div class="lic-cell label">Allowed</div>
-          <div class="lic-cell note">As agreed in the licence contract, including exclusivity terms and duration.</div>
-        </div>
-        <div class="lic-row cols-2">
-          <div class="lic-cell label">Not allowed</div>
-          <div class="lic-cell note">Use outside the agreed contract terms. This licence is negotiated individually, not self-serve.</div>
-        </div>
+      <div class="rules-box">
+        <div><strong>Allowed</strong> As explicitly agreed in the custom contract terms and duration.</div>
+        <div><strong>Not allowed</strong> Any use outside agreed contract terms. Not a self-serve option.</div>
       </div>
     </div>
   </div>
 
-  <!-- KEY CONDITIONS — static, always visible, applies across all categories above -->
+  <!-- KEY CONDITIONS -->
   <div class="key-conditions">
-    <div class="key-conditions-header">
-      <span class="acc-title">Key Conditions</span>
+    <div class="key-conditions-header">Key Conditions</div>
+    
+    <div class="condition-row">
+      <div class="condition-title">How pricing works</div>
+      <div class="condition-desc">Price scales with reach and exclusivity, not the image itself — shared use costs less than exclusive use.</div>
     </div>
-    <div class="lic-table">
-      <div class="lic-row cols-2">
-        <div class="lic-cell label">How pricing works</div>
-        <div class="lic-cell note">Price scales with reach and exclusivity, not the image itself — a single named publication costs less than a national campaign, and shared use costs less than exclusive use.</div>
-      </div>
-      <div class="lic-row cols-2">
-        <div class="lic-cell label">How long it lasts</div>
-        <div class="lic-cell note">Unless stated otherwise above, licences must be exercised within 12 months of purchase. This is a window for making use of the licence, not a deadline for removing material already published within it. Renewal is available at the same rate, subject to review.</div>
-      </div>
-      <div class="lic-row cols-2">
-        <div class="lic-cell label">Updated photographs</div>
-        <div class="lic-cell note">If a building or location is re-photographed at a later date, the new photographs are issued under a new licence. Existing licences cover only the images purchased at the time.</div>
-      </div>
-      <div class="lic-row cols-2">
-        <div class="lic-cell label">Passing it on</div>
-        <div class="lic-cell note">No licence permits passing it on to a third party unless agreed in writing. All licences are issued to the purchasing entity or named individual only.</div>
-      </div>
-      <div class="lic-row cols-2">
-        <div class="lic-cell label">Copyright enforcement</div>
-        <div class="lic-cell note">Unlicensed use is followed up on a case-by-case basis. The Single Listing Use rate is used as the reference price for basic copyright claims. Advertising or campaign use without a licence is assessed at the applicable commercial rate.</div>
-      </div>
-      <div class="lic-row cols-2">
-        <div class="lic-cell label">AI &amp; Machine Learning</div>
-        <div class="lic-cell note">This archive exists to document Brisbane accurately, not to train models. Images, metadata, and geographic coordinates may not be scraped, bulk downloaded, or used to train machine learning or AI systems of any kind, under any licence.</div>
-      </div>
+    <div class="condition-row">
+      <div class="condition-title">Duration</div>
+      <div class="condition-desc">Licences must be exercised within 12 months of purchase (a window for making use, not for removing already published material).</div>
+    </div>
+    <div class="condition-row">
+      <div class="condition-title">Updated photographs</div>
+      <div class="condition-desc">Re-photographed locations at a later date require a new licence. Existing licences cover only images purchased at the time.</div>
+    </div>
+    <div class="condition-row">
+      <div class="condition-title">Transferability</div>
+      <div class="condition-desc">No licence permits passing rights to a third party unless agreed in writing. Issued to the purchasing entity only.</div>
+    </div>
+    <div class="condition-row">
+      <div class="condition-title">Copyright enforcement</div>
+      <div class="condition-desc">Unlicensed use is billed using the Single Listing Use rate as a reference, or commercial rates for major advertising.</div>
+    </div>
+    <div class="condition-row">
+      <div class="condition-title">AI &amp; Machine Learning</div>
+      <div class="condition-desc">Images, metadata, and coordinates may not be scraped, bulk downloaded, or used to train AI/ML systems under any licence.</div>
     </div>
   </div>
 
@@ -492,10 +414,7 @@
 
 <script>
 (function () {
-  var root = document.currentScript.previousElementSibling;
-  if (!root || !root.classList.contains('pi-pricing-embed')) {
-    root = document.querySelector('.pi-pricing-embed');
-  }
+  var root = document.querySelector('.pi-pricing-embed');
   if (!root) return;
 
   function openSection(id) {
@@ -522,11 +441,8 @@
       openSection(this.getAttribute('data-target'));
     });
   });
-
-  root.querySelectorAll('.summary-row').forEach(function (row) {
-    row.addEventListener('click', function () {
-      openSection(this.getAttribute('data-target'));
-    });
-  });
 })();
 </script>
+
+</body>
+</html>
