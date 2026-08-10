@@ -7,8 +7,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet">
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
-<link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" rel="stylesheet">
-<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 <style>
   * { box-sizing: border-box; border-radius: 0 !important; box-shadow: none !important; -webkit-tap-highlight-color: transparent; }
@@ -21,11 +19,22 @@
   body { display: flex; flex-direction: column; }
 
   #topbar { border-bottom: 1px solid #DADADA; background: #FFFFFF; flex-shrink: 0; z-index: 10; }
-  #search-row { display: flex; align-items: center; height: 52px; padding: 0 16px; gap: 8px; border-bottom: 1px solid #DADADA; }
-  #geocoder { flex: 1; width: 100%; }
-  #geocoder .mapboxgl-ctrl-geocoder { width: 100%; max-width: none; font-family: 'Inter', system-ui, sans-serif; box-shadow: none; background: #FFFFFF; }
-  #geocoder .mapboxgl-ctrl-geocoder input { height: 36px; font-size: 13px; color: #111111; font-family: 'Inter', system-ui, sans-serif; background: #FFFFFF; padding-left: 32px; }
-  #geocoder .mapboxgl-ctrl-geocoder--icon-search { fill: #111111; top: 9px; left: 6px; }
+  #search-row { display: flex; align-items: center; height: 52px; padding: 0 16px; gap: 8px; border-bottom: 1px solid #DADADA; position: relative; }
+  #geocoder { flex: 1; width: 100%; position: relative; }
+
+  /* CUSTOM SEARCH (Search Box API) — replaces mapbox-gl-geocoder plugin */
+  #pi-search-wrap { position: relative; width: 100%; height: 36px; }
+  #pi-search-icon { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; opacity: 0.4; pointer-events: none; }
+  #pi-search-input { width: 100%; height: 36px; border: 1px solid #DADADA; background: #FFFFFF; font-family: 'Inter', system-ui, sans-serif; font-size: 13px; color: #111111; padding: 0 30px 0 30px; }
+  #pi-search-input::placeholder { color: #6B6B6B; }
+  #pi-search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); border: none; background: transparent; font-size: 16px; color: #6B6B6B; cursor: pointer; display: none; line-height: 1; padding: 4px; }
+  #pi-search-dropdown { display: none; position: absolute; top: 40px; left: 0; right: 0; background: #FFFFFF; border: 1px solid #DADADA; max-height: 320px; overflow-y: auto; z-index: 50; }
+  .pi-sr-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #EFEFEF; }
+  .pi-sr-item:last-child { border-bottom: none; }
+  .pi-sr-item:hover { background: #FAFAFA; }
+  .pi-sr-name { font-size: 13px; color: #111111; }
+  .pi-sr-sub { font-size: 11px; color: #6B6B6B; margin-top: 1px; }
+  .pi-sr-badge { font-size: 9px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #6B6B6B; border: 1px solid #DADADA; padding: 2px 6px; flex-shrink: 0; }
   
   #search-archive-btn { 
     height: 36px; 
@@ -678,17 +687,6 @@ var map = new mapboxgl.Map({
 });
 map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
 
-var geocoder = new MapboxGeocoder({
-  accessToken: mapboxgl.accessToken,
-  mapboxgl: mapboxgl,
-  marker: false,
-  placeholder: 'Search address or location…',
-  countries: 'au',
-  bbox: [152.85, -27.65, 153.25, -27.25],
-  flyTo: false
-});
-document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
-
 function frameArea(center, bbox) {
   if (bbox) {
     map.fitBounds(bbox, { padding: 60, duration: 1200, maxZoom: 14.5, essential: true });
@@ -698,46 +696,205 @@ function frameArea(center, bbox) {
   }
 }
 
-geocoder.on('result', function (e) {
+/* ─────────────────────────────────────────
+   CUSTOM SEARCH — Mapbox Search Box API v1
+   Replaces the old mapbox-gl-geocoder plugin (Geocoding API v5), which
+   reliably misses Brisbane POIs such as parks — Victoria Park returned
+   an empty result from v5 in earlier testing. Search Box does not have
+   that gap and also lets us keep local aliases (e.g. Barrambin) for
+   names Mapbox itself doesn't index.
+───────────────────────────────────────── */
+const PLACE_ALIASES = [
+  {
+    match: ['barrambin', 'victoria park barrambin', 'victoria park / barrambin'],
+    name: 'Victoria Park / Barrambin',
+    place_formatted: 'Herston, Brisbane',
+    center: [153.02936, -27.45651]
+  }
+];
+function aliasMatches(q) {
+  const qq = q.toLowerCase().trim();
+  return PLACE_ALIASES.filter(a => a.match.some(m => m.includes(qq) || qq.includes(m)));
+}
+
+let sbSession = null;
+let sbSessionTimer = null;
+function sbSessionToken() {
+  if (!sbSession) sbSession = 'pi-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+  clearTimeout(sbSessionTimer);
+  sbSessionTimer = setTimeout(() => { sbSession = null; }, 180000);
+  return sbSession;
+}
+function sbSessionEnd() { sbSession = null; clearTimeout(sbSessionTimer); }
+
+let searchSuggestions = [];
+
+function renderSearchDropdown() {
+  const dd = document.getElementById('pi-search-dropdown');
+  if (!dd) return;
+  if (searchSuggestions.length === 0) { dd.style.display = 'none'; dd.innerHTML = ''; return; }
+  dd.innerHTML = searchSuggestions.slice(0, 6).map((s, i) => {
+    const badge = s.kind === 'alias' ? 'Place' : (s.feature_type === 'poi' ? 'Place' : 'Address');
+    return '<div class="pi-sr-item" data-idx="' + i + '">' +
+      '<div style="min-width:0;flex:1">' +
+        '<div class="pi-sr-name">' + s.name + '</div>' +
+        '<div class="pi-sr-sub">' + (s.place_formatted || '') + '</div>' +
+      '</div>' +
+      '<span class="pi-sr-badge">' + badge + '</span>' +
+    '</div>';
+  }).join('');
+  dd.style.display = 'block';
+  dd.querySelectorAll('.pi-sr-item').forEach(el => {
+    el.addEventListener('click', () => pickSearchResult(parseInt(el.getAttribute('data-idx'), 10)));
+  });
+}
+
+let searchDebounce;
+function onSearchInput() {
+  const input = document.getElementById('pi-search-input');
+  const clearBtn = document.getElementById('pi-search-clear');
+  const q = input.value.trim();
+  if (clearBtn) clearBtn.style.display = q.length > 0 ? 'block' : 'none';
+  clearTimeout(searchDebounce);
+  searchDebounce = setTimeout(async () => {
+    if (q.length < 2) { searchSuggestions = []; renderSearchDropdown(); return; }
+    try {
+      const token = sbSessionToken();
+      const url = 'https://api.mapbox.com/search/searchbox/v1/suggest?q=' + encodeURIComponent(q) +
+        '&access_token=' + mapboxgl.accessToken +
+        '&session_token=' + token +
+        '&language=en&country=au' +
+        '&proximity=153.0251,-27.4698' +
+        '&bbox=152.85,-27.65,153.25,-27.25' +
+        '&limit=6';
+      const res = await fetch(url);
+      const data = await res.json();
+      const remote = (data.suggestions || []).map(s => ({
+        kind: 'sb',
+        mapbox_id: s.mapbox_id,
+        name: s.name,
+        place_formatted: s.place_formatted || s.full_address || '',
+        feature_type: s.feature_type
+      }));
+      const local = aliasMatches(q).map(a => ({ kind: 'alias', name: a.name, place_formatted: a.place_formatted, center: a.center }));
+      searchSuggestions = [...local, ...remote];
+      renderSearchDropdown();
+    } catch (e) {
+      searchSuggestions = [];
+      renderSearchDropdown();
+    }
+  }, 150);
+}
+
+async function pickSearchResult(idx) {
+  const s = searchSuggestions[idx];
+  if (!s) return;
+  let center, name, place_formatted, contextText = '';
+
+  if (s.kind === 'alias') {
+    center = s.center;
+    name = s.name;
+    place_formatted = s.place_formatted;
+    contextText = s.place_formatted || '';
+  } else {
+    try {
+      const token = sbSessionToken();
+      const url = 'https://api.mapbox.com/search/searchbox/v1/retrieve/' + s.mapbox_id +
+        '?access_token=' + mapboxgl.accessToken + '&session_token=' + token;
+      const res = await fetch(url);
+      const data = await res.json();
+      const feat = (data.features || [])[0];
+      if (!feat) { sbSessionEnd(); return; }
+      center = feat.geometry.coordinates;
+      name = feat.properties.name || s.name;
+      place_formatted = feat.properties.place_formatted || s.place_formatted || '';
+      contextText = place_formatted;
+    } catch (e) { sbSessionEnd(); return; }
+  }
+  sbSessionEnd();
+
+  document.getElementById('pi-search-input').value = name;
+  searchSuggestions = [];
+  renderSearchDropdown();
+
   if (window.innerWidth <= 720) {
     var mapTab = document.getElementById('tab-map');
     if (mapTab) mapTab.click();
   }
-  
-  var result = e.result;
-  var placeType = result.place_type || [];
-  var targetSuburb = '';
 
-  if (placeType.some(t => t === 'place' || t === 'locality' || t === 'neighborhood')) {
-    frameArea(result.center, result.bbox);
-    targetSuburb = result.text || '';
+  /* Broad places (suburbs etc.) get an area frame, everything else — including
+     parks and other POIs, which is exactly what was missing before — gets a
+     direct fly-to, same behaviour the old geocoder had for place_type 'place'
+     vs everything else. */
+  const isAreaType = s.feature_type === 'place' || s.feature_type === 'locality' || s.feature_type === 'neighborhood' || s.feature_type === 'district';
+  if (isAreaType) {
+    frameArea(center, null);
   } else {
-    map.flyTo({ center: result.center, zoom: 16 });
-    
-    if (result.context && Array.isArray(result.context)) {
-      var ctxMatch = result.context.find(c => c.id.startsWith('locality') || c.id.startsWith('neighborhood') || c.id.startsWith('place'));
-      if (ctxMatch) {
-        targetSuburb = ctxMatch.text;
-      }
-    }
+    map.flyTo({ center: center, zoom: 16 });
   }
 
+  /* Try to match a suburb filter from the context string, same as before */
+  var targetSuburb = isAreaType ? name : '';
+  if (!targetSuburb && contextText) {
+    var parts = contextText.split(',').map(p => p.trim());
+    targetSuburb = parts[0] || '';
+  }
   if (targetSuburb) {
     var matchedBox = null;
     document.querySelectorAll('.suburb-check').forEach(cb => {
       if (cb.value.toLowerCase() === targetSuburb.toLowerCase()) matchedBox = cb;
     });
-    
     if (matchedBox) {
       matchedBox.checked = true;
       searchState.suburb = matchedBox.value;
-    } else {
-      searchState.suburb = targetSuburb;
+      applySearchState();
     }
-    
-    applySearchState();
   }
+}
+
+document.addEventListener('click', e => {
+  var wrap = document.getElementById('pi-search-wrap');
+  var dd = document.getElementById('pi-search-dropdown');
+  if (wrap && dd && !wrap.contains(e.target)) { dd.style.display = 'none'; }
 });
+
+function initCustomSearch() {
+  var geocoderHost = document.getElementById('geocoder');
+  geocoderHost.innerHTML =
+    '<div id="pi-search-wrap">' +
+      '<svg id="pi-search-icon" viewBox="0 0 14 14"><circle cx="6" cy="6" r="4.5" stroke="#111" stroke-width="1.3" fill="none"/><path d="M10 10L13 13" stroke="#111" stroke-width="1.3" stroke-linecap="round"/></svg>' +
+      '<input type="text" id="pi-search-input" autocomplete="off" spellcheck="false" placeholder="Search address or place\u2026">' +
+      '<button type="button" id="pi-search-clear">\u00d7</button>' +
+      '<div id="pi-search-dropdown"></div>' +
+    '</div>';
+
+  var input = document.getElementById('pi-search-input');
+  var clearBtn = document.getElementById('pi-search-clear');
+  input.addEventListener('input', onSearchInput);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); if (searchSuggestions.length > 0) pickSearchResult(0); }
+    if (e.key === 'Escape') { searchSuggestions = []; renderSearchDropdown(); }
+  });
+  clearBtn.addEventListener('click', () => {
+    input.value = '';
+    searchSuggestions = [];
+    renderSearchDropdown();
+    clearBtn.style.display = 'none';
+    input.focus();
+  });
+}
+initCustomSearch();
+
+/* Kept as a small helper so any future code that wants to programmatically
+   clear the search box doesn't need to know the internal markup. */
+function clearPiSearch() {
+  var input = document.getElementById('pi-search-input');
+  var clearBtn = document.getElementById('pi-search-clear');
+  if (input) input.value = '';
+  if (clearBtn) clearBtn.style.display = 'none';
+  searchSuggestions = [];
+  renderSearchDropdown();
+}
 
 Promise.all([
   fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/locations.csv?t=' + Date.now()).then(r => r.text()).catch(() => ''),
@@ -1048,11 +1205,7 @@ document.querySelectorAll('.acc-head').forEach(h => {
 
 document.querySelectorAll('.filter-check').forEach(cb => {
   cb.addEventListener('change', function () {
-    if (geocoder) {
-      geocoder.clear();
-      const input = document.querySelector('.mapboxgl-ctrl-geocoder input');
-      if (input) input.blur();
-    }
+    clearPiSearch();
     if (this.getAttribute('data-cat') === 'year') toggleValue(searchState.years, this.value);
     else toggleValue(searchState.extraFilters, this.value);
     applySearchState();
@@ -1061,11 +1214,7 @@ document.querySelectorAll('.filter-check').forEach(cb => {
 
 document.querySelectorAll('.suburb-check').forEach(cb => {
   cb.addEventListener('change', function () {
-    if (geocoder) {
-      geocoder.clear();
-      const input = document.querySelector('.mapboxgl-ctrl-geocoder input');
-      if (input) input.blur();
-    }
+    clearPiSearch();
     if (window.piCloseAllPopups) window.piCloseAllPopups();
     searchState.suburb = this.value;
     applySearchState();
