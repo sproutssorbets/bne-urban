@@ -391,26 +391,26 @@
   <div id="index-panel">
     
     <div class="panel-section-container" id="filters-group">
-      <!-- MAP LAYERS LEGEND (Wizualnie odcięta dla jasności ról) -->
+      <!-- DEVELOPMENT STATUS — single control, drives both the map layer and the archive search -->
       <div class="section map-legend">
-        <div class="section-label">Map Controls: Pin Visibility</div>
-        <div class="filter-row" data-status="proposed">
+        <div class="section-label">1. Development Status</div>
+        <div class="filter-row" data-status="proposed" data-search-value="Proposed">
           <div style="display:flex;align-items:center;gap:9px;"><span class="swatch" style="background:#D1D1D1; border:1px solid #6B6B6B;"></span><span class="filter-label">Proposed</span></div>
           <span class="filter-count" id="count-proposed">–</span>
         </div>
-        <div class="filter-row" data-status="under_construction">
+        <div class="filter-row" data-status="under_construction" data-search-value="Under Construction">
           <div style="display:flex;align-items:center;gap:9px;"><span class="swatch" style="background:#6B6B6B;"></span><span class="filter-label">Under Construction</span></div>
           <span class="filter-count" id="count-under_construction">–</span>
         </div>
-        <div class="filter-row" data-status="approved">
+        <div class="filter-row" data-status="approved" data-search-value="Approved">
           <div style="display:flex;align-items:center;gap:9px;"><span class="swatch" style="background:#111111;"></span><span class="filter-label">Approved</span></div>
           <span class="filter-count" id="count-approved">–</span>
         </div>
       </div>
 
-      <!-- 1. LOCATION -->
+      <!-- 2. LOCATION -->
       <div class="acc-head" data-target="acc-location">
-        <span class="acc-title">1. Location</span><span class="acc-icon">+</span>
+        <span class="acc-title">2. Location</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-location">
         <label><input type="radio" name="suburb-group" class="suburb-check" value="" checked> All Locations</label>
@@ -439,22 +439,12 @@
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Woolloongabba"> Woolloongabba</label>
       </div>
 
-      <!-- 2. DEVELOPMENT STATUS (ARCHIVE FILTER) -->
-      <div class="acc-head" data-target="acc-status">
-        <span class="acc-title">2. Development Status</span><span class="acc-icon">+</span>
-      </div>
-      <div class="acc-body" id="acc-status">
-        <div class="sub-category-title" style="margin-top:0;">Filter Image Archive</div>
-        <label><input type="checkbox" class="filter-check" value="Proposed"> Proposed</label>
-        <label><input type="checkbox" class="filter-check" value="Under Construction"> Under Construction</label>
-        <label><input type="checkbox" class="filter-check" value="Approved"> Approved</label>
-      </div>
-
-      <!-- 3. PHYSICAL CONDITION (PRZYWRÓCONE) -->
+      <!-- 3. PHYSICAL CONDITION -->
       <div class="acc-head" data-target="acc-condition">
         <span class="acc-title">3. Physical Condition</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-condition">
+        <div class="sub-category-title" style="margin-top:0;color:#6B6B6B;font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">Refines the archive search below. Not shown on the map.</div>
         <label><input type="checkbox" class="filter-check" data-cat="condition" value="Existing Condition"> Existing Condition</label>
         <label><input type="checkbox" class="filter-check" data-cat="condition" value="Vacant & Development Site"> Vacant & Development Site</label>
         <label><input type="checkbox" class="filter-check" data-cat="condition" value="Demolition & Site Works"> Demolition & Site Works</label>
@@ -467,6 +457,7 @@
         <span class="acc-title">4. Typology & Architecture</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-typology">
+        <div class="sub-category-title" style="margin-top:0;color:#6B6B6B;font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">Refines the archive search below. Not shown on the map.</div>
         <label><input type="checkbox" class="filter-check" data-cat="typology" value="Residential"> Residential</label>
         <label><input type="checkbox" class="filter-check" data-cat="typology" value="Commercial & Retail"> Commercial & Retail</label>
         <label><input type="checkbox" class="filter-check" data-cat="typology" value="Public & Civic"> Public & Civic</label>
@@ -492,6 +483,7 @@
         <span class="acc-title">5. Urban Context</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-urban">
+        <div class="sub-category-title" style="margin-top:0;color:#6B6B6B;font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">Refines the archive search below. Not shown on the map.</div>
         <div class="sub-category-title">Process & Transformation</div>
         <label><input type="checkbox" class="filter-check" data-cat="urban" value="Urban Renewal"> Urban Renewal</label>
         <label><input type="checkbox" class="filter-check" data-cat="urban" value="High Density"> High Density</label>
@@ -513,6 +505,7 @@
         <span class="acc-title">6. Time</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-year">
+        <div class="sub-category-title" style="margin-top:0;color:#6B6B6B;font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">Refines the archive search below. Not shown on the map.</div>
         <label><input type="checkbox" class="filter-check" data-cat="year" value="2026"> 2026</label>
       </div>
     </div>
@@ -1074,14 +1067,30 @@ function initMapEverything() {
 }
 
 function applyLayerState() {
-  var expr = ['any'];
-  Object.keys(layerState).forEach(k => { if (layerState[k]) expr.push(['==', ['get', 'status'], k]); });
-  if (map.getLayer('projects-fill')) {
-    map.setFilter('projects-fill', expr.length > 1 ? expr : ['==', ['get', 'status'], '__none__']);
-    map.setFilter('projects-line', expr.length > 1 ? expr : ['==', ['get', 'status'], '__none__']);
+  var statusExpr = ['any'];
+  Object.keys(layerState).forEach(k => { if (layerState[k]) statusExpr.push(['==', ['get', 'status'], k]); });
+  var hasStatus = statusExpr.length > 1;
+
+  var finalExpr;
+  if (!hasStatus) {
+    finalExpr = ['==', ['get', 'status'], '__none__'];
+  } else if (searchState.suburb) {
+    finalExpr = ['all', statusExpr, ['==', ['get', 'suburb'], searchState.suburb]];
+  } else {
+    finalExpr = statusExpr;
   }
+
+  if (map.getLayer('projects-fill')) {
+    map.setFilter('projects-fill', finalExpr);
+    map.setFilter('projects-line', finalExpr);
+  }
+
+  var scoped = searchState.suburb
+    ? projects.features.filter(f => f.properties.suburb === searchState.suburb)
+    : projects.features;
+
   ['proposed', 'under_construction', 'approved'].forEach(s => {
-    var n = projects.features.filter(f => f.properties.status === s).length;
+    var n = scoped.filter(f => f.properties.status === s).length;
     var el = document.getElementById('count-' + s);
     if (el) el.textContent = n;
   });
@@ -1092,7 +1101,13 @@ function updatePhotoDeckLink() {
   
   if (searchState.suburb) queryParts.push('"' + searchState.suburb + '"');
   if (searchState.years.length > 0) queryParts.push('(' + searchState.years.join(' OR ') + ')');
-  
+
+  var statusMap = { proposed: 'Proposed', under_construction: 'Under Construction', approved: 'Approved' };
+  var activeStatuses = Object.keys(layerState).filter(k => layerState[k]).map(k => statusMap[k]);
+  if (activeStatuses.length > 0 && activeStatuses.length < 3) {
+    queryParts.push('("' + activeStatuses.join('" OR "') + '")');
+  }
+
   searchState.extraFilters.forEach(f => {
     var mappedTags = filterMapping[f];
     if (mappedTags && mappedTags.length > 1) {
@@ -1131,6 +1146,7 @@ function applySearchState() {
   renderList(visibleLocs);
   renderChips();
   updatePhotoDeckLink();
+  applyLayerState();
   
   var archiveCountEl = document.getElementById('archive-count');
   if (archiveCountEl) archiveCountEl.textContent = visibleLocs.length + ' LOCATIONS LINKED';
@@ -1155,6 +1171,18 @@ function renderList(items) {
 
 function renderChips() {
   var chips = [];
+  var activeStatusKeys = Object.keys(layerState).filter(k => layerState[k]);
+  if (activeStatusKeys.length > 0 && activeStatusKeys.length < 3) {
+    var statusLabelMap = { proposed: 'Proposed', under_construction: 'Under Construction', approved: 'Approved' };
+    chips.push({
+      label: activeStatusKeys.map(k => statusLabelMap[k]).join(', '),
+      clear: () => {
+        Object.keys(layerState).forEach(k => layerState[k] = true);
+        document.querySelectorAll('.filter-row').forEach(row => row.classList.remove('off'));
+        applySearchState();
+      }
+    });
+  }
   if (searchState.suburb) chips.push({ label: searchState.suburb, clear: () => { searchState.suburb = ''; document.querySelectorAll('.suburb-check').forEach(cb => cb.checked = (cb.value === '')); applySearchState(); } });
   searchState.years.forEach(y => chips.push({ label: y, clear: () => { toggleValue(searchState.years, y); syncCheckbox(`.filter-check[data-cat="year"]`, y, false); applySearchState(); } }));
   searchState.extraFilters.forEach(f => chips.push({ label: f, clear: () => { toggleValue(searchState.extraFilters, f); syncCheckbox(`.filter-check:not([data-cat="year"])`, f, false); applySearchState(); } }));
@@ -1191,7 +1219,7 @@ document.querySelectorAll('.filter-row').forEach(row => {
     var status = this.getAttribute('data-status');
     layerState[status] = !layerState[status];
     this.classList.toggle('off', !layerState[status]);
-    applyLayerState();
+    applySearchState();
   });
 });
 
