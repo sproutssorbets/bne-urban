@@ -256,9 +256,13 @@
     border-top: 1px solid #DADADA;
   }
 
-  .custom-marker-hitbox { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; transform: translate(-22px, -22px); }
-  .custom-marker-visual { min-width: 22px; height: 22px; padding: 0 4px; background: #111111; color: #FFFFFF; border: 1px solid #DADADA; font-family: 'Inter', system-ui, sans-serif; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; transition: transform 0.15s ease, background-color 0.15s ease; }
-  .custom-marker-hitbox:hover .custom-marker-visual, .custom-marker-hitbox:active .custom-marker-visual { transform: scale(1.15); background: #333333; }
+  .custom-marker-hitbox { width: 44px; height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; }
+  .pi-pin { display: flex; flex-direction: column; align-items: center; transition: transform 0.15s ease; transform-origin: bottom center; }
+  .pi-pin-body { min-width: 22px; height: 22px; padding: 0 4px; background: #111111; color: #FFFFFF; border: 1px solid #DADADA; font-family: 'Inter', system-ui, sans-serif; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+  .pi-pin-point { width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 9px solid #111111; }
+  .custom-marker-hitbox:hover .pi-pin, .custom-marker-hitbox:active .pi-pin { transform: scale(1.15); }
+  .custom-marker-hitbox:hover .pi-pin-body, .custom-marker-hitbox:active .pi-pin-body { background: #333333; }
+  .custom-marker-hitbox:hover .pi-pin-point, .custom-marker-hitbox:active .pi-pin-point { border-top-color: #333333; }
 
   #map-wrap { 
     flex: 1 1 auto; 
@@ -641,7 +645,7 @@ fetch(RECENT_PHOTOS_URL + '?t=' + Date.now())
 var locations = [];
 var lastMarkerClickAt = 0;
 
-var searchState = { suburb: '', years: [], extraFilters: [] };
+var searchState = { suburb: '', years: [], extraFilters: [], pickedAddress: '' };
 
 var map = new mapboxgl.Map({
   container: 'map',
@@ -777,9 +781,8 @@ async function pickSearchResult(idx) {
   }
   sbSessionEnd();
 
-  document.getElementById('pi-search-input').value = name;
-  searchSuggestions = [];
-  renderSearchDropdown();
+  searchState.pickedAddress = name;
+  syncSearchInputFromFilters();
 
   if (window.innerWidth <= 720) {
     var mapTab = document.getElementById('tab-map');
@@ -795,24 +798,6 @@ async function pickSearchResult(idx) {
     frameArea(center, null);
   } else {
     map.flyTo({ center: center, zoom: 16 });
-  }
-
-  /* Try to match a suburb filter from the context string, same as before */
-  var targetSuburb = isAreaType ? name : '';
-  if (!targetSuburb && contextText) {
-    var parts = contextText.split(',').map(p => p.trim());
-    targetSuburb = parts[0] || '';
-  }
-  if (targetSuburb) {
-    var matchedBox = null;
-    document.querySelectorAll('.suburb-check').forEach(cb => {
-      if (cb.value.toLowerCase() === targetSuburb.toLowerCase()) matchedBox = cb;
-    });
-    if (matchedBox) {
-      matchedBox.checked = true;
-      searchState.suburb = matchedBox.value;
-      applySearchState();
-    }
   }
 }
 
@@ -847,6 +832,7 @@ function initCustomSearch() {
     searchState.suburb = '';
     searchState.years = [];
     searchState.extraFilters = [];
+    searchState.pickedAddress = '';
     document.querySelectorAll('.suburb-check').forEach(el => { el.checked = (el.value === ''); });
     document.querySelectorAll('.filter-check').forEach(el => { el.checked = false; });
     applySearchState();
@@ -922,7 +908,7 @@ function initMapEverything() {
     locations.forEach((loc, index) => {
       var el = document.createElement('div');
       el.className = 'custom-marker-hitbox';
-      el.innerHTML = '<div class="custom-marker-visual">' + loc.count + '</div>';
+      el.innerHTML = '<div class="pi-pin"><div class="pi-pin-body">' + loc.count + '</div><div class="pi-pin-point"></div></div>';
 
       var popupHtml =
         '<div style="min-width:180px;">' +
@@ -931,8 +917,8 @@ function initMapEverything() {
           '<a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:#111111;color:#FFFFFF;padding:10px;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;">OPEN RECORD →</a>' +
         '</div>';
 
-      loc.popup = new mapboxgl.Popup({ offset: 14, closeButton: true, className: 'pi-popup' }).setHTML(popupHtml);
-      loc.marker = new mapboxgl.Marker({ element: el }).setLngLat(loc.coords).addTo(map);
+      loc.popup = new mapboxgl.Popup({ offset: [0, -46], closeButton: true, className: 'pi-popup' }).setHTML(popupHtml);
+      loc.marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' }).setLngLat(loc.coords).addTo(map);
       
       el.addEventListener('click', (ev) => {
         ev.stopPropagation();
@@ -1044,10 +1030,11 @@ function renderList(items) {
   });
 }
 
-/* Writes the currently selected side-panel filters into the search box itself,
-   instead of a separate row of tags underneath it. The same box is still used
-   for live address/place search — whichever the person touches last (typing
-   an address, or ticking a filter) is what the box shows. */
+/* Writes the currently selected side-panel filters, plus a picked address if
+   any, into the search box itself, instead of a separate row of tags
+   underneath it. Filters and an address selection are independent — picking
+   one never erases the other. Typing fresh text into the box still works
+   normally and simply replaces whatever was there. */
 function syncSearchInputFromFilters() {
   var input = document.getElementById('pi-search-input');
   var clearBtn = document.getElementById('pi-search-clear');
@@ -1055,6 +1042,7 @@ function syncSearchInputFromFilters() {
   var parts = [];
   if (searchState.suburb) parts.push(searchState.suburb);
   parts = parts.concat(searchState.years, searchState.extraFilters);
+  if (searchState.pickedAddress) parts.push(searchState.pickedAddress);
   input.value = parts.join(', ');
   if (clearBtn) clearBtn.style.display = parts.length > 0 ? 'block' : 'none';
   searchSuggestions = [];
