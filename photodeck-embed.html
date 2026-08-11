@@ -912,22 +912,27 @@ function initMapEverything() {
       el.innerHTML = '<div class="pi-pin"><div class="pi-pin-body">' + loc.count + '</div><div class="pi-pin-point"></div></div>';
 
       var datesList = loc.dates ? loc.dates.split(';').map(d => d.trim()).filter(Boolean) : [];
-      var datesLine = '';
-      if (datesList.length === 1) {
-        datesLine = datesList[0];
-      } else if (datesList.length === 2) {
-        datesLine = datesList.join(', ');
-      } else if (datesList.length > 2) {
-        datesLine = 'Photographed ' + datesList.length + ' times · latest ' + datesList[datesList.length - 1];
-      }
-      var datesLabel = datesList.length > 2 ? datesLine : (datesLine ? 'Photographed ' + datesLine : '');
+      var datesDesc = datesList.slice().reverse(); // stored oldest→newest, display newest→oldest
+
+      var rows = [];
+      rows.push(['Suburb', loc.suburb]);
+      rows.push(['Photos', String(loc.count)]);
+      datesDesc.forEach(function (d, i) {
+        rows.push([i === 0 ? 'Photographed' : '', d]);
+      });
+
+      var rowsHtml = rows.map(function (r) {
+        return '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:10px;padding:4px 0;">' +
+          '<span style="color:#6B6B6B;text-transform:uppercase;letter-spacing:0.06em;flex-shrink:0;">' + r[0] + '</span>' +
+          '<span style="color:#111111;font-weight:500;text-align:right;">' + r[1] + '</span>' +
+        '</div>';
+      }).join('');
 
       var popupHtml =
-        '<div style="min-width:190px;">' +
-          '<div style="font-size:14px;color:#111111;margin-bottom:4px;font-weight:600;">' + loc.street + '</div>' +
-          '<div style="font-size:11px;color:#6B6B6B;letter-spacing:0.04em;margin-bottom:' + (datesLabel ? '2px' : '12px') + ';">' + loc.suburb.toUpperCase() + ' · ' + loc.count + (loc.count === 1 ? ' PHOTO' : ' PHOTOS') + '</div>' +
-          (datesLabel ? '<div style="font-size:10px;color:#6B6B6B;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px;">' + datesLabel + '</div>' : '') +
-          '<a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:#111111;color:#FFFFFF;padding:10px;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;">OPEN RECORD →</a>' +
+        '<div style="min-width:200px;">' +
+          '<div style="font-size:14px;color:#111111;font-weight:600;margin-bottom:2px;">' + loc.street + '</div>' +
+          '<div style="border-top:1px solid #DADADA;border-bottom:1px solid #DADADA;margin-top:6px;padding:2px 0;">' + rowsHtml + '</div>' +
+          '<a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:#111111;color:#FFFFFF;padding:10px;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;margin-top:12px;">OPEN RECORD →</a>' +
         '</div>';
 
       loc.popup = new mapboxgl.Popup({ offset: [0, -46], closeButton: true, className: 'pi-popup' }).setHTML(popupHtml);
