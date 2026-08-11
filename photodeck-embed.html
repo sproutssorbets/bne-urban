@@ -367,7 +367,7 @@
 <div id="topbar">
   <div id="search-row">
     <div id="geocoder"></div>
-    <a id="search-archive-btn" href="https://photoindex.photodeck.com/" target="_top">
+    <a id="search-archive-btn" href="https://www.photoindex.au/" target="_top">
       <span id="search-archive-text">SEARCH</span>
     </a>
   </div>
@@ -530,7 +530,7 @@
 
           <div class="pi-footer-col">
             <div class="pi-footer-label">Archive</div>
-            <a href="https://photoindex.photodeck.com/" target="_top" class="pi-footer-link">Full Database ↗</a>
+            <a href="https://www.photoindex.au/" target="_top" class="pi-footer-link">Full Database ↗</a>
             <a href="#" class="pi-footer-link">Methodology v5.2</a>
           </div>
         </div>
@@ -554,7 +554,7 @@
   </div>
 </div>
 
-<a id="mobile-bottom-bar" href="https://photoindex.photodeck.com/" target="_top">
+<a id="mobile-bottom-bar" href="https://www.photoindex.au/" target="_top">
   SEARCH
 </a>
 
@@ -632,7 +632,7 @@ fetch(RECENT_PHOTOS_URL + '?t=' + Date.now())
     recentPhotosData.slice(0, 30).forEach(p => {
       var a = document.createElement('a');
       a.className = 'recent-row';
-      a.href = p.archiveUrl || 'https://photoindex.photodeck.com/';
+      a.href = p.archiveUrl || 'https://www.photoindex.au/';
       var dateStr = '';
       var m = p.url ? p.url.match(/PX-(\d{4})(\d{2})(\d{2})/) : null;
       if (m) {
@@ -1124,7 +1124,7 @@ function updatePhotoDeckLink() {
   var txtDesktop = document.getElementById('search-archive-text');
   var btnMobile = document.getElementById('mobile-bottom-bar');
   
-  var targetUrl = queryStr ? 'https://photoindex.photodeck.com/?search=' + encodeURIComponent(queryStr) : 'https://photoindex.photodeck.com/';
+  var targetUrl = queryStr ? 'https://www.photoindex.au/?search=' + encodeURIComponent(queryStr) : 'https://www.photoindex.au/';
   var textValue = queryStr ? 'VIEW SELECTION' : 'SEARCH';
 
   if (btnDesktop) {
