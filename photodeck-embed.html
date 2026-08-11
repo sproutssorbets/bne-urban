@@ -67,12 +67,6 @@
     text-transform: uppercase;
   }
 
-  #chip-row { display: flex; align-items: center; padding: 8px 16px; flex-wrap: wrap; min-height: 20px; background: #FFFFFF; border-top: 1px solid #DADADA; }
-  #chip-row:not(.has-search) { display: none !important; }
-  
-  #chip-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #111111; margin-right: 10px; }
-  .chip { display: inline-flex; align-items: center; justify-content: space-between; gap: 8px; border: 1px solid #DADADA; padding: 3px 8px; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #111111; cursor: pointer; background: #FFFFFF; margin: 0 4px 4px 0; }
-
   /* DESKTOP LAYOUT */
   #layout { 
     width: 100%; 
@@ -381,36 +375,15 @@
   <div id="context-bar">
     SELECT A PIN OR A FILTER TO OPEN A RECORD
   </div>
-  <div id="chip-row">
-    <span id="chip-label">ACTIVE FILTERS</span>
-    <span id="chips-here"></span>
-  </div>
 </div>
 
 <div id="layout">
   <div id="index-panel">
     
     <div class="panel-section-container" id="filters-group">
-      <!-- DEVELOPMENT STATUS — single control, drives both the map layer and the archive search -->
-      <div class="section map-legend">
-        <div class="section-label">1. Development Status</div>
-        <div class="filter-row" data-status="proposed" data-search-value="Proposed">
-          <div style="display:flex;align-items:center;gap:9px;"><span class="swatch" style="background:#D1D1D1; border:1px solid #6B6B6B;"></span><span class="filter-label">Proposed</span></div>
-          <span class="filter-count" id="count-proposed">–</span>
-        </div>
-        <div class="filter-row" data-status="under_construction" data-search-value="Under Construction">
-          <div style="display:flex;align-items:center;gap:9px;"><span class="swatch" style="background:#6B6B6B;"></span><span class="filter-label">Under Construction</span></div>
-          <span class="filter-count" id="count-under_construction">–</span>
-        </div>
-        <div class="filter-row" data-status="approved" data-search-value="Approved">
-          <div style="display:flex;align-items:center;gap:9px;"><span class="swatch" style="background:#111111;"></span><span class="filter-label">Approved</span></div>
-          <span class="filter-count" id="count-approved">–</span>
-        </div>
-      </div>
-
-      <!-- 2. LOCATION -->
+      <!-- 1. LOCATION -->
       <div class="acc-head" data-target="acc-location">
-        <span class="acc-title">2. Location</span><span class="acc-icon">+</span>
+        <span class="acc-title">1. Location</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-location">
         <label><input type="radio" name="suburb-group" class="suburb-check" value="" checked> All Locations</label>
@@ -441,7 +414,7 @@
 
       <!-- 3. PHYSICAL CONDITION -->
       <div class="acc-head" data-target="acc-condition">
-        <span class="acc-title">3. Physical Condition</span><span class="acc-icon">+</span>
+        <span class="acc-title">2. Physical Condition</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-condition">
         <div class="sub-category-title" style="margin-top:0;color:#6B6B6B;font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">Refines the archive search below. Not shown on the map.</div>
@@ -454,7 +427,7 @@
 
       <!-- 4. TYPOLOGY & ARCHITECTURE -->
       <div class="acc-head" data-target="acc-typology">
-        <span class="acc-title">4. Typology & Architecture</span><span class="acc-icon">+</span>
+        <span class="acc-title">3. Typology & Architecture</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-typology">
         <div class="sub-category-title" style="margin-top:0;color:#6B6B6B;font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">Refines the archive search below. Not shown on the map.</div>
@@ -480,7 +453,7 @@
 
       <!-- 5. URBAN CONTEXT -->
       <div class="acc-head" data-target="acc-urban">
-        <span class="acc-title">5. Urban Context</span><span class="acc-icon">+</span>
+        <span class="acc-title">4. Urban Context</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-urban">
         <div class="sub-category-title" style="margin-top:0;color:#6B6B6B;font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">Refines the archive search below. Not shown on the map.</div>
@@ -502,7 +475,7 @@
 
       <!-- 6. TIME -->
       <div class="acc-head" data-target="acc-year">
-        <span class="acc-title">6. Time</span><span class="acc-icon">+</span>
+        <span class="acc-title">5. Time</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-year">
         <div class="sub-category-title" style="margin-top:0;color:#6B6B6B;font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">Refines the archive search below. Not shown on the map.</div>
@@ -666,11 +639,9 @@ fetch(RECENT_PHOTOS_URL + '?t=' + Date.now())
   });
 
 var locations = [];
-var projects = { type: 'FeatureCollection', features: [] };
 var lastMarkerClickAt = 0;
 
 var searchState = { suburb: '', years: [], extraFilters: [] };
-var layerState = { proposed: true, under_construction: true, approved: true };
 
 var map = new mapboxgl.Map({
   container: 'map',
@@ -873,26 +844,18 @@ function initCustomSearch() {
     searchSuggestions = [];
     renderSearchDropdown();
     clearBtn.style.display = 'none';
+    searchState.suburb = '';
+    searchState.years = [];
+    searchState.extraFilters = [];
+    document.querySelectorAll('.suburb-check').forEach(el => { el.checked = (el.value === ''); });
+    document.querySelectorAll('.filter-check').forEach(el => { el.checked = false; });
+    applySearchState();
     input.focus();
   });
 }
 initCustomSearch();
 
-/* Kept as a small helper so any future code that wants to programmatically
-   clear the search box doesn't need to know the internal markup. */
-function clearPiSearch() {
-  var input = document.getElementById('pi-search-input');
-  var clearBtn = document.getElementById('pi-search-clear');
-  if (input) input.value = '';
-  if (clearBtn) clearBtn.style.display = 'none';
-  searchSuggestions = [];
-  renderSearchDropdown();
-}
-
-Promise.all([
-  fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/locations.csv?t=' + Date.now()).then(r => r.text()).catch(() => ''),
-  fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban/main/brisbane-development.geojson?t=' + Date.now()).then(r => r.json()).catch(() => ({ type: 'FeatureCollection', features: [] }))
-]).then(function ([csvText, geojson]) {
+fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/locations.csv?t=' + Date.now()).then(r => r.text()).catch(() => '').then(function (csvText) {
   if (csvText) {
     var lines = csvText.trim().split('\n');
     var headers = lines[0].split(',');
@@ -919,17 +882,6 @@ Promise.all([
     }).filter(l => !isNaN(l.coords[0]) && !isNaN(l.coords[1]));
   }
 
-  if (geojson && geojson.features) projects = geojson;
-
-  projects.features.forEach(feature => {
-    var matches = locations.filter(loc => turf.booleanPointInPolygon(turf.point(loc.coords), feature));
-    if (matches.length > 0) {
-      feature.properties.documentedRef = matches.map(m => m.ref).join(', ');
-      feature.properties.documentedStreet = [...new Set(matches.map(m => m.street))].join(' & ');
-      matches.forEach(match => { match.projectStatus = feature.properties.status; });
-    }
-  });
-
   initMapEverything();
 });
 
@@ -955,24 +907,6 @@ function initMapEverything() {
           if (map.getPaintProperty(l.id, 'icon-color') !== undefined) map.setPaintProperty(l.id, 'icon-opacity', 0);
         }
       } catch (e) {}
-    });
-
-    map.addSource('projects', { type: 'geojson', data: projects });
-
-    map.addLayer({
-      id: 'projects-fill', type: 'fill', source: 'projects', minzoom: 13.5,
-      paint: {
-        'fill-color': ['match', ['get', 'status'], 'approved', '#111111', 'under_construction', '#6B6B6B', 'proposed', '#D1D1D1', '#D1D1D1'],
-        'fill-opacity': ['match', ['get', 'status'], 'approved', 0.65, 'under_construction', 0.50, 'proposed', 0.35, 0.35]
-      }
-    });
-    
-    map.addLayer({
-      id: 'projects-line', type: 'line', source: 'projects', minzoom: 13.5,
-      paint: { 
-        'line-color': ['match', ['get', 'status'], 'approved', '#111111', 'under_construction', '#6B6B6B', 'proposed', '#6B6B6B', '#6B6B6B'], 
-        'line-width': 1 
-      }
     });
 
     var activePopup = null;
@@ -1007,29 +941,8 @@ function initMapEverything() {
       });
     });
 
-    map.on('mouseenter', 'projects-fill', () => map.getCanvas().style.cursor = 'pointer');
-    map.on('mouseleave', 'projects-fill', () => map.getCanvas().style.cursor = '');
-
-    map.on('click', 'projects-fill', (e) => {
-      if (Date.now() - lastMarkerClickAt < 80) return;
-      var props = e.features[0].properties;
-      var rawStatus = props.status ? props.status.toLowerCase() : 'proposed';
-      var statusFormatted = rawStatus === 'under_construction' ? 'Under Construction' : (rawStatus === 'approved' ? 'Approved' : 'Proposed');
-
-      var html =
-        '<div style="min-width:180px;">' +
-          '<div style="font-size:11px;font-weight:500;letter-spacing:0.14em;color:#111111;text-transform:uppercase;margin-bottom:4px;">STATUS</div>' +
-          '<div style="font-size:14px;color:#111111;font-weight:600;margin-bottom:8px;">' + statusFormatted + (props.name ? ' — ' + props.name : '') + '</div>' +
-          (props.documentedStreet ? '<div style="font-size:11px;color:#111111;border-top:1px solid #DADADA;padding-top:8px;margin-top:8px;">Linked: ' + props.documentedStreet + '</div>' : '') +
-        '</div>';
-      
-      window.piCloseAllPopups();
-      activePopup = new mapboxgl.Popup({ offset: 8, closeButton: true, className: 'pi-popup' }).setLngLat(e.lngLat).setHTML(html).addTo(map);
-    });
-
     renderList();
     applySearchState();
-    applyLayerState();
 
     if (window.innerWidth <= 720 && recentPhotosData.length > 0) {
       var recentCoords = [];
@@ -1066,47 +979,11 @@ function initMapEverything() {
   if (map.loaded()) setupMap(); else map.on('load', setupMap);
 }
 
-function applyLayerState() {
-  var statusExpr = ['any'];
-  Object.keys(layerState).forEach(k => { if (layerState[k]) statusExpr.push(['==', ['get', 'status'], k]); });
-  var hasStatus = statusExpr.length > 1;
-
-  var finalExpr;
-  if (!hasStatus) {
-    finalExpr = ['==', ['get', 'status'], '__none__'];
-  } else if (searchState.suburb) {
-    finalExpr = ['all', statusExpr, ['==', ['get', 'suburb'], searchState.suburb]];
-  } else {
-    finalExpr = statusExpr;
-  }
-
-  if (map.getLayer('projects-fill')) {
-    map.setFilter('projects-fill', finalExpr);
-    map.setFilter('projects-line', finalExpr);
-  }
-
-  var scoped = searchState.suburb
-    ? projects.features.filter(f => f.properties.suburb === searchState.suburb)
-    : projects.features;
-
-  ['proposed', 'under_construction', 'approved'].forEach(s => {
-    var n = scoped.filter(f => f.properties.status === s).length;
-    var el = document.getElementById('count-' + s);
-    if (el) el.textContent = n;
-  });
-}
-
 function updatePhotoDeckLink() {
   var queryParts = [];
   
   if (searchState.suburb) queryParts.push('"' + searchState.suburb + '"');
   if (searchState.years.length > 0) queryParts.push('(' + searchState.years.join(' OR ') + ')');
-
-  var statusMap = { proposed: 'Proposed', under_construction: 'Under Construction', approved: 'Approved' };
-  var activeStatuses = Object.keys(layerState).filter(k => layerState[k]).map(k => statusMap[k]);
-  if (activeStatuses.length > 0 && activeStatuses.length < 3) {
-    queryParts.push('("' + activeStatuses.join('" OR "') + '")');
-  }
 
   searchState.extraFilters.forEach(f => {
     var mappedTags = filterMapping[f];
@@ -1144,9 +1021,7 @@ function applySearchState() {
     if (loc.marker) loc.marker.getElement().style.display = visibleLocs.includes(loc) ? '' : 'none';
   });
   renderList(visibleLocs);
-  renderChips();
   updatePhotoDeckLink();
-  applyLayerState();
   
   var archiveCountEl = document.getElementById('archive-count');
   if (archiveCountEl) archiveCountEl.textContent = visibleLocs.length + ' LOCATIONS LINKED';
@@ -1169,41 +1044,21 @@ function renderList(items) {
   });
 }
 
-function renderChips() {
-  var chips = [];
-  var activeStatusKeys = Object.keys(layerState).filter(k => layerState[k]);
-  if (activeStatusKeys.length > 0 && activeStatusKeys.length < 3) {
-    var statusLabelMap = { proposed: 'Proposed', under_construction: 'Under Construction', approved: 'Approved' };
-    chips.push({
-      label: activeStatusKeys.map(k => statusLabelMap[k]).join(', '),
-      clear: () => {
-        Object.keys(layerState).forEach(k => layerState[k] = true);
-        document.querySelectorAll('.filter-row').forEach(row => row.classList.remove('off'));
-        applySearchState();
-      }
-    });
-  }
-  if (searchState.suburb) chips.push({ label: searchState.suburb, clear: () => { searchState.suburb = ''; document.querySelectorAll('.suburb-check').forEach(cb => cb.checked = (cb.value === '')); applySearchState(); } });
-  searchState.years.forEach(y => chips.push({ label: y, clear: () => { toggleValue(searchState.years, y); syncCheckbox(`.filter-check[data-cat="year"]`, y, false); applySearchState(); } }));
-  searchState.extraFilters.forEach(f => chips.push({ label: f, clear: () => { toggleValue(searchState.extraFilters, f); syncCheckbox(`.filter-check:not([data-cat="year"])`, f, false); applySearchState(); } }));
-
-  var host = document.getElementById('chips-here');
-  var chipRow = document.getElementById('chip-row');
-  if (!host || !chipRow) return;
-
-  host.innerHTML = '';
-  if (chips.length > 0) {
-    chipRow.classList.add('has-search');
-    chips.forEach(c => {
-      var span = document.createElement('span');
-      span.className = 'chip';
-      span.innerHTML = '<span>' + c.label + '</span><span>×</span>';
-      span.addEventListener('click', c.clear);
-      host.appendChild(span);
-    });
-  } else {
-    chipRow.classList.remove('has-search');
-  }
+/* Writes the currently selected side-panel filters into the search box itself,
+   instead of a separate row of tags underneath it. The same box is still used
+   for live address/place search — whichever the person touches last (typing
+   an address, or ticking a filter) is what the box shows. */
+function syncSearchInputFromFilters() {
+  var input = document.getElementById('pi-search-input');
+  var clearBtn = document.getElementById('pi-search-clear');
+  if (!input) return;
+  var parts = [];
+  if (searchState.suburb) parts.push(searchState.suburb);
+  parts = parts.concat(searchState.years, searchState.extraFilters);
+  input.value = parts.join(', ');
+  if (clearBtn) clearBtn.style.display = parts.length > 0 ? 'block' : 'none';
+  searchSuggestions = [];
+  renderSearchDropdown();
 }
 
 function toggleValue(arr, val) {
@@ -1213,15 +1068,6 @@ function toggleValue(arr, val) {
 function syncCheckbox(sel, val, checked) {
   document.querySelectorAll(sel).forEach(cb => { if (cb.value === val) cb.checked = checked; });
 }
-
-document.querySelectorAll('.filter-row').forEach(row => {
-  row.addEventListener('click', function () {
-    var status = this.getAttribute('data-status');
-    layerState[status] = !layerState[status];
-    this.classList.toggle('off', !layerState[status]);
-    applySearchState();
-  });
-});
 
 document.querySelectorAll('.acc-head').forEach(h => {
   h.addEventListener('click', function () {
@@ -1233,19 +1079,19 @@ document.querySelectorAll('.acc-head').forEach(h => {
 
 document.querySelectorAll('.filter-check').forEach(cb => {
   cb.addEventListener('change', function () {
-    clearPiSearch();
     if (this.getAttribute('data-cat') === 'year') toggleValue(searchState.years, this.value);
     else toggleValue(searchState.extraFilters, this.value);
     applySearchState();
+    syncSearchInputFromFilters();
   });
 });
 
 document.querySelectorAll('.suburb-check').forEach(cb => {
   cb.addEventListener('change', function () {
-    clearPiSearch();
     if (window.piCloseAllPopups) window.piCloseAllPopups();
     searchState.suburb = this.value;
     applySearchState();
+    syncSearchInputFromFilters();
     if (this.value) {
       fetch('https://api.mapbox.com/geocoding/v5/mapbox.places/' + encodeURIComponent(this.value + ', Brisbane, Australia') + '.json?access_token=' + mapboxgl.accessToken + '&country=au&types=place,locality,neighborhood&limit=1')
         .then(r => r.json()).then(data => { if (data.features && data.features[0]) frameArea(data.features[0].center, data.features[0].bbox); });
