@@ -28,17 +28,8 @@
   /* MOCNA RAMA DLA CAŁEJ GÓRNEJ SEKCJI */
   #topbar { border: none; background: #FFFFFF; flex-shrink: 0; z-index: 10; border-bottom: 1px solid #111111; }
   
-  /* WYSZUKIWARKA - Usunięto dolną linię, by scalić z context-bar */
-#search-row { 
-    display: flex; 
-    align-items: center; 
-    height: 56px; /* Sztywna, matematyczna wartość */
-    padding: 0 20px; 
-    border-top: 1px solid #111111; 
-    border-bottom: 1px solid #DADADA; /* Subtelne odcięcie funkcji */
-    background: #FFFFFF; 
-    position: relative;
-  }
+  /* WYSZUKIWARKA - Sztywny moduł poziomy */
+  #search-row { display: flex; align-items: center; height: 56px; padding: 0 20px; gap: 16px; border-top: 1px solid #111111; border-bottom: 1px solid #DADADA; position: relative; background: #FFFFFF; }
   #geocoder { flex: 1; width: 100%; position: relative; height: 100%; }
 
   /* CUSTOM SEARCH (Search Box API) */
@@ -49,7 +40,7 @@
   #pi-search-input::placeholder { color: #111111; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; }
   
   #pi-search-clear { position: absolute; right: 0; top: 50%; transform: translateY(-50%); border: none; background: transparent; font-size: 16px; color: #6B6B6B; cursor: pointer; display: none; line-height: 1; padding: 4px; }
-  #pi-search-dropdown { display: none; position: absolute; top: 50px; left: 0; right: 0; background: #FFFFFF; border: 1px solid #DADADA; border-top: none; max-height: 320px; overflow-y: auto; z-index: 50; }
+  #pi-search-dropdown { display: none; position: absolute; top: 56px; left: 0; right: 0; background: #FFFFFF; border: 1px solid #DADADA; border-top: none; max-height: 320px; overflow-y: auto; z-index: 50; }
   .pi-sr-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #EFEFEF; }
   .pi-sr-item:last-child { border-bottom: none; }
   .pi-sr-item:hover { background: #FAFAFA; }
@@ -57,7 +48,7 @@
   .pi-sr-sub { font-size: 11px; color: #6B6B6B; margin-top: 1px; }
   .pi-sr-badge { font-size: 9px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #6B6B6B; border: 1px solid #DADADA; padding: 2px 6px; flex-shrink: 0; }
   
-  /* PRZYCISK - zrównany do prawej osi */
+  /* PRZYCISK */
   #search-archive-btn { 
     height: auto; 
     padding: 0; 
@@ -77,21 +68,22 @@
     flex-shrink: 0; 
     transition: color 0.15s; 
   }
-  #search-archive-btn:hover { background: transparent; color: #6B6B6B; }
+  #search-archive-btn:hover { color: #6B6B6B; }
 
-  /* CONTEXT BAR - podwieszony pod wyszukiwarkę bez zbędnych kresek */
- #context-bar {
+  /* CONTEXT BAR - Twardy moduł poziomy oddzielający od mapy */
+  #context-bar {
     display: flex;
     align-items: center;
-    height: 32px; /* Twardy moduł pionowy */
+    height: 32px;
     padding: 0 20px;
     font-size: 9px;
     color: #6B6B6B;
     letter-spacing: 0.1em;
     background: #FFFFFF;
     text-transform: uppercase;
-    border-bottom: 1px solid #111111; /* Główne, grube cięcie przed mapą */
+    border-bottom: 1px solid #111111;
   }
+
   /* DESKTOP LAYOUT */
   #layout { 
     width: 100%; 
@@ -187,7 +179,7 @@
   }
   .list-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid #DADADA; cursor: pointer; background: #FFFFFF; transition: background 0.15s ease, padding-left 0.15s ease; }
   .list-row:hover { background: #FAFAFA; padding-left: 24px; }
-  .list-street { font-size: 13px; color: #111111; font-weight: 500; }
+  .list-street { font-size: 13px; color: #111111; font-weight: 500; transition: color 0.15s ease; }
 
   /* STOPKA PHOTOINDEX */
   #pi-footer {
@@ -281,6 +273,7 @@
     border-top: 1px solid #DADADA;
   }
 
+  /* PINESKI - Rygorystycznie czarno-białe */
   .custom-marker-hitbox { 
     width: 44px; 
     height: 52px; 
@@ -357,7 +350,7 @@
   #recent-track { display: flex; flex-direction: column; gap: 8px; }
   .recent-row { display: block; cursor: pointer; text-decoration: none; padding: 2px 0; }
   .recent-row:hover .recent-headline { color: #6B6B6B; }
-  .recent-headline { font-size: 12px; color: #111111; font-weight: 400; margin-bottom: 2px; line-height: 1.3; }
+  .recent-headline { font-size: 12px; color: #111111; font-weight: 400; margin-bottom: 2px; line-height: 1.3; transition: color 0.15s ease; }
   .recent-date { font-size: 10px; color: #6B6B6B; letter-spacing: 0.02em; }
 
   /* TRYB MOBILNY */
@@ -432,7 +425,7 @@
       <span id="search-archive-text">SEARCH</span>
     </a>
   </div>
-  <!-- Context bar zintegrowany z nagłówkiem -->
+  <!-- Context bar oddzielony, niezależny pas z czarną linią brzegową -->
   <div id="context-bar">
     SELECT A PIN OR A FILTER TO OPEN A RECORD
   </div>
@@ -448,7 +441,7 @@
   <div id="index-panel">
     
     <div class="panel-section-container" id="filters-group">
-    <!-- 1. LOCATION - Otwarty domyślnie -->
+      <!-- 1. LOCATION - Otwarty domyślnie -->
       <div class="acc-head open" data-target="acc-location">
         <span class="acc-title">1. Location</span><span class="acc-icon">+</span>
       </div>
@@ -867,7 +860,6 @@ function initMapboxApp() {
 
   function initCustomSearch() {
     var geocoderHost = document.getElementById('geocoder');
-    // Usunięto ikonę SVG z HTML
     geocoderHost.innerHTML =
       '<div id="pi-search-wrap">' +
         '<input type="text" id="pi-search-input" autocomplete="off" spellcheck="false" placeholder="Search address or place\u2026">' +
