@@ -25,17 +25,22 @@
   html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Inter', system-ui, sans-serif; background: #FFFFFF; color: #111111; }
   body { display: flex; flex-direction: column; }
 
-  #topbar { border: none; background: #FFFFFF; flex-shrink: 0; z-index: 10; }
-  #search-row { display: flex; align-items: center; height: 60px; padding: 0 20px; gap: 16px; border-top: 1px solid #111111; border-bottom: 1px solid #111111; position: relative; background: #FFFFFF; }
+  /* MOCNA RAMA DLA CAŁEJ GÓRNEJ SEKCJI */
+  #topbar { border: none; background: #FFFFFF; flex-shrink: 0; z-index: 10; border-bottom: 1px solid #111111; }
+  
+  /* WYSZUKIWARKA - Usunięto dolną linię, by scalić z context-bar */
+  #search-row { display: flex; align-items: center; height: 50px; padding: 0 20px; gap: 16px; border-top: 1px solid #111111; border-bottom: none; position: relative; background: #FFFFFF; }
   #geocoder { flex: 1; width: 100%; position: relative; height: 100%; }
 
   /* CUSTOM SEARCH (Search Box API) */
   #pi-search-wrap { position: relative; width: 100%; height: 100%; display: flex; align-items: center; }
-  #pi-search-icon { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; opacity: 0.4; pointer-events: none; }
-  #pi-search-input { width: 100%; height: 100%; border: none; background: transparent; font-family: 'Inter', system-ui, sans-serif; font-size: 13px; color: #111111; padding: 0 30px; outline: none !important; }
+  
+  /* INPUT - Czysta typografia, wyzerowany padding lewy */
+  #pi-search-input { width: 100%; height: 100%; border: none; background: transparent; font-family: 'Inter', system-ui, sans-serif; font-size: 13px; color: #111111; padding: 0; outline: none !important; }
   #pi-search-input::placeholder { color: #111111; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; }
-  #pi-search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); border: none; background: transparent; font-size: 16px; color: #6B6B6B; cursor: pointer; display: none; line-height: 1; padding: 4px; }
-  #pi-search-dropdown { display: none; position: absolute; top: 60px; left: 0; right: 0; background: #FFFFFF; border: 1px solid #DADADA; max-height: 320px; overflow-y: auto; z-index: 50; }
+  
+  #pi-search-clear { position: absolute; right: 0; top: 50%; transform: translateY(-50%); border: none; background: transparent; font-size: 16px; color: #6B6B6B; cursor: pointer; display: none; line-height: 1; padding: 4px; }
+  #pi-search-dropdown { display: none; position: absolute; top: 50px; left: 0; right: 0; background: #FFFFFF; border: 1px solid #DADADA; border-top: none; max-height: 320px; overflow-y: auto; z-index: 50; }
   .pi-sr-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #EFEFEF; }
   .pi-sr-item:last-child { border-bottom: none; }
   .pi-sr-item:hover { background: #FAFAFA; }
@@ -43,6 +48,7 @@
   .pi-sr-sub { font-size: 11px; color: #6B6B6B; margin-top: 1px; }
   .pi-sr-badge { font-size: 9px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #6B6B6B; border: 1px solid #DADADA; padding: 2px 6px; flex-shrink: 0; }
   
+  /* PRZYCISK - zrównany do prawej osi */
   #search-archive-btn { 
     height: auto; 
     padding: 0; 
@@ -57,20 +63,22 @@
     cursor: pointer; 
     display: flex; 
     align-items: center; 
-    justify-content: center;
+    justify-content: flex-end;
     text-decoration: none; 
     flex-shrink: 0; 
     transition: color 0.15s; 
   }
   #search-archive-btn:hover { background: transparent; color: #6B6B6B; }
 
+  /* CONTEXT BAR - podwieszony pod wyszukiwarkę bez zbędnych kresek */
   #context-bar {
-    padding: 6px 20px;
+    padding: 0 20px 12px 20px;
     font-size: 10px;
     color: #6B6B6B;
     letter-spacing: 0.05em;
     background: #FFFFFF;
     text-transform: uppercase;
+    border: none;
   }
 
   /* DESKTOP LAYOUT */
@@ -413,15 +421,15 @@
       <span id="search-archive-text">SEARCH</span>
     </a>
   </div>
+  <!-- Context bar zintegrowany z nagłówkiem -->
+  <div id="context-bar">
+    SELECT A PIN OR A FILTER TO OPEN A RECORD
+  </div>
 
   <div class="mobile-tabs">
     <button class="mobile-tab" id="tab-index" data-tab="index">Index</button>
     <button class="mobile-tab" id="tab-filters" data-tab="filters">Filters</button>
     <button class="mobile-tab active" id="tab-map" data-tab="map">Map</button>
-  </div>
-
-  <div id="context-bar">
-    SELECT A PIN OR A FILTER TO OPEN A RECORD
   </div>
 </div>
 
@@ -848,9 +856,9 @@ function initMapboxApp() {
 
   function initCustomSearch() {
     var geocoderHost = document.getElementById('geocoder');
+    // Usunięto ikonę SVG z HTML
     geocoderHost.innerHTML =
       '<div id="pi-search-wrap">' +
-        '<svg id="pi-search-icon" viewBox="0 0 14 14"><circle cx="6" cy="6" r="4.5" stroke="#111" stroke-width="1.3" fill="none"/><path d="M10 10L13 13" stroke="#111" stroke-width="1.3" stroke-linecap="round"/></svg>' +
         '<input type="text" id="pi-search-input" autocomplete="off" spellcheck="false" placeholder="Search address or place\u2026">' +
         '<button type="button" id="pi-search-clear">\u00d7</button>' +
         '<div id="pi-search-dropdown"></div>' +
