@@ -582,14 +582,12 @@
 const LATEST_UPDATE = {
   id: "SYS.UPD.26.08",
   timestamp: "13 AUG 2026 / 22:12",
-  volume: "+ 6 FILES",
+  volume: "+ 4 FILES",
   images: [
-    "https://www.photoindex.au/-/archive/brisbane/herston/-/medias/019ff467-51c7-70cb-b42c-7ce2621033e3-victoria-park-spring-hill",
-    "https://www.photoindex.au/-/archive/brisbane/herston/-/medias/019ff466-d922-79a9-a0d2-7c217dcc7a17-victoria-park",
-    "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0086.jpg",
-    "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0083.jpg",
+    "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0100.jpg",
     "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0077.jpg",
-    "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0041.jpg"
+    "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0041.jpg",
+    "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0083.jpg"
   ]
 };
 // =========================================================
@@ -1182,13 +1180,18 @@ function initMapboxApp() {
 
 initMapboxApp();
 
-// Inicjalizacja i dynamiczne ładowanie danych do Splash Screenu
+// Inicjalizacja z obsługą pamięci sesji (wyświetli się dokładnie 1 raz i nigdy więcej przy powrocie do Home)
 document.addEventListener('DOMContentLoaded', function() {
   var ticket = document.getElementById('pi-update-ticket');
   var ackBtn = document.getElementById('pi-ticket-ack');
   var gallery = document.getElementById('upd-gallery');
 
   if (ticket) {
+    // Sprawdzenie, czy użytkownik kliknął już "ACKNOWLEDGE" w tej sesji
+    if (sessionStorage.getItem('pi_update_acknowledged') === 'true') {
+      ticket.style.display = 'none';
+    }
+
     // Wstrzyknięcie danych z Panelu Kontrolnego
     document.getElementById('upd-id').textContent = LATEST_UPDATE.id;
     document.getElementById('upd-time').textContent = LATEST_UPDATE.timestamp;
@@ -1201,10 +1204,11 @@ document.addEventListener('DOMContentLoaded', function() {
       }).join('');
     }
 
-    // Zamknięcie ekranu powitalnego i odsłonięcie mapy
+    // Zamknięcie i zapamiętanie w pamięci sesji przeglądarki
     if (ackBtn) {
       ackBtn.addEventListener('click', function() {
         ticket.classList.add('pi-ticket-hidden');
+        sessionStorage.setItem('pi_update_acknowledged', 'true');
       });
     }
   }
