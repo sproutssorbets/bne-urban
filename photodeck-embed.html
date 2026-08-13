@@ -70,7 +70,7 @@
   }
   #search-archive-btn:hover { color: #6B6B6B; }
 
-  /* CONTEXT BAR */
+  /* CONTEXT BAR - Twardy moduł poziomy oddzielający od mapy */
   #context-bar {
     display: flex;
     align-items: center;
@@ -164,43 +164,187 @@
   .acc-body label { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 8px 0; font-size: 13px; }
   .acc-body input[type="checkbox"], .acc-body input[type="radio"] { margin: 0; flex-shrink: 0; accent-color: #111111; width: 16px; height: 16px; }
 
-  #index-group { display: flex; flex-direction: column; background: #FFFFFF; min-height: 0; }
+  #index-group { 
+    display: flex; 
+    flex-direction: column; 
+    background: #FFFFFF; 
+    min-height: 0;
+  }
   #filters-group { display: flex; flex-direction: column; }
 
-  #list-wrap { flex: 0 1 auto; background: #FFFFFF; overflow-y: auto; }
+  #list-wrap { 
+    flex: 0 1 auto;
+    background: #FFFFFF; 
+    overflow-y: auto; 
+  }
   .list-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid #DADADA; cursor: pointer; background: #FFFFFF; transition: background 0.15s ease, padding-left 0.15s ease; }
   .list-row:hover { background: #FAFAFA; padding-left: 24px; }
   .list-street { font-size: 13px; color: #111111; font-weight: 500; transition: color 0.15s ease; }
 
   /* STOPKA PHOTOINDEX */
-  #pi-footer { padding: 16px 20px; background: #FFFFFF; border-top: 1px solid #DADADA; font-family: 'Inter', system-ui, sans-serif; flex-shrink: 0; }
-  .pi-footer-top { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid #DADADA; }
-  .pi-brand { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; color: #111111; text-transform: uppercase; }
-  .pi-sub { font-size: 9px; font-weight: 500; letter-spacing: 0.08em; color: #6B6B6B; text-transform: uppercase; }
-  .pi-footer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px; }
-  .pi-footer-label { font-size: 9px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #6B6B6B; margin-bottom: 6px; }
-  .pi-footer-stat { font-size: 10px; font-weight: 500; letter-spacing: 0.04em; color: #111111; margin-bottom: 3px; display: flex; align-items: center; gap: 4px; }
-  .pi-dot { font-size: 7px; color: #111111; }
-  .pi-footer-link { display: block; font-size: 10px; font-weight: 500; color: #111111; text-decoration: none; margin-bottom: 3px; letter-spacing: 0.02em; transition: color 0.15s ease; }
-  .pi-footer-link:hover { color: #6B6B6B; }
-  .pi-footer-bottom { display: flex; justify-content: space-between; font-size: 9px; color: #6B6B6B; letter-spacing: 0.05em; text-transform: uppercase; padding-top: 10px; border-top: 1px solid #DADADA; }
+  #pi-footer {
+    padding: 16px 20px;
+    background: #FFFFFF;
+    border-top: 1px solid #DADADA;
+    font-family: 'Inter', system-ui, sans-serif;
+    flex-shrink: 0;
+  }
 
-  /* PINESKI */
-  .custom-marker-hitbox { width: 44px; height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; }
-  .pi-pin { display: flex; flex-direction: column; align-items: center; }
-  .pi-pin-body { min-width: 24px; height: 24px; padding: 0 6px; background: #111111; color: #FFFFFF; font-family: 'Inter', system-ui, sans-serif; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; transition: background 0.1s ease, color 0.1s ease; }
-  .pi-pin-point { width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 5px solid #111111; }
-  .custom-marker-hitbox:hover .pi-pin-body, .custom-marker-hitbox:active .pi-pin-body { background: #FFFFFF; color: #111111; outline: 1px solid #111111; outline-offset: -1px; }
+  .pi-footer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #DADADA;
+  }
 
-  #map-wrap { flex: 1 1 auto; position: relative; height: 100%; background: #FFFFFF; z-index: 1; }
+  .pi-brand {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    color: #111111;
+    text-transform: uppercase;
+  }
+
+  .pi-sub {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: #6B6B6B;
+    text-transform: uppercase;
+  }
+
+  .pi-footer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 14px;
+  }
+
+  .pi-footer-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #6B6B6B;
+    margin-bottom: 6px;
+  }
+
+  .pi-footer-stat {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: #111111;
+    margin-bottom: 3px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .pi-dot {
+    font-size: 7px;
+    color: #111111;
+  }
+
+  .pi-footer-link {
+    display: block;
+    font-size: 10px;
+    font-weight: 500;
+    color: #111111;
+    text-decoration: none;
+    margin-bottom: 3px;
+    letter-spacing: 0.02em;
+    transition: color 0.15s ease;
+  }
+
+  .pi-footer-link:hover {
+    color: #6B6B6B;
+  }
+
+  .pi-footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    color: #6B6B6B;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding-top: 10px;
+    border-top: 1px solid #DADADA;
+  }
+
+  /* PINESKI - Rygorystycznie czarno-białe */
+  .custom-marker-hitbox { 
+    width: 44px; 
+    height: 52px; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: flex-end; 
+    cursor: pointer; 
+  }
+  
+  .pi-pin { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+  }
+  
+  .pi-pin-body { 
+    min-width: 24px; 
+    height: 24px; 
+    padding: 0 6px; 
+    background: #111111; 
+    color: #FFFFFF; 
+    font-family: 'Inter', system-ui, sans-serif; 
+    font-size: 11px; 
+    font-weight: 600; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    transition: background 0.1s ease, color 0.1s ease;
+  }
+  
+  .pi-pin-point { 
+    width: 0; 
+    height: 0; 
+    border-left: 5px solid transparent; 
+    border-right: 5px solid transparent; 
+    border-top: 5px solid #111111; 
+  }
+  
+  .custom-marker-hitbox:hover .pi-pin-body, .custom-marker-hitbox:active .pi-pin-body { 
+    background: #FFFFFF; 
+    color: #111111; 
+    outline: 1px solid #111111;
+    outline-offset: -1px; 
+  }
+
+  #map-wrap { 
+    flex: 1 1 auto; 
+    position: relative; 
+    height: 100%; 
+    background: #FFFFFF; 
+    z-index: 1; 
+  }
   #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.8s ease-in-out; }
   #map.loaded { opacity: 1; }
 
   .pi-popup .mapboxgl-popup-content, .pi-popup .mapboxgl-popup-content:focus { background: #FFFFFF; border: 1px solid #DADADA; padding: 16px; font-family: 'Inter', system-ui, sans-serif; border-radius: 0; box-shadow: none; outline: none !important; }
   .pi-popup .mapboxgl-popup-tip { border-top-color: #FFFFFF !important; border-bottom-color: #FFFFFF !important; }
   .pi-popup .mapboxgl-popup-close-button { font-size: 18px; color: #111111; padding: 4px 8px; outline: none !important; border: none; background: transparent; cursor: pointer; }
+  
+  #page-loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #FFFFFF; font-family: 'Inter', system-ui, sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #111111; z-index: 9999; transition: opacity 0.5s ease-in-out; }
+  #page-loading.fade-out { opacity: 0; pointer-events: none; }
 
-  #recent-strip { display: none; flex-direction: column; background: #FFFFFF; border-bottom: 1px solid #DADADA; flex-shrink: 0; padding: 16px 20px; }
+  #recent-strip { 
+    display: none; 
+    flex-direction: column; 
+    background: #FFFFFF; 
+    border-bottom: 1px solid #DADADA; 
+    flex-shrink: 0; 
+    padding: 16px 20px; 
+  }
   #recent-strip.has-photos { display: flex; }
   #recent-label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #6B6B6B; margin-bottom: 10px; }
   #recent-track { display: flex; flex-direction: column; gap: 8px; }
@@ -211,165 +355,68 @@
 
   /* TRYB MOBILNY */
   @media (max-width: 720px) {
-    body { padding-bottom: 48px !important; box-sizing: border-box !important; }
+    body {
+      padding-bottom: 48px !important;
+      box-sizing: border-box !important;
+    }
+
     #topbar { border-bottom: none; }
     #search-row { border-bottom: 1px solid #DADADA; border-top: none; padding: 0 12px; height: 52px; }
     #search-archive-btn { display: none !important; }
     .mobile-tabs { display: flex !important; }
     #context-bar { display: none; }
-    #layout { height: 100% !important; flex: 1 1 auto !important; flex-direction: column !important; }
-    #index-panel { width: 100% !important; height: 100% !important; border-right: none !important; border-bottom: none !important; display: none; }
-    #index-panel.mobile-active { display: flex !important; }
+
+    #layout {
+      height: 100% !important;
+      flex: 1 1 auto !important;
+      flex-direction: column !important;
+    }
+
+    #index-panel { 
+      width: 100% !important; 
+      height: 100% !important; 
+      border-right: none !important; 
+      border-bottom: none !important; 
+      display: none; 
+    }
+
+    #index-panel.mobile-active {
+      display: flex !important; 
+    }
+
     #map-wrap { display: none; }
     #map-wrap.mobile-active { display: block !important; }
-    #mobile-bottom-bar { display: flex !important; position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; width: 100% !important; height: 48px !important; background: #111111 !important; color: #FFFFFF !important; align-items: center !important; justify-content: center !important; font-size: 11px !important; font-weight: 500 !important; letter-spacing: 0.14em !important; text-transform: uppercase !important; text-decoration: none !important; z-index: 99999999 !important; border-top: 1px solid #111111 !important; }
-    .mapboxgl-ctrl-bottom-right, .mapboxgl-ctrl-bottom-left { bottom: 12px !important; }
-  }
 
-  /* =========================================================
-     MODUŁ SPLASH SCREEN: PEŁNOEKRANOWY RAPORT Z AKTUALIZACJI
-     ========================================================= */
-  #pi-update-ticket {
-    position: fixed;
-    inset: 0;
-    background: #FFFFFF;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999999;
-    padding: 20px;
-    transition: opacity 0.4s ease, visibility 0.4s;
-  }
+    #mobile-bottom-bar {
+      display: flex !important;
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      width: 100% !important;
+      height: 48px !important;
+      background: #111111 !important;
+      color: #FFFFFF !important;
+      align-items: center !important;
+      justify-content: center !important;
+      font-size: 11px !important;
+      font-weight: 500 !important;
+      letter-spacing: 0.14em !important;
+      text-transform: uppercase !important;
+      text-decoration: none !important;
+      z-index: 99999999 !important;
+      border-top: 1px solid #111111 !important;
+    }
 
-  #pi-update-ticket.pi-ticket-hidden {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-  }
-
-  .pi-ticket-container {
-    width: 100%;
-    max-width: 800px;
-    background: #FFFFFF;
-    border: 1px solid #111111;
-    border-top: 8px solid #111111; 
-    display: flex;
-    flex-direction: column;
-    font-family: 'Inter', system-ui, sans-serif;
-    color: #111111;
-  }
-
-  .pi-ticket-header {
-    display: flex;
-    justify-content: space-between;
-    padding: 16px 20px;
-    border-bottom: 1px solid #111111;
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  .pi-ticket-body {
-    padding: 32px 20px;
-  }
-
-  .pi-ticket-title {
-    margin: 0 0 32px 0;
-    font-size: 42px;
-    font-weight: 400;
-    line-height: 0.95;
-    letter-spacing: -0.03em;
-    text-transform: uppercase;
-  }
-
-  .pi-ticket-grid {
-    display: flex;
-    flex-direction: column;
-    border-top: 1px solid #111111;
-  }
-
-  .pi-ticket-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 12px 0;
-    border-bottom: 1px solid #111111;
-    font-size: 11px;
-    text-transform: uppercase;
-  }
-
-  .pi-ticket-label {
-    color: #6B6B6B;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-  }
-
-  .pi-ticket-data {
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-align: right;
-  }
-
-  .pi-ticket-thumbnails {
-    margin-top: 32px;
-    border-top: 1px solid #111111;
-    padding-top: 16px;
-  }
-
-  .pi-thumb-label {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: #111111;
-    margin-bottom: 16px;
-  }
-
-  .pi-thumb-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1px; 
-    background: #111111; 
-    border: 1px solid #111111;
-  }
-
-  .pi-thumb-grid img {
-    width: 100%;
-    aspect-ratio: 1 / 1; 
-    object-fit: cover; 
-    display: block;
-    filter: grayscale(100%) contrast(1.1); 
-    cursor: crosshair; 
-    transition: filter 0.15s ease;
-  }
-
-  .pi-thumb-grid img:hover {
-    filter: grayscale(0%) contrast(1);
-  }
-
-  #pi-ticket-ack {
-    width: 100%;
-    border: none;
-    border-top: 1px solid #111111;
-    background: #111111;
-    color: #FFFFFF;
-    padding: 20px;
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease;
-  }
-
-  #pi-ticket-ack:hover {
-    background: #FFFFFF;
-    color: #111111;
+    .mapboxgl-ctrl-bottom-right, .mapboxgl-ctrl-bottom-left {
+      bottom: 12px !important;
+    }
   }
 </style>
 </head>
 <body>
+
+<div id="page-loading">LOADING MAP INDEX...</div>
 
 <div id="topbar">
   <div id="search-row">
@@ -378,6 +425,7 @@
       <span id="search-archive-text">SEARCH</span>
     </a>
   </div>
+  <!-- Context bar oddzielony, niezależny pas z czarną linią brzegową -->
   <div id="context-bar">
     SELECT A PIN OR A FILTER TO OPEN A RECORD
   </div>
@@ -393,12 +441,13 @@
   <div id="index-panel">
     
     <div class="panel-section-container" id="filters-group">
-      <!-- 1. LOCATION -->
+      <!-- 1. LOCATION - Otwarty domyślnie -->
       <div class="acc-head open" data-target="acc-location">
         <span class="acc-title">1. Location</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body open" id="acc-location">
         <label><input type="radio" name="suburb-group" class="suburb-check" value="" checked> All Locations</label>
+
         <div class="sub-category-title">Inner North & CBD</div>
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Brisbane City"> Brisbane City</label>
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Spring Hill"> Spring Hill</label>
@@ -542,56 +591,7 @@
   SEARCH
 </a>
 
-<!-- PEŁNOEKRANOWY SPLASH SCREEN -->
-<div id="pi-update-ticket">
-  <div class="pi-ticket-container">
-    <div class="pi-ticket-header">
-      <span class="pi-ticket-id" id="upd-id"></span>
-      <span class="pi-ticket-status">NEW RECORDS ADDED</span>
-    </div>
-    
-    <div class="pi-ticket-body">
-      <h2 class="pi-ticket-title">ARCHIVE<br>EXPANDED</h2>
-      
-      <div class="pi-ticket-grid">
-        <div class="pi-ticket-row">
-          <span class="pi-ticket-label">TIMESTAMP</span>
-          <span class="pi-ticket-data" id="upd-time"></span>
-        </div>
-        <div class="pi-ticket-row">
-          <span class="pi-ticket-label">VOLUME</span>
-          <span class="pi-ticket-data" id="upd-volume"></span>
-        </div>
-      </div>
-
-      <!-- WGLĄDÓWKA -->
-      <div class="pi-ticket-thumbnails">
-        <div class="pi-thumb-label">ATTACHED VISUAL DATA</div>
-        <div class="pi-thumb-grid" id="upd-gallery"></div>
-      </div>
-    </div>
-
-    <button id="pi-ticket-ack">ACKNOWLEDGE</button>
-  </div>
-</div>
-
 <script>
-// =========================================================
-// PANEL KONTROLNY AKTUALIZACJI (EDYTUJ TUTAJ CO TYDZIEŃ)
-// =========================================================
-const LATEST_UPDATE = {
-  id: "SYS.UPD.26.08",
-  timestamp: "13 AUG 2026 / 22:12",
-  volume: "+ 4 FILES",
-  images: [
-    "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0100.jpg",
-    "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0077.jpg",
-    "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0041.jpg",
-    "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0083.jpg"
-  ]
-};
-// =========================================================
-
 function initMapboxApp() {
   if (typeof mapboxgl === 'undefined') {
     setTimeout(initMapboxApp, 50);
@@ -1022,6 +1022,11 @@ function initMapboxApp() {
 
       map.once('idle', () => {
         document.getElementById('map').classList.add('loaded');
+        var loadingEl = document.getElementById('page-loading');
+        if (loadingEl) {
+          loadingEl.classList.add('fade-out');
+          setTimeout(() => loadingEl.style.display = 'none', 500);
+        }
       });
     }
 
@@ -1180,39 +1185,6 @@ function initMapboxApp() {
 
 initMapboxApp();
 
-// Inicjalizacja z obsługą pamięci sesji (wyświetli się dokładnie 1 raz i nigdy więcej przy powrocie do Home)
-document.addEventListener('DOMContentLoaded', function() {
-  var ticket = document.getElementById('pi-update-ticket');
-  var ackBtn = document.getElementById('pi-ticket-ack');
-  var gallery = document.getElementById('upd-gallery');
-
-  if (ticket) {
-    // Sprawdzenie, czy użytkownik kliknął już "ACKNOWLEDGE" w tej sesji
-    if (sessionStorage.getItem('pi_update_acknowledged') === 'true') {
-      ticket.style.display = 'none';
-    }
-
-    // Wstrzyknięcie danych z Panelu Kontrolnego
-    document.getElementById('upd-id').textContent = LATEST_UPDATE.id;
-    document.getElementById('upd-time').textContent = LATEST_UPDATE.timestamp;
-    document.getElementById('upd-volume').textContent = LATEST_UPDATE.volume;
-
-    // Generowanie siatki zdjęć
-    if (gallery && LATEST_UPDATE.images.length > 0) {
-      gallery.innerHTML = LATEST_UPDATE.images.map(function(url) {
-        return '<img src="' + url + '" alt="Archive Record">';
-      }).join('');
-    }
-
-    // Zamknięcie i zapamiętanie w pamięci sesji przeglądarki
-    if (ackBtn) {
-      ackBtn.addEventListener('click', function() {
-        ticket.classList.add('pi-ticket-hidden');
-        sessionStorage.setItem('pi_update_acknowledged', 'true');
-      });
-    }
-  }
-});
 </script>
 
 </body>
