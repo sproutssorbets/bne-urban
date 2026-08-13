@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>PHOTOINDEX</title>
 
-<!-- OPTYMALIZACJA: Wcześniejsze nawiązanie połączeń z serwerami -->
 <link rel="preconnect" href="https://api.mapbox.com">
 <link rel="preconnect" href="https://events.mapbox.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,9 +13,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet">
 
-<!-- OPTYMALIZACJA: Atrybut defer wymusza ładowanie skryptów w tle, nie blokując renderowania strony (redukcja TBT i LCP) -->
-<script defer src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 
 <style>
   * { box-sizing: border-box; border-radius: 0 !important; box-shadow: none !important; -webkit-tap-highlight-color: transparent; }
@@ -545,10 +543,7 @@
   SEARCH
 </a>
 
-<!-- OPTYMALIZACJA: Zamknięcie kodu w nasłuchiwaczu zapobiega błędom przed pobraniem Mapboxa w tle -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-
   mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
 
   /* ZAKTWALIZOWANA LOGIKA FILTER MAPPING (v5.2) */
@@ -1131,8 +1126,6 @@ document.addEventListener('DOMContentLoaded', function() {
     var tm = document.getElementById('tab-map');
     if (tm) tm.click();
   }
-
-});
 </script>
 
 </body>
