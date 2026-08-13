@@ -592,8 +592,8 @@ const LATEST_UPDATE = {
 };
 // =========================================================
 
-// Bezpieczne ukrycie w CSS, jeśli użytkownik kliknął już "ACKNOWLEDGE"
-if (localStorage.getItem('pi_archive_seen') === 'true') {
+// Ukrycie w CSS jeśli użytkownik widział JUŻ TĘ konkretną aktualizację (po ID, nie po samym fakcie kliknięcia)
+if (localStorage.getItem('pi_archive_seen_id') === LATEST_UPDATE.id) {
   document.write('<style>#pi-update-ticket { display: none !important; }</style>');
 }
 
@@ -1185,14 +1185,14 @@ function initMapboxApp() {
 
 initMapboxApp();
 
-// Inicjalizacja Splash Screenu z zachowaniem pamięci i bezpośrednimi adresami zdjęć
+// Inicjalizacja Splash Screenu z zachowaniem pamięci PO ID AKTUALIZACJI i bezpośrednimi adresami zdjęć
 document.addEventListener('DOMContentLoaded', function() {
   var ticket = document.getElementById('pi-update-ticket');
   var ackBtn = document.getElementById('pi-ticket-ack');
   var gallery = document.getElementById('upd-gallery');
 
   if (ticket) {
-    if (localStorage.getItem('pi_archive_seen') === 'true') {
+    if (localStorage.getItem('pi_archive_seen_id') === LATEST_UPDATE.id) {
       ticket.style.display = 'none';
       return;
     }
@@ -1210,7 +1210,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (ackBtn) {
       ackBtn.addEventListener('click', function() {
         ticket.classList.add('pi-ticket-hidden');
-        localStorage.setItem('pi_archive_seen', 'true');
+        localStorage.setItem('pi_archive_seen_id', LATEST_UPDATE.id);
         setTimeout(function() {
           ticket.style.display = 'none';
         }, 400);
