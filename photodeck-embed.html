@@ -29,7 +29,16 @@
   #topbar { border: none; background: #FFFFFF; flex-shrink: 0; z-index: 10; border-bottom: 1px solid #111111; }
   
   /* WYSZUKIWARKA - Usunięto dolną linię, by scalić z context-bar */
-  #search-row { display: flex; align-items: center; height: 50px; padding: 0 20px; gap: 16px; border-top: 1px solid #111111; border-bottom: none; position: relative; background: #FFFFFF; }
+#search-row { 
+    display: flex; 
+    align-items: center; 
+    height: 56px; /* Sztywna, matematyczna wartość */
+    padding: 0 20px; 
+    border-top: 1px solid #111111; 
+    border-bottom: 1px solid #DADADA; /* Subtelne odcięcie funkcji */
+    background: #FFFFFF; 
+    position: relative;
+  }
   #geocoder { flex: 1; width: 100%; position: relative; height: 100%; }
 
   /* CUSTOM SEARCH (Search Box API) */
@@ -71,16 +80,18 @@
   #search-archive-btn:hover { background: transparent; color: #6B6B6B; }
 
   /* CONTEXT BAR - podwieszony pod wyszukiwarkę bez zbędnych kresek */
-  #context-bar {
-    padding: 0 20px 12px 20px;
-    font-size: 10px;
+ #context-bar {
+    display: flex;
+    align-items: center;
+    height: 32px; /* Twardy moduł pionowy */
+    padding: 0 20px;
+    font-size: 9px;
     color: #6B6B6B;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.1em;
     background: #FFFFFF;
     text-transform: uppercase;
-    border: none;
+    border-bottom: 1px solid #111111; /* Główne, grube cięcie przed mapą */
   }
-
   /* DESKTOP LAYOUT */
   #layout { 
     width: 100%; 
