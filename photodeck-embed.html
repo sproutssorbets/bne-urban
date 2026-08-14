@@ -623,6 +623,7 @@ const LATEST_UPDATE = {
     { url: "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0100.jpg", link: "https://www.photoindex.au/-/archive/brisbane/herston/victoria-park-barrambin" },
     { url: "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0077.jpg", link: "https://www.photoindex.au/-/archive/brisbane/herston/victoria-park-barrambin" },
     { url: "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0041.jpg", link: "https://www.photoindex.au/-/archive/brisbane/herston/victoria-park-barrambin" }
+     { url: "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0080.jpg", link: "https://www.photoindex.au/-/archive/brisbane/herston/victoria-park-barrambin" }
   ]
 };
 
@@ -707,9 +708,28 @@ function initMapboxApp() {
       el.className = 'custom-marker-hitbox';
       el.innerHTML = '<div class="pi-pin"><div class="pi-pin-body">' + loc.count + '</div><div class="pi-pin-point"></div></div>';
 
-      var popupHtml = '<div style="min-width:200px;">' +
-        '<div style="font-size:14px;color:#111111;font-weight:600;margin-bottom:2px;">' + loc.street + '</div>' +
-        '<a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:#111111;color:#FFFFFF;padding:10px;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;margin-top:12px;">OPEN RECORD →</a>' +
+      var datesList = loc.dates ? loc.dates.split(';').map(d => d.trim()).filter(Boolean) : [];
+      var datesDesc = datesList.slice().reverse(); 
+
+      var rows = [];
+      rows.push(['Suburb', loc.suburb]);
+      rows.push(['Photos', String(loc.count)]);
+      datesDesc.forEach(function (d, i) {
+        rows.push([i === 0 ? 'Photographed' : '', d]);
+      });
+
+      var rowsHtml = rows.map(function (r) {
+        return '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:10px;padding:4px 0;">' +
+          '<span style="color:#6B6B6B;text-transform:uppercase;letter-spacing:0.06em;flex-shrink:0;">' + r[0] + '</span>' +
+          '<span style="color:#111111;font-weight:500;text-align:right;">' + r[1] + '</span>' +
+        '</div>';
+      }).join('');
+
+      var popupHtml =
+        '<div style="min-width:200px;">' +
+          '<div style="font-size:14px;color:#111111;font-weight:600;margin-bottom:2px;">' + loc.street + '</div>' +
+          '<div style="border-top:1px solid #DADADA;border-bottom:1px solid #DADADA;margin-top:6px;padding:2px 0;">' + rowsHtml + '</div>' +
+          '<a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:#111111;color:#FFFFFF;padding:10px;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;margin-top:12px;">OPEN RECORD →</a>' +
         '</div>';
 
       loc.popup = new mapboxgl.Popup({ offset: [0, -46], closeButton: true, className: 'pi-popup' }).setHTML(popupHtml);
@@ -724,7 +744,6 @@ function initMapboxApp() {
     document.getElementById('map').classList.add('loaded');
   }
 
-  // Obsługa zakładek mobilnych
   var tabs = { 'tab-index': 'index-group', 'tab-filters': 'filters-group', 'tab-map': 'map-wrap' };
   Object.keys(tabs).forEach(tabId => {
     var btn = document.getElementById(tabId);
