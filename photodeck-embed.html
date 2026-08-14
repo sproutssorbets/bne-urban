@@ -24,7 +24,7 @@
 
   html, body { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Inter', system-ui, sans-serif; background: #FFFFFF; color: #111111; }
   
-  /* ZABLOKOWANIE TŁA, GDY POPUP JEST OTWARTY */
+  /* ZABLOKOWANIE TŁA I SCROLLA GDY POPUP JEST AKTYWNY */
   html.pi-has-modal, body.pi-has-modal {
     overflow: hidden !important;
     touch-action: none;
@@ -172,9 +172,7 @@
     flex-shrink: 0;
     padding: 0;
   }
-  .acc-body input[type="radio"] {
-    border-radius: 50% !important;
-  }
+  .acc-body input[type="radio"] { border-radius: 50% !important; }
   .acc-body input[type="radio"]:checked::before {
     content: "";
     width: 8px;
@@ -182,9 +180,7 @@
     background: #111111;
     border-radius: 50%;
   }
-  .acc-body input[type="checkbox"]:checked {
-    background: #111111;
-  }
+  .acc-body input[type="checkbox"]:checked { background: #111111; }
 
   #index-group { display: flex; flex-direction: column; background: #FFFFFF; min-height: 0; }
   #filters-group { display: flex; flex-direction: column; }
@@ -218,28 +214,20 @@
   .pi-popup .mapboxgl-popup-content, .pi-popup .mapboxgl-popup-content:focus { background: #FFFFFF; border: 1px solid #DADADA; padding: 16px; font-family: 'Inter', system-ui, sans-serif; border-radius: 0; box-shadow: none; outline: none !important; }
   .pi-popup .mapboxgl-popup-tip { border-top-color: #FFFFFF !important; border-bottom-color: #FFFFFF !important; }
 
-  /* TRYB MOBILNY - UKŁAD I PRZYCISK BOTTOM BAR */
+  /* TRYB MOBILNY - OPTYMALIZACJA INTERFEJSU I PRZYCISK BOTTOM BAR */
   @media (max-width: 720px) {
-    body { 
-      padding-bottom: 0 !important; 
-      box-sizing: border-box !important; 
-    }
+    body { padding-bottom: 0 !important; box-sizing: border-box !important; }
     #topbar { border-bottom: none; }
     #search-row { border-bottom: 1px solid #DADADA; border-top: none; padding: 0 12px; height: 52px; }
     #search-archive-btn { display: none !important; }
     .mobile-tabs { display: flex !important; }
     #context-bar { display: none; }
-    #layout { 
-      height: calc(100% - 92px - 50px - env(safe-area-inset-bottom)) !important; 
-      flex: 1 1 auto !important; 
-      flex-direction: column !important; 
-    }
+    #layout { height: calc(100% - 92px - 50px - env(safe-area-inset-bottom)) !important; flex: 1 1 auto !important; flex-direction: column !important; }
     #index-panel { width: 100% !important; height: 100% !important; border-right: none !important; border-bottom: none !important; display: none; }
     #index-panel.mobile-active { display: flex !important; }
     #map-wrap { display: none; }
     #map-wrap.mobile-active { display: block !important; }
     
-    /* PEŁNY I PRZYKLEJONY PRZYCISK DOLNY NA MOBILE */
     #mobile-bottom-bar { 
       display: flex !important; 
       position: fixed !important; 
@@ -265,16 +253,17 @@
     .mapboxgl-ctrl-bottom-right, .mapboxgl-ctrl-bottom-left { bottom: 60px !important; }
   }
 
-  /* MODUŁ NAKŁADKI / POPUP */
+  /* MODUŁ NAKŁADKI / UPDATE TICKET POPUP */
   #pi-update-ticket {
     position: fixed;
     inset: 0;
-    background: #FFFFFF;
+    background: rgba(247, 247, 245, 0.95);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 99999999;
     padding: 24px;
+    backdrop-filter: blur(4px);
     touch-action: pan-y;
   }
 
@@ -289,8 +278,8 @@
     width: 100%;
     max-width: 980px;
     height: auto;
-    max-height: 85vh;
-    background: #FFFFFF;
+    max-height: 90%;
+    background: #F7F7F5;
     border: 1px solid #111111;
     border-top: 6px solid #111111;
     display: flex;
@@ -320,6 +309,8 @@
     overflow-y: auto;
     flex: 1 1 auto;
     min-height: 0;
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent 100%);
   }
 
   .pi-ticket-info {
@@ -382,6 +373,7 @@
     font-family: 'Inter', system-ui, sans-serif;
     transition: opacity 0.15s ease;
   }
+
   .pi-action-link:hover { opacity: 0.55; }
   .pi-action-arrow { color: #6B6B6B; font-size: 12px; }
 
@@ -424,7 +416,7 @@
     border: none;
     border-top: 1px solid #111111;
     background: #111111;
-    color: #FFFFFF;
+    color: #F7F7F5;
     padding: 16px;
     font-family: 'Inter', system-ui, sans-serif;
     font-size: 11px;
@@ -432,19 +424,18 @@
     letter-spacing: 0.16em;
     text-transform: uppercase;
     cursor: pointer;
-    transition: background 0.15s ease;
+    transition: background 0.15s ease, color 0.15s ease;
     flex-shrink: 0;
   }
-  #pi-ticket-ack:hover { background: #333333; }
+
+  #pi-ticket-ack:hover {
+    background: #F7F7F5;
+    color: #111111;
+  }
 
   @media (max-width: 720px) {
-    #pi-update-ticket { padding: 0; background: #FFFFFF; }
-    .pi-ticket-container { 
-      height: 100dvh;
-      max-height: 100dvh;
-      border: none;
-      background: #FFFFFF;
-    }
+    #pi-update-ticket { padding: 0; background: #F7F7F5; }
+    .pi-ticket-container { height: auto; max-height: 100%; border: none; border-top: none; }
     .pi-ticket-main { grid-template-columns: 1fr; overflow-y: auto; flex: 1; }
     .pi-ticket-info { border-right: none; border-bottom: 1px solid #DADADA; padding: 20px; }
     .pi-ticket-actions { margin-top: 8px; }
@@ -473,7 +464,7 @@
 
         <div class="pi-ticket-grid">
           <div class="pi-ticket-row">
-            <span class="pi-ticket-label">Timestamp</span>
+            <span class="pi-ticket-label">Added to archive</span>
             <span class="pi-ticket-data" id="upd-time"></span>
           </div>
           <div class="pi-ticket-row">
@@ -483,20 +474,20 @@
         </div>
 
         <div class="pi-ticket-actions">
-          <a class="pi-action-link" href="#" id="action-search-map">
+          <a class="pi-action-link" href="https://www.photoindex.au/" target="_top" id="action-search-map">
             <span>Search on map</span><span class="pi-action-arrow">→</span>
           </a>
-          <a class="pi-action-link" href="#" id="action-browse-index">
-            <span>Browse records</span><span class="pi-action-arrow">→</span>
+          <a class="pi-action-link" href="https://www.photoindex.au/index" target="_top" id="action-browse-index">
+            <span>Browse index</span><span class="pi-action-arrow">→</span>
           </a>
-          <a class="pi-action-link" href="https://www.photoindex.au/contact" id="action-contact">
+          <a class="pi-action-link" href="https://www.photoindex.au/contact" target="_top" id="action-contact">
             <span>Contact</span><span class="pi-action-arrow">→</span>
           </a>
         </div>
       </div>
 
       <div class="pi-ticket-thumbnails">
-        <div class="pi-thumb-label">Attached visual data — click to open in the archive</div>
+        <div class="pi-thumb-label">Photographs from this update. Tap to open in the archive.</div>
         <div class="pi-thumb-grid" id="upd-gallery"></div>
       </div>
     </div>
@@ -637,9 +628,9 @@
 </a>
 
 <script>
-// ZMIENIONO ID NA SYS.UPD.26.09 ABY POPUP POKAZAŁ SIĘ PONOWNIE (DLA NOWEJ AKTUALIZACJI)
 const LATEST_UPDATE = {
-  id: "SYS.UPD.26.09",
+  id: "SYS.UPD.26.08",
+  label: "UPDATE, AUGUST 2026",
   timestamp: "14 AUG 2026 / 10:00",
   volume: "+ 30 FILES",
   defaultArchiveUrl: "https://www.photoindex.au/",
@@ -653,7 +644,7 @@ const LATEST_UPDATE = {
   ]
 };
 
-// UKRYCIE GDY JUŻ ZOBACZONO TĘ WERSJĘ + ODBLOKOWANIE SCROLLA TŁA
+// Sprawdzenie na starcie: jeśli ten update był widziany, odblokowujemy tło i ukrywamy popup CSS-em
 if (localStorage.getItem('pi_archive_seen_id') === LATEST_UPDATE.id) {
   document.documentElement.classList.remove('pi-has-modal');
   document.body && document.body.classList.remove('pi-has-modal');
@@ -913,17 +904,20 @@ document.addEventListener('DOMContentLoaded', function() {
   var ticket = document.getElementById('pi-update-ticket');
   var ackBtn = document.getElementById('pi-ticket-ack');
   var gallery = document.getElementById('upd-gallery');
-  var searchMapBtn = document.getElementById('action-search-map');
-  var browseIndexBtn = document.getElementById('action-browse-index');
+  var actionLinks = document.querySelectorAll('.pi-action-link');
 
-  // Zamknięcie i odblokowanie tła
+  function markAsSeen() {
+    localStorage.setItem('pi_archive_seen_id', LATEST_UPDATE.id);
+  }
+
   function closeTicket() {
-    if (!ticket) return;
-    ticket.classList.add('pi-ticket-hidden');
+    markAsSeen();
     document.documentElement.classList.remove('pi-has-modal');
     document.body.classList.remove('pi-has-modal');
-    localStorage.setItem('pi_archive_seen_id', LATEST_UPDATE.id);
-    setTimeout(function() { ticket.style.display = 'none'; }, 400);
+    if (ticket) {
+      ticket.classList.add('pi-ticket-hidden');
+      setTimeout(function() { ticket.style.display = 'none'; }, 400);
+    }
   }
 
   if (localStorage.getItem('pi_archive_seen_id') === LATEST_UPDATE.id) {
@@ -934,33 +928,28 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   if (ticket) {
-    document.getElementById('upd-id').textContent = LATEST_UPDATE.id;
+    document.getElementById('upd-id').textContent = LATEST_UPDATE.label;
     document.getElementById('upd-time').textContent = LATEST_UPDATE.timestamp;
     document.getElementById('upd-volume').textContent = LATEST_UPDATE.volume;
 
     if (gallery && LATEST_UPDATE.images.length > 0) {
       gallery.innerHTML = LATEST_UPDATE.images.map(function(item) {
         var link = item.link || LATEST_UPDATE.defaultArchiveUrl;
-        return '<a href="' + link + '" target="_top">' +
+        return '<a href="' + link + '" target="_top" class="pi-thumb-link">' +
           '<img src="' + item.url + '" alt="Archive Record" loading="lazy" decoding="async">' +
         '</a>';
       }).join('');
+
+      gallery.querySelectorAll('.pi-thumb-link').forEach(function(el) {
+        el.addEventListener('click', markAsSeen);
+      });
     }
 
     if (ackBtn) ackBtn.addEventListener('click', closeTicket);
-    if (searchMapBtn) searchMapBtn.addEventListener('click', function(ev) { ev.preventDefault(); closeTicket(); });
-    if (browseIndexBtn) {
-      browseIndexBtn.addEventListener('click', function(ev) {
-        ev.preventDefault();
-        closeTicket();
-        setTimeout(function() {
-          if (window.innerWidth <= 720) {
-            var tabIndex = document.getElementById('tab-index');
-            if (tabIndex) tabIndex.click();
-          }
-        }, 420);
-      });
-    }
+
+    actionLinks.forEach(function(link) {
+      link.addEventListener('click', markAsSeen);
+    });
   }
 });
 </script>
