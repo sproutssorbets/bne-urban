@@ -691,9 +691,10 @@ const LATEST_UPDATE = {
   ]
 };
 
-if (localStorage.getItem('pi_archive_seen_id') === LATEST_UPDATE.id) {
-  document.write('<style>#pi-update-ticket { display: none !important; }</style>');
-}
+// TYMCZASOWO ZAKOMENTOWANE NA CZAS TESTÓW UX (dzięki temu popup pokazuje się przy każdym odświeżeniu):
+// if (localStorage.getItem('pi_archive_seen_id') === LATEST_UPDATE.id) {
+//   document.write('<style>#pi-update-ticket { display: none !important; }</style>');
+// }
 
 function initMapboxApp() {
   if (typeof mapboxgl === 'undefined') {
@@ -953,10 +954,11 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   if (ticket) {
-    if (localStorage.getItem('pi_archive_seen_id') === LATEST_UPDATE.id) {
-      ticket.style.display = 'none';
-      return;
-    }
+    // TYMCZASOWO ZAKOMENTOWANE DLA TESTÓW (odkomentuj na produkcji):
+    // if (localStorage.getItem('pi_archive_seen_id') === LATEST_UPDATE.id) {
+    //   ticket.style.display = 'none';
+    //   return;
+    // }
 
     document.getElementById('upd-id').textContent = LATEST_UPDATE.id;
     document.getElementById('upd-time').textContent = LATEST_UPDATE.timestamp;
