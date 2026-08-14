@@ -294,7 +294,13 @@
   .pi-ticket-container {
     width: 100%;
     max-width: 980px;
-    height: 100%;
+    /* height: auto zamiast 100% — kontener dopasowuje się do zawartości.
+       Przy height: 100% grid rozciągał wiersz na całą dostępną wysokość
+       (do 85vh), a realna treść potrzebuje mniej, stąd pusty pas pod
+       siatką miniatur. max-height zostaje jako limit na wypadek dużej
+       liczby zdjęć — wtedy włączy się scroll w .pi-ticket-main zamiast
+       dalszego rozciągania. */
+    height: auto;
     max-height: 85vh;
     background: #F7F7F5;
     border: 1px solid #111111;
