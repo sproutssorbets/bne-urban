@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="pi-has-modal">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -22,7 +22,14 @@
     outline: none !important;
   }
 
-  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Inter', system-ui, sans-serif; background: #FFFFFF; color: #111111; }
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Inter', system-ui, sans-serif; background: #FFFFFF; color: #111111; }
+  
+  /* ZABLOKOWANIE TŁA, GDY POPUP JEST OTWARTY */
+  html.pi-has-modal, body.pi-has-modal {
+    overflow: hidden !important;
+    touch-action: none;
+  }
+
   body { display: flex; flex-direction: column; }
 
   /* MOCNA RAMA DLA CAŁEJ GÓRNEJ SEKCJI */
@@ -35,7 +42,7 @@
   /* CUSTOM SEARCH (Search Box API) */
   #pi-search-wrap { position: relative; width: 100%; height: 100%; display: flex; align-items: center; }
   
-  /* INPUT - Czysta typografia, wyzerowany padding lewy */
+  /* INPUT */
   #pi-search-input { width: 100%; height: 100%; border: none; background: transparent; font-family: 'Inter', system-ui, sans-serif; font-size: 13px; color: #111111; padding: 0; outline: none !important; }
   #pi-search-input::placeholder { color: #111111; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; }
   
@@ -126,16 +133,6 @@
   #index-panel::-webkit-scrollbar { display: none; }
   .panel-section-container { display: flex; flex-direction: column; }
   
-  .section { padding: 18px 20px 14px 20px; border-bottom: 1px solid #DADADA; flex-shrink: 0; }
-  .section.map-legend { background: #FAFAFA; border-bottom: 2px solid #111111; }
-  .section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #111111; margin-bottom: 14px; }
-
-  .filter-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; cursor: pointer; user-select: none; transition: opacity 0.15s ease; }
-  .filter-row.off { opacity: 0.35; }
-  .swatch { width: 12px; height: 12px; flex-shrink: 0; border-radius: 0 !important; }
-  .filter-label { font-size: 13px; font-weight: 400; color: #111111; }
-  .filter-count { font-size: 12px; font-weight: 400; color: #6B6B6B; }
-
   .acc-head { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #DADADA; cursor: pointer; user-select: none; background: #FFFFFF; flex-shrink: 0; transition: background 0.15s ease; }
   .acc-head:hover { background: #FAFAFA; }
   .acc-title { font-size: 11px; font-weight: 400; letter-spacing: 0.14em; text-transform: uppercase; color: #111111; }
@@ -206,9 +203,6 @@
   .pi-footer-label { font-size: 9px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #6B6B6B; margin-bottom: 6px; }
   .pi-footer-stat { font-size: 10px; font-weight: 500; letter-spacing: 0.04em; color: #111111; margin-bottom: 3px; display: flex; align-items: center; gap: 4px; }
   .pi-dot { font-size: 7px; color: #111111; }
-  .pi-footer-link { display: block; font-size: 10px; font-weight: 500; color: #111111; text-decoration: none; margin-bottom: 3px; letter-spacing: 0.02em; transition: color 0.15s ease; }
-  .pi-footer-link:hover { color: #6B6B6B; }
-  .pi-footer-bottom { display: flex; justify-content: space-between; font-size: 9px; color: #6B6B6B; letter-spacing: 0.05em; text-transform: uppercase; padding-top: 10px; border-top: 1px solid #DADADA; }
 
   /* PINESKI */
   .custom-marker-hitbox { width: 44px; height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; }
@@ -223,40 +217,37 @@
 
   .pi-popup .mapboxgl-popup-content, .pi-popup .mapboxgl-popup-content:focus { background: #FFFFFF; border: 1px solid #DADADA; padding: 16px; font-family: 'Inter', system-ui, sans-serif; border-radius: 0; box-shadow: none; outline: none !important; }
   .pi-popup .mapboxgl-popup-tip { border-top-color: #FFFFFF !important; border-bottom-color: #FFFFFF !important; }
-  .pi-popup .mapboxgl-popup-close-button { font-size: 18px; color: #111111; padding: 4px 8px; outline: none !important; border: none; background: transparent; cursor: pointer; }
 
-  #recent-strip { display: none; flex-direction: column; background: #FFFFFF; border-bottom: 1px solid #DADADA; flex-shrink: 0; padding: 16px 20px; }
-  #recent-strip.has-photos { display: flex; }
-  #recent-label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #6B6B6B; margin-bottom: 10px; }
-  #recent-track { display: flex; flex-direction: column; gap: 8px; }
-  .recent-row { display: block; cursor: pointer; text-decoration: none; padding: 2px 0; }
-  .recent-row:hover .recent-headline { color: #6B6B6B; }
-  .recent-headline { font-size: 12px; color: #111111; font-weight: 400; margin-bottom: 2px; line-height: 1.3; transition: color 0.15s ease; }
-  .recent-date { font-size: 10px; color: #6B6B6B; letter-spacing: 0.02em; }
-
-  /* TRYB MOBILNY - OPTYMALIZACJA */
+  /* TRYB MOBILNY - UKŁAD I PRZYCISK BOTTOM BAR */
   @media (max-width: 720px) {
-    body { padding-bottom: calc(48px + env(safe-area-inset-bottom)) !important; box-sizing: border-box !important; }
+    body { 
+      padding-bottom: 0 !important; 
+      box-sizing: border-box !important; 
+    }
     #topbar { border-bottom: none; }
     #search-row { border-bottom: 1px solid #DADADA; border-top: none; padding: 0 12px; height: 52px; }
     #search-archive-btn { display: none !important; }
     .mobile-tabs { display: flex !important; }
     #context-bar { display: none; }
-    #layout { height: 100% !important; flex: 1 1 auto !important; flex-direction: column !important; }
+    #layout { 
+      height: calc(100% - 92px - 50px - env(safe-area-inset-bottom)) !important; 
+      flex: 1 1 auto !important; 
+      flex-direction: column !important; 
+    }
     #index-panel { width: 100% !important; height: 100% !important; border-right: none !important; border-bottom: none !important; display: none; }
     #index-panel.mobile-active { display: flex !important; }
     #map-wrap { display: none; }
     #map-wrap.mobile-active { display: block !important; }
     
+    /* PEŁNY I PRZYKLEJONY PRZYCISK DOLNY NA MOBILE */
     #mobile-bottom-bar { 
       display: flex !important; 
       position: fixed !important; 
       left: 0 !important; 
       right: 0 !important; 
       bottom: 0 !important; 
-      width: 100vw !important; 
-      max-width: 100% !important; 
-      height: calc(48px + env(safe-area-inset-bottom)) !important; 
+      width: 100% !important; 
+      height: calc(50px + env(safe-area-inset-bottom)) !important; 
       padding-bottom: env(safe-area-inset-bottom) !important;
       background: #111111 !important; 
       color: #FFFFFF !important; 
@@ -267,14 +258,14 @@
       letter-spacing: 0.14em !important; 
       text-transform: uppercase !important; 
       text-decoration: none !important; 
-      z-index: 9999999 !important; 
-      border-top: 1px solid #111111 !important; 
+      z-index: 9999 !important; 
+      border: none !important;
       margin: 0 !important;
     }
     .mapboxgl-ctrl-bottom-right, .mapboxgl-ctrl-bottom-left { bottom: 60px !important; }
   }
 
-  /* MODUŁ NAKŁADKI: POPRAWIONE OKNO ZASŁANIAJĄCE (BIAŁE TŁO) */
+  /* MODUŁ NAKŁADKI / POPUP */
   #pi-update-ticket {
     position: fixed;
     inset: 0;
@@ -284,6 +275,7 @@
     justify-content: center;
     z-index: 99999999;
     padding: 24px;
+    touch-action: pan-y;
   }
 
   #pi-update-ticket.pi-ticket-hidden {
@@ -362,17 +354,8 @@
     text-transform: uppercase;
   }
 
-  .pi-ticket-label {
-    color: #6B6B6B;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-  }
-
-  .pi-ticket-data {
-    font-weight: 500;
-    letter-spacing: 0.04em;
-    text-align: right;
-  }
+  .pi-ticket-label { color: #6B6B6B; font-weight: 500; letter-spacing: 0.08em; }
+  .pi-ticket-data { font-weight: 500; letter-spacing: 0.04em; text-align: right; }
 
   .pi-ticket-actions {
     margin-top: auto;
@@ -399,7 +382,6 @@
     font-family: 'Inter', system-ui, sans-serif;
     transition: opacity 0.15s ease;
   }
-
   .pi-action-link:hover { opacity: 0.55; }
   .pi-action-arrow { color: #6B6B6B; font-size: 12px; }
 
@@ -426,12 +408,7 @@
     border: 1px solid #DADADA;
   }
 
-  .pi-thumb-grid a {
-    display: block;
-    position: relative;
-    overflow: hidden;
-  }
-
+  .pi-thumb-grid a { display: block; position: relative; overflow: hidden; }
   .pi-thumb-grid img {
     width: 100%;
     aspect-ratio: 1 / 1;
@@ -440,7 +417,6 @@
     background: #EFEFEC;
     transition: opacity 0.15s ease;
   }
-
   .pi-thumb-grid a:hover img { opacity: 0.8; }
 
   #pi-ticket-ack {
@@ -456,51 +432,24 @@
     letter-spacing: 0.16em;
     text-transform: uppercase;
     cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease;
+    transition: background 0.15s ease;
     flex-shrink: 0;
   }
+  #pi-ticket-ack:hover { background: #333333; }
 
-  #pi-ticket-ack:hover {
-    background: #333333;
-    color: #FFFFFF;
-  }
-
-  /* MEDIA QUERY DLA URZĄDZEŃ MOBILNYCH */
   @media (max-width: 720px) {
-    #pi-update-ticket { 
-      padding: 0; 
-      background: #FFFFFF; 
-    }
+    #pi-update-ticket { padding: 0; background: #FFFFFF; }
     .pi-ticket-container { 
-      max-height: 100vh;
-      height: calc(var(--pi-vh, 1vh) * 100);
       height: 100dvh;
       max-height: 100dvh;
       border: none;
-      border-top: none;
       background: #FFFFFF;
     }
-    .pi-ticket-main { 
-      grid-template-columns: 1fr; 
-      overflow-y: auto;
-      flex: 1;
-    }
-    .pi-ticket-info { 
-      border-right: none; 
-      border-bottom: 1px solid #DADADA; 
-      padding: 20px; 
-    }
-    .pi-ticket-actions {
-      margin-top: 8px;
-    }
-    .pi-ticket-thumbnails { 
-      padding: 20px;
-      overflow-y: visible;
-    }
-    .pi-ticket-title { 
-      font-size: 24px; 
-      margin-bottom: 16px; 
-    }
+    .pi-ticket-main { grid-template-columns: 1fr; overflow-y: auto; flex: 1; }
+    .pi-ticket-info { border-right: none; border-bottom: 1px solid #DADADA; padding: 20px; }
+    .pi-ticket-actions { margin-top: 8px; }
+    .pi-ticket-thumbnails { padding: 20px; overflow-y: visible; }
+    .pi-ticket-title { font-size: 24px; margin-bottom: 16px; }
     #pi-ticket-ack {
       padding: 20px;
       padding-bottom: calc(20px + env(safe-area-inset-bottom));
@@ -508,7 +457,7 @@
   }
 </style>
 </head>
-<body>
+<body class="pi-has-modal">
 
 <!-- NAKŁADKA PEŁNOEKRANOWA -->
 <div id="pi-update-ticket">
@@ -688,8 +637,9 @@
 </a>
 
 <script>
+// ZMIENIONO ID NA SYS.UPD.26.09 ABY POPUP POKAZAŁ SIĘ PONOWNIE (DLA NOWEJ AKTUALIZACJI)
 const LATEST_UPDATE = {
-  id: "SYS.UPD.26.08",
+  id: "SYS.UPD.26.09",
   timestamp: "14 AUG 2026 / 10:00",
   volume: "+ 30 FILES",
   defaultArchiveUrl: "https://www.photoindex.au/",
@@ -703,13 +653,13 @@ const LATEST_UPDATE = {
   ]
 };
 
-// Sprawdzenie czy użytkownik widział już tę konkretną wersję aktualizacji.
-// Jeśli tak - ukrywamy nakładkę zanim w ogóle renderuje się na ekranie.
+// UKRYCIE GDY JUŻ ZOBACZONO TĘ WERSJĘ + ODBLOKOWANIE SCROLLA TŁA
 if (localStorage.getItem('pi_archive_seen_id') === LATEST_UPDATE.id) {
+  document.documentElement.classList.remove('pi-has-modal');
+  document.body && document.body.classList.remove('pi-has-modal');
   document.write('<style>#pi-update-ticket { display: none !important; }</style>');
 }
 
-// Fallback wysokości viewportu dla przeglądarek mobilnych
 function setPiViewportHeight() {
   document.documentElement.style.setProperty('--pi-vh', (window.innerHeight * 0.01) + 'px');
 }
@@ -904,7 +854,6 @@ function initMapboxApp() {
     });
   }
 
-  // Obsługa akordeonów bocznych
   document.querySelectorAll('.acc-head').forEach(h => {
     h.addEventListener('click', function () {
       this.classList.toggle('open');
@@ -913,7 +862,6 @@ function initMapboxApp() {
     });
   });
 
-  // Obsługa wyboru dzielnicy
   document.querySelectorAll('.suburb-check').forEach(cb => {
     cb.addEventListener('change', function () {
       if (window.piCloseAllPopups) window.piCloseAllPopups();
@@ -928,7 +876,6 @@ function initMapboxApp() {
     });
   });
 
-  // Obsługa zakładek mobilnych
   var tabs = { 'tab-index': 'index-group', 'tab-filters': 'filters-group', 'tab-map': 'map-wrap' };
   Object.keys(tabs).forEach(tabId => {
     var btn = document.getElementById(tabId);
@@ -969,17 +916,20 @@ document.addEventListener('DOMContentLoaded', function() {
   var searchMapBtn = document.getElementById('action-search-map');
   var browseIndexBtn = document.getElementById('action-browse-index');
 
+  // Zamknięcie i odblokowanie tła
   function closeTicket() {
     if (!ticket) return;
     ticket.classList.add('pi-ticket-hidden');
-    // Zapisujemy identyfikator wersji w LocalStorage po zamknięciu okna przez użytkownika:
+    document.documentElement.classList.remove('pi-has-modal');
+    document.body.classList.remove('pi-has-modal');
     localStorage.setItem('pi_archive_seen_id', LATEST_UPDATE.id);
     setTimeout(function() { ticket.style.display = 'none'; }, 400);
   }
 
-  // Jeśli użytkownik już widział ten ID aktualizacji – ukrywamy natychmiast
   if (localStorage.getItem('pi_archive_seen_id') === LATEST_UPDATE.id) {
     if (ticket) ticket.style.display = 'none';
+    document.documentElement.classList.remove('pi-has-modal');
+    document.body.classList.remove('pi-has-modal');
     return;
   }
 
