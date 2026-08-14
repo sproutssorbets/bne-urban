@@ -1,287 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>PHOTOINDEX</title>
-
-<link rel="preconnect" href="https://api.mapbox.com">
-<link rel="preconnect" href="https://events.mapbox.com">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet">
-
-<script defer src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
-
-<style>
-  * { box-sizing: border-box; border-radius: 0 !important; box-shadow: none !important; -webkit-tap-highlight-color: transparent; }
-  
-  *:focus, *:focus-visible, a:focus, button:focus, input:focus {
-    outline: none !important;
-  }
-
-  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Inter', system-ui, sans-serif; background: #FFFFFF; color: #111111; }
-  body { display: flex; flex-direction: column; }
-
-  /* MOCNA RAMA DLA CAŁEJ GÓRNEJ SEKCJI */
-  #topbar { border: none; background: #FFFFFF; flex-shrink: 0; z-index: 10; border-bottom: 1px solid #111111; }
-  
-  /* WYSZUKIWARKA - Sztywny moduł poziomy */
-  #search-row { display: flex; align-items: center; height: 56px; padding: 0 20px; gap: 16px; border-top: 1px solid #111111; border-bottom: 1px solid #DADADA; position: relative; background: #FFFFFF; }
-  #geocoder { flex: 1; width: 100%; position: relative; height: 100%; }
-
-  /* CUSTOM SEARCH (Search Box API) */
-  #pi-search-wrap { position: relative; width: 100%; height: 100%; display: flex; align-items: center; }
-  
-  /* INPUT - Czysta typografia, wyzerowany padding lewy */
-  #pi-search-input { width: 100%; height: 100%; border: none; background: transparent; font-family: 'Inter', system-ui, sans-serif; font-size: 13px; color: #111111; padding: 0; outline: none !important; }
-  #pi-search-input::placeholder { color: #111111; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; }
-  
-  #pi-search-clear { position: absolute; right: 0; top: 50%; transform: translateY(-50%); border: none; background: transparent; font-size: 16px; color: #6B6B6B; cursor: pointer; display: none; line-height: 1; padding: 4px; }
-  #pi-search-dropdown { display: none; position: absolute; top: 56px; left: 0; right: 0; background: #FFFFFF; border: 1px solid #DADADA; border-top: none; max-height: 320px; overflow-y: auto; z-index: 50; }
-  .pi-sr-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #EFEFEF; }
-  .pi-sr-item:last-child { border-bottom: none; }
-  .pi-sr-item:hover { background: #FAFAFA; }
-  .pi-sr-name { font-size: 13px; color: #111111; }
-  .pi-sr-sub { font-size: 11px; color: #6B6B6B; margin-top: 1px; }
-  .pi-sr-badge { font-size: 9px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #6B6B6B; border: 1px solid #DADADA; padding: 2px 6px; flex-shrink: 0; }
-  
-  /* PRZYCISK */
-  #search-archive-btn { 
-    height: auto; 
-    padding: 0; 
-    border: none; 
-    background: transparent; 
-    color: #111111; 
-    font-size: 11px; 
-    font-weight: 600; 
-    letter-spacing: 0.14em; 
-    text-transform: uppercase; 
-    font-family: 'Inter', system-ui, sans-serif; 
-    cursor: pointer; 
-    display: flex; 
-    align-items: center; 
-    justify-content: flex-end;
-    text-decoration: none; 
-    flex-shrink: 0; 
-    transition: color 0.15s; 
-  }
-  #search-archive-btn:hover { color: #6B6B6B; }
-
-  /* CONTEXT BAR */
-  #context-bar {
-    display: flex;
-    align-items: center;
-    height: 32px;
-    padding: 0 20px;
-    font-size: 9px;
-    color: #6B6B6B;
-    letter-spacing: 0.1em;
-    background: #FFFFFF;
-    text-transform: uppercase;
-    border-bottom: 1px solid #111111;
-  }
-
-  /* DESKTOP LAYOUT */
-  #layout { 
-    width: 100%; 
-    flex: 1 1 auto; 
-    min-height: 0; 
-    background: #FFFFFF; 
-    position: relative; 
-    display: flex;
-    flex-direction: row;
-    overflow: hidden; 
-  }
-
-  .mobile-tabs { 
-    display: none !important; 
-    background: #FFFFFF; 
-    flex-shrink: 0; 
-    border-bottom: 1px solid #DADADA; 
-  }
-  .mobile-tab { flex: 1; height: 40px; border: none; border-right: 1px solid #DADADA; background: #FFFFFF; color: #111111; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; font-family: 'Inter', system-ui, sans-serif; cursor: pointer; }
-  .mobile-tab:last-child { border-right: none; }
-  .mobile-tab.active { background: #111111; color: #FFFFFF; }
-
-  #mobile-bottom-bar { display: none !important; }
-
-  /* PANEL BOCZNY DESKTOP */
-  #index-panel { 
-    width: 340px; 
-    flex-shrink: 0;
-    position: relative; 
-    height: 100%; 
-    border-right: 1px solid #DADADA; 
-    display: flex; 
-    flex-direction: column; 
-    background: #FFFFFF; 
-    overflow-y: auto; 
-    scrollbar-width: none; 
-    -ms-overflow-style: none; 
-    z-index: 3; 
-  }
-  #index-panel::-webkit-scrollbar { display: none; }
-  .panel-section-container { display: flex; flex-direction: column; }
-  
-  .section { padding: 18px 20px 14px 20px; border-bottom: 1px solid #DADADA; flex-shrink: 0; }
-  .section.map-legend { background: #FAFAFA; border-bottom: 2px solid #111111; }
-  .section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #111111; margin-bottom: 14px; }
-
-  .filter-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; cursor: pointer; user-select: none; transition: opacity 0.15s ease; }
-  .filter-row.off { opacity: 0.35; }
-  .swatch { width: 12px; height: 12px; flex-shrink: 0; border-radius: 0 !important; }
-  .filter-label { font-size: 13px; font-weight: 400; color: #111111; }
-  .filter-count { font-size: 12px; font-weight: 400; color: #6B6B6B; }
-
-  .acc-head { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #DADADA; cursor: pointer; user-select: none; background: #FFFFFF; flex-shrink: 0; transition: background 0.15s ease; }
-  .acc-head:hover { background: #FAFAFA; }
-  .acc-title { font-size: 11px; font-weight: 400; letter-spacing: 0.14em; text-transform: uppercase; color: #111111; }
-  
-  .acc-icon { 
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 16px; 
-    font-weight: 300;
-    color: #111111; 
-    line-height: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 16px;
-    height: 16px;
-    opacity: 0.8;
-    transition: transform 0.2s ease, opacity 0.2s ease; 
-  }
-  .acc-head.open .acc-icon { transform: rotate(45deg); opacity: 1; }
-  
-  .acc-body { display: none; padding: 14px 20px; border-bottom: 1px solid #DADADA; font-size: 13px; color: #111111; background: #FFFFFF; }
-  .acc-body.open { display: block; }
-  .sub-category-title { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #6B6B6B; margin: 18px 0 8px 0; }
-  .sub-category-title:first-child { margin-top: 4px; }
-  
-  /* Poprawione style pól wyboru dla Safari i innych przeglądarek */
-  .acc-body label { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 8px 0; font-size: 13px; }
-  .acc-body input[type="checkbox"], .acc-body input[type="radio"] {
-    -webkit-appearance: none;
-    appearance: none;
-    margin: 0;
-    width: 16px;
-    height: 16px;
-    border: 1px solid #111111;
-    background: #FFFFFF;
-    display: inline-grid;
-    place-content: center;
-    flex-shrink: 0;
-    padding: 0;
-  }
-  .acc-body input[type="radio"] {
-    border-radius: 50% !important;
-  }
-  .acc-body input[type="radio"]:checked::before {
-    content: "";
-    width: 8px;
-    height: 8px;
-    background: #111111;
-    border-radius: 50%;
-  }
-  .acc-body input[type="checkbox"]:checked {
-    background: #111111;
-  }
-
-  #index-group { display: flex; flex-direction: column; background: #FFFFFF; min-height: 0; }
-  #filters-group { display: flex; flex-direction: column; }
-
-  #list-wrap { flex: 0 1 auto; background: #FFFFFF; overflow-y: auto; }
-  .list-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid #DADADA; cursor: pointer; background: #FFFFFF; transition: background 0.15s ease, padding-left 0.15s ease; }
-  .list-row:hover { background: #FAFAFA; padding-left: 24px; }
-  .list-street { font-size: 13px; color: #111111; font-weight: 500; transition: color 0.15s ease; }
-
-  /* STOPKA PHOTOINDEX */
-  #pi-footer { padding: 16px 20px; background: #FFFFFF; border-top: 1px solid #DADADA; font-family: 'Inter', system-ui, sans-serif; flex-shrink: 0; }
-  .pi-footer-top { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid #DADADA; }
-  .pi-brand { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; color: #111111; text-transform: uppercase; }
-  .pi-sub { font-size: 9px; font-weight: 500; letter-spacing: 0.08em; color: #6B6B6B; text-transform: uppercase; }
-  .pi-footer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px; }
-  .pi-footer-label { font-size: 9px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #6B6B6B; margin-bottom: 6px; }
-  .pi-footer-stat { font-size: 10px; font-weight: 500; letter-spacing: 0.04em; color: #111111; margin-bottom: 3px; display: flex; align-items: center; gap: 4px; }
-  .pi-dot { font-size: 7px; color: #111111; }
-  .pi-footer-link { display: block; font-size: 10px; font-weight: 500; color: #111111; text-decoration: none; margin-bottom: 3px; letter-spacing: 0.02em; transition: color 0.15s ease; }
-  .pi-footer-link:hover { color: #6B6B6B; }
-  .pi-footer-bottom { display: flex; justify-content: space-between; font-size: 9px; color: #6B6B6B; letter-spacing: 0.05em; text-transform: uppercase; padding-top: 10px; border-top: 1px solid #DADADA; }
-
-  /* PINESKI */
-  .custom-marker-hitbox { width: 44px; height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; }
-  .pi-pin { display: flex; flex-direction: column; align-items: center; }
-  .pi-pin-body { min-width: 24px; height: 24px; padding: 0 6px; background: #111111; color: #FFFFFF; font-family: 'Inter', system-ui, sans-serif; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; transition: background 0.1s ease, color 0.1s ease; }
-  .pi-pin-point { width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 5px solid #111111; }
-  .custom-marker-hitbox:hover .pi-pin-body, .custom-marker-hitbox:active .pi-pin-body { background: #FFFFFF; color: #111111; outline: 1px solid #111111; outline-offset: -1px; }
-
-  #map-wrap { flex: 1 1 auto; position: relative; height: 100%; background: #FFFFFF; z-index: 1; }
-  #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.8s ease-in-out; }
-  #map.loaded { opacity: 1; }
-
-  .pi-popup .mapboxgl-popup-content, .pi-popup .mapboxgl-popup-content:focus { background: #FFFFFF; border: 1px solid #DADADA; padding: 16px; font-family: 'Inter', system-ui, sans-serif; border-radius: 0; box-shadow: none; outline: none !important; }
-  .pi-popup .mapboxgl-popup-tip { border-top-color: #FFFFFF !important; border-bottom-color: #FFFFFF !important; }
-  .pi-popup .mapboxgl-popup-close-button { font-size: 18px; color: #111111; padding: 4px 8px; outline: none !important; border: none; background: transparent; cursor: pointer; }
-
-  #recent-strip { display: none; flex-direction: column; background: #FFFFFF; border-bottom: 1px solid #DADADA; flex-shrink: 0; padding: 16px 20px; }
-  #recent-strip.has-photos { display: flex; }
-  #recent-label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #6B6B6B; margin-bottom: 10px; }
-  #recent-track { display: flex; flex-direction: column; gap: 8px; }
-  .recent-row { display: block; cursor: pointer; text-decoration: none; padding: 2px 0; }
-  .recent-row:hover .recent-headline { color: #6B6B6B; }
-  .recent-headline { font-size: 12px; color: #111111; font-weight: 400; margin-bottom: 2px; line-height: 1.3; transition: color 0.15s ease; }
-  .recent-date { font-size: 10px; color: #6B6B6B; letter-spacing: 0.02em; }
-
-  /* TRYB MOBILNY - OPTYMALIZACJA */
-  @media (max-width: 720px) {
-    body { padding-bottom: calc(48px + env(safe-area-inset-bottom)) !important; box-sizing: border-box !important; }
-    #topbar { border-bottom: none; }
-    #search-row { border-bottom: 1px solid #DADADA; border-top: none; padding: 0 12px; height: 52px; }
-    #search-archive-btn { display: none !important; }
-    .mobile-tabs { display: flex !important; }
-    #context-bar { display: none; }
-    #layout { height: 100% !important; flex: 1 1 auto !important; flex-direction: column !important; }
-    #index-panel { width: 100% !important; height: 100% !important; border-right: none !important; border-bottom: none !important; display: none; }
-    #index-panel.mobile-active { display: flex !important; }
-    #map-wrap { display: none; }
-    #map-wrap.mobile-active { display: block !important; }
-    #mobile-bottom-bar { 
-      display: flex !important; 
-      position: fixed !important; 
-      bottom: 0 !important; 
-      left: 0 !important; 
-      right: 0 !important; 
-      width: 100% !important; 
-      height: calc(48px + env(safe-area-inset-bottom)) !important; 
-      padding-bottom: env(safe-area-inset-bottom) !important;
-      background: #111111 !important; 
-      color: #FFFFFF !important; 
-      align-items: center !important; 
-      justify-content: center !important; 
-      font-size: 11px !important; 
-      font-weight: 500 !important; 
-      letter-spacing: 0.14em !important; 
-      text-transform: uppercase !important; 
-      text-decoration: none !important; 
-      z-index: 99999999 !important; 
-      border-top: 1px solid #111111 !important; 
-    }
-    .mapboxgl-ctrl-bottom-right, .mapboxgl-ctrl-bottom-left { bottom: 60px !important; }
-  }
-
-  /* MODUŁ NAKŁADKI: OKNO ZASŁANIAJĄCE */
+/* MODUŁ NAKŁADKI: OKNO ZASŁANIAJĄCE */
   #pi-update-ticket {
     position: fixed;
     inset: 0;
-    background: rgba(247, 247, 245, 0.9);
+    background: rgba(247, 247, 245, 0.95);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 99999999;
-    padding: 32px;
+    padding: 24px;
+    backdrop-filter: blur(4px);
   }
 
   #pi-update-ticket.pi-ticket-hidden {
@@ -294,7 +21,8 @@
   .pi-ticket-container {
     width: 100%;
     max-width: 980px;
-    max-height: calc(100vh - 64px);
+    height: 100%;
+    max-height: 85vh;
     background: #F7F7F5;
     border: 1px solid #111111;
     border-top: 6px solid #111111;
@@ -302,6 +30,7 @@
     flex-direction: column;
     font-family: 'Inter', system-ui, sans-serif;
     color: #111111;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15) !important;
   }
 
   .pi-ticket-header {
@@ -319,7 +48,8 @@
   .pi-ticket-main {
     display: grid;
     grid-template-columns: 320px 1fr;
-    overflow: hidden;
+    overflow-y: auto;
+    flex: 1 1 auto;
     min-height: 0;
   }
 
@@ -328,7 +58,6 @@
     border-right: 1px solid #DADADA;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
   }
 
   .pi-ticket-title {
@@ -400,6 +129,7 @@
   .pi-ticket-thumbnails {
     padding: 24px;
     overflow-y: auto;
+    background: #FFFFFF;
   }
 
   .pi-thumb-label {
@@ -414,7 +144,7 @@
   .pi-thumb-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
+    gap: 4px;
     background: #DADADA;
     border: 1px solid #DADADA;
   }
@@ -456,512 +186,39 @@
   #pi-ticket-ack:hover {
     background: #F7F7F5;
     color: #111111;
-    box-shadow: inset 0 0 0 1px #111111;
   }
 
+  /* MEDIA QUERY DLA URZĄDZEŃ MOBILNYCH */
   @media (max-width: 780px) {
-    #pi-update-ticket { padding: 12px; }
-    .pi-ticket-container { max-height: calc(100vh - 24px); }
-    .pi-ticket-main { grid-template-columns: 1fr; overflow-y: auto; }
-    .pi-ticket-info { border-right: none; border-bottom: 1px solid #DADADA; padding: 16px; }
-    .pi-ticket-thumbnails { padding: 16px; }
-    .pi-ticket-title { font-size: 22px; margin-bottom: 16px; }
-  }
-</style>
-</head>
-<body>
-
-<!-- NAKŁADKA PEŁNOEKRANOWA -->
-<div id="pi-update-ticket">
-  <div class="pi-ticket-container">
-    <div class="pi-ticket-header">
-      <span class="pi-ticket-id" id="upd-id"></span>
-      <span class="pi-ticket-status">NEW RECORDS ADDED</span>
-    </div>
-
-    <div class="pi-ticket-main">
-      <div class="pi-ticket-info">
-        <h2 class="pi-ticket-title">Archive<br>expanded</h2>
-
-        <div class="pi-ticket-grid">
-          <div class="pi-ticket-row">
-            <span class="pi-ticket-label">Timestamp</span>
-            <span class="pi-ticket-data" id="upd-time"></span>
-          </div>
-          <div class="pi-ticket-row">
-            <span class="pi-ticket-label">Volume</span>
-            <span class="pi-ticket-data" id="upd-volume"></span>
-          </div>
-        </div>
-
-        <div class="pi-ticket-actions">
-          <a class="pi-action-link" href="#" id="action-search-map">
-            <span>Search on map</span><span class="pi-action-arrow">→</span>
-          </a>
-          <a class="pi-action-link" href="#" id="action-browse-index">
-            <span>Browse index</span><span class="pi-action-arrow">→</span>
-          </a>
-          <a class="pi-action-link" href="https://www.photoindex.au/contact" id="action-contact">
-            <span>Contact</span><span class="pi-action-arrow">→</span>
-          </a>
-        </div>
-      </div>
-
-      <div class="pi-ticket-thumbnails">
-        <div class="pi-thumb-label">Attached visual data — click to open in the archive</div>
-        <div class="pi-thumb-grid" id="upd-gallery"></div>
-      </div>
-    </div>
-
-    <button id="pi-ticket-ack">Enter archive</button>
-  </div>
-</div>
-
-<div id="topbar">
-  <div id="search-row">
-    <div id="geocoder"></div>
-    <a id="search-archive-btn" href="https://www.photoindex.au/" target="_top">
-      <span id="search-archive-text">SEARCH</span>
-    </a>
-  </div>
-  <div id="context-bar">
-    SELECT A PIN OR A FILTER TO OPEN A RECORD
-  </div>
-
-  <div class="mobile-tabs">
-    <button class="mobile-tab" id="tab-index" data-tab="index">Index</button>
-    <button class="mobile-tab" id="tab-filters" data-tab="filters">Filters</button>
-    <button class="mobile-tab active" id="tab-map" data-tab="map">Map</button>
-  </div>
-</div>
-
-<div id="layout">
-  <div id="index-panel">
-    
-    <div class="panel-section-container" id="filters-group">
-      <!-- 1. LOCATION -->
-      <div class="acc-head open" data-target="acc-location">
-        <span class="acc-title">1. Location</span><span class="acc-icon">+</span>
-      </div>
-      <div class="acc-body open" id="acc-location">
-        <label><input type="radio" name="suburb-group" class="suburb-check" value="" checked> All Locations</label>
-        <div class="sub-category-title">Inner North & CBD</div>
-        <label><input type="radio" name="suburb-group" class="suburb-check" value="Brisbane City"> Brisbane City</label>
-        <label><input type="radio" name="suburb-group" class="suburb-check" value="Spring Hill"> Spring Hill</label>
-        <label><input type="radio" name="suburb-group" class="suburb-check" value="Fortitude Valley"> Fortitude Valley</label>
-        <label><input type="radio" name="suburb-group" class="suburb-check" value="Newstead"> Newstead</label>
-        <label><input type="radio" name="suburb-group" class="suburb-check" value="Teneriffe"> Teneriffe</label>
-        <label><input type="radio" name="suburb-group" class="suburb-check" value="New Farm"> New Farm</label>
-        <label><input type="radio" name="suburb-group" class="suburb-check" value="Bowen Hills"> Bowen Hills</label>
-        <label><input type="radio" name="suburb-group" class="suburb-check" value="Herston"> Herston</label>
-        <label><input type="radio" name="suburb-group" class="suburb-check" value="Albion"> Albion</label>
-
-        <div class="sub-category-title">Inner West</div>
-        <label><input type="radio" name="suburb-group" class="suburb-check" value="Milton"> Milton</label>
-        <label><input type="radio" name="suburb-group" class="suburb-check" value="Paddington"> Paddington</label>
-        <label><input type="radio" name="suburb-group" class="suburb-check" value="Red Hill"> Red Hill</label>
-        <label><input type="radio" name="suburb-group" class="suburb-check" value="Kelvin Grove"> Kelvin Grove</label>
-
-        <div class="sub-category-title">Inner South</div>
-        <label><input type="radio" name="suburb-group" class="suburb-check" value="South Brisbane"> South Brisbane</label>
-        <label><input type="radio" name="suburb-group" class="suburb-check" value="West End"> West End</label>
-        <label><input type="radio" name="suburb-group" class="suburb-check" value="Kangaroo Point"> Kangaroo Point</label>
-        <label><input type="radio" name="suburb-group" class="suburb-check" value="Woolloongabba"> Woolloongabba</label>
-      </div>
-
-      <!-- 2. PHYSICAL CONDITION -->
-      <div class="acc-head" data-target="acc-condition">
-        <span class="acc-title">2. Physical Condition</span><span class="acc-icon">+</span>
-      </div>
-      <div class="acc-body" id="acc-condition">
-        <label><input type="checkbox" class="filter-check" data-cat="condition" value="Existing Condition"> Existing Condition</label>
-        <label><input type="checkbox" class="filter-check" data-cat="condition" value="Fenced Development Site"> Fenced Development Site</label>
-        <label><input type="checkbox" class="filter-check" data-cat="condition" value="Demolition & Site Works"> Demolition & Site Works</label>
-        <label><input type="checkbox" class="filter-check" data-cat="condition" value="Active Construction Site"> Active Construction Site</label>
-        <label><input type="checkbox" class="filter-check" data-cat="condition" value="Completed Development"> Completed Development</label>
-      </div>
-
-      <!-- 3. TYPOLOGY & ARCHITECTURE -->
-      <div class="acc-head" data-target="acc-typology">
-        <span class="acc-title">3. Typology & Architecture</span><span class="acc-icon">+</span>
-      </div>
-      <div class="acc-body" id="acc-typology">
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Residential"> Residential</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Commercial & Retail"> Commercial & Retail</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Public & Civic"> Public & Civic</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Heritage & Traditional"> Heritage & Traditional</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Industrial"> Industrial</label>
-      </div>
-
-      <!-- 4. URBAN CONTEXT -->
-      <div class="acc-head" data-target="acc-urban">
-        <span class="acc-title">4. Urban Context</span><span class="acc-icon">+</span>
-      </div>
-      <div class="acc-body" id="acc-urban">
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="Urban Renewal"> Urban Renewal</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="High Density"> High Density</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="Riverfront"> Riverfront</label>
-      </div>
-
-      <!-- 5. TIME -->
-      <div class="acc-head" data-target="acc-year">
-        <span class="acc-title">5. Time</span><span class="acc-icon">+</span>
-      </div>
-      <div class="acc-body" id="acc-year">
-        <label><input type="checkbox" class="filter-check" data-cat="year" value="2026"> 2026</label>
-      </div>
-    </div>
-
-    <!-- GRUPA LISTY (INDEX) -->
-    <div id="index-group" style="display:none; flex:1; overflow-y:auto; flex-direction:column; background:#FFFFFF;">
-      <div id="list-wrap"></div>
-      
-      <footer id="pi-footer">
-        <div class="pi-footer-top">
-          <span class="pi-brand">PHOTOINDEX</span>
-          <span class="pi-sub">BRISBANE URBAN ARCHIVE</span>
-        </div>
-        
-        <div class="pi-footer-grid">
-          <div class="pi-footer-col">
-            <div class="pi-footer-label">Status</div>
-            <div class="pi-footer-stat"><span class="pi-dot">●</span> <span id="archive-count">LOADING...</span></div>
-            <div class="pi-footer-stat"><span class="pi-dot">●</span> UPDATED: 23 JUL 2026</div>
-          </div>
-        </div>
-      </footer>
-
-      <div id="recent-strip">
-        <div id="recent-label">RECENT</div>
-        <div id="recent-track"></div>
-      </div>
-    </div>
-
-  </div>
-
-  <div id="map-wrap">
-    <div id="map"></div>
-  </div>
-</div>
-
-<a id="mobile-bottom-bar" href="https://www.photoindex.au/" target="_top">
-  SEARCH
-</a>
-
-<script>
-const LATEST_UPDATE = {
-  id: "SYS.UPD.26.08",
-  timestamp: "14 AUG 2026 / 10:00",
-  volume: "+ 30 FILES",
-  defaultArchiveUrl: "https://www.photoindex.au/",
-  images: [
-    { url: "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0100.jpg", link: "https://www.photoindex.au/-/archive/brisbane/herston/victoria-park-barrambin" },
-    { url: "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0077.jpg", link: "https://www.photoindex.au/-/archive/brisbane/herston/victoria-park-barrambin" },
-    { url: "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0041.jpg", link: "https://www.photoindex.au/-/archive/brisbane/herston/victoria-park-barrambin" },
-    { url: "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0060.jpg", link: "https://www.photoindex.au/-/archive/brisbane/herston/victoria-park-barrambin" },
-    { url: "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0105.jpg", link: "https://www.photoindex.au/-/archive/brisbane/herston/victoria-park-barrambin" },
-    { url: "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0107.jpg", link: "https://www.photoindex.au/-/archive/brisbane/herston/victoria-park-barrambin" }
-  ]
-};
-
-if (localStorage.getItem('pi_archive_seen_id') === LATEST_UPDATE.id) {
-  document.write('<style>#pi-update-ticket { display: none !important; }</style>');
-}
-
-function initMapboxApp() {
-  if (typeof mapboxgl === 'undefined') {
-    setTimeout(initMapboxApp, 50);
-    return;
-  }
-
-  mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
-
-  var locations = [];
-  var searchState = { suburb: '', years: [], extraFilters: [], pickedAddress: '' };
-
-  var map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/mapbox/light-v11',
-    center: [153.0307, -27.4598],
-    zoom: 13
-  });
-  map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
-
-  function bboxAroundPoint(center, radiusKm) {
-    var latOffset = radiusKm / 111;
-    var lngOffset = radiusKm / (111 * Math.cos(center[1] * Math.PI / 180));
-    return [
-      center[0] - lngOffset, center[1] - latOffset,
-      center[0] + lngOffset, center[1] + latOffset
-    ];
-  }
-
-  function frameArea(center, bbox) {
-    if (bbox) {
-      map.fitBounds(bbox, { padding: 60, duration: 1200, maxZoom: 14.5, essential: true });
-    } else {
-      var simpleBbox = bboxAroundPoint(center, 0.2);
-      map.fitBounds(simpleBbox, { padding: 60, duration: 1200, maxZoom: 14.5, essential: true });
+    #pi-update-ticket { 
+      padding: 0; 
+      background: #F7F7F5; 
+    }
+    .pi-ticket-container { 
+      max-height: 100vh; 
+      height: 100vh;
+      border: none;
+      border-top: none;
+    }
+    .pi-ticket-main { 
+      grid-template-columns: 1fr; 
+      overflow-y: auto;
+      flex: 1;
+    }
+    .pi-ticket-info { 
+      border-right: none; 
+      border-bottom: 1px solid #DADADA; 
+      padding: 20px; 
+    }
+    .pi-ticket-thumbnails { 
+      padding: 20px; 
+    }
+    .pi-ticket-title { 
+      font-size: 24px; 
+      margin-bottom: 16px; 
+    }
+    #pi-ticket-ack {
+      padding: 20px;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom));
     }
   }
-
-  function initCustomSearch() {
-    var geocoderHost = document.getElementById('geocoder');
-    geocoderHost.innerHTML =
-      '<div id="pi-search-wrap">' +
-        '<input type="text" id="pi-search-input" autocomplete="off" spellcheck="false" placeholder="Search address or place\u2026">' +
-        '<button type="button" id="pi-search-clear">\u00d7</button>' +
-        '<div id="pi-search-dropdown"></div>' +
-      '</div>';
-  }
-  initCustomSearch();
-
-  fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/locations.csv?t=' + Date.now()).then(r => r.text()).catch(() => '').then(function (csvText) {
-    if (csvText) {
-      var lines = csvText.trim().split('\n');
-      var headers = lines[0].split(',');
-      locations = lines.slice(1).map(line => {
-        var cols = [];
-        let cur = '', inQ = false;
-        for (let c of line) {
-          if (c === '"') inQ = !inQ;
-          else if (c === ',' && !inQ) { cols.push(cur); cur = ''; }
-          else cur += c;
-        }
-        cols.push(cur);
-        var row = {};
-        headers.forEach((h, i) => row[h.trim()] = (cols[i] || '').trim());
-
-        return {
-          ref: row.ref || 'PX.26.000',
-          street: row.address || row.street || 'Unnamed location',
-          suburb: row.suburb || 'Brisbane City',
-          count: row.count ? parseInt(row.count) : 1,
-          dates: row.shoot_dates || row.date || '',
-          coords: [parseFloat(row.lng), parseFloat(row.lat)],
-          archiveUrl: row.archiveUrl || '#'
-        };
-      }).filter(l => !isNaN(l.coords[0]) && !isNaN(l.coords[1]));
-    }
-
-    if (map.loaded()) setupMap(); else map.on('load', setupMap);
-  });
-
-  function setupMap() {
-    var activePopup = null;
-    window.piCloseAllPopups = function() {
-      if (activePopup) { activePopup.remove(); activePopup = null; }
-    };
-    window.piOpenPopup = function(popup, coords) {
-      window.piCloseAllPopups();
-      popup.setLngLat(coords).addTo(map);
-      activePopup = popup;
-    };
-
-    locations.forEach((loc) => {
-      var el = document.createElement('div');
-      el.className = 'custom-marker-hitbox';
-      el.innerHTML = '<div class="pi-pin"><div class="pi-pin-body">' + loc.count + '</div><div class="pi-pin-point"></div></div>';
-
-      var datesList = loc.dates ? loc.dates.split(';').map(d => d.trim()).filter(Boolean) : [];
-      var datesDesc = datesList.slice().reverse(); 
-
-      var rows = [];
-      rows.push(['Suburb', loc.suburb]);
-      rows.push(['Photos', String(loc.count)]);
-      datesDesc.forEach(function (d, i) {
-        rows.push([i === 0 ? 'Photographed' : '', d]);
-      });
-
-      var rowsHtml = rows.map(function (r) {
-        return '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:10px;padding:4px 0;">' +
-          '<span style="color:#6B6B6B;text-transform:uppercase;letter-spacing:0.06em;flex-shrink:0;">' + r[0] + '</span>' +
-          '<span style="color:#111111;font-weight:500;text-align:right;">' + r[1] + '</span>' +
-        '</div>';
-      }).join('');
-
-      var popupHtml =
-        '<div style="min-width:200px;">' +
-          '<div style="font-size:14px;color:#111111;font-weight:600;margin-bottom:2px;">' + loc.street + '</div>' +
-          '<div style="border-top:1px solid #DADADA;border-bottom:1px solid #DADADA;margin-top:6px;padding:2px 0;">' + rowsHtml + '</div>' +
-          '<a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:#111111;color:#FFFFFF;padding:10px;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;margin-top:12px;">OPEN RECORD →</a>' +
-        '</div>';
-
-      loc.popup = new mapboxgl.Popup({ offset: [0, -46], closeButton: true, className: 'pi-popup' }).setHTML(popupHtml);
-      loc.marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' }).setLngLat(loc.coords).addTo(map);
-      
-      el.addEventListener('click', (ev) => {
-        ev.stopPropagation();
-        window.piOpenPopup(loc.popup, loc.coords);
-      });
-    });
-
-    renderList();
-    applySearchState();
-
-    map.once('idle', () => {
-      document.getElementById('map').classList.add('loaded');
-    });
-  }
-
-  function updatePhotoDeckLink() {
-    var queryParts = [];
-    if (searchState.suburb) queryParts.push('"' + searchState.suburb + '"');
-    var queryStr = queryParts.join(' ');
-    var btnDesktop = document.getElementById('search-archive-btn');
-    var txtDesktop = document.getElementById('search-archive-text');
-    var btnMobile = document.getElementById('mobile-bottom-bar');
-    
-    var targetUrl = queryStr ? 'https://www.photoindex.au/?search=' + encodeURIComponent(queryStr) : 'https://www.photoindex.au/';
-    var textValue = queryStr ? 'VIEW SELECTION' : 'SEARCH';
-
-    if (btnDesktop) {
-      btnDesktop.href = targetUrl;
-      if (txtDesktop) txtDesktop.textContent = textValue;
-    }
-    if (btnMobile) {
-      btnMobile.href = targetUrl;
-      btnMobile.textContent = textValue;
-    }
-  }
-
-  function applySearchState() {
-    // Zmiana: wszystkie pinezki pozostają widoczne (nie ukrywamy markerów po wybranym suburb)
-    locations.forEach(loc => {
-      if (loc.marker) loc.marker.getElement().style.display = '';
-    });
-    var visibleLocs = locations.filter(loc => !searchState.suburb || loc.suburb.toLowerCase() === searchState.suburb.toLowerCase());
-    renderList(visibleLocs);
-    updatePhotoDeckLink();
-    
-    var archiveCountEl = document.getElementById('archive-count');
-    if (archiveCountEl) archiveCountEl.textContent = visibleLocs.length + ' LOCATIONS LINKED';
-  }
-
-  function renderList(items) {
-    var wrap = document.getElementById('list-wrap');
-    if (!wrap) return;
-    wrap.innerHTML = '';
-    (items || locations).slice(0, 100).forEach(loc => {
-      var row = document.createElement('div');
-      row.className = 'list-row';
-      row.innerHTML = '<div class="list-street">' + loc.street + '</div>';
-      row.addEventListener('click', () => {
-        if (window.innerWidth <= 720) document.getElementById('tab-map').click();
-        map.flyTo({ center: loc.coords, zoom: 15 });
-        if (window.piOpenPopup && loc.popup) window.piOpenPopup(loc.popup, loc.coords);
-      });
-      wrap.appendChild(row);
-    });
-  }
-
-  // Obsługa akordeonów bocznych
-  document.querySelectorAll('.acc-head').forEach(h => {
-    h.addEventListener('click', function () {
-      this.classList.toggle('open');
-      var body = document.getElementById(this.getAttribute('data-target'));
-      if (body) body.classList.toggle('open');
-    });
-  });
-
-  // Obsługa wyboru dzielnicy (zostają wszystkie pinezki, mapa się przesuwa)
-  document.querySelectorAll('.suburb-check').forEach(cb => {
-    cb.addEventListener('change', function () {
-      if (window.piCloseAllPopups) window.piCloseAllPopups();
-      searchState.suburb = this.value;
-      applySearchState();
-
-      if (this.value) {
-        fetch('https://api.mapbox.com/geocoding/v5/mapbox.places/' + encodeURIComponent(this.value + ', Brisbane, Australia') + '.json?access_token=' + mapboxgl.accessToken + '&country=au&types=place,locality,neighborhood&limit=1')
-          .then(r => r.json()).then(data => { if (data.features && data.features[0]) frameArea(data.features[0].center, data.features[0].bbox); });
-        if (window.innerWidth <= 720) document.getElementById('tab-map').click();
-      }
-    });
-  });
-
-  // Obsługa zakładek mobilnych
-  var tabs = { 'tab-index': 'index-group', 'tab-filters': 'filters-group', 'tab-map': 'map-wrap' };
-  Object.keys(tabs).forEach(tabId => {
-    var btn = document.getElementById(tabId);
-    if (!btn) return;
-    btn.addEventListener('click', function() {
-      document.querySelectorAll('.mobile-tabs .mobile-tab').forEach(t => t.classList.remove('active'));
-      this.classList.add('active');
-
-      var isMap = tabId === 'tab-map';
-      var indexPanel = document.getElementById('index-panel');
-      
-      indexPanel.classList.toggle('mobile-active', !isMap);
-      indexPanel.style.display = isMap ? 'none' : 'flex';
-
-      document.getElementById('map-wrap').classList.toggle('mobile-active', isMap);
-      
-      if (!isMap) {
-        document.getElementById('index-group').style.display = tabId === 'tab-index' ? 'flex' : 'none';
-        document.getElementById('filters-group').style.display = tabId === 'tab-filters' ? 'flex' : 'none';
-      } else {
-        setTimeout(() => map.resize(), 50);
-      }
-    });
-  });
-
-  if (window.innerWidth <= 720) {
-    var tm = document.getElementById('tab-map');
-    if (tm) tm.click();
-  }
-}
-
-initMapboxApp();
-
-document.addEventListener('DOMContentLoaded', function() {
-  var ticket = document.getElementById('pi-update-ticket');
-  var ackBtn = document.getElementById('pi-ticket-ack');
-  var gallery = document.getElementById('upd-gallery');
-  var searchMapBtn = document.getElementById('action-search-map');
-  var browseIndexBtn = document.getElementById('action-browse-index');
-
-  function closeTicket() {
-    ticket.classList.add('pi-ticket-hidden');
-    localStorage.setItem('pi_archive_seen_id', LATEST_UPDATE.id);
-    setTimeout(function() { ticket.style.display = 'none'; }, 400);
-  }
-
-  if (ticket) {
-    if (localStorage.getItem('pi_archive_seen_id') === LATEST_UPDATE.id) {
-      ticket.style.display = 'none';
-      return;
-    }
-
-    document.getElementById('upd-id').textContent = LATEST_UPDATE.id;
-    document.getElementById('upd-time').textContent = LATEST_UPDATE.timestamp;
-    document.getElementById('upd-volume').textContent = LATEST_UPDATE.volume;
-
-    if (gallery && LATEST_UPDATE.images.length > 0) {
-      gallery.innerHTML = LATEST_UPDATE.images.map(function(item) {
-        var link = item.link || LATEST_UPDATE.defaultArchiveUrl;
-        return '<a href="' + link + '" target="_top">' +
-          '<img src="' + item.url + '" alt="Archive Record" loading="lazy" decoding="async">' +
-        '</a>';
-      }).join('');
-    }
-
-    if (ackBtn) ackBtn.addEventListener('click', closeTicket);
-    if (searchMapBtn) searchMapBtn.addEventListener('click', function(ev) { ev.preventDefault(); closeTicket(); });
-    if (browseIndexBtn) {
-      browseIndexBtn.addEventListener('click', function(ev) {
-        ev.preventDefault();
-        closeTicket();
-        setTimeout(function() {
-          if (window.innerWidth <= 720) {
-            var tabIndex = document.getElementById('tab-index');
-            if (tabIndex) tabIndex.click();
-          }
-        }, 420);
-      });
-    }
-  }
-});
-</script>
-
-</body>
-</html>
