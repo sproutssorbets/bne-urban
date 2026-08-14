@@ -622,7 +622,8 @@ const LATEST_UPDATE = {
   images: [
     { url: "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0100.jpg", link: "https://www.photoindex.au/-/archive/brisbane/herston/victoria-park-barrambin" },
     { url: "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0077.jpg", link: "https://www.photoindex.au/-/archive/brisbane/herston/victoria-park-barrambin" },
-    { url: "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0041.jpg", link: "https://www.photoindex.au/-/archive/brisbane/herston/victoria-park-barrambin" },
+    { url: "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0041.jpg", link: "https://www.photoindex.au/-/archive/brisbane/herston/victoria-park-barrambin" }
+  ]
 };
 
 if (localStorage.getItem('pi_archive_seen_id') === LATEST_UPDATE.id) {
@@ -802,8 +803,8 @@ document.addEventListener('DOMContentLoaded', function() {
       gallery.innerHTML = LATEST_UPDATE.images.map(function(item) {
         var link = item.link || LATEST_UPDATE.defaultArchiveUrl;
         return '<a href="' + link + '" target="_top">' +
-         '<img src="' + item.url + '" alt="Archive Record" loading="lazy" decoding="async">' +
-       '</a>';
+          '<img src="' + item.url + '" alt="Archive Record" loading="lazy" decoding="async">' +
+        '</a>';
       }).join('');
     }
 
