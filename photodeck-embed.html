@@ -48,7 +48,7 @@
   .pi-sr-sub { font-size: 11px; color: #6B6B6B; margin-top: 1px; }
   .pi-sr-badge { font-size: 9px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #6B6B6B; border: 1px solid #DADADA; padding: 2px 6px; flex-shrink: 0; }
   
-  /* PRZYCISK */
+  /* PRZYCISK DESKTOP */
   #search-archive-btn { 
     height: auto; 
     padding: 0; 
@@ -247,13 +247,15 @@
     #index-panel.mobile-active { display: flex !important; }
     #map-wrap { display: none; }
     #map-wrap.mobile-active { display: block !important; }
+    
     #mobile-bottom-bar { 
       display: flex !important; 
       position: fixed !important; 
-      bottom: 0 !important; 
       left: 0 !important; 
       right: 0 !important; 
-      width: 100% !important; 
+      bottom: 0 !important; 
+      width: 100vw !important; 
+      max-width: 100% !important; 
       height: calc(48px + env(safe-area-inset-bottom)) !important; 
       padding-bottom: env(safe-area-inset-bottom) !important;
       background: #111111 !important; 
@@ -267,21 +269,21 @@
       text-decoration: none !important; 
       z-index: 9999999 !important; 
       border-top: 1px solid #111111 !important; 
+      margin: 0 !important;
     }
     .mapboxgl-ctrl-bottom-right, .mapboxgl-ctrl-bottom-left { bottom: 60px !important; }
   }
 
-  /* MODUŁ NAKŁADKI: POPRAWIONE OKNO ZASŁANIAJĄCE (UX UPDATE) */
+  /* MODUŁ NAKŁADKI: POPRAWIONE OKNO ZASŁANIAJĄCE (BIAŁE TŁO) */
   #pi-update-ticket {
     position: fixed;
     inset: 0;
-    background: rgba(247, 247, 245, 0.95);
+    background: #FFFFFF;
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 99999999;
     padding: 24px;
-    backdrop-filter: blur(4px);
   }
 
   #pi-update-ticket.pi-ticket-hidden {
@@ -294,15 +296,9 @@
   .pi-ticket-container {
     width: 100%;
     max-width: 980px;
-    /* height: auto zamiast 100% — kontener dopasowuje się do zawartości.
-       Przy height: 100% grid rozciągał wiersz na całą dostępną wysokość
-       (do 85vh), a realna treść potrzebuje mniej, stąd pusty pas pod
-       siatką miniatur. max-height zostaje jako limit na wypadek dużej
-       liczby zdjęć — wtedy włączy się scroll w .pi-ticket-main zamiast
-       dalszego rozciągania. */
     height: auto;
     max-height: 85vh;
-    background: #F7F7F5;
+    background: #FFFFFF;
     border: 1px solid #111111;
     border-top: 6px solid #111111;
     display: flex;
@@ -452,7 +448,7 @@
     border: none;
     border-top: 1px solid #111111;
     background: #111111;
-    color: #F7F7F5;
+    color: #FFFFFF;
     padding: 16px;
     font-family: 'Inter', system-ui, sans-serif;
     font-size: 11px;
@@ -465,30 +461,24 @@
   }
 
   #pi-ticket-ack:hover {
-    background: #F7F7F5;
-    color: #111111;
+    background: #333333;
+    color: #FFFFFF;
   }
 
-  /* MEDIA QUERY DLA URZĄDZEŃ MOBILNYCH - POPRAWKI UX
-     Breakpoint 720px, ten sam co reszta interfejsu (wcześniej było 780px,
-     co tworzyło niespójną strefę 721–780px). */
+  /* MEDIA QUERY DLA URZĄDZEŃ MOBILNYCH */
   @media (max-width: 720px) {
     #pi-update-ticket { 
       padding: 0; 
-      background: #F7F7F5; 
+      background: #FFFFFF; 
     }
     .pi-ticket-container { 
-      /* 100vh na telefonie nie odpowiada realnie widocznemu obszarowi
-         (pasek adresu chowa się i pokazuje). Efekt: przycisk na dole
-         potrafi wypaść poza ekran albo nachodzić na to, co jest pod spodem.
-         100dvh liczy faktyczną widoczną wysokość; --pi-vh niżej to fallback
-         dla przeglądarek bez wsparcia dvh (ustawiany przez JS). */
       max-height: 100vh;
       height: calc(var(--pi-vh, 1vh) * 100);
       height: 100dvh;
       max-height: 100dvh;
       border: none;
       border-top: none;
+      background: #FFFFFF;
     }
     .pi-ticket-main { 
       grid-template-columns: 1fr; 
@@ -501,17 +491,10 @@
       padding: 20px; 
     }
     .pi-ticket-actions {
-      /* margin-top: auto z bazowej reguły nic tu nie robi, bo kolumna
-         nie jest rozciągana na pełną wysokość rzędu grida (tylko jedna
-         kolumna w układzie mobilnym). Stały odstęp zamiast liczenia na auto. */
       margin-top: 8px;
     }
     .pi-ticket-thumbnails { 
       padding: 20px;
-      /* overflow-y: auto z bazowej reguły było martwym kodem: ta sekcja
-         nigdy nie ma własnej ograniczonej wysokości, więc nie przewija się
-         sama, tylko scrolluje razem z .pi-ticket-main. Wyłączone jawnie,
-         żeby nie sugerować dwóch niezależnych obszarów przewijania. */
       overflow-y: visible;
     }
     .pi-ticket-title { 
@@ -720,14 +703,13 @@ const LATEST_UPDATE = {
   ]
 };
 
-// TYMCZASOWO ZAKOMENTOWANE NA CZAS TESTÓW UX (dzięki temu popup pokazuje się przy każdym odświeżeniu):
-// if (localStorage.getItem('pi_archive_seen_id') === LATEST_UPDATE.id) {
-//   document.write('<style>#pi-update-ticket { display: none !important; }</style>');
-// }
+// Sprawdzenie czy użytkownik widział już tę konkretną wersję aktualizacji.
+// Jeśli tak - ukrywamy nakładkę zanim w ogóle renderuje się na ekranie.
+if (localStorage.getItem('pi_archive_seen_id') === LATEST_UPDATE.id) {
+  document.write('<style>#pi-update-ticket { display: none !important; }</style>');
+}
 
-// Fallback wysokości viewportu dla przeglądarek bez wsparcia dla 100dvh
-// (starsze Androidy, starsze Safari). Ustawia realną wysokość okna w px
-// jako zmienną CSS, przeliczaną też przy zmianie rozmiaru / obrotu ekranu.
+// Fallback wysokości viewportu dla przeglądarek mobilnych
 function setPiViewportHeight() {
   document.documentElement.style.setProperty('--pi-vh', (window.innerHeight * 0.01) + 'px');
 }
@@ -774,6 +756,7 @@ function initMapboxApp() {
 
   function initCustomSearch() {
     var geocoderHost = document.getElementById('geocoder');
+    if (!geocoderHost) return;
     geocoderHost.innerHTML =
       '<div id="pi-search-wrap">' +
         '<input type="text" id="pi-search-input" autocomplete="off" spellcheck="false" placeholder="Search address or place\u2026">' +
@@ -987,18 +970,20 @@ document.addEventListener('DOMContentLoaded', function() {
   var browseIndexBtn = document.getElementById('action-browse-index');
 
   function closeTicket() {
+    if (!ticket) return;
     ticket.classList.add('pi-ticket-hidden');
+    // Zapisujemy identyfikator wersji w LocalStorage po zamknięciu okna przez użytkownika:
     localStorage.setItem('pi_archive_seen_id', LATEST_UPDATE.id);
     setTimeout(function() { ticket.style.display = 'none'; }, 400);
   }
 
-  if (ticket) {
-    // TYMCZASOWO ZAKOMENTOWANE DLA TESTÓW (odkomentuj na produkcji):
-    // if (localStorage.getItem('pi_archive_seen_id') === LATEST_UPDATE.id) {
-    //   ticket.style.display = 'none';
-    //   return;
-    // }
+  // Jeśli użytkownik już widział ten ID aktualizacji – ukrywamy natychmiast
+  if (localStorage.getItem('pi_archive_seen_id') === LATEST_UPDATE.id) {
+    if (ticket) ticket.style.display = 'none';
+    return;
+  }
 
+  if (ticket) {
     document.getElementById('upd-id').textContent = LATEST_UPDATE.id;
     document.getElementById('upd-time').textContent = LATEST_UPDATE.timestamp;
     document.getElementById('upd-volume').textContent = LATEST_UPDATE.volume;
