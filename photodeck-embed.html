@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>PHOTOINDEX</title>
 
 <link rel="preconnect" href="https://api.mapbox.com">
@@ -209,9 +209,9 @@
   .recent-headline { font-size: 12px; color: #111111; font-weight: 400; margin-bottom: 2px; line-height: 1.3; transition: color 0.15s ease; }
   .recent-date { font-size: 10px; color: #6B6B6B; letter-spacing: 0.02em; }
 
-  /* TRYB MOBILNY */
+  /* TRYB MOBILNY - OPTYMALIZACJA */
   @media (max-width: 720px) {
-    body { padding-bottom: 48px !important; box-sizing: border-box !important; }
+    body { padding-bottom: calc(48px + env(safe-area-inset-bottom)) !important; box-sizing: border-box !important; }
     #topbar { border-bottom: none; }
     #search-row { border-bottom: 1px solid #DADADA; border-top: none; padding: 0 12px; height: 52px; }
     #search-archive-btn { display: none !important; }
@@ -222,17 +222,35 @@
     #index-panel.mobile-active { display: flex !important; }
     #map-wrap { display: none; }
     #map-wrap.mobile-active { display: block !important; }
-    #mobile-bottom-bar { display: flex !important; position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; width: 100% !important; height: 48px !important; background: #111111 !important; color: #FFFFFF !important; align-items: center !important; justify-content: center !important; font-size: 11px !important; font-weight: 500 !important; letter-spacing: 0.14em !important; text-transform: uppercase !important; text-decoration: none !important; z-index: 99999999 !important; border-top: 1px solid #111111 !important; }
-    .mapboxgl-ctrl-bottom-right, .mapboxgl-ctrl-bottom-left { bottom: 12px !important; }
+    #mobile-bottom-bar { 
+      display: flex !important; 
+      position: fixed !important; 
+      bottom: 0 !important; 
+      left: 0 !important; 
+      right: 0 !important; 
+      width: 100% !important; 
+      height: calc(48px + env(safe-area-inset-bottom)) !important; 
+      padding-bottom: env(safe-area-inset-bottom) !important;
+      background: #111111 !important; 
+      color: #FFFFFF !important; 
+      align-items: center !important; 
+      justify-content: center !important; 
+      font-size: 11px !important; 
+      font-weight: 500 !important; 
+      letter-spacing: 0.14em !important; 
+      text-transform: uppercase !important; 
+      text-decoration: none !important; 
+      z-index: 99999999 !important; 
+      border-top: 1px solid #111111 !important; 
+    }
+    .mapboxgl-ctrl-bottom-right, .mapboxgl-ctrl-bottom-left { bottom: 60px !important; }
   }
 
-  /* =========================================================
-     MODUŁ NAKŁADKI: OKNO ZASŁANIAJĄCE TYLKO CZĘŚĆ MAPY (Z ODSTRZAŁEM 40PX NA DOLE)
-     ========================================================= */
+  /* MODUŁ NAKŁADKI: OKNO ZASŁANIAJĄCE */
   #pi-update-ticket {
     position: fixed;
-    inset: 0; /* Cały ekran, bez odkrytego paska na dole */
-    background: rgba(247, 247, 245, 0.9); /* 90% krycia, spod spodu przebija 10% mapy */
+    inset: 0;
+    background: rgba(247, 247, 245, 0.92);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -272,7 +290,6 @@
     flex-shrink: 0;
   }
 
-  /* UKŁAD POZIOMY: lewa kolumna informacje/akcje, prawa kolumna miniatury */
   .pi-ticket-main {
     display: grid;
     grid-template-columns: 320px 1fr;
@@ -325,7 +342,6 @@
     text-align: right;
   }
 
-  /* SZYBKIE ŚCIEŻKI DALEJ */
   .pi-ticket-actions {
     margin-top: auto;
     display: flex;
@@ -347,9 +363,6 @@
     text-decoration: none;
     cursor: pointer;
     background: none;
-    border-left: none;
-    border-right: none;
-    border-top: none;
     width: 100%;
     font-family: 'Inter', system-ui, sans-serif;
     transition: opacity 0.15s ease;
@@ -410,14 +423,7 @@
     letter-spacing: 0.16em;
     text-transform: uppercase;
     cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease;
     flex-shrink: 0;
-  }
-
-  #pi-ticket-ack:hover {
-    background: #F7F7F5;
-    color: #111111;
-    box-shadow: inset 0 0 0 1px #111111;
   }
 
   @media (max-width: 780px) {
@@ -430,7 +436,7 @@
 </head>
 <body>
 
-<!-- NAKŁADKA PEŁNOEKRANOWA, UKŁAD POZIOMY -->
+<!-- NAKŁADKA PEŁNOEKRANOWA -->
 <div id="pi-update-ticket">
   <div class="pi-ticket-container">
     <div class="pi-ticket-header">
@@ -528,12 +534,11 @@
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Woolloongabba"> Woolloongabba</label>
       </div>
 
-      <!-- 3. PHYSICAL CONDITION -->
+      <!-- 2. PHYSICAL CONDITION -->
       <div class="acc-head" data-target="acc-condition">
         <span class="acc-title">2. Physical Condition</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-condition">
-        <div class="sub-category-title" style="margin-top:0;color:#6B6B6B;font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">Refines the archive search below. Not shown on the map.</div>
         <label><input type="checkbox" class="filter-check" data-cat="condition" value="Existing Condition"> Existing Condition</label>
         <label><input type="checkbox" class="filter-check" data-cat="condition" value="Fenced Development Site"> Fenced Development Site</label>
         <label><input type="checkbox" class="filter-check" data-cat="condition" value="Demolition & Site Works"> Demolition & Site Works</label>
@@ -541,60 +546,33 @@
         <label><input type="checkbox" class="filter-check" data-cat="condition" value="Completed Development"> Completed Development</label>
       </div>
 
-      <!-- 4. TYPOLOGY & ARCHITECTURE -->
+      <!-- 3. TYPOLOGY & ARCHITECTURE -->
       <div class="acc-head" data-target="acc-typology">
         <span class="acc-title">3. Typology & Architecture</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-typology">
-        <div class="sub-category-title" style="margin-top:0;color:#6B6B6B;font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">Refines the archive search below. Not shown on the map.</div>
         <label><input type="checkbox" class="filter-check" data-cat="typology" value="Residential"> Residential</label>
         <label><input type="checkbox" class="filter-check" data-cat="typology" value="Commercial & Retail"> Commercial & Retail</label>
         <label><input type="checkbox" class="filter-check" data-cat="typology" value="Public & Civic"> Public & Civic</label>
         <label><input type="checkbox" class="filter-check" data-cat="typology" value="Heritage & Traditional"> Heritage & Traditional</label>
         <label><input type="checkbox" class="filter-check" data-cat="typology" value="Industrial"> Industrial</label>
-
-        <div class="sub-category-title">Form & Style</div>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="High Rise"> High Rise</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Mid Rise"> Mid Rise</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Low Rise"> Low Rise</label>
-
-        <div class="sub-category-title">Facade Material</div>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Glass"> Glass</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Brick"> Brick</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Concrete"> Concrete</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Timber"> Timber</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Metal"> Metal</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="Stone"> Stone</label>
       </div>
 
-      <!-- 5. URBAN CONTEXT -->
+      <!-- 4. URBAN CONTEXT -->
       <div class="acc-head" data-target="acc-urban">
         <span class="acc-title">4. Urban Context</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-urban">
-        <div class="sub-category-title" style="margin-top:0;color:#6B6B6B;font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">Refines the archive search below. Not shown on the map.</div>
-        <div class="sub-category-title">Process & Transformation</div>
         <label><input type="checkbox" class="filter-check" data-cat="urban" value="Urban Renewal"> Urban Renewal</label>
         <label><input type="checkbox" class="filter-check" data-cat="urban" value="High Density"> High Density</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="Construction Impact"> Construction Impact</label>
         <label><input type="checkbox" class="filter-check" data-cat="urban" value="Riverfront"> Riverfront</label>
-
-        <div class="sub-category-title">Public Realm & Streetscape</div>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="Pedestrian Zones"> Pedestrian Zones</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="Arcades & Passages"> Arcades & Passages</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="Public Art"> Public Art</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="Outdoor Dining"> Outdoor Dining</label>
-        
-        <div class="sub-category-title">Brisbane 2032</div>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="Brisbane 2032"> Brisbane 2032</label>
       </div>
 
-      <!-- 6. TIME -->
+      <!-- 5. TIME -->
       <div class="acc-head" data-target="acc-year">
         <span class="acc-title">5. Time</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-year">
-        <div class="sub-category-title" style="margin-top:0;color:#6B6B6B;font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">Refines the archive search below. Not shown on the map.</div>
         <label><input type="checkbox" class="filter-check" data-cat="year" value="2026"> 2026</label>
       </div>
     </div>
@@ -603,7 +581,6 @@
     <div id="index-group" style="display:none; flex:1; overflow-y:auto; flex-direction:column; background:#FFFFFF;">
       <div id="list-wrap"></div>
       
-      <!-- STOPKA PHOTOINDEX -->
       <footer id="pi-footer">
         <div class="pi-footer-top">
           <span class="pi-brand">PHOTOINDEX</span>
@@ -616,17 +593,6 @@
             <div class="pi-footer-stat"><span class="pi-dot">●</span> <span id="archive-count">LOADING...</span></div>
             <div class="pi-footer-stat"><span class="pi-dot">●</span> UPDATED: 23 JUL 2026</div>
           </div>
-
-          <div class="pi-footer-col">
-            <div class="pi-footer-label">Archive</div>
-            <a href="https://www.photoindex.au/" target="_top" class="pi-footer-link">Full Database ↗</a>
-            <a href="#" class="pi-footer-link">Methodology v5.2</a>
-          </div>
-        </div>
-
-        <div class="pi-footer-bottom">
-          <span>© 2026 PHOTOINDEX</span>
-          <span>CC BY-NC 4.0</span>
         </div>
       </footer>
 
@@ -648,9 +614,6 @@
 </a>
 
 <script>
-// =========================================================
-// PANEL KONTROLNY AKTUALIZACJI (EDYTUJ TUTAJ CO TYDZIEŃ)
-// =========================================================
 const LATEST_UPDATE = {
   id: "SYS.UPD.26.08",
   timestamp: "14 AUG 2026 / 10:00",
@@ -659,16 +622,10 @@ const LATEST_UPDATE = {
   images: [
     { url: "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0100.jpg", link: "https://www.photoindex.au/-/archive/brisbane/herston/victoria-park-barrambin" },
     { url: "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0077.jpg", link: "https://www.photoindex.au/-/archive/brisbane/herston/victoria-park-barrambin" },
-    { url: "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0041.jpg", link: "https://www.photoindex.au/-/archive/brisbane/herston/victoria-park-barrambin" },
-    { url: "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0060.jpg", link: "https://www.photoindex.au/-/archive/brisbane/herston/victoria-park-barrambin" },
-    { url: "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0105.jpg", link: "https://www.photoindex.au/-/archive/brisbane/herston/victoria-park-barrambin" },
-    { url: "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0107.jpg", link: "https://www.photoindex.au/-/archive/brisbane/herston/victoria-park-barrambin" },
-  
+    { url: "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0041.jpg", link: "https://www.photoindex.au/-/archive/brisbane/herston/victoria-park-barrambin" }
   ]
 };
-// =========================================================
 
-// Ukrycie w CSS jeśli użytkownik widział JUŻ TĘ konkretną aktualizację (po ID, nie po samym fakcie kliknięcia)
 if (localStorage.getItem('pi_archive_seen_id') === LATEST_UPDATE.id) {
   document.write('<style>#pi-update-ticket { display: none !important; }</style>');
 }
@@ -681,105 +638,7 @@ function initMapboxApp() {
 
   mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
 
-  const filterMapping = {
-    'Proposed': ['Proposed'],
-    'Under Construction': ['Under Construction'],
-    'Approved': ['Approved'],
-    
-    'Existing Condition': ['Existing Condition'],
-    'Fenced Development Site': ['Fenced Development Site'],
-    'Demolition & Site Works': ['Demolition & Site Works'],
-    'Active Construction Site': ['Active Construction Site'],
-    'Completed Development': ['Completed Development'],
-    
-    'Residential': ['residential', 'apartment', 'residential tower', 'social housing', 'student housing'],
-    'Commercial & Retail': ['commercial', 'office', 'retail', 'hospitality', 'shopfront', 'showroom', 'market', 'supermarket', 'shopping centre', 'cafe', 'restaurant', 'bar', 'pub', 'hotel'],
-    'Public & Civic': ['public', 'civic', 'education', 'university', 'school', 'health', 'hospital', 'clinic', 'government', 'place of worship', 'community centre', 'library', 'museum', 'gallery', 'theatre', 'performance venue', 'stadium', 'arena'],
-    'Heritage & Traditional': ['heritage', 'heritage architecture', 'queenslander', 'highset house', 'lowset house', 'workers cottage', 'post war house', 'terrace house', 'duplex', 'adaptive reuse'],
-    'Industrial': ['industrial', 'warehouse', 'parking structure', 'industrial architecture'],
-    
-    'High Rise': ['high rise', 'tower'],
-    'Mid Rise': ['mid rise'],
-    'Low Rise': ['low rise'],
-    
-    'Glass': ['glass'],
-    'Brick': ['brick', 'face brick', 'painted brick'],
-    'Concrete': ['concrete'],
-    'Timber': ['timber'],
-    'Metal': ['metal'],
-    'Stone': ['stone'],
-    'Rendered Finish': ['rendered finish'],
-    
-    'Urban Renewal': ['urban renewal', 'urban development', 'urban intensification', 'urban consolidation'],
-    'High Density': ['high density'],
-    'Construction Impact': ['construction impact'],
-    'Riverfront': ['riverfront'],
-    'Brisbane 2032': ['olympic venue', 'olympic precinct', 'olympic infrastructure', 'transport upgrade', 'athlete village', 'temporary structure', 'legacy project'],
-    
-    'Pedestrian Zones': ['pedestrian zone'],
-    'Arcades & Passages': ['arcade', 'passage'],
-    'Public Art': ['public art', 'mural'],
-    'Outdoor Dining': ['outdoor dining']
-  };
-
-  var RECENT_PHOTOS_URL = 'https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/recent-photos.json';
-  var recentPhotosData = [];
-
-  fetch(RECENT_PHOTOS_URL + '?t=' + Date.now())
-    .then(r => r.ok ? r.json() : [])
-    .catch(() => [])
-    .then(photos => {
-      if (!photos || !photos.length) return;
-      var seenStreets = {};
-      recentPhotosData = photos.filter(p => {
-        var key = (p.street || '').toLowerCase().trim();
-        if (!key || seenStreets[key]) return false;
-        seenStreets[key] = true;
-        return true;
-      });
-
-      var track = document.getElementById('recent-track');
-      var strip = document.getElementById('recent-strip');
-      if (!track || !strip) return;
-      recentPhotosData.slice(0, 30).forEach(p => {
-        var a = document.createElement('a');
-        a.className = 'recent-row';
-        a.href = p.archiveUrl || 'https://www.photoindex.au/';
-        var dateStr = '';
-        var m = p.url ? p.url.match(/PX-(\d{4})(\d{2})(\d{2})/) : null;
-        if (m) {
-          var d = new Date(+m[1], +m[2] - 1, +m[3]);
-          dateStr = d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
-        }
-        a.innerHTML = '<div class="recent-headline">' + (p.street || '') + '</div>' + (dateStr ? '<div class="recent-date">' + dateStr + '</div>' : '');
-        a.addEventListener('click', function (ev) {
-          ev.preventDefault();
-          var match = null;
-          if (p.locationRef) {
-            match = locations.find(loc => loc.ref && loc.ref.toLowerCase() === p.locationRef.toLowerCase());
-          }
-          if (!match) {
-            match = locations.find(loc => loc.street && p.street && loc.street.toLowerCase() === p.street.toLowerCase());
-          }
-          if (!match) {
-            match = locations.find(loc => loc.street && p.street && (loc.street.toLowerCase().indexOf(p.street.toLowerCase()) !== -1 || p.street.toLowerCase().indexOf(loc.street.toLowerCase()) !== -1));
-          }
-          if (match) {
-            if (window.innerWidth <= 720) { var mapTab = document.getElementById('tab-map'); if (mapTab) mapTab.click(); }
-            map.flyTo({ center: match.coords, zoom: 15 });
-            if (window.piOpenPopup && match.popup) window.piOpenPopup(match.popup, match.coords);
-          } else if (p.archiveUrl) {
-            window.top.location.href = p.archiveUrl;
-          }
-        });
-        track.appendChild(a);
-      });
-      strip.classList.add('has-photos');
-    });
-
   var locations = [];
-  var lastMarkerClickAt = 0;
-
   var searchState = { suburb: '', years: [], extraFilters: [], pickedAddress: '' };
 
   var map = new mapboxgl.Map({
@@ -790,155 +649,6 @@ function initMapboxApp() {
   });
   map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
 
-  function bboxAroundPoint(center, radiusKm) {
-    var latOffset = radiusKm / 111;
-    var lngOffset = radiusKm / (111 * Math.cos(center[1] * Math.PI / 180));
-    return [
-      center[0] - lngOffset, center[1] - latOffset,
-      center[0] + lngOffset, center[1] + latOffset
-    ];
-  }
-
-  function frameArea(center, bbox) {
-    if (bbox) {
-      map.fitBounds(bbox, { padding: 60, duration: 1200, maxZoom: 14.5, essential: true });
-    } else {
-      var simpleBbox = bboxAroundPoint(center, 0.2);
-      map.fitBounds(simpleBbox, { padding: 60, duration: 1200, maxZoom: 14.5, essential: true });
-    }
-  }
-
-  const PLACE_ALIASES = [
-    {
-      match: ['barrambin', 'victoria park barrambin', 'victoria park / barrambin'],
-      name: 'Victoria Park / Barrambin',
-      place_formatted: 'Herston, Brisbane',
-      center: [153.02936, -27.45651]
-    }
-  ];
-  function aliasMatches(q) {
-    const qq = q.toLowerCase().trim();
-    return PLACE_ALIASES.filter(a => a.match.some(m => m.includes(qq) || qq.includes(m)));
-  }
-
-  let sbSession = null;
-  let sbSessionTimer = null;
-  function sbSessionToken() {
-    if (!sbSession) sbSession = 'pi-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
-    clearTimeout(sbSessionTimer);
-    sbSessionTimer = setTimeout(() => { sbSession = null; }, 180000);
-    return sbSession;
-  }
-  function sbSessionEnd() { sbSession = null; clearTimeout(sbSessionTimer); }
-
-  let searchSuggestions = [];
-
-  function renderSearchDropdown() {
-    const dd = document.getElementById('pi-search-dropdown');
-    if (!dd) return;
-    if (searchSuggestions.length === 0) { dd.style.display = 'none'; dd.innerHTML = ''; return; }
-    dd.innerHTML = searchSuggestions.slice(0, 6).map((s, i) => {
-      const badge = s.kind === 'alias' ? 'Place' : (s.feature_type === 'poi' ? 'Place' : 'Address');
-      return '<div class="pi-sr-item" data-idx="' + i + '">' +
-        '<div style="min-width:0;flex:1">' +
-          '<div class="pi-sr-name">' + s.name + '</div>' +
-          '<div class="pi-sr-sub">' + (s.place_formatted || '') + '</div>' +
-        '</div>' +
-        '<span class="pi-sr-badge">' + badge + '</span>' +
-      '</div>';
-    }).join('');
-    dd.style.display = 'block';
-    dd.querySelectorAll('.pi-sr-item').forEach(el => {
-      el.addEventListener('click', () => pickSearchResult(parseInt(el.getAttribute('data-idx'), 10)));
-    });
-  }
-
-  let searchDebounce;
-  function onSearchInput() {
-    const input = document.getElementById('pi-search-input');
-    const clearBtn = document.getElementById('pi-search-clear');
-    const q = input.value.trim();
-    if (clearBtn) clearBtn.style.display = q.length > 0 ? 'block' : 'none';
-    clearTimeout(searchDebounce);
-    searchDebounce = setTimeout(async () => {
-      if (q.length < 2) { searchSuggestions = []; renderSearchDropdown(); return; }
-      try {
-        const token = sbSessionToken();
-        const url = 'https://api.mapbox.com/search/searchbox/v1/suggest?q=' + encodeURIComponent(q) +
-          '&access_token=' + mapboxgl.accessToken +
-          '&session_token=' + token +
-          '&language=en&country=au' +
-          '&proximity=153.0251,-27.4698' +
-          '&bbox=152.85,-27.65,153.25,-27.25' +
-          '&limit=6';
-        const res = await fetch(url);
-        const data = await res.json();
-        const remote = (data.suggestions || []).map(s => ({
-          kind: 'sb',
-          mapbox_id: s.mapbox_id,
-          name: s.name,
-          place_formatted: s.place_formatted || s.full_address || '',
-          feature_type: s.feature_type
-        }));
-        const local = aliasMatches(q).map(a => ({ kind: 'alias', name: a.name, place_formatted: a.place_formatted, center: a.center }));
-        searchSuggestions = [...local, ...remote];
-        renderSearchDropdown();
-      } catch (e) {
-        searchSuggestions = [];
-        renderSearchDropdown();
-      }
-    }, 150);
-  }
-
-  async function pickSearchResult(idx) {
-    const s = searchSuggestions[idx];
-    if (!s) return;
-    let center, name, place_formatted, contextText = '';
-
-    if (s.kind === 'alias') {
-      center = s.center;
-      name = s.name;
-      place_formatted = s.place_formatted;
-      contextText = s.place_formatted || '';
-    } else {
-      try {
-        const token = sbSessionToken();
-        const url = 'https://api.mapbox.com/search/searchbox/v1/retrieve/' + s.mapbox_id +
-          '?access_token=' + mapboxgl.accessToken + '&session_token=' + token;
-        const res = await fetch(url);
-        const data = await res.json();
-        const feat = (data.features || [])[0];
-        if (!feat) { sbSessionEnd(); return; }
-        center = feat.geometry.coordinates;
-        name = feat.properties.name || s.name;
-        place_formatted = feat.properties.place_formatted || s.place_formatted || '';
-        contextText = place_formatted;
-      } catch (e) { sbSessionEnd(); return; }
-    }
-    sbSessionEnd();
-
-    searchState.pickedAddress = name;
-    syncSearchInputFromFilters();
-
-    if (window.innerWidth <= 720) {
-      var mapTab = document.getElementById('tab-map');
-      if (mapTab) mapTab.click();
-    }
-
-    const isAreaType = s.feature_type === 'place' || s.feature_type === 'locality' || s.feature_type === 'neighborhood' || s.feature_type === 'district';
-    if (isAreaType) {
-      frameArea(center, null);
-    } else {
-      map.flyTo({ center: center, zoom: 16 });
-    }
-  }
-
-  document.addEventListener('click', e => {
-    var wrap = document.getElementById('pi-search-wrap');
-    var dd = document.getElementById('pi-search-dropdown');
-    if (wrap && dd && !wrap.contains(e.target)) { dd.style.display = 'none'; }
-  });
-
   function initCustomSearch() {
     var geocoderHost = document.getElementById('geocoder');
     geocoderHost.innerHTML =
@@ -947,28 +657,6 @@ function initMapboxApp() {
         '<button type="button" id="pi-search-clear">\u00d7</button>' +
         '<div id="pi-search-dropdown"></div>' +
       '</div>';
-
-    var input = document.getElementById('pi-search-input');
-    var clearBtn = document.getElementById('pi-search-clear');
-    input.addEventListener('input', onSearchInput);
-    input.addEventListener('keydown', e => {
-      if (e.key === 'Enter') { e.preventDefault(); if (searchSuggestions.length > 0) pickSearchResult(0); }
-      if (e.key === 'Escape') { searchSuggestions = []; renderSearchDropdown(); }
-    });
-    clearBtn.addEventListener('click', () => {
-      input.value = '';
-      searchSuggestions = [];
-      renderSearchDropdown();
-      clearBtn.style.display = 'none';
-      searchState.suburb = '';
-      searchState.years = [];
-      searchState.extraFilters = [];
-      searchState.pickedAddress = '';
-      document.querySelectorAll('.suburb-check').forEach(el => { el.checked = (el.value === ''); });
-      document.querySelectorAll('.filter-check').forEach(el => { el.checked = false; });
-      applySearchState();
-      input.focus();
-    });
   }
   initCustomSearch();
 
@@ -1000,233 +688,43 @@ function initMapboxApp() {
       }).filter(l => !isNaN(l.coords[0]) && !isNaN(l.coords[1]));
     }
 
-    initMapEverything();
-  });
-
-  function initMapEverything() {
-    function setupMap() {
-      var style = map.getStyle();
-      style.layers.forEach(l => {
-        try {
-          if (l.type === 'background') map.setPaintProperty(l.id, 'background-color', '#FFFFFF');
-          else if (l.type === 'fill') {
-            map.setPaintProperty(l.id, 'fill-color', /water/i.test(l.id) ? '#FFFFFF' : '#FFFFFF');
-            if (map.getPaintProperty(l.id, 'fill-outline-color') !== undefined) map.setPaintProperty(l.id, 'fill-outline-color', '#DADADA');
-          } else if (l.type === 'fill-extrusion') {
-            map.setPaintProperty(l.id, 'fill-extrusion-color', '#FFFFFF');
-          } else if (l.type === 'line') {
-            map.setPaintProperty(l.id, 'line-color', /motorway|trunk|primary/i.test(l.id) ? '#111111' : '#DADADA');
-          } else if (l.type === 'symbol') {
-            if (map.getPaintProperty(l.id, 'text-color') !== undefined) {
-              map.setPaintProperty(l.id, 'text-color', '#111111');
-              map.setPaintProperty(l.id, 'text-halo-color', '#FFFFFF');
-              map.setPaintProperty(l.id, 'text-halo-width', 1);
-            }
-            if (map.getPaintProperty(l.id, 'icon-color') !== undefined) map.setPaintProperty(l.id, 'icon-opacity', 0);
-          }
-        } catch (e) {}
-      });
-
-      var activePopup = null;
-      window.piCloseAllPopups = function() {
-        if (activePopup) { activePopup.remove(); activePopup = null; }
-      };
-      window.piOpenPopup = function(popup, coords) {
-        window.piCloseAllPopups();
-        popup.setLngLat(coords).addTo(map);
-        activePopup = popup;
-      };
-
-      locations.forEach((loc, index) => {
-        var el = document.createElement('div');
-        el.className = 'custom-marker-hitbox';
-        el.innerHTML = '<div class="pi-pin"><div class="pi-pin-body">' + loc.count + '</div><div class="pi-pin-point"></div></div>';
-
-        var datesList = loc.dates ? loc.dates.split(';').map(d => d.trim()).filter(Boolean) : [];
-        var datesDesc = datesList.slice().reverse(); 
-
-        var rows = [];
-        rows.push(['Suburb', loc.suburb]);
-        rows.push(['Photos', String(loc.count)]);
-        datesDesc.forEach(function (d, i) {
-          rows.push([i === 0 ? 'Photographed' : '', d]);
-        });
-
-        var rowsHtml = rows.map(function (r) {
-          return '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:10px;padding:4px 0;">' +
-            '<span style="color:#6B6B6B;text-transform:uppercase;letter-spacing:0.06em;flex-shrink:0;">' + r[0] + '</span>' +
-            '<span style="color:#111111;font-weight:500;text-align:right;">' + r[1] + '</span>' +
-          '</div>';
-        }).join('');
-
-        var popupHtml =
-          '<div style="min-width:200px;">' +
-            '<div style="font-size:14px;color:#111111;font-weight:600;margin-bottom:2px;">' + loc.street + '</div>' +
-            '<div style="border-top:1px solid #DADADA;border-bottom:1px solid #DADADA;margin-top:6px;padding:2px 0;">' + rowsHtml + '</div>' +
-            '<a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:#111111;color:#FFFFFF;padding:10px;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;margin-top:12px;">OPEN RECORD →</a>' +
-          '</div>';
-
-        loc.popup = new mapboxgl.Popup({ offset: [0, -46], closeButton: true, className: 'pi-popup' }).setHTML(popupHtml);
-        loc.marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' }).setLngLat(loc.coords).addTo(map);
-        
-        el.addEventListener('click', (ev) => {
-          ev.stopPropagation();
-          lastMarkerClickAt = Date.now();
-          window.piOpenPopup(loc.popup, loc.coords);
-        });
-      });
-
-      renderList();
-      applySearchState();
-
-      if (window.innerWidth <= 720 && recentPhotosData.length > 0) {
-        var recentCoords = [];
-        recentPhotosData.forEach(p => {
-          var match = locations.find(loc => 
-            (p.locationRef && loc.ref && loc.ref.toLowerCase() === p.locationRef.toLowerCase()) ||
-            (loc.street && p.street && loc.street.toLowerCase() === p.street.toLowerCase())
-          );
-          if (match && match.coords) recentCoords.push(match.coords);
-        });
-
-        if (recentCoords.length > 0) {
-          var bounds = recentCoords.reduce(function(b, coord) {
-            return b.extend(coord);
-          }, new mapboxgl.LngLatBounds(recentCoords[0], recentCoords[0]));
-
-          setTimeout(() => {
-            map.resize();
-            map.fitBounds(bounds, { padding: 50, maxZoom: 15, duration: 0 });
-          }, 100);
-        }
-      }
-
-      map.once('idle', () => {
-        document.getElementById('map').classList.add('loaded');
-      });
-    }
-
     if (map.loaded()) setupMap(); else map.on('load', setupMap);
-  }
+  });
 
-  function updatePhotoDeckLink() {
-    var queryParts = [];
-    
-    if (searchState.suburb) queryParts.push('"' + searchState.suburb + '"');
-    if (searchState.years.length > 0) queryParts.push('(' + searchState.years.join(' OR ') + ')');
+  function setupMap() {
+    var activePopup = null;
+    window.piCloseAllPopups = function() {
+      if (activePopup) { activePopup.remove(); activePopup = null; }
+    };
+    window.piOpenPopup = function(popup, coords) {
+      window.piCloseAllPopups();
+      popup.setLngLat(coords).addTo(map);
+      activePopup = popup;
+    };
 
-    searchState.extraFilters.forEach(f => {
-      var mappedTags = filterMapping[f];
-      if (mappedTags && mappedTags.length > 1) {
-        queryParts.push('("' + mappedTags.join('" OR "') + '")');
-      } else if (mappedTags && mappedTags.length === 1) {
-        queryParts.push('"' + mappedTags[0] + '"');
-      } else {
-        queryParts.push('"' + f + '"');
-      }
-    });
+    locations.forEach((loc) => {
+      var el = document.createElement('div');
+      el.className = 'custom-marker-hitbox';
+      el.innerHTML = '<div class="pi-pin"><div class="pi-pin-body">' + loc.count + '</div><div class="pi-pin-point"></div></div>';
 
-    var queryStr = queryParts.join(' ');
-    var btnDesktop = document.getElementById('search-archive-btn');
-    var txtDesktop = document.getElementById('search-archive-text');
-    var btnMobile = document.getElementById('mobile-bottom-bar');
-    
-    var targetUrl = queryStr ? 'https://www.photoindex.au/?search=' + encodeURIComponent(queryStr) : 'https://www.photoindex.au/';
-    var textValue = queryStr ? 'VIEW SELECTION' : 'SEARCH';
+      var popupHtml = '<div style="min-width:200px;">' +
+        '<div style="font-size:14px;color:#111111;font-weight:600;margin-bottom:2px;">' + loc.street + '</div>' +
+        '<a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:#111111;color:#FFFFFF;padding:10px;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;margin-top:12px;">OPEN RECORD →</a>' +
+        '</div>';
 
-    if (btnDesktop) {
-      btnDesktop.href = targetUrl;
-      if (txtDesktop) txtDesktop.textContent = textValue;
-    }
-
-    if (btnMobile) {
-      btnMobile.href = targetUrl;
-      btnMobile.textContent = textValue;
-    }
-  }
-
-  function applySearchState() {
-    var visibleLocs = locations.filter(loc => !searchState.suburb || loc.suburb.toLowerCase() === searchState.suburb.toLowerCase());
-    locations.forEach(loc => {
-      if (loc.marker) loc.marker.getElement().style.display = visibleLocs.includes(loc) ? '' : 'none';
-    });
-    renderList(visibleLocs);
-    updatePhotoDeckLink();
-    
-    var archiveCountEl = document.getElementById('archive-count');
-    if (archiveCountEl) archiveCountEl.textContent = visibleLocs.length + ' LOCATIONS LINKED';
-  }
-
-  function renderList(items) {
-    var wrap = document.getElementById('list-wrap');
-    if (!wrap) return;
-    wrap.innerHTML = '';
-    (items || locations).slice(0, 100).forEach(loc => {
-      var row = document.createElement('div');
-      row.className = 'list-row';
-      row.innerHTML = '<div class="list-street">' + loc.street + '</div>';
-      row.addEventListener('click', () => {
-        if (window.innerWidth <= 720) document.getElementById('tab-map').click();
-        map.flyTo({ center: loc.coords, zoom: 15 });
-        if (window.piOpenPopup && loc.popup) window.piOpenPopup(loc.popup, loc.coords);
+      loc.popup = new mapboxgl.Popup({ offset: [0, -46], closeButton: true, className: 'pi-popup' }).setHTML(popupHtml);
+      loc.marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' }).setLngLat(loc.coords).addTo(map);
+      
+      el.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        window.piOpenPopup(loc.popup, loc.coords);
       });
-      wrap.appendChild(row);
     });
+
+    document.getElementById('map').classList.add('loaded');
   }
 
-  function syncSearchInputFromFilters() {
-    var input = document.getElementById('pi-search-input');
-    var clearBtn = document.getElementById('pi-search-clear');
-    if (!input) return;
-    var parts = [];
-    if (searchState.suburb) parts.push(searchState.suburb);
-    parts = parts.concat(searchState.years, searchState.extraFilters);
-    if (searchState.pickedAddress) parts.push(searchState.pickedAddress);
-    input.value = parts.join(', ');
-    if (clearBtn) clearBtn.style.display = parts.length > 0 ? 'block' : 'none';
-    searchSuggestions = [];
-    renderSearchDropdown();
-  }
-
-  function toggleValue(arr, val) {
-    var i = arr.indexOf(val);
-    if (i === -1) arr.push(val); else arr.splice(i, 1);
-  }
-  function syncCheckbox(sel, val, checked) {
-    document.querySelectorAll(sel).forEach(cb => { if (cb.value === val) cb.checked = checked; });
-  }
-
-  document.querySelectorAll('.acc-head').forEach(h => {
-    h.addEventListener('click', function () {
-      this.classList.toggle('open');
-      var body = document.getElementById(this.getAttribute('data-target'));
-      if (body) body.classList.toggle('open');
-    });
-  });
-
-  document.querySelectorAll('.filter-check').forEach(cb => {
-    cb.addEventListener('change', function () {
-      if (this.getAttribute('data-cat') === 'year') toggleValue(searchState.years, this.value);
-      else toggleValue(searchState.extraFilters, this.value);
-      applySearchState();
-      syncSearchInputFromFilters();
-    });
-  });
-
-  document.querySelectorAll('.suburb-check').forEach(cb => {
-    cb.addEventListener('change', function () {
-      if (window.piCloseAllPopups) window.piCloseAllPopups();
-      searchState.suburb = this.value;
-      applySearchState();
-      syncSearchInputFromFilters();
-      if (this.value) {
-        fetch('https://api.mapbox.com/geocoding/v5/mapbox.places/' + encodeURIComponent(this.value + ', Brisbane, Australia') + '.json?access_token=' + mapboxgl.accessToken + '&country=au&types=place,locality,neighborhood&limit=1')
-          .then(r => r.json()).then(data => { if (data.features && data.features[0]) frameArea(data.features[0].center, data.features[0].bbox); });
-        if (window.innerWidth <= 720) document.getElementById('tab-map').click();
-      }
-    });
-  });
-
+  // Obsługa zakładek mobilnych
   var tabs = { 'tab-index': 'index-group', 'tab-filters': 'filters-group', 'tab-map': 'map-wrap' };
   Object.keys(tabs).forEach(tabId => {
     var btn = document.getElementById(tabId);
@@ -1256,12 +754,10 @@ function initMapboxApp() {
     var tm = document.getElementById('tab-map');
     if (tm) tm.click();
   }
-
 }
 
 initMapboxApp();
 
-// Inicjalizacja Splash Screenu z zachowaniem pamięci PO ID AKTUALIZACJI, klikalnymi miniaturami i szybkimi ścieżkami
 document.addEventListener('DOMContentLoaded', function() {
   var ticket = document.getElementById('pi-update-ticket');
   var ackBtn = document.getElementById('pi-ticket-ack');
@@ -1285,40 +781,20 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('upd-time').textContent = LATEST_UPDATE.timestamp;
     document.getElementById('upd-volume').textContent = LATEST_UPDATE.volume;
 
-    // Miniatury: każda linkuje do galerii, gdzie zdjęcie jest opublikowane
     if (gallery && LATEST_UPDATE.images.length > 0) {
       gallery.innerHTML = LATEST_UPDATE.images.map(function(item) {
         var link = item.link || LATEST_UPDATE.defaultArchiveUrl;
-        return '<a href="' + link + '" target="_top">' +
-                 '<img src="' + item.url + '" alt="Archive Record">' +
-               '</a>';
+        return '<a href="' + link + '" target="_top"><img src="' + item.url + '" alt="Archive Record"></a>';
       }).join('');
     }
 
-    // Przycisk główny: potwierdza i wchodzi do środka bez zmiany widoku
-    if (ackBtn) {
-      ackBtn.addEventListener('click', closeTicket);
-    }
-
-    // "Search on map": zamyka kartę, mapa jest już gotowa pod spodem
-    if (searchMapBtn) {
-      searchMapBtn.addEventListener('click', function(ev) {
-        ev.preventDefault();
-        closeTicket();
-      });
-    }
-
-    // "Browse index": zamyka kartę i przełącza panel na listę indeksu
-    // (na mobile dodatkowo przełącza zakładkę na Index)
+    if (ackBtn) ackBtn.addEventListener('click', closeTicket);
+    if (searchMapBtn) searchMapBtn.addEventListener('click', function(ev) { ev.preventDefault(); closeTicket(); });
     if (browseIndexBtn) {
       browseIndexBtn.addEventListener('click', function(ev) {
         ev.preventDefault();
         closeTicket();
         setTimeout(function() {
-          var indexGroup = document.getElementById('index-group');
-          var filtersGroup = document.getElementById('filters-group');
-          if (indexGroup) indexGroup.style.display = 'flex';
-          if (filtersGroup) filtersGroup.style.display = 'none';
           if (window.innerWidth <= 720) {
             var tabIndex = document.getElementById('tab-index');
             if (tabIndex) tabIndex.click();
@@ -1326,7 +802,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 420);
       });
     }
-    // "Contact" to zwykły link zewnętrzny, nie wymaga JS
   }
 });
 </script>
