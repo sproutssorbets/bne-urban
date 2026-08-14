@@ -801,7 +801,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (gallery && LATEST_UPDATE.images.length > 0) {
       gallery.innerHTML = LATEST_UPDATE.images.map(function(item) {
         var link = item.link || LATEST_UPDATE.defaultArchiveUrl;
-        return '<a href="' + link + '" target="_top"><img src="' + item.url + '" alt="Archive Record"></a>';
+        return '<a href="' + link + '" target="_top">' +
+         '<img src="' + item.url + '" alt="Archive Record" loading="lazy" decoding="async">' +
+       '</a>';
       }).join('');
     }
 
