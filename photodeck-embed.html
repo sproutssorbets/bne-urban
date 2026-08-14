@@ -307,7 +307,10 @@
 
   .pi-ticket-header {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
+    align-items: baseline;
+    gap: 4px 16px;
     padding: 14px 24px;
     border-bottom: 1px solid #111111;
     font-size: 10px;
@@ -460,15 +463,24 @@
     color: #111111;
   }
 
-  /* MEDIA QUERY DLA URZĄDZEŃ MOBILNYCH - POPRAWKI UX */
-  @media (max-width: 780px) {
+  /* MEDIA QUERY DLA URZĄDZEŃ MOBILNYCH - POPRAWKI UX
+     Breakpoint 720px, ten sam co reszta interfejsu (wcześniej było 780px,
+     co tworzyło niespójną strefę 721–780px). */
+  @media (max-width: 720px) {
     #pi-update-ticket { 
       padding: 0; 
       background: #F7F7F5; 
     }
     .pi-ticket-container { 
-      max-height: 100vh; 
-      height: 100vh;
+      /* 100vh na telefonie nie odpowiada realnie widocznemu obszarowi
+         (pasek adresu chowa się i pokazuje). Efekt: przycisk na dole
+         potrafi wypaść poza ekran albo nachodzić na to, co jest pod spodem.
+         100dvh liczy faktyczną widoczną wysokość; --pi-vh niżej to fallback
+         dla przeglądarek bez wsparcia dvh (ustawiany przez JS). */
+      max-height: 100vh;
+      height: calc(var(--pi-vh, 1vh) * 100);
+      height: 100dvh;
+      max-height: 100dvh;
       border: none;
       border-top: none;
     }
@@ -482,8 +494,19 @@
       border-bottom: 1px solid #DADADA; 
       padding: 20px; 
     }
+    .pi-ticket-actions {
+      /* margin-top: auto z bazowej reguły nic tu nie robi, bo kolumna
+         nie jest rozciągana na pełną wysokość rzędu grida (tylko jedna
+         kolumna w układzie mobilnym). Stały odstęp zamiast liczenia na auto. */
+      margin-top: 8px;
+    }
     .pi-ticket-thumbnails { 
-      padding: 20px; 
+      padding: 20px;
+      /* overflow-y: auto z bazowej reguły było martwym kodem: ta sekcja
+         nigdy nie ma własnej ograniczonej wysokości, więc nie przewija się
+         sama, tylko scrolluje razem z .pi-ticket-main. Wyłączone jawnie,
+         żeby nie sugerować dwóch niezależnych obszarów przewijania. */
+      overflow-y: visible;
     }
     .pi-ticket-title { 
       font-size: 24px; 
@@ -695,6 +718,16 @@ const LATEST_UPDATE = {
 // if (localStorage.getItem('pi_archive_seen_id') === LATEST_UPDATE.id) {
 //   document.write('<style>#pi-update-ticket { display: none !important; }</style>');
 // }
+
+// Fallback wysokości viewportu dla przeglądarek bez wsparcia dla 100dvh
+// (starsze Androidy, starsze Safari). Ustawia realną wysokość okna w px
+// jako zmienną CSS, przeliczaną też przy zmianie rozmiaru / obrotu ekranu.
+function setPiViewportHeight() {
+  document.documentElement.style.setProperty('--pi-vh', (window.innerHeight * 0.01) + 'px');
+}
+setPiViewportHeight();
+window.addEventListener('resize', setPiViewportHeight);
+window.addEventListener('orientationchange', setPiViewportHeight);
 
 function initMapboxApp() {
   if (typeof mapboxgl === 'undefined') {
