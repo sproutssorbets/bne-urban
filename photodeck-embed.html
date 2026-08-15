@@ -27,8 +27,9 @@
     width: 100%; height: 100%; height: 100dvh;
     font-family: 'Inter', -apple-system, system-ui, sans-serif;
     background: #FFFFFF; color: #111111; -webkit-font-smoothing: antialiased;
+    overflow: hidden;
   }
-  body { display: flex; flex-direction: column; overflow: hidden; }
+  body { display: flex; flex-direction: column; }
   body.pi-drawer-lock { overflow: hidden; }
 
   /* --- GÓRNY PASEK --- */
@@ -44,8 +45,8 @@
   #search-archive-btn { height: 100%; padding: 0 4px; border: none; background: transparent; color: #111111; font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; text-decoration: none; flex-shrink: 0; transition: opacity 0.15s ease; }
   #search-archive-btn:hover { opacity: 0.5; }
 
-  /* --- GŁÓWNY UKŁAD MAPY I FILTRÓW --- */
-  #layout { width: 100%; flex: 1 1 auto; min-height: 0; background: #FFFFFF; position: relative; display: flex; overflow: hidden; }
+  /* --- GŁÓWNY UKŁAD MAPY I FILTRÓW (SZCZELNY BEZ ODSTĘPÓW) --- */
+  #layout { width: 100%; flex: 1 1 auto; min-height: 0; background: #FFFFFF; position: relative; display: flex; overflow: hidden; margin: 0; padding: 0; }
   
   #index-panel { width: 320px; flex-shrink: 0; position: relative; height: 100%; border-right: 1px solid #111111; display: flex; flex-direction: column; background: #FFFFFF; overflow-y: auto; z-index: 3; }
   .acc-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid #EAEAEA; cursor: pointer; user-select: none; background: #FFFFFF; flex-shrink: 0; transition: background 0.15s ease; }
@@ -73,7 +74,8 @@
   .pi-sub { font-size: 9px; color: #888888; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; }
   .pi-footer-stat { font-size: 9px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #111111; margin-top: 10px; }
 
-  #map-wrap { flex: 1; position: relative; height: 100%; background: #F8F8F8; }
+  /* MAPA PRZYLEGAJĄCA DO KRAWĘDZI */
+  #map-wrap { flex: 1; position: relative; height: 100%; background: #F8F8F8; margin: 0; padding: 0; }
   #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.6s ease-in-out; }
   #map.loaded { opacity: 1; }
   
@@ -83,17 +85,23 @@
   .pi-pin-point { width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 4px solid #111111; }
   .custom-marker-hitbox:hover .pi-pin-body { background: #FFFFFF; color: #111111; outline: 1px solid #111111; }
   
-  /* --- POPUP (POPRAWIONE POZYCJONOWANIE KRZYŻYKA) --- */
+  /* --- IDEALNIE SKROJONY POPUP (BEZ KOLIZJI Z KRZYŻYKIEM) --- */
   .pi-popup .mapboxgl-popup-content { 
     background: #FFFFFF; border: 1px solid #111111; padding: 16px; 
     font-family: 'Inter', sans-serif; position: relative;
   }
   .pi-popup .mapboxgl-popup-close-button {
-    position: absolute; top: 12px; right: 12px; font-size: 16px; color: #111111;
+    position: absolute; top: 14px; right: 14px; font-size: 16px; color: #111111;
     border: none; background: transparent; cursor: pointer; line-height: 1; padding: 4px; z-index: 10;
   }
   .pi-popup .mapboxgl-popup-close-button:hover { opacity: 0.5; }
   .pi-popup .mapboxgl-popup-tip { border-top-color: #FFFFFF !important; border-bottom-color: #FFFFFF !important; }
+  
+  /* Bezpieczna strefa tytułu w popupie, by długi tekst nigdy nie wjechał na krzyżyk */
+  .pi-popup-title {
+    font-size: 12px; font-weight: 700; text-transform: uppercase; 
+    padding-right: 20px; line-height: 1.3; margin-bottom: 6px;
+  }
 
   /* --- WSUWANY PANEL LOGÓW (DRAWER) --- */
   #pi-drawer-tab {
@@ -541,8 +549,8 @@ function initMapboxApp() {
       }).join('');
 
       var popupHtml =
-        '<div style="min-width:180px;">' +
-          '<div style="font-size:12px;font-weight:700;margin-bottom:6px;text-transform:uppercase;">' + loc.street + '</div>' +
+        '<div style="min-width:180px; position:relative;">' +
+          '<div class="pi-popup-title">' + loc.street + '</div>' +
           '<div style="border-top:1px solid #111;border-bottom:1px solid #111;padding:6px 0;margin-bottom:8px;">' + rowsHtml + '</div>' +
           '<a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:#111;color:#FFF;padding:8px;font-size:9px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;">OPEN RECORD →</a>' +
         '</div>';
