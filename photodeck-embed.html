@@ -78,7 +78,7 @@
   #pi-footer { padding: 16px 18px; background: var(--bg); border-top: 1px solid var(--text); flex-shrink: 0; }
   .pi-footer-stat { font-size: 9px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); margin-top: 10px; }
   #map-wrap { flex: 1; position: relative; height: 100%; background: #F8F8F8; margin: 0; padding: 0; }
-  #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s ease-in-out; }
+  #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s ease-in-out; will-change: transform; }
   #map.loaded { opacity: 1; }
   #map-error {
     position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
@@ -331,6 +331,24 @@ var globalPopup = null;
 var mapInitiated = false;
 var CONDITION_TERMS = ['Existing Condition', 'Fenced Development Site', 'Demolition & Site Works', 'Active Construction Site', 'Completed Development'];
 var CAT_ARRAY_KEYS = { condition: 'conditionArr', typology: 'typologyArr', urban: 'urbanArr', year: 'yearArr' };
+var MAP_STATE_KEY = 'pi_map_state';
+
+function saveMapState(partial) {
+  var existing = {};
+  try {
+    var raw = sessionStorage.getItem(MAP_STATE_KEY);
+    if (raw) existing = JSON.parse(raw);
+  } catch (e) {}
+  for (var k in partial) { existing[k] = partial[k]; }
+  try { sessionStorage.setItem(MAP_STATE_KEY, JSON.stringify(existing)); } catch (e) {}
+}
+
+function loadMapState() {
+  try {
+    var raw = sessionStorage.getItem(MAP_STATE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
 
 function normalizeKey(s) { return (s || '').toLowerCase().trim(); }
 
@@ -440,6 +458,7 @@ function applySearchState() {
     badge.textContent = n;
     badge.style.display = n > 0 ? 'inline-flex' : 'none';
   }
+  saveMapState({ suburb: searchState.suburb, categories: searchState.categories });
 }
 
 function annotateFilterCoverage() {
@@ -492,10 +511,34 @@ function renderList(items) {
   wrap.appendChild(frag);
 }
 
+function restoreSavedFilters() {
+  var saved = loadMapState();
+  if (!saved) return;
+  if (saved.suburb) {
+    searchState.suburb = saved.suburb;
+    var radio = document.querySelector('.suburb-check[value="' + saved.suburb + '"]');
+    if (radio) radio.checked = true;
+    var searchInput = document.getElementById('pi-search-input');
+    var clearBtn = document.getElementById('pi-search-clear');
+    if (searchInput) { searchInput.value = saved.suburb; }
+    if (clearBtn) { clearBtn.style.display = saved.suburb ? 'block' : 'none'; }
+  }
+  if (saved.categories) {
+    searchState.categories = saved.categories;
+    for (var cat in saved.categories) {
+      (saved.categories[cat] || []).forEach(function(val) {
+        var cb = document.querySelector('.filter-check[data-cat="' + cat + '"][value="' + val + '"]');
+        if (cb) cb.checked = true;
+      });
+    }
+  }
+  applySearchState();
+}
+
 function loadInitialData() {
   Promise.all([
-    fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/locations.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }),
-    fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/medias.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }).catch(function() { return ''; })
+    fetch('https://cdn.jsdelivr.net/gh/sproutssorbets/bne-urban-index@main/locations.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }),
+    fetch('https://cdn.jsdelivr.net/gh/sproutssorbets/bne-urban-index@main/medias.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }).catch(function() { return ''; })
   ])
   .then(function(results) {
     var csvText = results[0];
@@ -597,6 +640,7 @@ function loadInitialData() {
     if (archiveCountEl) archiveCountEl.textContent = locations.length + ' LOCATIONS';
     var indexCount = document.getElementById('index-count');
     if (indexCount) indexCount.textContent = '(' + locations.length + ')';
+    restoreSavedFilters();
   })
   .catch(function() {});
 }
@@ -606,22 +650,30 @@ function initMapLazy() {
   mapInitiated = true;
   var css = document.createElement('link');
   css.rel = 'stylesheet';
-  css.href = 'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css';
+  css.href = 'https://api.mapbox.com/mapbox-gl-js/v3.28.1/mapbox-gl.css';
   document.head.appendChild(css);
   var js = document.createElement('script');
-  js.src = 'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js';
+  js.src = 'https://api.mapbox.com/mapbox-gl-js/v3.28.1/mapbox-gl.js';
   js.onload = function() {
     mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
     globalPopup = new mapboxgl.Popup({ offset: [0, -42], closeButton: true, className: 'pi-popup' });
+    var savedMapState = loadMapState();
+    var startCenter = (savedMapState && typeof savedMapState.lng === 'number' && typeof savedMapState.lat === 'number')
+      ? [savedMapState.lng, savedMapState.lat] : [153.0307, -27.4598];
+    var startZoom = (savedMapState && typeof savedMapState.zoom === 'number') ? savedMapState.zoom : 13;
     mapInstance = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/mapbox/light-v11',
-      center: [153.0307, -27.4598],
-      zoom: 13,
+      center: startCenter,
+      zoom: startZoom,
       fadeDuration: 0,
       attributionControl: false,
       maxTileCacheSize: 50,
       collectResourceTiming: false
+    });
+    mapInstance.on('moveend', function() {
+      var c = mapInstance.getCenter();
+      saveMapState({ lng: c.lng, lat: c.lat, zoom: mapInstance.getZoom() });
     });
     mapInstance.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
     window.piOpenPopupForLocation = function(loc) {
@@ -651,13 +703,17 @@ function initMapLazy() {
     };
     var index = 0;
     var CHUNK = 60;
+    // Jeden szablon budowany raz. cloneNode jest tańsze niż parsowanie tego samego
+    // innerHTML osobno dla każdej lokalizacji.
+    var markerTemplate = document.createElement('div');
+    markerTemplate.className = 'custom-marker-hitbox';
+    markerTemplate.innerHTML = '<div class="pi-pin"><div class="pi-pin-body"></div><div class="pi-pin-point"></div></div>';
     function mountMarkers() {
       var end = Math.min(index + CHUNK, locations.length);
       for (var i = index; i < end; i++) {
         var loc = locations[i];
-        var el = document.createElement('div');
-        el.className = 'custom-marker-hitbox';
-        el.innerHTML = '<div class="pi-pin"><div class="pi-pin-body">' + loc.count + '</div><div class="pi-pin-point"></div></div>';
+        var el = markerTemplate.cloneNode(true);
+        el.querySelector('.pi-pin-body').textContent = loc.count;
         loc.marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' })
           .setLngLat(loc.coords)
           .addTo(mapInstance);
@@ -688,9 +744,9 @@ loadInitialData();
 
 window.addEventListener('load', function() {
   if (window.requestIdleCallback) {
-    requestIdleCallback(function() { setTimeout(initMapLazy, 1000); });
+    requestIdleCallback(function() { setTimeout(initMapLazy, 2500); });
   } else {
-    setTimeout(initMapLazy, 1200);
+    setTimeout(initMapLazy, 3000);
   }
 });
 
