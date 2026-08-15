@@ -243,8 +243,10 @@
     #index-panel {
       position: fixed; inset: 0; width: 100% !important; height: 100% !important;
       z-index: 800; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
-      border-right: none;
+      border-right: none; overflow-y: auto;
     }
+    #index-group { flex: none; min-height: 0; }
+    #list-wrap { flex: none; overflow-y: visible; }
     #index-panel.mobile-active { transform: translateY(0); }
 
     .mobile-bar {
@@ -268,7 +270,7 @@
       background: #FFFFFF; color: var(--text);
     }
 
-    #map-wrap { height: calc(100dvh - 42px - 32px - 52px); }
+    #map-wrap { height: calc(100dvh - 42px - 52px); }
 
     /* Zakładka logu — szersza strefa dotyku (34px) bez powiększania wizualnego elementu,
        plus niewidoczny margines wewnętrzny rozszerzający hitbox w lewo. */
@@ -407,6 +409,7 @@
 
 <div class="mobile-bar">
   <button type="button" class="mobile-bar-btn" id="mobile-toggle-filters">Filters<span class="count-badge" id="mobile-filter-count" style="display:none;"></span></button>
+  <button type="button" class="mobile-bar-btn" id="mobile-toggle-index">Index</button>
   <a id="mobile-search-btn" class="mobile-bar-btn" href="https://www.photoindex.au/" target="_top">Search</a>
 </div>
 
@@ -539,17 +542,14 @@ function initMapboxApp() {
       });
       if (matched.size === 0) return;
 
+      // Tylko Physical Condition jest wystarczająco wiarygodny do automatycznego dopasowania:
+      // to jeden, konkretny, wieloczłonowy termin na zdjęcie ("Fenced Development Site"), mało
+      // podatny na przypadkową zgodność. Typology i Urban Context łapią pojedyncze, ogólne słowa
+      // ("residential", "heritage", "public"), które pojawiają się też jako szum z automatycznego
+      // opisu zdjęcia (np. budynek w tle), nie jako świadoma kategoryzacja tej lokalizacji —
+      // wyłączone, dopóki nie będzie czystszego źródła danych.
       var conditions = CONDITION_TERMS.filter(function (t) { return matched.has(t.toLowerCase()); });
-      var typologies = Object.keys(TYPOLOGY_GROUPS).filter(function (group) {
-        return TYPOLOGY_GROUPS[group].some(function (t) { return matched.has(t); });
-      });
-      var urbans = Object.keys(URBAN_GROUPS).filter(function (group) {
-        return URBAN_GROUPS[group].some(function (t) { return matched.has(t); });
-      });
-
       if (conditions.length) loc.condition = conditions.join(';');
-      if (typologies.length) loc.typology = typologies.join(';');
-      if (urbans.length) loc.urban = urbans.join(';');
     });
   }
 
@@ -1083,6 +1083,7 @@ document.addEventListener('DOMContentLoaded', function () {
   window.piCloseDrawer = closeDrawer;
 
   var mobileToggleBtn = document.getElementById('mobile-toggle-filters');
+  var mobileIndexBtn = document.getElementById('mobile-toggle-index');
   var indexPanel = document.getElementById('index-panel');
   var mobileCloseBtn = document.getElementById('mobile-panel-close');
 
@@ -1090,6 +1091,21 @@ document.addEventListener('DOMContentLoaded', function () {
     mobileToggleBtn.addEventListener('click', function() {
       indexPanel.classList.add('mobile-active');
       document.body.classList.add('pi-drawer-lock');
+      indexPanel.scrollTop = 0;
+    });
+  }
+  if (mobileIndexBtn && indexPanel) {
+    mobileIndexBtn.addEventListener('click', function() {
+      indexPanel.classList.add('mobile-active');
+      document.body.classList.add('pi-drawer-lock');
+      var indexGroup = document.getElementById('index-group');
+      if (indexGroup) {
+        // Otwarcie panelu i przewinięcie do listy w tej samej klatce animacji bywa
+        // ignorowane przez przeglądarkę, stąd małe opóźnienie.
+        setTimeout(function () {
+          indexGroup.scrollIntoView({ behavior: 'auto', block: 'start' });
+        }, 50);
+      }
     });
   }
   if (mobileCloseBtn && indexPanel) {
