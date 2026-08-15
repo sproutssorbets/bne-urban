@@ -382,7 +382,10 @@ function initMapboxApp() {
       }
 
       // --- GENEROWANIE SZUFLADY Z DANYCH CSV ---
-      var sortedBatches = Object.keys(batchesMap).filter(b => b !== 'UNKNOWN').sort().reverse();
+var sortedBatches = Object.keys(batchesMap).filter(b => b !== 'UNKNOWN').sort(function(a, b) {
+  // Przekształcamy tekst "20 June 2026" na prawdziwą datę, by poprawnie sprawdzić, co jest nowsze
+  return new Date(b) - new Date(a); 
+});
       var latestBatchId = sortedBatches[0]; 
       
       if (latestBatchId) {
