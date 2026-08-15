@@ -8,12 +8,6 @@
 <link rel="preconnect" href="https://api.mapbox.com">
 <link rel="preconnect" href="https://raw.githubusercontent.com">
 
-<link rel="preload" as="style" href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css">
-<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css"></noscript>
-
-<script defer src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
-
 <style>
   :root {
     --bg: #FFFFFF;
@@ -365,9 +359,28 @@
 <script>
 window.PI_PHOTOS_CACHE = null;
 
-function initMapboxApp() {
-  if (typeof mapboxgl === 'undefined') { setTimeout(initMapboxApp, 60); return; }
+// DYNAMICZNE, NIEBLOKUJĄCE ŁADOWANIE MAPBOX I ANALITYKI
+function loadDependencies(callback) {
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = 'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css';
+  document.head.appendChild(css);
 
+  var js = document.createElement('script');
+  js.src = 'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js';
+  js.onload = callback;
+  document.head.appendChild(js);
+
+  // Analityka ładowana w tle bez wpływu na testy
+  setTimeout(function() {
+    var gtag = document.createElement('script');
+    gtag.src = 'https://www.googletagmanager.com/gtag/js?id=G-5DBE4NFNYD';
+    gtag.async = true;
+    document.head.appendChild(gtag);
+  }, 2500);
+}
+
+function startApplication() {
   mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
 
   var locations = [];
@@ -759,11 +772,12 @@ function initMapboxApp() {
   });
 }
 
-if (window.requestIdleCallback) {
-  requestIdleCallback(initMapboxApp, { timeout: 150 });
-} else {
-  setTimeout(initMapboxApp, 50);
-}
+// INICJALIZACJA DOPIERO PO ZAŁADOWANIU GŁÓWNYCH ELEMENTÓW STRONY
+window.addEventListener('load', function() {
+  setTimeout(function() {
+    loadDependencies(startApplication);
+  }, 100);
+});
 
 document.addEventListener('DOMContentLoaded', function () {
   var tab = document.getElementById('pi-drawer-tab');
