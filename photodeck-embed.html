@@ -33,6 +33,7 @@
   body { display: flex; flex-direction: column; }
   body.pi-drawer-lock { overflow: hidden; }
 
+  /* GÓRNY PASEK */
   #topbar { background: var(--bg); flex-shrink: 0; z-index: 10; border-bottom: 1px solid var(--text); }
   #search-row { display: flex; align-items: center; height: 42px; padding: 0 16px; gap: 12px; background: var(--bg); }
   .search-lead-icon { width: 14px; height: 14px; flex-shrink: 0; stroke: var(--text); }
@@ -51,6 +52,7 @@
     font-weight: 500;
   }
 
+  /* UKŁAD GŁÓWNY */
   #layout { width: 100%; flex: 1 1 auto; min-height: 0; background: var(--bg); position: relative; display: flex; overflow: hidden; margin: 0; padding: 0; }
 
   #index-panel { width: 320px; flex-shrink: 0; position: relative; height: 100%; border-right: 1px solid var(--text); display: flex; flex-direction: column; background: var(--bg); z-index: 3; overflow-y: auto; }
@@ -91,6 +93,7 @@
   #pi-footer { padding: 16px 18px; background: var(--bg); border-top: 1px solid var(--text); flex-shrink: 0; }
   .pi-footer-stat { font-size: 9px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); margin-top: 10px; }
 
+  /* MAPA */
   #map-wrap { flex: 1; position: relative; height: 100%; background: #F8F8F8; margin: 0; padding: 0; }
   #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s ease-in-out; }
   #map.loaded { opacity: 1; }
@@ -102,7 +105,15 @@
   #map-error.visible { display: flex; }
   #map-error-text { font-size: 11px; letter-spacing: 0.06em; color: var(--subtext); max-width: 320px; line-height: 1.6; }
 
-  .custom-marker-hitbox { width: 36px; height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transform: translate3d(0,0,0); }
+  /* MARKERY Z WILL-CHANGE I CONTAIN DLA WYELIMINOWANIA FORCED REFLOW */
+  .custom-marker-hitbox {
+    width: 36px; height: 44px;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+    cursor: pointer;
+    transform: translate3d(0,0,0);
+    will-change: transform;
+    contain: layout style;
+  }
   .pi-pin { display: flex; flex-direction: column; align-items: center; }
   .pi-pin-body { min-width: 22px; height: 22px; padding: 0 5px; background: var(--text); color: #FFFFFF; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
   .pi-pin-point { width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 4px solid var(--text); }
@@ -131,7 +142,6 @@
     font-size: 9px; font-weight: 700; letter-spacing: 0.16em; font-family: inherit;
   }
 
-  /* Zielony wskaźnik nowości w Update Log */
   #pi-drawer-dot { width: 6px; height: 6px; flex-shrink: 0; background: #00C853; transition: opacity 0.3s ease; }
   #pi-drawer-dot.hidden { opacity: 0; pointer-events: none; }
 
@@ -173,7 +183,6 @@
   .pi-log-link .arrow { opacity: 0; transform: translateX(-4px); font-size: 11px; }
   .pi-log-link:hover .arrow { opacity: 1; transform: translateX(0); }
 
-  /* Siatka miniatur zdjęć */
   .pi-drawer-thumbs { column-count: 2; column-gap: 6px; margin-top: 6px; }
   .pi-thumb-card { break-inside: avoid; margin-bottom: 6px; background: var(--panel); border: 1px solid var(--line-light); overflow: hidden; }
   .pi-thumb-card img { width: 100%; height: auto; display: block; }
@@ -333,7 +342,6 @@
   </main>
 </div>
 
-<!-- SZUFLADA LOGÓW Z ZIELONĄ KROPKĄ -->
 <div id="pi-drawer-backdrop"></div>
 <button id="pi-drawer-tab" type="button" aria-expanded="false" aria-controls="pi-drawer-panel">
   <span id="pi-drawer-tab-inner">
@@ -361,6 +369,9 @@
 </aside>
 
 <script>
+// 1. WERSJONOWANIE DANYCH DLA DISK CACHE (ZMIENIAJ PRZY AKTUALIZACJI ZDJĘĆ)
+var DATA_VERSION = '20260815';
+
 window.PI_PHOTOS_CACHE = null;
 var locations = [];
 var searchState = { text: '', suburb: '', categories: {} };
@@ -438,6 +449,7 @@ function countActiveFilters() {
   return n;
 }
 
+// 4. ZOPTYMALIZOWANE FILTROWANIE Z UŻYCIEM SET.HAS() O(1)
 function applySearchState() {
   var visibleLocs = locations.filter(loc => {
     var matchesText = !searchState.text || loc.street.toLowerCase().includes(searchState.text) || loc.suburb.toLowerCase().includes(searchState.text);
@@ -453,9 +465,10 @@ function applySearchState() {
     return matchesText && matchesSuburb && matchesCategories;
   });
 
-  locations.forEach(loc => {
+  var visibleSet = new Set(visibleLocs);
+  locations.forEach(function(loc) {
     if (loc.marker) {
-      loc.marker.getElement().style.display = (visibleLocs.indexOf(loc) !== -1) ? '' : 'none';
+      loc.marker.getElement().style.display = visibleSet.has(loc) ? '' : 'none';
     }
   });
 
@@ -530,11 +543,11 @@ function renderList(items) {
   wrap.appendChild(frag);
 }
 
+// 1. POBIERANIE CSV Z WYKORZYSTANIEM PAMIĘCI PODRĘCZNEJ
 function loadInitialData() {
-  var ts = Date.now();
   Promise.all([
-    fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/locations.csv?t=' + ts).then(r => r.ok ? r.text() : ''),
-    fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/medias.csv?t=' + ts).then(r => r.ok ? r.text() : '').catch(() => '')
+    fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/locations.csv?v=' + DATA_VERSION).then(r => r.ok ? r.text() : ''),
+    fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/medias.csv?v=' + DATA_VERSION).then(r => r.ok ? r.text() : '').catch(() => '')
   ])
   .then(function ([csvText, mediaCsvText]) {
     if (!csvText || !csvText.trim()) return;
@@ -611,7 +624,6 @@ function loadInitialData() {
         });
       }
 
-      // KROPKA NOWOŚCI (24h)
       var dot = document.getElementById('pi-drawer-dot');
       if (dot) {
         var storageKey = 'pi_archive_seen_time_' + latestBatchId;
@@ -638,6 +650,7 @@ function loadInitialData() {
   .catch(() => {});
 }
 
+// 5. ZOPTYMALIZOWANA INICJALIZACJA MAPY
 function initMapLazy() {
   if (mapInitiated) return;
   mapInitiated = true;
@@ -659,7 +672,9 @@ function initMapLazy() {
       center: [153.0307, -27.4598],
       zoom: 13,
       fadeDuration: 0,
-      attributionControl: false
+      attributionControl: false,
+      maxTileCacheSize: 50,
+      collectResourceTiming: false
     });
     mapInstance.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
 
@@ -686,19 +701,29 @@ function initMapLazy() {
       }
     };
 
+    // 2. SZYBSZE MONTOWANIE MARKERÓW (CHUNK 60, RAF, CLOSURE)
     var index = 0;
+    var CHUNK = 60;
     function mountMarkers() {
-      var chunk = locations.slice(index, index + 35);
-      chunk.forEach(loc => {
+      var end = Math.min(index + CHUNK, locations.length);
+      for (var i = index; i < end; i++) {
+        var loc = locations[i];
         var el = document.createElement('div');
         el.className = 'custom-marker-hitbox';
         el.innerHTML = '<div class="pi-pin"><div class="pi-pin-body">' + loc.count + '</div><div class="pi-pin-point"></div></div>';
-        loc.marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' }).setLngLat(loc.coords).addTo(mapInstance);
-        el.addEventListener('click', (ev) => { ev.stopPropagation(); window.piOpenPopupForLocation(loc); });
-      });
-      index += 35;
+        loc.marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' })
+          .setLngLat(loc.coords)
+          .addTo(mapInstance);
+        el.addEventListener('click', (function(l) {
+          return function(ev) {
+            ev.stopPropagation();
+            window.piOpenPopupForLocation(l);
+          };
+        })(loc));
+      }
+      index = end;
       if (index < locations.length) {
-        setTimeout(mountMarkers, 4);
+        requestAnimationFrame(mountMarkers);
       } else {
         document.getElementById('map').classList.add('loaded');
       }
@@ -722,10 +747,12 @@ window.addEventListener('load', function() {
   }
 });
 
-// INTERFEJS, FILTRY I SZUFLADA
+// 3. DEBOUNCE WYSZUKIWANIA ORAZ INTERFEJS
 document.addEventListener('DOMContentLoaded', function () {
   var searchInput = document.getElementById('pi-search-input');
   var clearBtn = document.getElementById('pi-search-clear');
+  var searchTimeout = null;
+
   if (searchInput && clearBtn) {
     clearBtn.addEventListener('click', function () {
       searchInput.value = '';
@@ -740,8 +767,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     searchInput.addEventListener('input', function () {
       clearBtn.style.display = this.value ? 'block' : 'none';
-      searchState.text = this.value.trim().toLowerCase();
-      applySearchState();
+      clearTimeout(searchTimeout);
+      var val = this.value.trim().toLowerCase();
+      searchTimeout = setTimeout(function() {
+        searchState.text = val;
+        applySearchState();
+      }, 120);
     });
   }
 
@@ -788,6 +819,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
+  // OBSŁUGA PASKA MOBILNEGO
   var mobileToggleBtn = document.getElementById('mobile-toggle-filters');
   var mobileIndexBtn = document.getElementById('mobile-toggle-index');
   var indexPanel = document.getElementById('index-panel');
@@ -819,6 +851,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  // GEST SWIPE W DÓŁ NA MOBILE
   if (indexPanel) {
     var touchStartY = null;
     indexPanel.addEventListener('touchstart', function (ev) {
@@ -840,7 +873,7 @@ document.addEventListener('DOMContentLoaded', function () {
     indexPanel.addEventListener('touchend', function () { touchStartY = null; }, { passive: true });
   }
 
-  // OBSŁUGA DRAWERA I POBIERANIA ZDJĘĆ Z GITHUB
+  // OBSŁUGA DRAWERA I POBIERANIA MINIATUR Z GITHUB
   var tab = document.getElementById('pi-drawer-tab');
   var panel = document.getElementById('pi-drawer-panel');
   var closeBtn = document.getElementById('pi-drawer-close');
