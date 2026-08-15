@@ -4,8 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>PHOTOINDEX - Spatial Database</title>
+
+<!-- Preload zasobów dla błyskawicznego powrotu z podstron -->
 <link rel="preconnect" href="https://api.mapbox.com">
 <link rel="preconnect" href="https://raw.githubusercontent.com">
+<link rel="preload" href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js" as="script">
+<link rel="preload" href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" as="style">
+
 <style>
   :root {
     --bg: #FFFFFF;
@@ -78,7 +83,7 @@
   #pi-footer { padding: 16px 18px; background: var(--bg); border-top: 1px solid var(--text); flex-shrink: 0; }
   .pi-footer-stat { font-size: 9px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); margin-top: 10px; }
   #map-wrap { flex: 1; position: relative; height: 100%; background: #F8F8F8; margin: 0; padding: 0; }
-  #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s ease-in-out; will-change: transform; }
+  #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.2s ease-in-out; }
   #map.loaded { opacity: 1; }
   #map-error {
     position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
@@ -514,9 +519,7 @@ function renderList(items) {
 function restoreSavedFilters() {
   var saved = loadMapState();
   if (!saved) return;
-  var hasFilters = false;
   if (saved.suburb) {
-    hasFilters = true;
     searchState.suburb = saved.suburb;
     var radio = document.querySelector('.suburb-check[value="' + saved.suburb + '"]');
     if (radio) radio.checked = true;
@@ -525,8 +528,7 @@ function restoreSavedFilters() {
     if (searchInput) { searchInput.value = saved.suburb; }
     if (clearBtn) { clearBtn.style.display = saved.suburb ? 'block' : 'none'; }
   }
-  if (saved.categories && Object.keys(saved.categories).some(function(cat) { return (saved.categories[cat] || []).length > 0; })) {
-    hasFilters = true;
+  if (saved.categories) {
     searchState.categories = saved.categories;
     for (var cat in saved.categories) {
       (saved.categories[cat] || []).forEach(function(val) {
@@ -535,226 +537,237 @@ function restoreSavedFilters() {
       });
     }
   }
-  // applySearchState renderuje listę od nowa, więc odpalamy ją tylko gdy faktycznie
-  // jest jakiś zapisany filtr do przywrócenia. Sama pozycja mapy bez filtrów
-  // nie wymaga ponownego renderu listy lokalizacji.
-  if (hasFilters) applySearchState();
+  applySearchState();
 }
 
-function loadInitialData() {
-  Promise.all([
-    fetch('https://cdn.jsdelivr.net/gh/sproutssorbets/bne-urban-index@main/locations.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }),
-    fetch('https://cdn.jsdelivr.net/gh/sproutssorbets/bne-urban-index@main/medias.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }).catch(function() { return ''; })
-  ])
-  .then(function(results) {
-    var csvText = results[0];
-    var mediaCsvText = results[1];
-    if (!csvText || !csvText.trim()) return;
-    var lines = csvText.trim().split('\n');
-    var headers = lines[0].split(',').map(function(h) { return h.trim(); });
-    locations = [];
-    var totalArchiveRecords = 0;
-    var batchesMap = {};
-    for (var i = 1; i < lines.length; i++) {
-      var line = lines[i];
-      if (!line) continue;
-      var cols = splitCsvLine(line, ',');
-      var row = {};
-      headers.forEach(function(h, idx) { row[h] = (cols[idx] || '').trim(); });
-      var count = parseInt(row.count, 10) || 1;
-      totalArchiveRecords += count;
-      var locData = {
-        ref: row.ref || 'PX.26.000',
-        street: row.address || row.street || 'Unnamed location',
-        suburb: row.suburb || 'Brisbane City',
-        condition: row.condition || '',
-        typology: row.typology || '',
-        urban: row.urban || '',
-        year: row.year || (row.date ? row.date.slice(-4) : ''),
-        count: count,
-        dates: row.shoot_dates || row.date || '',
-        coords: [parseFloat(row.lng), parseFloat(row.lat)],
-        archiveUrl: row.archiveUrl || '#'
-      };
-      locData.streetLc = locData.street.toLowerCase();
-      locData.suburbLc = locData.suburb.toLowerCase();
-      locData.typologyArr = splitCatValue(locData.typology);
-      locData.urbanArr = splitCatValue(locData.urban);
-      locData.yearArr = splitCatValue(locData.year);
-      if (!isNaN(locData.coords[0]) && !isNaN(locData.coords[1])) {
-        locations.push(locData);
-      }
-      var batchId = row.update_batch || 'UNKNOWN';
-      if (!batchesMap[batchId]) batchesMap[batchId] = [];
-      batchesMap[batchId].push(locData);
+// PROMISE GWARANTUJĄCY POBRANIE I SPARSOWANIE DANYCH PRZED STARTEM MAPY
+var dataReadyPromise = Promise.all([
+  fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/locations.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }),
+  fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/medias.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }).catch(function() { return ''; })
+])
+.then(function(results) {
+  var csvText = results[0];
+  var mediaCsvText = results[1];
+  if (!csvText || !csvText.trim()) return;
+  var lines = csvText.trim().split('\n');
+  var headers = lines[0].split(',').map(function(h) { return h.trim(); });
+  locations = [];
+  var totalArchiveRecords = 0;
+  var batchesMap = {};
+  for (var i = 1; i < lines.length; i++) {
+    var line = lines[i];
+    if (!line) continue;
+    var cols = splitCsvLine(line, ',');
+    var row = {};
+    headers.forEach(function(h, idx) { row[h] = (cols[idx] || '').trim(); });
+    var count = parseInt(row.count, 10) || 1;
+    totalArchiveRecords += count;
+    var locData = {
+      ref: row.ref || 'PX.26.000',
+      street: row.address || row.street || 'Unnamed location',
+      suburb: row.suburb || 'Brisbane City',
+      condition: row.condition || '',
+      typology: row.typology || '',
+      urban: row.urban || '',
+      year: row.year || (row.date ? row.date.slice(-4) : ''),
+      count: count,
+      dates: row.shoot_dates || row.date || '',
+      coords: [parseFloat(row.lng), parseFloat(row.lat)],
+      archiveUrl: row.archiveUrl || '#'
+    };
+    locData.streetLc = locData.street.toLowerCase();
+    locData.suburbLc = locData.suburb.toLowerCase();
+    locData.typologyArr = splitCatValue(locData.typology);
+    locData.urbanArr = splitCatValue(locData.urban);
+    locData.yearArr = splitCatValue(locData.year);
+    if (!isNaN(locData.coords[0]) && !isNaN(locData.coords[1])) {
+      locations.push(locData);
     }
-    if (mediaCsvText) {
-      applyMediaTagsToLocations(parseMediasCsv(mediaCsvText));
-    }
-    locations.forEach(function(loc) { loc.conditionArr = splitCatValue(loc.condition); });
-    var sortedBatches = Object.keys(batchesMap).filter(function(b) { return b !== 'UNKNOWN'; }).sort(function(a, b) {
-      var timeA = new Date(a).getTime();
-      var timeB = new Date(b).getTime();
-      if (!isNaN(timeA) && !isNaN(timeB)) return timeB - timeA;
-      return b.localeCompare(a);
-    });
-    var latestBatchId = sortedBatches[0];
-    if (latestBatchId) {
-      var latestRecords = batchesMap[latestBatchId];
-      var latestTotalCount = latestRecords.reduce(function(acc, r) { return acc + r.count; }, 0);
-      var elDrawerIdx = document.getElementById('pi-drawer-index');
-      if (elDrawerIdx) elDrawerIdx.innerHTML = 'UPDATE &middot; ' + latestBatchId.toUpperCase();
-      var elDrawerTitle = document.getElementById('pi-drawer-title');
-      if (elDrawerTitle) elDrawerTitle.textContent = latestTotalCount + ' new records documented';
-      var elDrawerSub = document.getElementById('pi-drawer-sub');
-      if (elDrawerSub) elDrawerSub.textContent = 'Archive total: ' + totalArchiveRecords + ' records';
-      var logContainer = document.getElementById('pi-drawer-log');
-      if (logContainer) {
-        logContainer.innerHTML = latestRecords.map(function(rec) {
-          var padCount = rec.count.toString().padStart(2, '0');
-          var linkUrl = rec.archiveUrl || 'https://www.photoindex.au/';
-          return '<a href="' + linkUrl + '" target="_top" class="pi-log-link" data-query="' + rec.street + '">' +
-                   '<span class="loc">' + rec.street + '</span>' +
-                   '<span class="stats"><span class="count">' + padCount + '</span><span class="arrow">→</span></span>' +
-                 '</a>';
-        }).join('');
-        logContainer.querySelectorAll('.pi-log-link').forEach(function(link) {
-          link.addEventListener('mouseenter', function() {
-            var q = this.getAttribute('data-query');
-            if (window.piFlyToQuery) window.piFlyToQuery(q);
-          });
+    var batchId = row.update_batch || 'UNKNOWN';
+    if (!batchesMap[batchId]) batchesMap[batchId] = [];
+    batchesMap[batchId].push(locData);
+  }
+  if (mediaCsvText) {
+    applyMediaTagsToLocations(parseMediasCsv(mediaCsvText));
+  }
+  locations.forEach(function(loc) { loc.conditionArr = splitCatValue(loc.condition); });
+  var sortedBatches = Object.keys(batchesMap).filter(function(b) { return b !== 'UNKNOWN'; }).sort(function(a, b) {
+    var timeA = new Date(a).getTime();
+    var timeB = new Date(b).getTime();
+    if (!isNaN(timeA) && !isNaN(timeB)) return timeB - timeA;
+    return b.localeCompare(a);
+  });
+  var latestBatchId = sortedBatches[0];
+  if (latestBatchId) {
+    var latestRecords = batchesMap[latestBatchId];
+    var latestTotalCount = latestRecords.reduce(function(acc, r) { return acc + r.count; }, 0);
+    var elDrawerIdx = document.getElementById('pi-drawer-index');
+    if (elDrawerIdx) elDrawerIdx.innerHTML = 'UPDATE &middot; ' + latestBatchId.toUpperCase();
+    var elDrawerTitle = document.getElementById('pi-drawer-title');
+    if (elDrawerTitle) elDrawerTitle.textContent = latestTotalCount + ' new records documented';
+    var elDrawerSub = document.getElementById('pi-drawer-sub');
+    if (elDrawerSub) elDrawerSub.textContent = 'Archive total: ' + totalArchiveRecords + ' records';
+    var logContainer = document.getElementById('pi-drawer-log');
+    if (logContainer) {
+      logContainer.innerHTML = latestRecords.map(function(rec) {
+        var padCount = rec.count.toString().padStart(2, '0');
+        var linkUrl = rec.archiveUrl || 'https://www.photoindex.au/';
+        return '<a href="' + linkUrl + '" target="_top" class="pi-log-link" data-query="' + rec.street + '">' +
+                 '<span class="loc">' + rec.street + '</span>' +
+                 '<span class="stats"><span class="count">' + padCount + '</span><span class="arrow">→</span></span>' +
+               '</a>';
+      }).join('');
+      logContainer.querySelectorAll('.pi-log-link').forEach(function(link) {
+        link.addEventListener('mouseenter', function() {
+          var q = this.getAttribute('data-query');
+          if (window.piFlyToQuery) window.piFlyToQuery(q);
         });
-      }
-      var dot = document.getElementById('pi-drawer-dot');
-      if (dot) {
-        var storageKey = 'pi_archive_seen_time_' + latestBatchId;
-        var firstSeenTime = localStorage.getItem(storageKey);
-        var now = Date.now();
-        if (!firstSeenTime) {
-          localStorage.setItem(storageKey, now);
-          dot.classList.remove('hidden');
-        } else if (now - parseInt(firstSeenTime, 10) < 86400000) {
-          dot.classList.remove('hidden');
-        } else {
-          dot.classList.add('hidden');
-        }
+      });
+    }
+    var dot = document.getElementById('pi-drawer-dot');
+    if (dot) {
+      var storageKey = 'pi_archive_seen_time_' + latestBatchId;
+      var firstSeenTime = localStorage.getItem(storageKey);
+      var now = Date.now();
+      if (!firstSeenTime) {
+        localStorage.setItem(storageKey, now);
+        dot.classList.remove('hidden');
+      } else if (now - parseInt(firstSeenTime, 10) < 86400000) {
+        dot.classList.remove('hidden');
+      } else {
+        dot.classList.add('hidden');
       }
     }
-    annotateFilterCoverage();
-    renderList(locations);
-    var archiveCountEl = document.getElementById('archive-count');
-    if (archiveCountEl) archiveCountEl.textContent = locations.length + ' LOCATIONS';
-    var indexCount = document.getElementById('index-count');
-    if (indexCount) indexCount.textContent = '(' + locations.length + ')';
-    restoreSavedFilters();
-  })
-  .catch(function() {});
-}
+  }
+  annotateFilterCoverage();
+  renderList(locations);
+  var archiveCountEl = document.getElementById('archive-count');
+  if (archiveCountEl) archiveCountEl.textContent = locations.length + ' LOCATIONS';
+  var indexCount = document.getElementById('index-count');
+  if (indexCount) indexCount.textContent = '(' + locations.length + ')';
+  restoreSavedFilters();
+  return true;
+})
+.catch(function() { return false; });
 
 function initMapLazy() {
   if (mapInitiated) return;
   mapInitiated = true;
-  var css = document.createElement('link');
-  css.rel = 'stylesheet';
-  css.href = 'https://api.mapbox.com/mapbox-gl-js/v3.28.1/mapbox-gl.css';
-  document.head.appendChild(css);
-  var js = document.createElement('script');
-  js.src = 'https://api.mapbox.com/mapbox-gl-js/v3.28.1/mapbox-gl.js';
-  js.onload = function() {
-    mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
-    globalPopup = new mapboxgl.Popup({ offset: [0, -42], closeButton: true, className: 'pi-popup' });
-    var savedMapState = loadMapState();
-    var startCenter = (savedMapState && typeof savedMapState.lng === 'number' && typeof savedMapState.lat === 'number')
-      ? [savedMapState.lng, savedMapState.lat] : [153.0307, -27.4598];
-    var startZoom = (savedMapState && typeof savedMapState.zoom === 'number') ? savedMapState.zoom : 13;
-    mapInstance = new mapboxgl.Map({
-      container: 'map',
-      style: 'mapbox://styles/mapbox/light-v11',
-      center: startCenter,
-      zoom: startZoom,
-      fadeDuration: 0,
-      attributionControl: false,
-      maxTileCacheSize: 50,
-      collectResourceTiming: false
-    });
-    mapInstance.on('moveend', function() {
-      var c = mapInstance.getCenter();
-      saveMapState({ lng: c.lng, lat: c.lat, zoom: mapInstance.getZoom() });
-    });
-    mapInstance.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
-    window.piOpenPopupForLocation = function(loc) {
-      var datesList = loc.dates ? loc.dates.split(';').map(function(d) { return d.trim(); }).filter(Boolean) : [];
-      var datesDesc = datesList.slice().reverse();
-      var rows = [['Suburb', loc.suburb], ['Photos', String(loc.count)]];
-      datesDesc.forEach(function(d, i) { rows.push([i === 0 ? 'Photographed' : '', d]); });
-      var rowsHtml = rows.map(function(r) {
-        return '<div style="display:flex;justify-content:space-between;gap:12px;font-size:10px;padding:3px 0;"><span style="color:var(--subtext);text-transform:uppercase;">' + r[0] + '</span><span style="color:var(--text);font-weight:500;">' + r[1] + '</span></div>';
-      }).join('');
-      var popupHtml = '<div style="min-width:180px;position:relative;"><div class="pi-popup-title">' + loc.street + '</div><div style="border-top:1px solid var(--text);border-bottom:1px solid var(--text);padding:6px 0;margin-bottom:8px;">' + rowsHtml + '</div><a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:var(--text);color:#FFF;padding:8px;font-size:9px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;">OPEN RECORD →</a></div>';
-      globalPopup.setLngLat(loc.coords).setHTML(popupHtml).addTo(mapInstance);
-    };
-    window.piFlyToQuery = function(query) {
-      if (!query || !locations || !locations.length) return;
-      var match = locations.find(function(l) {
-        return l.street.toLowerCase().includes(query.toLowerCase()) || l.suburb.toLowerCase() === query.toLowerCase();
+
+  dataReadyPromise.then(function() {
+    var css = document.createElement('link');
+    css.rel = 'stylesheet';
+    css.href = 'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css';
+    document.head.appendChild(css);
+
+    var js = document.createElement('script');
+    js.src = 'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js';
+    js.onload = function() {
+      mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
+      globalPopup = new mapboxgl.Popup({ offset: [0, -42], closeButton: true, className: 'pi-popup' });
+      var savedMapState = loadMapState();
+      var startCenter = (savedMapState && typeof savedMapState.lng === 'number' && typeof savedMapState.lat === 'number')
+        ? [savedMapState.lng, savedMapState.lat] : [153.0307, -27.4598];
+      var startZoom = (savedMapState && typeof savedMapState.zoom === 'number') ? savedMapState.zoom : 13;
+      
+      mapInstance = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/light-v11',
+        center: startCenter,
+        zoom: startZoom,
+        fadeDuration: 0,
+        attributionControl: false,
+        maxTileCacheSize: 50,
+        collectResourceTiming: false
       });
-      if (match) {
-        if (window.innerWidth <= 720) {
-          document.getElementById('index-panel').classList.remove('mobile-active');
-          document.body.classList.remove('pi-drawer-lock');
+
+      mapInstance.on('moveend', function() {
+        var c = mapInstance.getCenter();
+        saveMapState({ lng: c.lng, lat: c.lat, zoom: mapInstance.getZoom() });
+      });
+
+      mapInstance.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
+
+      window.piOpenPopupForLocation = function(loc) {
+        var datesList = loc.dates ? loc.dates.split(';').map(function(d) { return d.trim(); }).filter(Boolean) : [];
+        var datesDesc = datesList.slice().reverse();
+        var rows = [['Suburb', loc.suburb], ['Photos', String(loc.count)]];
+        datesDesc.forEach(function(d, i) { rows.push([i === 0 ? 'Photographed' : '', d]); });
+        var rowsHtml = rows.map(function(r) {
+          return '<div style="display:flex;justify-content:space-between;gap:12px;font-size:10px;padding:3px 0;"><span style="color:var(--subtext);text-transform:uppercase;">' + r[0] + '</span><span style="color:var(--text);font-weight:500;">' + r[1] + '</span></div>';
+        }).join('');
+        var popupHtml = '<div style="min-width:180px;position:relative;"><div class="pi-popup-title">' + loc.street + '</div><div style="border-top:1px solid var(--text);border-bottom:1px solid var(--text);padding:6px 0;margin-bottom:8px;">' + rowsHtml + '</div><a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:var(--text);color:#FFF;padding:8px;font-size:9px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;">OPEN RECORD →</a></div>';
+        globalPopup.setLngLat(loc.coords).setHTML(popupHtml).addTo(mapInstance);
+      };
+
+      window.piFlyToQuery = function(query) {
+        if (!query || !locations || !locations.length) return;
+        var match = locations.find(function(l) {
+          return l.street.toLowerCase().includes(query.toLowerCase()) || l.suburb.toLowerCase() === query.toLowerCase();
+        });
+        if (match) {
+          if (window.innerWidth <= 720) {
+            document.getElementById('index-panel').classList.remove('mobile-active');
+            document.body.classList.remove('pi-drawer-lock');
+          }
+          mapInstance.flyTo({ center: match.coords, zoom: 15, speed: 1.2 });
+          if (window.piOpenPopupForLocation) window.piOpenPopupForLocation(match);
         }
-        mapInstance.flyTo({ center: match.coords, zoom: 15, speed: 1.2 });
-        if (window.piOpenPopupForLocation) window.piOpenPopupForLocation(match);
+      };
+
+      var index = 0;
+      var CHUNK = 60;
+      var markerTemplate = document.createElement('div');
+      markerTemplate.className = 'custom-marker-hitbox';
+      markerTemplate.innerHTML = '<div class="pi-pin"><div class="pi-pin-body"></div><div class="pi-pin-point"></div></div>';
+
+      function mountMarkers() {
+        var end = Math.min(index + CHUNK, locations.length);
+        for (var i = index; i < end; i++) {
+          var loc = locations[i];
+          var el = markerTemplate.cloneNode(true);
+          el.querySelector('.pi-pin-body').textContent = loc.count;
+          loc.marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' })
+            .setLngLat(loc.coords)
+            .addTo(mapInstance);
+          el.addEventListener('click', (function(l) {
+            return function(ev) {
+              ev.stopPropagation();
+              window.piOpenPopupForLocation(l);
+            };
+          })(loc));
+        }
+        index = end;
+        if (index < locations.length) {
+          requestAnimationFrame(mountMarkers);
+        } else {
+          document.getElementById('map').classList.add('loaded');
+          applySearchState();
+        }
       }
+      mountMarkers();
     };
-    var index = 0;
-    var CHUNK = 60;
-    // Jeden szablon budowany raz. cloneNode jest tańsze niż parsowanie tego samego
-    // innerHTML osobno dla każdej lokalizacji.
-    var markerTemplate = document.createElement('div');
-    markerTemplate.className = 'custom-marker-hitbox';
-    markerTemplate.innerHTML = '<div class="pi-pin"><div class="pi-pin-body"></div><div class="pi-pin-point"></div></div>';
-    function mountMarkers() {
-      var end = Math.min(index + CHUNK, locations.length);
-      for (var i = index; i < end; i++) {
-        var loc = locations[i];
-        var el = markerTemplate.cloneNode(true);
-        el.querySelector('.pi-pin-body').textContent = loc.count;
-        loc.marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' })
-          .setLngLat(loc.coords)
-          .addTo(mapInstance);
-        el.addEventListener('click', (function(l) {
-          return function(ev) {
-            ev.stopPropagation();
-            window.piOpenPopupForLocation(l);
-          };
-        })(loc));
-      }
-      index = end;
-      if (index < locations.length) {
-        requestAnimationFrame(mountMarkers);
-      } else {
-        document.getElementById('map').classList.add('loaded');
-      }
-    }
-    mountMarkers();
-  };
-  document.head.appendChild(js);
+    document.head.appendChild(js);
+  });
 }
 
-loadInitialData();
+// INICJALIZACJA: BŁYSKAWICZNA JEŚLI TO POWRÓT Z PODSTRONY LUB ODROCZONA DLA NOWEGO WEJŚCIA
+var existingSavedState = loadMapState();
+if (existingSavedState && typeof existingSavedState.lng === 'number') {
+  initMapLazy();
+} else {
+  ['mousemove', 'scroll', 'touchstart', 'keydown', 'click'].forEach(function(evt) {
+    window.addEventListener(evt, initMapLazy, { once: true, passive: true });
+  });
 
-['mousemove', 'scroll', 'touchstart', 'keydown', 'click'].forEach(function(evt) {
-  window.addEventListener(evt, initMapLazy, { once: true, passive: true });
-});
-
-window.addEventListener('load', function() {
-  if (window.requestIdleCallback) {
-    requestIdleCallback(function() { setTimeout(initMapLazy, 2500); });
-  } else {
-    setTimeout(initMapLazy, 3000);
-  }
-});
+  window.addEventListener('load', function() {
+    if (window.requestIdleCallback) {
+      requestIdleCallback(function() { setTimeout(initMapLazy, 2500); });
+    } else {
+      setTimeout(initMapLazy, 3000);
+    }
+  });
+}
 
 document.addEventListener('DOMContentLoaded', function() {
   var searchInput = document.getElementById('pi-search-input');
@@ -768,6 +781,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (defRadio) defRadio.checked = true;
       searchState.suburb = '';
       searchState.text = '';
+      sessionStorage.removeItem(MAP_STATE_KEY);
       applySearchState();
       if (mapInstance) mapInstance.flyTo({ center: [153.0307, -27.4598], zoom: 13, duration: 800 });
     });
@@ -820,7 +834,7 @@ document.addEventListener('DOMContentLoaded', function() {
       var cat = this.getAttribute('data-cat');
       if (!searchState.categories[cat]) searchState.categories[cat] = [];
       if (this.checked) searchState.categories[cat].push(this.value);
-      else searchState.categories[cat] = searchState.categories[cat].filter(function(v) { return v !== this.value; }.bind(this));
+      else searchState.categories[cat] = searchState.categories[cat].filter(function(v) { return v !== cb.value; });
       applySearchState();
     });
   });
