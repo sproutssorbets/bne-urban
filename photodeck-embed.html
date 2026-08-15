@@ -65,7 +65,7 @@
   /* --- GŁÓWNY UKŁAD MAPY I FILTRÓW --- */
   #layout { width: 100%; flex: 1 1 auto; min-height: 0; background: var(--bg); position: relative; display: flex; overflow: hidden; margin: 0; padding: 0; }
 
-  #index-panel { width: 320px; flex-shrink: 0; position: relative; height: 100%; border-right: 1px solid var(--text); display: flex; flex-direction: column; background: var(--bg); overflow-y: auto; z-index: 3; }
+  #index-panel { width: 320px; flex-shrink: 0; position: relative; height: 100%; border-right: 1px solid var(--text); display: flex; flex-direction: column; background: var(--bg); z-index: 3; }
 
   .mobile-only-header { display: none; }
   .mobile-grip { display: none; }
@@ -82,9 +82,14 @@
   .sub-category-title:first-child { margin-top: 0; }
   .acc-body label { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 6px 0; font-size: 12px; letter-spacing: 0.02em; color: #444444; transition: color 0.15s ease; }
   .acc-body label:hover { color: #000000; }
+  .acc-body label.no-data { opacity: 0.4; cursor: default; }
+  .acc-body label.no-data:hover { color: #444444; }
+  .filter-count { margin-left: auto; font-size: 11px; color: var(--subtext); }
   .acc-body input[type="checkbox"], .acc-body input[type="radio"] { -webkit-appearance: none; appearance: none; margin: 0; width: 12px; height: 12px; border: 1px solid var(--text); background: var(--bg); display: grid; place-content: center; flex-shrink: 0; }
   .acc-body input[type="radio"]:checked::before { content: ""; width: 6px; height: 6px; background: var(--text); }
   .acc-body input[type="checkbox"]:checked { background: var(--text); }
+
+  #filters-group { flex-shrink: 0; }
 
   /* LISTA (INDEX) — zawsze widoczna pod filtrami */
   #index-group { display: flex; flex-direction: column; flex: 1; min-height: 0; }
@@ -670,12 +675,49 @@ function initMapboxApp() {
         window.CURRENT_BATCH_ID = latestBatchId;
       }
 
+      annotateFilterCoverage();
+
       if (map.loaded()) setupMap(); else map.on('load', setupMap);
     })
     .catch(function (err) {
       console.error('PhotoIndex map: failed to load locations', err);
       showErrorState();
     });
+
+  // Przy każdej opcji filtra 2-5 pokazujemy, ile lokalizacji faktycznie ma taki tag w CSV.
+  // Opcje bez żadnego pokrycia są wyszarzone i zablokowane, żeby nie dawały fałszywego
+  // wrażenia, że filtr działa, skoro pole w locations.csv jest po prostu puste.
+  function annotateFilterCoverage() {
+    document.querySelectorAll('.filter-check').forEach(function (cb) {
+      var cat = cb.getAttribute('data-cat');
+      var val = cb.value;
+      var count = locations.filter(function (loc) {
+        var values = (loc[cat] || '').split(';').map(function (v) { return v.trim(); }).filter(Boolean);
+        return values.indexOf(val) !== -1;
+      }).length;
+
+      var label = cb.closest('label');
+      if (!label) return;
+
+      var existing = label.querySelector('.filter-count');
+      if (existing) existing.remove();
+
+      var countSpan = document.createElement('span');
+      countSpan.className = 'filter-count';
+      countSpan.textContent = count;
+      label.appendChild(countSpan);
+
+      if (count === 0) {
+        cb.disabled = true;
+        label.classList.add('no-data');
+        label.title = 'No locations tagged with this yet';
+      } else {
+        cb.disabled = false;
+        label.classList.remove('no-data');
+        label.title = '';
+      }
+    });
+  }
 
   function setupMap() {
     var activePopup = null;
