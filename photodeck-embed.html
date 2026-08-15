@@ -131,8 +131,9 @@
     font-size: 9px; font-weight: 700; letter-spacing: 0.16em; font-family: inherit;
   }
 
-  #pi-drawer-dot { width: 6px; height: 6px; flex-shrink: 0; background: #00C853; }
-  #pi-drawer-dot.hidden { opacity: 0; transform: scale(0); pointer-events: none; }
+  /* Zielony wskaźnik nowości w Update Log */
+  #pi-drawer-dot { width: 6px; height: 6px; flex-shrink: 0; background: #00C853; transition: opacity 0.3s ease; }
+  #pi-drawer-dot.hidden { opacity: 0; pointer-events: none; }
 
   #pi-drawer-backdrop {
     position: fixed; inset: 0; z-index: 600; opacity: 0; pointer-events: none;
@@ -172,6 +173,7 @@
   .pi-log-link .arrow { opacity: 0; transform: translateX(-4px); font-size: 11px; }
   .pi-log-link:hover .arrow { opacity: 1; transform: translateX(0); }
 
+  /* Siatka miniatur zdjęć */
   .pi-drawer-thumbs { column-count: 2; column-gap: 6px; margin-top: 6px; }
   .pi-thumb-card { break-inside: avoid; margin-bottom: 6px; background: var(--panel); border: 1px solid var(--line-light); overflow: hidden; }
   .pi-thumb-card img { width: 100%; height: auto; display: block; }
@@ -331,6 +333,7 @@
   </main>
 </div>
 
+<!-- SZUFLADA LOGÓW Z ZIELONĄ KROPKĄ -->
 <div id="pi-drawer-backdrop"></div>
 <button id="pi-drawer-tab" type="button" aria-expanded="false" aria-controls="pi-drawer-panel">
   <span id="pi-drawer-tab-inner">
@@ -599,8 +602,16 @@ function loadInitialData() {
                    '<span class="stats"><span class="count">' + padCount + '</span><span class="arrow">→</span></span>' +
                  '</a>';
         }).join('');
+
+        logContainer.querySelectorAll('.pi-log-link').forEach(function(link) {
+          link.addEventListener('mouseenter', function() {
+            var q = this.getAttribute('data-query');
+            if (window.piFlyToQuery) window.piFlyToQuery(q);
+          });
+        });
       }
 
+      // KROPKA NOWOŚCI (24h)
       var dot = document.getElementById('pi-drawer-dot');
       if (dot) {
         var storageKey = 'pi_archive_seen_time_' + latestBatchId;
@@ -662,6 +673,19 @@ function initMapLazy() {
       globalPopup.setLngLat(loc.coords).setHTML(popupHtml).addTo(mapInstance);
     };
 
+    window.piFlyToQuery = function(query) {
+      if (!query || !locations || !locations.length) return;
+      var match = locations.find(l => l.street.toLowerCase().includes(query.toLowerCase()) || l.suburb.toLowerCase() === query.toLowerCase());
+      if (match) {
+        if (window.innerWidth <= 720) {
+          document.getElementById('index-panel').classList.remove('mobile-active');
+          document.body.classList.remove('pi-drawer-lock');
+        }
+        mapInstance.flyTo({ center: match.coords, zoom: 15, speed: 1.2 });
+        if (window.piOpenPopupForLocation) window.piOpenPopupForLocation(match);
+      }
+    };
+
     var index = 0;
     function mountMarkers() {
       var chunk = locations.slice(index, index + 35);
@@ -698,7 +722,7 @@ window.addEventListener('load', function() {
   }
 });
 
-// PEŁNY INTERFEJS (DESKTOP + MOBILE)
+// INTERFEJS, FILTRY I SZUFLADA
 document.addEventListener('DOMContentLoaded', function () {
   var searchInput = document.getElementById('pi-search-input');
   var clearBtn = document.getElementById('pi-search-clear');
@@ -764,7 +788,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  // OBSŁUGA PASKA MOBILNEGO
   var mobileToggleBtn = document.getElementById('mobile-toggle-filters');
   var mobileIndexBtn = document.getElementById('mobile-toggle-index');
   var indexPanel = document.getElementById('index-panel');
@@ -796,7 +819,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // GEST SWIPE W DÓŁ NA MOBILE
   if (indexPanel) {
     var touchStartY = null;
     indexPanel.addEventListener('touchstart', function (ev) {
@@ -818,7 +840,7 @@ document.addEventListener('DOMContentLoaded', function () {
     indexPanel.addEventListener('touchend', function () { touchStartY = null; }, { passive: true });
   }
 
-  // SZUFLADA LOGÓW
+  // OBSŁUGA DRAWERA I POBIERANIA ZDJĘĆ Z GITHUB
   var tab = document.getElementById('pi-drawer-tab');
   var panel = document.getElementById('pi-drawer-panel');
   var closeBtn = document.getElementById('pi-drawer-close');
