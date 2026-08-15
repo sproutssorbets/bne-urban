@@ -5,17 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>PHOTOINDEX - Spatial Database</title>
 
-<!-- PRECONNECT DLA ZASOBÓW ZEWNĘTRZNYCH -->
+<!-- PRECONNECT TYLKO DLA KLUCZOWYCH DOMEN -->
 <link rel="preconnect" href="https://api.mapbox.com">
-<link rel="preconnect" href="https://events.mapbox.com">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://raw.githubusercontent.com">
-
-<!-- ASYNCHRONICZNE CZCIONKI (BEZ BLOKOWANIA FCP) -->
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"></noscript>
 
 <!-- ASYNCHRONICZNE STYLE MAPBOX -->
 <link rel="preload" as="style" href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css">
@@ -42,7 +34,7 @@
 
   html, body {
     width: 100%; height: 100%; height: 100dvh;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased;
     overflow: hidden;
   }
@@ -396,7 +388,7 @@
 window.PI_PHOTOS_CACHE = null;
 
 function initMapboxApp() {
-  if (typeof mapboxgl === 'undefined') { setTimeout(initMapboxApp, 50); return; }
+  if (typeof mapboxgl === 'undefined') { setTimeout(initMapboxApp, 60); return; }
 
   mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
 
@@ -421,7 +413,7 @@ function initMapboxApp() {
 
   function frameArea(center, bbox) {
     var bounds = bbox || bboxAroundPoint(center, 0.2);
-    map.fitBounds(bounds, { padding: 60, duration: 800, maxZoom: 14.5, essential: true });
+    map.fitBounds(bounds, { padding: 60, duration: 600, maxZoom: 14.5, essential: true });
   }
 
   var CONDITION_TERMS = ['Existing Condition', 'Fenced Development Site', 'Demolition & Site Works', 'Active Construction Site', 'Completed Development'];
@@ -440,25 +432,23 @@ function initMapboxApp() {
     return cols;
   }
 
-  function parseDelimitedCsv(text, delimiter) {
+  function parseMediasCsv(text) {
     var lines = text.trim().split('\n');
-    var headers = splitCsvLine(lines[0], delimiter).map(h => h.trim());
+    var headers = splitCsvLine(lines[0], ';').map(h => h.trim());
     var rows = [];
     for (var i = 1; i < lines.length; i++) {
       if (!lines[i]) continue;
-      var cols = splitCsvLine(lines[i], delimiter);
+      var cols = splitCsvLine(lines[i], ';');
       var row = {};
       headers.forEach((h, idx) => { row[h] = (cols[idx] || '').trim(); });
-      rows.push(row);
+      if (row.title) {
+        rows.push({
+          titleLower: normalizeKey(row.title),
+          keywordsLower: (row.keywords || '').split(',').map(k => k.trim().toLowerCase()).filter(Boolean)
+        });
+      }
     }
     return rows;
-  }
-
-  function parseMediasCsv(text) {
-    return parseDelimitedCsv(text, ';').map(row => ({
-      titleLower: normalizeKey(row.title),
-      keywordsLower: (row.keywords || '').split(',').map(k => k.trim().toLowerCase()).filter(Boolean)
-    })).filter(r => r.titleLower);
   }
 
   function applyMediaTagsToLocations(mediaRows) {
@@ -611,7 +601,7 @@ function initMapboxApp() {
     };
 
     var index = 0;
-    var batchSize = 25;
+    var batchSize = 30;
 
     function processBatch() {
       var chunk = locations.slice(index, index + batchSize);
@@ -739,7 +729,7 @@ function initMapboxApp() {
       searchState.suburb = '';
       searchState.text = '';
       applySearchState();
-      map.flyTo({ center: [153.0307, -27.4598], zoom: 13, duration: 1200 });
+      map.flyTo({ center: [153.0307, -27.4598], zoom: 13, duration: 800 });
     });
 
     searchInput.addEventListener('input', function () {
@@ -771,7 +761,7 @@ function initMapboxApp() {
           .then(r => r.json())
           .then(data => { if (data.features && data.features[0]) frameArea(data.features[0].center, data.features[0].bbox); });
       } else {
-        map.flyTo({ center: [153.0307, -27.4598], zoom: 13, duration: 1200 });
+        map.flyTo({ center: [153.0307, -27.4598], zoom: 13, duration: 800 });
       }
     });
   });
@@ -787,7 +777,12 @@ function initMapboxApp() {
   });
 }
 
-initMapboxApp();
+// ODRACZAMY START O JEDNĄ KLATKĘ DLA BŁYSKAWICZNEGO FCP
+if (window.requestIdleCallback) {
+  requestIdleCallback(initMapboxApp, { timeout: 150 });
+} else {
+  setTimeout(initMapboxApp, 50);
+}
 
 // SZUFLADA: LAZY LOADING MINIATUR NA ŻĄDANIE
 document.addEventListener('DOMContentLoaded', function () {
