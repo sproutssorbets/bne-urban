@@ -537,8 +537,8 @@ function restoreSavedFilters() {
 
 function loadInitialData() {
   Promise.all([
-    fetch('https://cdn.jsdelivr.net/gh/sproutssorbets/bne-urban-index@main/locations.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }),
-    fetch('https://cdn.jsdelivr.net/gh/sproutssorbets/bne-urban-index@main/medias.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }).catch(function() { return ''; })
+    fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/locations.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }),
+    fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/medias.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }).catch(function() { return ''; })
   ])
   .then(function(results) {
     var csvText = results[0];
@@ -661,6 +661,7 @@ function initMapLazy() {
     var startCenter = (savedMapState && typeof savedMapState.lng === 'number' && typeof savedMapState.lat === 'number')
       ? [savedMapState.lng, savedMapState.lat] : [153.0307, -27.4598];
     var startZoom = (savedMapState && typeof savedMapState.zoom === 'number') ? savedMapState.zoom : 13;
+    
     mapInstance = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/mapbox/light-v11',
@@ -736,17 +737,23 @@ function initMapLazy() {
 
 loadInitialData();
 
-['mousemove', 'scroll', 'touchstart', 'keydown', 'click'].forEach(function(evt) {
-  window.addEventListener(evt, initMapLazy, { once: true, passive: true });
-});
+// NATYCHMIASTOWY START JEŚLI WRACAMY ZE ZDJĘCIA (SESJA ZAPISANA) LUB STANDARDOWE ODROCZENIE
+var existingSavedState = loadMapState();
+if (existingSavedState && existingSavedState.lng) {
+  initMapLazy();
+} else {
+  ['mousemove', 'scroll', 'touchstart', 'keydown', 'click'].forEach(function(evt) {
+    window.addEventListener(evt, initMapLazy, { once: true, passive: true });
+  });
 
-window.addEventListener('load', function() {
-  if (window.requestIdleCallback) {
-    requestIdleCallback(function() { setTimeout(initMapLazy, 2500); });
-  } else {
-    setTimeout(initMapLazy, 3000);
-  }
-});
+  window.addEventListener('load', function() {
+    if (window.requestIdleCallback) {
+      requestIdleCallback(function() { setTimeout(initMapLazy, 2500); });
+    } else {
+      setTimeout(initMapLazy, 3000);
+    }
+  });
+}
 
 document.addEventListener('DOMContentLoaded', function() {
   var searchInput = document.getElementById('pi-search-input');
