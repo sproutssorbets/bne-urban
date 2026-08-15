@@ -330,8 +330,13 @@ var mapInstance = null;
 var globalPopup = null;
 var mapInitiated = false;
 var CONDITION_TERMS = ['Existing Condition', 'Fenced Development Site', 'Demolition & Site Works', 'Active Construction Site', 'Completed Development'];
+var CAT_ARRAY_KEYS = { condition: 'conditionArr', typology: 'typologyArr', urban: 'urbanArr', year: 'yearArr' };
 
 function normalizeKey(s) { return (s || '').toLowerCase().trim(); }
+
+function splitCatValue(v) {
+  return v ? v.split(';').map(function(s) { return s.trim(); }).filter(Boolean) : [];
+}
 
 function splitCsvLine(line, delimiter) {
   var cols = [], cur = '', inQ = false;
@@ -398,15 +403,21 @@ function countActiveFilters() {
 }
 
 function applySearchState() {
+  var textLc = searchState.text;
+  var suburbLc = searchState.suburb ? searchState.suburb.toLowerCase() : '';
   var visibleLocs = locations.filter(function(loc) {
-    var matchesText = !searchState.text || loc.street.toLowerCase().includes(searchState.text) || loc.suburb.toLowerCase().includes(searchState.text);
-    var matchesSuburb = !searchState.suburb || loc.suburb.toLowerCase() === searchState.suburb.toLowerCase();
+    var matchesText = !textLc || loc.streetLc.indexOf(textLc) !== -1 || loc.suburbLc.indexOf(textLc) !== -1;
+    var matchesSuburb = !suburbLc || loc.suburbLc === suburbLc;
     var matchesCategories = true;
     for (var cat in searchState.categories) {
       var allowed = searchState.categories[cat];
       if (allowed && allowed.length > 0) {
-        var values = (loc[cat] || '').split(';').map(function(v) { return v.trim(); }).filter(Boolean);
-        if (!values.some(function(v) { return allowed.includes(v); })) { matchesCategories = false; break; }
+        var values = loc[CAT_ARRAY_KEYS[cat]] || [];
+        var found = false;
+        for (var i = 0; i < values.length; i++) {
+          if (allowed.indexOf(values[i]) !== -1) { found = true; break; }
+        }
+        if (!found) { matchesCategories = false; break; }
       }
     }
     return matchesText && matchesSuburb && matchesCategories;
@@ -435,9 +446,9 @@ function annotateFilterCoverage() {
   document.querySelectorAll('.filter-check').forEach(function(cb) {
     var cat = cb.getAttribute('data-cat');
     var val = cb.value;
+    var key = CAT_ARRAY_KEYS[cat];
     var count = locations.filter(function(loc) {
-      var values = (loc[cat] || '').split(';').map(function(v) { return v.trim(); }).filter(Boolean);
-      return values.indexOf(val) !== -1;
+      return (loc[key] || []).indexOf(val) !== -1;
     }).length;
     var label = cb.closest('label');
     if (!label) return;
@@ -516,6 +527,11 @@ function loadInitialData() {
         coords: [parseFloat(row.lng), parseFloat(row.lat)],
         archiveUrl: row.archiveUrl || '#'
       };
+      locData.streetLc = locData.street.toLowerCase();
+      locData.suburbLc = locData.suburb.toLowerCase();
+      locData.typologyArr = splitCatValue(locData.typology);
+      locData.urbanArr = splitCatValue(locData.urban);
+      locData.yearArr = splitCatValue(locData.year);
       if (!isNaN(locData.coords[0]) && !isNaN(locData.coords[1])) {
         locations.push(locData);
       }
@@ -526,6 +542,7 @@ function loadInitialData() {
     if (mediaCsvText) {
       applyMediaTagsToLocations(parseMediasCsv(mediaCsvText));
     }
+    locations.forEach(function(loc) { loc.conditionArr = splitCatValue(loc.condition); });
     var sortedBatches = Object.keys(batchesMap).filter(function(b) { return b !== 'UNKNOWN'; }).sort(function(a, b) {
       var timeA = new Date(a).getTime();
       var timeB = new Date(b).getTime();
