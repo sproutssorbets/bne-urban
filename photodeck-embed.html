@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>PHOTOINDEX - Spatial Database</title>
 <link rel="preconnect" href="https://api.mapbox.com">
 <link rel="preconnect" href="https://raw.githubusercontent.com">
@@ -27,18 +27,18 @@
   :focus-visible { outline: 1px solid var(--text) !important; outline-offset: -1px; }
   html, body {
     width: 100%; height: 100%; height: 100dvh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
     background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased;
-    overflow: hidden; position: fixed; inset: 0;
+    overflow: hidden;
   }
   body { display: flex; flex-direction: column; }
-  body.pi-drawer-lock { overflow: hidden; touch-action: none; }
-
+  body.pi-drawer-lock { overflow: hidden; }
   #topbar { background: var(--bg); flex-shrink: 0; z-index: 10; border-bottom: 1px solid var(--text); }
   #search-row { display: flex; align-items: center; height: 42px; padding: 0 16px; gap: 12px; background: var(--bg); }
   .search-lead-icon { width: 14px; height: 14px; flex-shrink: 0; stroke: var(--text); }
   #geocoder { flex: 1; height: 100%; position: relative; }
   #pi-search-wrap { position: relative; width: 100%; height: 100%; display: flex; align-items: center; }
-  #pi-search-input { width: 100%; height: 100%; border: none; background: transparent; font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text); outline: none; }
+  #pi-search-input { width: 100%; height: 100%; border: none; background: transparent; font-family: inherit; font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text); outline: none; }
   #pi-search-input::placeholder { color: var(--subtext); font-weight: 400; }
   #pi-search-clear { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); border: none; background: transparent; font-size: 20px; color: var(--text); cursor: pointer; display: none; line-height: 1; padding: 4px 8px; }
   #search-archive-btn { height: 100%; padding: 0 4px; border: none; background: transparent; color: var(--text); font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; text-decoration: none; flex-shrink: 0; }
@@ -49,7 +49,7 @@
     font-weight: 500;
   }
   #layout { width: 100%; flex: 1 1 auto; min-height: 0; background: var(--bg); position: relative; display: flex; overflow: hidden; margin: 0; padding: 0; }
-  #index-panel { width: 320px; flex-shrink: 0; position: relative; height: 100%; border-right: 1px solid var(--text); display: flex; flex-direction: column; background: var(--bg); z-index: 3; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  #index-panel { width: 320px; flex-shrink: 0; position: relative; height: 100%; border-right: 1px solid var(--text); display: flex; flex-direction: column; background: var(--bg); z-index: 3; overflow-y: auto; }
   .mobile-only-header { display: none; }
   .mobile-grip { display: none; }
   .acc-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--line-light); cursor: pointer; user-select: none; background: var(--bg); flex-shrink: 0; }
@@ -81,9 +81,8 @@
   .list-empty { padding: 16px 18px; font-size: 11px; color: var(--subtext); }
   #pi-footer { padding: 16px 18px; background: var(--bg); border-top: 1px solid var(--text); flex-shrink: 0; }
   .pi-footer-stat { font-size: 9px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); margin-top: 10px; }
-  
-  #map-wrap { flex: 1 1 auto; position: relative; width: 100%; height: 100%; min-height: 0; background: #F8F8F8; margin: 0; padding: 0; }
-  #map { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.3s ease-in-out; }
+  #map-wrap { flex: 1; position: relative; height: 100%; background: #F8F8F8; margin: 0; padding: 0; }
+  #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s ease-in-out; }
   #map.loaded { opacity: 1; }
   #map-error {
     position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
@@ -91,7 +90,6 @@
   }
   #map-error.visible { display: flex; }
   #map-error-text { font-size: 11px; letter-spacing: 0.06em; color: var(--subtext); max-width: 320px; line-height: 1.6; }
-  
   .custom-marker-hitbox {
     width: 36px; height: 44px;
     display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
@@ -106,7 +104,7 @@
   .custom-marker-hitbox:hover .pi-pin-body { background: #FFFFFF; color: var(--text); outline: 1px solid var(--text); }
   .pi-popup .mapboxgl-popup-content {
     background: var(--bg); border: 1px solid var(--text); padding: 16px;
-    position: relative;
+    font-family: inherit; position: relative;
   }
   .pi-popup .mapboxgl-popup-close-button {
     position: absolute; top: 12px; right: 12px; font-size: 16px; color: var(--text);
@@ -114,7 +112,6 @@
   }
   .pi-popup .mapboxgl-popup-tip { border-top-color: var(--bg) !important; border-bottom-color: var(--bg) !important; }
   .pi-popup-title { font-size: 12px; font-weight: 700; text-transform: uppercase; padding-right: 20px; line-height: 1.3; margin-bottom: 6px; }
-  
   #pi-drawer-tab {
     position: fixed; top: 50%; right: 0; transform: translateY(-50%);
     width: 28px; height: 144px; background: var(--text); color: #FFFFFF;
@@ -124,7 +121,7 @@
   #pi-drawer-tab-inner {
     display: inline-flex; align-items: center; gap: 6px;
     transform: rotate(-90deg); white-space: nowrap;
-    font-size: 9px; font-weight: 700; letter-spacing: 0.16em;
+    font-size: 9px; font-weight: 700; letter-spacing: 0.16em; font-family: inherit;
   }
   #pi-drawer-dot { width: 6px; height: 6px; flex-shrink: 0; background: #00C853; transition: opacity 0.3s ease; }
   #pi-drawer-dot.hidden { opacity: 0; pointer-events: none; }
@@ -145,7 +142,7 @@
     font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text); flex-shrink: 0;
   }
   .pi-drawer-close { border: none; background: transparent; cursor: pointer; width: 22px; height: 22px; font-size: 15px; color: var(--text); display: flex; align-items: center; justify-content: center; padding: 0; }
-  .pi-drawer-body { flex: 1; overflow-y: auto; padding: 20px; -webkit-overflow-scrolling: touch; }
+  .pi-drawer-body { flex: 1; overflow-y: auto; padding: 20px; }
   .pi-drawer-title { font-size: 20px; font-weight: 700; line-height: 1.1; text-transform: uppercase; letter-spacing: -0.02em; margin-bottom: 4px; color: var(--text); }
   .pi-drawer-sub { font-size: 11px; color: var(--subtext); margin-bottom: 20px; font-weight: 400; line-height: 1.4; }
   .pi-drawer-section-title { font-size: 9px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--subtext); margin-bottom: 8px; }
@@ -166,11 +163,10 @@
   .pi-thumb-card img { width: 100%; height: auto; display: block; }
   .pi-drawer-footer { padding: 16px 20px; border-top: 1px solid var(--text); flex-shrink: 0; background: var(--bg); }
   .pi-drawer-cta { display: block; width: 100%; text-align: center; border: 1px solid var(--text); background: var(--text); color: #FFFFFF; padding: 12px; font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none; cursor: pointer; }
-  
   .mobile-bar { display: none; }
   @media (max-width: 720px) {
     #context-bar { display: none; }
-    #search-row { height: 44px; padding: 0 14px; }
+    #search-row { height: 48px; padding: 0 14px; }
     #search-archive-btn { font-size: 9px; }
     .mobile-only-header { display: flex; justify-content: space-between; align-items: center; }
     .mobile-grip { display: block; width: 36px; height: 3px; background: var(--line); margin: 10px auto 0; }
@@ -180,7 +176,7 @@
       border-right: none;
     }
     #index-panel.mobile-active { transform: translateY(0); }
-    .mobile-bar { display: flex; height: 48px; background: var(--text); color: #FFFFFF; border-bottom: 1px solid var(--text); flex-shrink: 0; }
+    .mobile-bar { display: flex; height: 52px; background: var(--text); color: #FFFFFF; border-bottom: 1px solid var(--text); }
     .mobile-bar-btn {
       flex: 1; background: transparent; border: none; color: #FFFFFF;
       font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer;
@@ -193,7 +189,8 @@
       min-width: 14px; height: 14px; padding: 0 3px; font-size: 8px; font-weight: 700;
       background: #FFFFFF; color: var(--text);
     }
-    #pi-drawer-tab { height: 120px; width: 30px; padding-left: 4px; }
+    #map-wrap { height: calc(100dvh - 42px - 52px); }
+    #pi-drawer-tab { height: 144px; width: 34px; padding-left: 6px; }
   }
 </style>
 </head>
@@ -671,7 +668,6 @@ function initMapLazy() {
     var startCenter = (savedMapState && typeof savedMapState.lng === 'number' && typeof savedMapState.lat === 'number')
       ? [savedMapState.lng, savedMapState.lat] : [153.0307, -27.4598];
     var startZoom = (savedMapState && typeof savedMapState.zoom === 'number') ? savedMapState.zoom : 13;
-    
     mapInstance = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/mapbox/light-v11',
@@ -682,17 +678,11 @@ function initMapLazy() {
       maxTileCacheSize: 50,
       collectResourceTiming: false
     });
-    
-    window.addEventListener('resize', function() {
-      if (mapInstance) mapInstance.resize();
-    });
-
     mapInstance.on('moveend', function() {
       var c = mapInstance.getCenter();
       saveMapState({ lng: c.lng, lat: c.lat, zoom: mapInstance.getZoom() });
     });
     mapInstance.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
-
     window.piOpenPopupForLocation = function(loc) {
       var datesList = loc.dates ? loc.dates.split(';').map(function(d) { return d.trim(); }).filter(Boolean) : [];
       var datesDesc = datesList.slice().reverse();
@@ -704,7 +694,6 @@ function initMapLazy() {
       var popupHtml = '<div style="min-width:180px;position:relative;"><div class="pi-popup-title">' + loc.street + '</div><div style="border-top:1px solid var(--text);border-bottom:1px solid var(--text);padding:6px 0;margin-bottom:8px;">' + rowsHtml + '</div><a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:var(--text);color:#FFF;padding:8px;font-size:9px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;">OPEN RECORD →</a></div>';
       globalPopup.setLngLat(loc.coords).setHTML(popupHtml).addTo(mapInstance);
     };
-
     window.piFlyToQuery = function(query) {
       if (!query || !locations || !locations.length) return;
       var match = locations.find(function(l) {
@@ -719,13 +708,11 @@ function initMapLazy() {
         if (window.piOpenPopupForLocation) window.piOpenPopupForLocation(match);
       }
     };
-
     var index = 0;
     var CHUNK = 60;
     var markerTemplate = document.createElement('div');
     markerTemplate.className = 'custom-marker-hitbox';
     markerTemplate.innerHTML = '<div class="pi-pin"><div class="pi-pin-body"></div><div class="pi-pin-point"></div></div>';
-
     function mountMarkers() {
       if (!locations || locations.length === 0) {
         setTimeout(mountMarkers, 50);
@@ -851,7 +838,6 @@ document.addEventListener('DOMContentLoaded', function() {
   var mobileIndexBtn = document.getElementById('mobile-toggle-index');
   var indexPanel = document.getElementById('index-panel');
   var mobileCloseBtn = document.getElementById('mobile-panel-close');
-  
   if (mobileToggleBtn && indexPanel) {
     mobileToggleBtn.addEventListener('click', function() {
       indexPanel.classList.add('mobile-active');
@@ -876,6 +862,25 @@ document.addEventListener('DOMContentLoaded', function() {
       indexPanel.classList.remove('mobile-active');
       document.body.classList.remove('pi-drawer-lock');
     });
+  }
+
+  if (indexPanel) {
+    var touchStartY = null;
+    indexPanel.addEventListener('touchstart', function(ev) {
+      if (window.innerWidth > 720 || !indexPanel.classList.contains('mobile-active')) return;
+      if (indexPanel.scrollTop > 0) return;
+      touchStartY = ev.touches[0].clientY;
+    }, { passive: true });
+    indexPanel.addEventListener('touchmove', function(ev) {
+      if (touchStartY === null) return;
+      var delta = ev.touches[0].clientY - touchStartY;
+      if (delta > 80) {
+        indexPanel.classList.remove('mobile-active');
+        document.body.classList.remove('pi-drawer-lock');
+        touchStartY = null;
+      }
+    }, { passive: true });
+    indexPanel.addEventListener('touchend', function() { touchStartY = null; }, { passive: true });
   }
 
   var tab = document.getElementById('pi-drawer-tab');
