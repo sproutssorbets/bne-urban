@@ -5,18 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>PHOTOINDEX - Spatial Database</title>
 
-<!-- PRECONNECT & DNS-PREFETCH -->
+<!-- PRECONNECT DLA ZASOBÓW ZEWNĘTRZNYCH -->
 <link rel="preconnect" href="https://api.mapbox.com">
 <link rel="preconnect" href="https://events.mapbox.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://raw.githubusercontent.com">
 
-<!-- ASYNC FONTS & CSS (Non-blocking) -->
+<!-- ASYNCHRONICZNE CZCIONKI (BEZ BLOKOWANIA FCP) -->
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"></noscript>
 
+<!-- ASYNCHRONICZNE STYLE MAPBOX -->
 <link rel="preload" as="style" href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css">
 <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css"></noscript>
@@ -24,7 +25,6 @@
 <script defer src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
 
 <style>
-  /* --- BAZA I SYSTEM DESIGN — wyłącznie skala szarości --- */
   :root {
     --bg: #FFFFFF;
     --panel: #FAFAFA;
@@ -49,7 +49,7 @@
   body { display: flex; flex-direction: column; }
   body.pi-drawer-lock { overflow: hidden; }
 
-  /* --- GÓRNY PASEK --- */
+  /* GÓRNY PASEK */
   #topbar { background: var(--bg); flex-shrink: 0; z-index: 10; border-bottom: 1px solid var(--text); }
   #search-row { display: flex; align-items: center; height: 42px; padding: 0 16px; gap: 12px; background: var(--bg); }
   .search-lead-icon { width: 14px; height: 14px; flex-shrink: 0; stroke: var(--text); }
@@ -63,7 +63,6 @@
   #search-archive-btn { height: 100%; padding: 0 4px; border: none; background: transparent; color: var(--text); font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; text-decoration: none; flex-shrink: 0; transition: opacity 0.15s ease; }
   #search-archive-btn:hover { opacity: 0.5; }
 
-  /* PASEK KONTEKSTOWY */
   #context-bar {
     display: flex; align-items: center; height: 32px; padding: 0 18px;
     font-size: 9px; color: var(--subtext); letter-spacing: 0.1em;
@@ -71,7 +70,7 @@
     font-weight: 500;
   }
 
-  /* --- GŁÓWNY UKŁAD MAPY I FILTRÓW --- */
+  /* UKŁAD GŁÓWNY */
   #layout { width: 100%; flex: 1 1 auto; min-height: 0; background: var(--bg); position: relative; display: flex; overflow: hidden; margin: 0; padding: 0; }
 
   #index-panel { width: 320px; flex-shrink: 0; position: relative; height: 100%; border-right: 1px solid var(--text); display: flex; flex-direction: column; background: var(--bg); z-index: 3; overflow-y: auto; }
@@ -110,7 +109,6 @@
   .list-street { font-size: 12px; font-weight: 500; text-transform: uppercase; }
   .list-suburb { font-size: 10px; color: var(--subtext); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.06em; }
   .list-empty { padding: 16px 18px; font-size: 11px; color: var(--subtext); }
-  .list-truncated { padding: 12px 18px; font-size: 10px; color: var(--subtext); letter-spacing: 0.04em; border-top: 1px solid var(--line-light); }
 
   #pi-footer { padding: 16px 18px; background: var(--bg); border-top: 1px solid var(--text); flex-shrink: 0; }
   .pi-footer-stat { font-size: 9px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); margin-top: 10px; }
@@ -133,7 +131,7 @@
   .pi-pin-point { width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 4px solid var(--text); }
   .custom-marker-hitbox:hover .pi-pin-body { background: #FFFFFF; color: var(--text); outline: 1px solid var(--text); }
 
-  /* --- POPUP --- */
+  /* POPUP */
   .pi-popup .mapboxgl-popup-content {
     background: var(--bg); border: 1px solid var(--text); padding: 16px;
     font-family: inherit; position: relative;
@@ -146,7 +144,7 @@
   .pi-popup .mapboxgl-popup-tip { border-top-color: var(--bg) !important; border-bottom-color: var(--bg) !important; }
   .pi-popup-title { font-size: 12px; font-weight: 700; text-transform: uppercase; padding-right: 20px; line-height: 1.3; margin-bottom: 6px; }
 
-  /* --- WSUWANY PANEL LOGÓW (DRAWER) --- */
+  /* SZUFLADA LOGÓW */
   #pi-drawer-tab {
     position: fixed; top: 50%; right: 0; transform: translateY(-50%);
     width: 28px; height: 144px; background: var(--text); color: #FFFFFF;
@@ -216,7 +214,7 @@
   .pi-drawer-cta { display: block; width: 100%; text-align: center; border: 1px solid var(--text); background: var(--text); color: #FFFFFF; padding: 12px; font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none; transition: background 0.15s ease; cursor: pointer; }
   .pi-drawer-cta:hover { background: #333333; }
 
-  /* --- WERSJA MOBILNA --- */
+  /* WERSJA MOBILNA */
   .mobile-bar { display: none; }
   @media (max-width: 720px) {
     #context-bar { display: none; }
@@ -283,7 +281,6 @@
     </div>
 
     <div class="panel-section-container" id="filters-group">
-      <!-- 1. LOCATION -->
       <div class="acc-head open" data-target="acc-location">
         <span class="acc-title">1. Location</span><span class="acc-icon">+</span>
       </div>
@@ -311,7 +308,6 @@
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Woolloongabba"> Woolloongabba</label>
       </div>
 
-      <!-- 2. PHYSICAL CONDITION -->
       <div class="acc-head" data-target="acc-condition">
         <span class="acc-title">2. Physical Condition</span><span class="acc-icon">+</span>
       </div>
@@ -323,7 +319,6 @@
         <label><input type="checkbox" class="filter-check" data-cat="condition" value="Completed Development"> Completed Development</label>
       </div>
 
-      <!-- 3. TYPOLOGY & ARCHITECTURE -->
       <div class="acc-head" data-target="acc-typology">
         <span class="acc-title">3. Typology & Architecture</span><span class="acc-icon">+</span>
       </div>
@@ -335,7 +330,6 @@
         <label><input type="checkbox" class="filter-check" data-cat="typology" value="Industrial"> Industrial</label>
       </div>
 
-      <!-- 4. URBAN CONTEXT -->
       <div class="acc-head" data-target="acc-urban">
         <span class="acc-title">4. Urban Context</span><span class="acc-icon">+</span>
       </div>
@@ -345,7 +339,6 @@
         <label><input type="checkbox" class="filter-check" data-cat="urban" value="Riverfront"> Riverfront</label>
       </div>
 
-      <!-- 5. TIME -->
       <div class="acc-head" data-target="acc-year">
         <span class="acc-title">5. Time</span><span class="acc-icon">+</span>
       </div>
@@ -373,7 +366,6 @@
   </main>
 </div>
 
-<!-- ZAKŁADKA I SZUFLADA LOGÓW -->
 <div id="pi-drawer-backdrop"></div>
 <button id="pi-drawer-tab" type="button" aria-expanded="false" aria-controls="pi-drawer-panel">
   <span id="pi-drawer-tab-inner">
@@ -416,7 +408,8 @@ function initMapboxApp() {
     style: 'mapbox://styles/mapbox/light-v11',
     center: [153.0307, -27.4598],
     zoom: 13,
-    fadeDuration: 100
+    fadeDuration: 0,
+    attributionControl: false
   });
   map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
 
@@ -428,7 +421,7 @@ function initMapboxApp() {
 
   function frameArea(center, bbox) {
     var bounds = bbox || bboxAroundPoint(center, 0.2);
-    map.fitBounds(bounds, { padding: 60, duration: 1000, maxZoom: 14.5, essential: true });
+    map.fitBounds(bounds, { padding: 60, duration: 800, maxZoom: 14.5, essential: true });
   }
 
   var CONDITION_TERMS = ['Existing Condition', 'Fenced Development Site', 'Demolition & Site Works', 'Active Construction Site', 'Completed Development'];
@@ -449,53 +442,41 @@ function initMapboxApp() {
 
   function parseDelimitedCsv(text, delimiter) {
     var lines = text.trim().split('\n');
-    var headers = splitCsvLine(lines[0], delimiter).map(function (h) { return h.trim(); });
+    var headers = splitCsvLine(lines[0], delimiter).map(h => h.trim());
     var rows = [];
     for (var i = 1; i < lines.length; i++) {
       if (!lines[i]) continue;
       var cols = splitCsvLine(lines[i], delimiter);
       var row = {};
-      headers.forEach(function (h, idx) { row[h] = (cols[idx] || '').trim(); });
+      headers.forEach((h, idx) => { row[h] = (cols[idx] || '').trim(); });
       rows.push(row);
     }
     return rows;
   }
 
   function parseMediasCsv(text) {
-    return parseDelimitedCsv(text, ';').map(function (row) {
-      return {
-        titleLower: normalizeKey(row.title),
-        keywordsLower: (row.keywords || '').split(',').map(function (k) { return k.trim().toLowerCase(); }).filter(Boolean)
-      };
-    }).filter(function (r) { return r.titleLower; });
+    return parseDelimitedCsv(text, ';').map(row => ({
+      titleLower: normalizeKey(row.title),
+      keywordsLower: (row.keywords || '').split(',').map(k => k.trim().toLowerCase()).filter(Boolean)
+    })).filter(r => r.titleLower);
   }
 
   function applyMediaTagsToLocations(mediaRows) {
-    locations.forEach(function (loc) {
+    locations.forEach(loc => {
       var streetKey = normalizeKey((loc.street || '').split('/')[0].split(',')[0]);
       if (!streetKey) return;
       var matched = new Set();
-      mediaRows.forEach(function (m) {
+      mediaRows.forEach(m => {
         if (m.titleLower.indexOf(streetKey) !== -1) {
-          m.keywordsLower.forEach(function (k) { matched.add(k); });
+          m.keywordsLower.forEach(k => matched.add(k));
         }
       });
       if (matched.size === 0) return;
-      var conditions = CONDITION_TERMS.filter(function (t) { return matched.has(t.toLowerCase()); });
+      var conditions = CONDITION_TERMS.filter(t => matched.has(t.toLowerCase()));
       if (conditions.length) loc.condition = conditions.join(';');
     });
   }
 
-  function showErrorState() {
-    var mapErr = document.getElementById('map-error');
-    if (mapErr) mapErr.classList.add('visible');
-    var listWrap = document.getElementById('list-wrap');
-    if (listWrap) listWrap.innerHTML = '<div class="list-empty">Archive data could not be loaded.</div>';
-    var archiveCountEl = document.getElementById('archive-count');
-    if (archiveCountEl) archiveCountEl.textContent = 'ARCHIVE UNAVAILABLE';
-  }
-
-  // --- RÓWNOLEGŁE POBIERANIE DANYCH ---
   var ts = Date.now();
   Promise.all([
     fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/locations.csv?t=' + ts).then(r => r.ok ? r.text() : Promise.reject(r.status)),
@@ -547,7 +528,6 @@ function initMapboxApp() {
       applyMediaTagsToLocations(parseMediasCsv(mediaCsvText));
     }
 
-    // SZUFLADA
     var sortedBatches = Object.keys(batchesMap).filter(b => b !== 'UNKNOWN').sort((a, b) => b.localeCompare(a));
     var latestBatchId = sortedBatches[0];
 
@@ -572,13 +552,6 @@ function initMapboxApp() {
                    '<span class="stats"><span class="count">' + padCount + '</span><span class="arrow">→</span></span>' +
                  '</a>';
         }).join('');
-
-        logContainer.querySelectorAll('.pi-log-link').forEach(function (link) {
-          link.addEventListener('mouseenter', function () {
-            var q = this.getAttribute('data-query');
-            if (window.piFlyToQuery) window.piFlyToQuery(q);
-          });
-        });
       }
 
       var dot = document.getElementById('pi-drawer-dot');
@@ -598,25 +571,23 @@ function initMapboxApp() {
     }
 
     annotateFilterCoverage();
-    if (map.loaded()) setupMap(); else map.on('load', setupMap);
+    if (map.loaded()) setupMapNonBlocking(); else map.on('load', setupMapNonBlocking);
   })
   .catch(function (err) {
     console.error('PhotoIndex load failure', err);
-    showErrorState();
   });
 
   function annotateFilterCoverage() {
     document.querySelectorAll('.filter-check').forEach(function (cb) {
       var cat = cb.getAttribute('data-cat');
       var val = cb.value;
-      var count = locations.filter(function (loc) {
+      var count = locations.filter(loc => {
         var values = (loc[cat] || '').split(';').map(v => v.trim()).filter(Boolean);
         return values.indexOf(val) !== -1;
       }).length;
 
       var label = cb.closest('label');
       if (!label) return;
-
       var existing = label.querySelector('.filter-count');
       if (existing) existing.remove();
 
@@ -625,48 +596,54 @@ function initMapboxApp() {
       countSpan.textContent = count;
       label.appendChild(countSpan);
 
-      if (count === 0) {
-        cb.disabled = true;
-        label.classList.add('no-data');
-      } else {
-        cb.disabled = false;
-        label.classList.remove('no-data');
-      }
+      if (count === 0) { cb.disabled = true; label.classList.add('no-data'); }
+      else { cb.disabled = false; label.classList.remove('no-data'); }
     });
   }
 
-  function setupMap() {
+  function setupMapNonBlocking() {
     var activePopup = null;
-    window.piCloseAllPopups = function () {
-      if (activePopup) { activePopup.remove(); activePopup = null; }
-    };
+    window.piCloseAllPopups = function () { if (activePopup) { activePopup.remove(); activePopup = null; } };
     window.piOpenPopup = function (popup, coords) {
       window.piCloseAllPopups();
       popup.setLngLat(coords).addTo(map);
       activePopup = popup;
     };
 
-    locations.forEach((loc) => {
-      var el = document.createElement('div');
-      el.className = 'custom-marker-hitbox';
-      el.innerHTML = '<div class="pi-pin"><div class="pi-pin-body">' + loc.count + '</div><div class="pi-pin-point"></div></div>';
+    var index = 0;
+    var batchSize = 25;
 
-      var datesList = loc.dates ? loc.dates.split(';').map(d => d.trim()).filter(Boolean) : [];
-      var datesDesc = datesList.slice().reverse();
-      var rows = [['Suburb', loc.suburb], ['Photos', String(loc.count)]];
-      datesDesc.forEach((d, i) => rows.push([i === 0 ? 'Photographed' : '', d]));
+    function processBatch() {
+      var chunk = locations.slice(index, index + batchSize);
+      chunk.forEach(loc => {
+        var el = document.createElement('div');
+        el.className = 'custom-marker-hitbox';
+        el.innerHTML = '<div class="pi-pin"><div class="pi-pin-body">' + loc.count + '</div><div class="pi-pin-point"></div></div>';
 
-      var rowsHtml = rows.map(r => '<div style="display:flex;justify-content:space-between;gap:12px;font-size:10px;padding:3px 0;"><span style="color:var(--subtext);text-transform:uppercase;">' + r[0] + '</span><span style="color:var(--text);font-weight:500;">' + r[1] + '</span></div>').join('');
-      var popupHtml = '<div style="min-width:180px;position:relative;"><div class="pi-popup-title">' + loc.street + '</div><div style="border-top:1px solid var(--text);border-bottom:1px solid var(--text);padding:6px 0;margin-bottom:8px;">' + rowsHtml + '</div><a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:var(--text);color:#FFF;padding:8px;font-size:9px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;">OPEN RECORD →</a></div>';
+        var datesList = loc.dates ? loc.dates.split(';').map(d => d.trim()).filter(Boolean) : [];
+        var datesDesc = datesList.slice().reverse();
+        var rows = [['Suburb', loc.suburb], ['Photos', String(loc.count)]];
+        datesDesc.forEach((d, i) => rows.push([i === 0 ? 'Photographed' : '', d]));
 
-      loc.popup = new mapboxgl.Popup({ offset: [0, -42], closeButton: true, className: 'pi-popup' }).setHTML(popupHtml);
-      loc.marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' }).setLngLat(loc.coords).addTo(map);
+        var rowsHtml = rows.map(r => '<div style="display:flex;justify-content:space-between;gap:12px;font-size:10px;padding:3px 0;"><span style="color:var(--subtext);text-transform:uppercase;">' + r[0] + '</span><span style="color:var(--text);font-weight:500;">' + r[1] + '</span></div>').join('');
+        var popupHtml = '<div style="min-width:180px;position:relative;"><div class="pi-popup-title">' + loc.street + '</div><div style="border-top:1px solid var(--text);border-bottom:1px solid var(--text);padding:6px 0;margin-bottom:8px;">' + rowsHtml + '</div><a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:var(--text);color:#FFF;padding:8px;font-size:9px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;">OPEN RECORD →</a></div>';
 
-      el.addEventListener('click', (ev) => { ev.stopPropagation(); window.piOpenPopup(loc.popup, loc.coords); });
-    });
+        loc.popup = new mapboxgl.Popup({ offset: [0, -42], closeButton: true, className: 'pi-popup' }).setHTML(popupHtml);
+        loc.marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' }).setLngLat(loc.coords).addTo(map);
 
-    applySearchState();
-    document.getElementById('map').classList.add('loaded');
+        el.addEventListener('click', (ev) => { ev.stopPropagation(); window.piOpenPopup(loc.popup, loc.coords); });
+      });
+
+      index += batchSize;
+      if (index < locations.length) {
+        requestAnimationFrame(processBatch);
+      } else {
+        applySearchState();
+        document.getElementById('map').classList.add('loaded');
+      }
+    }
+
+    processBatch();
   }
 
   function updatePhotoDeckLink() {
@@ -751,7 +728,6 @@ function initMapboxApp() {
     wrap.appendChild(frag);
   }
 
-  // Wyszukiwarka i filtry
   var searchInput = document.getElementById('pi-search-input');
   var clearBtn = document.getElementById('pi-search-clear');
   if (searchInput && clearBtn) {
@@ -809,21 +785,11 @@ function initMapboxApp() {
       applySearchState();
     });
   });
-
-  window.piFlyToQuery = function(query) {
-    if (!query || !locations || !locations.length) return;
-    var match = locations.find(l => l.street.toLowerCase().includes(query.toLowerCase()) || l.suburb.toLowerCase() === query.toLowerCase());
-    if (match) {
-      if (window.innerWidth <= 720) document.getElementById('index-panel').classList.remove('mobile-active');
-      map.flyTo({ center: match.coords, zoom: 15, speed: 1.2 });
-      if (window.piOpenPopup && match.popup) window.piOpenPopup(match.popup, match.coords);
-    }
-  };
 }
 
 initMapboxApp();
 
-// --- LAZY GITHUB FETCH & UI ---
+// SZUFLADA: LAZY LOADING MINIATUR NA ŻĄDANIE
 document.addEventListener('DOMContentLoaded', function () {
   var tab = document.getElementById('pi-drawer-tab');
   var panel = document.getElementById('pi-drawer-panel');
@@ -836,9 +802,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var thumbsTitle = document.getElementById('pi-thumbs-title');
     if (thumbsContainer && urls.length > 0) {
       if (thumbsTitle) thumbsTitle.style.display = 'block';
-      thumbsContainer.innerHTML = urls.map(function(url) {
-        return '<div class="pi-thumb-card"><img src="' + url + '" alt="Record thumbnail" loading="lazy"></div>';
-      }).join('');
+      thumbsContainer.innerHTML = urls.map(url => '<div class="pi-thumb-card"><img src="' + url + '" alt="Archive Record" loading="lazy"></div>').join('');
     }
   }
 
@@ -862,7 +826,6 @@ document.addEventListener('DOMContentLoaded', function () {
     panel.setAttribute('aria-hidden', 'false');
     tab.setAttribute('aria-expanded', 'true');
 
-    // LAZY FETCH MINIATUR DOPIERO PO OTWARCIU SZUFLADY
     if (!window.PI_PHOTOS_CACHE) {
       fetchAllPhotos().then(function (urls) {
         window.PI_PHOTOS_CACHE = urls;
