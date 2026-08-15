@@ -5,13 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>PHOTOINDEX - Spatial Database</title>
 
+<!-- PRECONNECT & DNS-PREFETCH -->
 <link rel="preconnect" href="https://api.mapbox.com">
 <link rel="preconnect" href="https://events.mapbox.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://raw.githubusercontent.com">
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet">
+<!-- ASYNC FONTS & CSS (Non-blocking) -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"></noscript>
+
+<link rel="preload" as="style" href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css">
+<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css"></noscript>
+
 <script defer src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
 
 <style>
@@ -33,7 +42,7 @@
 
   html, body {
     width: 100%; height: 100%; height: 100dvh;
-    font-family: 'Inter', -apple-system, system-ui, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased;
     overflow: hidden;
   }
@@ -46,7 +55,7 @@
   .search-lead-icon { width: 14px; height: 14px; flex-shrink: 0; stroke: var(--text); }
   #geocoder { flex: 1; height: 100%; position: relative; }
   #pi-search-wrap { position: relative; width: 100%; height: 100%; display: flex; align-items: center; }
-  #pi-search-input { width: 100%; height: 100%; border: none; background: transparent; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text); outline: none; }
+  #pi-search-input { width: 100%; height: 100%; border: none; background: transparent; font-family: inherit; font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text); outline: none; }
   #pi-search-input::placeholder { color: var(--subtext); font-weight: 400; }
   #pi-search-clear { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); border: none; background: transparent; font-size: 20px; color: var(--text); cursor: pointer; display: none; line-height: 1; padding: 4px 8px; transition: opacity 0.15s ease; }
   #pi-search-clear:hover { opacity: 0.5; }
@@ -91,7 +100,7 @@
 
   #filters-group { flex-shrink: 0; }
 
-  /* LISTA (INDEX) — zawsze widoczna pod filtrami */
+  /* LISTA (INDEX) */
   #index-group { display: flex; flex-direction: column; flex: none; min-height: 0; }
   .index-group-head { padding: 14px 18px; border-bottom: 1px solid var(--text); background: var(--bg); flex-shrink: 0; }
   #list-wrap { flex: none; overflow-y: visible; }
@@ -108,7 +117,7 @@
 
   /* MAPA */
   #map-wrap { flex: 1; position: relative; height: 100%; background: #F8F8F8; margin: 0; padding: 0; }
-  #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.6s ease-in-out; }
+  #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.4s ease-in-out; }
   #map.loaded { opacity: 1; }
 
   #map-error {
@@ -118,7 +127,7 @@
   #map-error.visible { display: flex; }
   #map-error-text { font-size: 11px; letter-spacing: 0.06em; color: var(--subtext); max-width: 320px; line-height: 1.6; }
 
-  .custom-marker-hitbox { width: 36px; height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; }
+  .custom-marker-hitbox { width: 36px; height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; will-change: transform; }
   .pi-pin { display: flex; flex-direction: column; align-items: center; }
   .pi-pin-body { min-width: 22px; height: 22px; padding: 0 5px; background: var(--text); color: #FFFFFF; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
   .pi-pin-point { width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 4px solid var(--text); }
@@ -127,7 +136,7 @@
   /* --- POPUP --- */
   .pi-popup .mapboxgl-popup-content {
     background: var(--bg); border: 1px solid var(--text); padding: 16px;
-    font-family: 'Inter', sans-serif; position: relative;
+    font-family: inherit; position: relative;
   }
   .pi-popup .mapboxgl-popup-close-button {
     position: absolute; top: 12px; right: 12px; font-size: 16px; color: var(--text);
@@ -148,10 +157,9 @@
   #pi-drawer-tab-inner {
     display: inline-flex; align-items: center; gap: 6px;
     transform: rotate(-90deg); white-space: nowrap;
-    font-size: 9px; font-weight: 700; letter-spacing: 0.16em; font-family: 'Inter', sans-serif;
+    font-size: 9px; font-weight: 700; letter-spacing: 0.16em; font-family: inherit;
   }
 
-  /* Wskaźnik nowości — zielona kropka w linii z tekstem, bez poświaty (bez cienia) */
   #pi-drawer-dot {
     width: 6px; height: 6px; flex-shrink: 0;
     background: #00C853;
@@ -170,7 +178,6 @@
     position: fixed; top: 0; right: 0; height: 100%; width: 340px; max-width: calc(100vw - 40px);
     background: var(--bg); border-left: 2px solid var(--text); transform: translateX(100%);
     transition: transform 0.35s cubic-bezier(0.16,1,0.3,1); z-index: 700; display: flex; flex-direction: column;
-    font-family: 'Inter', system-ui, sans-serif;
   }
   #pi-drawer-panel.open { transform: translateX(0); }
 
@@ -201,23 +208,9 @@
   .pi-log-link .arrow { opacity: 0; transform: translateX(-4px); transition: all 0.15s ease; font-size: 11px; }
   .pi-log-link:hover .arrow { opacity: 1; transform: translateX(0); }
 
-  .pi-drawer-thumbs {
-    column-count: 2;
-    column-gap: 6px;
-    margin-top: 6px;
-  }
-  .pi-thumb-card {
-    break-inside: avoid;
-    margin-bottom: 6px;
-    background: var(--panel);
-    border: 1px solid var(--line-light);
-    overflow: hidden;
-  }
-  .pi-thumb-card img {
-    width: 100%;
-    height: auto;
-    display: block;
-  }
+  .pi-drawer-thumbs { column-count: 2; column-gap: 6px; margin-top: 6px; }
+  .pi-thumb-card { break-inside: avoid; margin-bottom: 6px; background: var(--panel); border: 1px solid var(--line-light); overflow: hidden; }
+  .pi-thumb-card img { width: 100%; height: auto; display: block; }
 
   .pi-drawer-footer { padding: 16px 20px; border-top: 1px solid var(--text); flex-shrink: 0; background: var(--bg); }
   .pi-drawer-cta { display: block; width: 100%; text-align: center; border: 1px solid var(--text); background: var(--text); color: #FFFFFF; padding: 12px; font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none; transition: background 0.15s ease; cursor: pointer; }
@@ -229,15 +222,8 @@
     #context-bar { display: none; }
     #search-row { height: 48px; padding: 0 14px; }
     #search-archive-btn { font-size: 9px; }
-
     .mobile-only-header { display: flex; justify-content: space-between; align-items: center; }
-
-    /* Uchwyt na górze panelu — czytelny sygnał "to jest arkusz, można go zamknąć",
-       spójny z resztą interfejsu (linia, nie kolor). */
-    .mobile-grip {
-      display: block; width: 36px; height: 3px; background: var(--line);
-      margin: 10px auto 0;
-    }
+    .mobile-grip { display: block; width: 36px; height: 3px; background: var(--line); margin: 10px auto 0; }
 
     #index-panel {
       position: fixed; inset: 0; width: 100% !important; height: 100% !important;
@@ -246,15 +232,10 @@
     }
     #index-panel.mobile-active { transform: translateY(0); }
 
-    .mobile-bar {
-      display: flex; height: 52px;
-      background: var(--text); color: #FFFFFF;
-      border-bottom: 1px solid var(--text);
-    }
+    .mobile-bar { display: flex; height: 52px; background: var(--text); color: #FFFFFF; border-bottom: 1px solid var(--text); }
     .mobile-bar-btn {
       flex: 1; background: transparent; border: none; color: #FFFFFF;
-      font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600;
-      letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer;
+      font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer;
       display: flex; align-items: center; justify-content: center; gap: 6px;
       border-right: 1px solid #333333; text-decoration: none; position: relative;
     }
@@ -264,14 +245,8 @@
       min-width: 14px; height: 14px; padding: 0 3px; font-size: 8px; font-weight: 700;
       background: #FFFFFF; color: var(--text);
     }
-
     #map-wrap { height: calc(100dvh - 42px - 52px); }
-
-    /* Zakładka logu — szersza strefa dotyku (34px) bez powiększania wizualnego elementu,
-       plus niewidoczny margines wewnętrzny rozszerzający hitbox w lewo. */
-    #pi-drawer-tab {
-      height: 144px; width: 34px; padding-left: 6px;
-    }
+    #pi-drawer-tab { height: 144px; width: 34px; padding-left: 6px; }
   }
 </style>
 </head>
@@ -280,15 +255,12 @@
 <div id="topbar">
   <div id="search-row">
     <svg class="search-lead-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="square"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16" y2="16"></line></svg>
-
     <div id="geocoder">
       <div id="pi-search-wrap">
         <input type="text" id="pi-search-input" autocomplete="off" spellcheck="false" placeholder="SEARCH ADDRESS OR PLACE...">
         <button type="button" id="pi-search-clear" aria-label="Clear search">&times;</button>
-        <div id="pi-search-dropdown"></div>
       </div>
     </div>
-
     <a id="search-archive-btn" href="https://www.photoindex.au/" target="_top"><span id="search-archive-text">Search</span></a>
   </div>
   <div id="context-bar">
@@ -317,7 +289,6 @@
       </div>
       <div class="acc-body open" id="acc-location">
         <label><input type="radio" name="suburb-group" class="suburb-check" value="" checked> All Locations</label>
-
         <div class="sub-category-title">Inner North & CBD</div>
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Brisbane City"> Brisbane City</label>
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Spring Hill"> Spring Hill</label>
@@ -328,13 +299,11 @@
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Bowen Hills"> Bowen Hills</label>
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Herston"> Herston</label>
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Albion"> Albion</label>
-
         <div class="sub-category-title">Inner West</div>
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Milton"> Milton</label>
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Paddington"> Paddington</label>
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Red Hill"> Red Hill</label>
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Kelvin Grove"> Kelvin Grove</label>
-
         <div class="sub-category-title">Inner South</div>
         <label><input type="radio" name="suburb-group" class="suburb-check" value="South Brisbane"> South Brisbane</label>
         <label><input type="radio" name="suburb-group" class="suburb-check" value="West End"> West End</label>
@@ -385,7 +354,6 @@
       </div>
     </div>
 
-    <!-- LISTA (Index) — zawsze widoczna pod filtrami -->
     <div id="index-group">
       <div class="index-group-head">
         <span class="acc-title">Index</span><span class="acc-count" id="index-count"></span>
@@ -422,10 +390,8 @@
   <div class="pi-drawer-body">
     <div class="pi-drawer-title" id="pi-drawer-title">New records documented</div>
     <div class="pi-drawer-sub" id="pi-drawer-sub">Archive total: … records</div>
-
     <div class="pi-drawer-section-title">By location</div>
     <div id="pi-drawer-log"></div>
-
     <div class="pi-drawer-section-title" id="pi-thumbs-title" style="display:none; margin-top:24px;">Visual preview</div>
     <div class="pi-drawer-thumbs" id="pi-drawer-thumbs"></div>
   </div>
@@ -435,6 +401,8 @@
 </aside>
 
 <script>
+window.PI_PHOTOS_CACHE = null;
+
 function initMapboxApp() {
   if (typeof mapboxgl === 'undefined') { setTimeout(initMapboxApp, 50); return; }
 
@@ -447,7 +415,8 @@ function initMapboxApp() {
     container: 'map',
     style: 'mapbox://styles/mapbox/light-v11',
     center: [153.0307, -27.4598],
-    zoom: 13
+    zoom: 13,
+    fadeDuration: 100
   });
   map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
 
@@ -462,24 +431,7 @@ function initMapboxApp() {
     map.fitBounds(bounds, { padding: 60, duration: 1000, maxZoom: 14.5, essential: true });
   }
 
-  // --- SŁOWNIK KONTROLOWANY (Part I taksonomii ze skilla tagowania) ---
-  // Physical Condition to gotowe, dokładne terminy — dopasowanie 1:1.
-  // Typology i Urban Context na mapie to etykiety GRUPOWE (Residential, Urban Renewal itd.),
-  // więc grupa jest "aktywna" dla lokalizacji, jeśli KTÓREKOLWIEK realne słowo z tej grupy
-  // pojawia się w słowach kluczowych zdjęć przypisanych do tej lokalizacji.
   var CONDITION_TERMS = ['Existing Condition', 'Fenced Development Site', 'Demolition & Site Works', 'Active Construction Site', 'Completed Development'];
-  var TYPOLOGY_GROUPS = {
-    'Residential': ['residential', 'apartment', 'residential tower', 'social housing', 'student housing'],
-    'Commercial & Retail': ['commercial', 'office', 'retail', 'hospitality', 'shopfront', 'showroom', 'market', 'supermarket', 'shopping centre', 'cafe', 'restaurant', 'bar', 'pub', 'hotel'],
-    'Public & Civic': ['public', 'civic', 'education', 'university', 'school', 'health', 'hospital', 'clinic', 'government', 'place of worship', 'community centre', 'library', 'museum', 'gallery', 'theatre', 'performance venue', 'stadium', 'arena'],
-    'Heritage & Traditional': ['heritage', 'heritage architecture', 'queenslander', 'highset house', 'lowset house', 'workers cottage', 'post war house', 'terrace house', 'duplex', 'adaptive reuse'],
-    'Industrial': ['industrial', 'warehouse', 'parking structure', 'industrial architecture']
-  };
-  var URBAN_GROUPS = {
-    'Urban Renewal': ['urban renewal', 'urban development', 'urban intensification', 'urban consolidation'],
-    'High Density': ['high density'],
-    'Riverfront': ['riverfront']
-  };
 
   function normalizeKey(s) { return (s || '').toLowerCase().trim(); }
 
@@ -518,14 +470,10 @@ function initMapboxApp() {
     }).filter(function (r) { return r.titleLower; });
   }
 
-  // Łączy zdjęcia z lokalizacjami po nazwie ulicy (podciąg tytułu zdjęcia), bo medias.csv
-  // nie ma kolumny referencyjnej do pineski na mapie. To dopasowanie tekstowe — przybliżone,
-  // warto zweryfikować wynik dla kilku lokalizacji po wdrożeniu.
   function applyMediaTagsToLocations(mediaRows) {
     locations.forEach(function (loc) {
       var streetKey = normalizeKey((loc.street || '').split('/')[0].split(',')[0]);
       if (!streetKey) return;
-
       var matched = new Set();
       mediaRows.forEach(function (m) {
         if (m.titleLower.indexOf(streetKey) !== -1) {
@@ -533,13 +481,6 @@ function initMapboxApp() {
         }
       });
       if (matched.size === 0) return;
-
-      // Tylko Physical Condition jest wystarczająco wiarygodny do automatycznego dopasowania:
-      // to jeden, konkretny, wieloczłonowy termin na zdjęcie ("Fenced Development Site"), mało
-      // podatny na przypadkową zgodność. Typology i Urban Context łapią pojedyncze, ogólne słowa
-      // ("residential", "heritage", "public"), które pojawiają się też jako szum z automatycznego
-      // opisu zdjęcia (np. budynek w tle), nie jako świadoma kategoryzacja tej lokalizacji —
-      // wyłączone, dopóki nie będzie czystszego źródła danych.
       var conditions = CONDITION_TERMS.filter(function (t) { return matched.has(t.toLowerCase()); });
       if (conditions.length) loc.condition = conditions.join(';');
     });
@@ -552,239 +493,124 @@ function initMapboxApp() {
     if (listWrap) listWrap.innerHTML = '<div class="list-empty">Archive data could not be loaded.</div>';
     var archiveCountEl = document.getElementById('archive-count');
     if (archiveCountEl) archiveCountEl.textContent = 'ARCHIVE UNAVAILABLE';
-    var drawerIndex = document.getElementById('pi-drawer-index');
-    var drawerTitle = document.getElementById('pi-drawer-title');
-    var drawerSub = document.getElementById('pi-drawer-sub');
-    if (drawerIndex) drawerIndex.textContent = 'UNAVAILABLE';
-    if (drawerTitle) drawerTitle.textContent = 'Data unavailable';
-    if (drawerSub) drawerSub.textContent = 'Could not load the archive log right now.';
-    var contextText = document.getElementById('context-bar-text');
-    if (contextText) contextText.textContent = 'ARCHIVE DATA UNAVAILABLE — PLEASE REFRESH';
   }
 
-  // --- WYSZUKIWARKA I SYNCHRONIZACJA ---
-  var searchInput = document.getElementById('pi-search-input');
-  var clearBtn = document.getElementById('pi-search-clear');
+  // --- RÓWNOLEGŁE POBIERANIE DANYCH ---
+  var ts = Date.now();
+  Promise.all([
+    fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/locations.csv?t=' + ts).then(r => r.ok ? r.text() : Promise.reject(r.status)),
+    fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/medias.csv?t=' + ts).then(r => r.ok ? r.text() : '').catch(() => '')
+  ])
+  .then(function ([csvText, mediaCsvText]) {
+    if (!csvText || !csvText.trim()) throw new Error('CSV empty');
 
-  if (searchInput && clearBtn) {
-    clearBtn.addEventListener('click', function() {
-      searchInput.value = '';
-      this.style.display = 'none';
-      var defaultRadio = document.querySelector('.suburb-check[value=""]');
-      if (defaultRadio) defaultRadio.checked = true;
-      searchState.suburb = '';
-      searchState.text = '';
-      applySearchState();
-      map.flyTo({ center: [153.0307, -27.4598], zoom: 13, duration: 1200 });
-    });
+    var lines = csvText.trim().split('\n');
+    var headers = lines[0].split(',').map(h => h.trim());
+    locations = [];
+    var totalArchiveRecords = 0;
+    var batchesMap = {};
 
-    searchInput.addEventListener('input', function() {
-      clearBtn.style.display = this.value ? 'block' : 'none';
-      searchState.text = this.value.trim().toLowerCase();
-      applySearchState();
-    });
-  }
+    for (var i = 1; i < lines.length; i++) {
+      var line = lines[i];
+      if (!line) continue;
+      var cols = splitCsvLine(line, ',');
+      var row = {};
+      headers.forEach((h, idx) => row[h] = (cols[idx] || '').trim());
 
-  // --- POBIERANIE Z CSV Z OBSŁUGĄ BŁĘDÓW ---
-  fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/locations.csv?t=' + Date.now())
-    .then(function (r) {
-      if (!r.ok) throw new Error('Network error: ' + r.status);
-      return r.text();
-    })
-    .then(function (csvText) {
-      if (!csvText || !csvText.trim()) throw new Error('CSV empty');
+      var count = parseInt(row.count, 10) || 1;
+      totalArchiveRecords += count;
 
-      var lines = csvText.trim().split('\n');
-      var headers = lines[0].split(',').map(h => h.trim());
+      var locData = {
+        ref: row.ref || 'PX.26.000',
+        street: row.address || row.street || 'Unnamed location',
+        suburb: row.suburb || 'Brisbane City',
+        condition: row.condition || '',
+        typology: row.typology || '',
+        urban: row.urban || '',
+        year: row.year || (row.date ? row.date.slice(-4) : ''),
+        count: count,
+        dates: row.shoot_dates || row.date || '',
+        coords: [parseFloat(row.lng), parseFloat(row.lat)],
+        archiveUrl: row.archiveUrl || '#'
+      };
 
-      locations = [];
-      var totalArchiveRecords = 0;
-      var batchesMap = {};
-
-      for (var i = 1; i < lines.length; i++) {
-        var line = lines[i];
-        if(!line) continue;
-
-        var cols = [];
-        let cur = '', inQ = false;
-        for (let c of line) {
-          if (c === '"') inQ = !inQ;
-          else if (c === ',' && !inQ) { cols.push(cur); cur = ''; }
-          else cur += c;
-        }
-        cols.push(cur);
-
-        var row = {};
-        headers.forEach((h, idx) => row[h] = (cols[idx] || '').trim());
-
-        var count = parseInt(row.count) || 1;
-        totalArchiveRecords += count;
-
-        var locData = {
-          ref: row.ref || 'PX.26.000',
-          street: row.address || row.street || 'Unnamed location',
-          suburb: row.suburb || 'Brisbane City',
-          condition: row.condition || '',
-          typology: row.typology || '',
-          urban: row.urban || '',
-          year: row.year || (row.date ? row.date.slice(-4) : ''),
-          count: count,
-          dates: row.shoot_dates || row.date || '',
-          coords: [parseFloat(row.lng), parseFloat(row.lat)],
-          archiveUrl: row.archiveUrl || '#'
-        };
-
-        if (!isNaN(locData.coords[0]) && !isNaN(locData.coords[1])) {
-          locations.push(locData);
-        }
-
-        var batchId = row.update_batch || 'UNKNOWN';
-        if (!batchesMap[batchId]) batchesMap[batchId] = [];
-        batchesMap[batchId].push(locData);
+      if (!isNaN(locData.coords[0]) && !isNaN(locData.coords[1])) {
+        locations.push(locData);
       }
 
-      // --- GENEROWANIE SZUFLADY ---
-      var sortedBatches = Object.keys(batchesMap).filter(b => b !== 'UNKNOWN').sort(function(a, b) {
-        var dateA = new Date(a);
-        var dateB = new Date(b);
-        if (!isNaN(dateA) && !isNaN(dateB)) return dateB - dateA;
-        return b.localeCompare(a);
-      });
+      var batchId = row.update_batch || 'UNKNOWN';
+      if (!batchesMap[batchId]) batchesMap[batchId] = [];
+      batchesMap[batchId].push(locData);
+    }
 
-      var latestBatchId = sortedBatches[0];
+    if (mediaCsvText) {
+      applyMediaTagsToLocations(parseMediasCsv(mediaCsvText));
+    }
 
-      if (latestBatchId) {
-        var latestRecords = batchesMap[latestBatchId];
-        var latestTotalCount = 0;
+    // SZUFLADA
+    var sortedBatches = Object.keys(batchesMap).filter(b => b !== 'UNKNOWN').sort((a, b) => b.localeCompare(a));
+    var latestBatchId = sortedBatches[0];
 
-        latestRecords.forEach(rec => { latestTotalCount += rec.count; });
+    if (latestBatchId) {
+      var latestRecords = batchesMap[latestBatchId];
+      var latestTotalCount = latestRecords.reduce((acc, r) => acc + r.count, 0);
 
-        document.getElementById('pi-drawer-index').innerHTML = 'UPDATE &middot; ' + latestBatchId.toUpperCase();
-        // "records", nie "frames" — zgodnie z linią "Archive total: X records" tuż poniżej.
-        document.getElementById('pi-drawer-title').textContent = latestTotalCount + ' new records documented';
-        document.getElementById('pi-drawer-sub').textContent = 'Archive total: ' + totalArchiveRecords + ' records';
+      var elDrawerIdx = document.getElementById('pi-drawer-index');
+      if (elDrawerIdx) elDrawerIdx.innerHTML = 'UPDATE &middot; ' + latestBatchId.toUpperCase();
+      var elDrawerTitle = document.getElementById('pi-drawer-title');
+      if (elDrawerTitle) elDrawerTitle.textContent = latestTotalCount + ' new records documented';
+      var elDrawerSub = document.getElementById('pi-drawer-sub');
+      if (elDrawerSub) elDrawerSub.textContent = 'Archive total: ' + totalArchiveRecords + ' records';
 
-        var logContainer = document.getElementById('pi-drawer-log');
-        if (logContainer) {
-          logContainer.innerHTML = latestRecords.map(function(rec) {
-            var padCount = rec.count.toString().padStart(2, '0');
-            var linkUrl = rec.archiveUrl || 'https://www.photoindex.au/';
-            return '<a href="' + linkUrl + '" target="_top" class="pi-log-link" data-query="' + rec.street + '">' +
-                     '<span class="loc">' + rec.street + '</span>' +
-                     '<span class="stats">' +
-                       '<span class="count">' + padCount + '</span>' +
-                       '<span class="arrow">→</span>' +
-                     '</span>' +
-                   '</a>';
-          }).join('');
+      var logContainer = document.getElementById('pi-drawer-log');
+      if (logContainer) {
+        logContainer.innerHTML = latestRecords.map(function (rec) {
+          var padCount = rec.count.toString().padStart(2, '0');
+          var linkUrl = rec.archiveUrl || 'https://www.photoindex.au/';
+          return '<a href="' + linkUrl + '" target="_top" class="pi-log-link" data-query="' + rec.street + '">' +
+                   '<span class="loc">' + rec.street + '</span>' +
+                   '<span class="stats"><span class="count">' + padCount + '</span><span class="arrow">→</span></span>' +
+                 '</a>';
+        }).join('');
 
-          logContainer.querySelectorAll('.pi-log-link').forEach(function(link) {
-            link.addEventListener('mouseenter', function() {
-              var q = this.getAttribute('data-query');
-              if (window.piFlyToQuery) window.piFlyToQuery(q);
-            });
+        logContainer.querySelectorAll('.pi-log-link').forEach(function (link) {
+          link.addEventListener('mouseenter', function () {
+            var q = this.getAttribute('data-query');
+            if (window.piFlyToQuery) window.piFlyToQuery(q);
           });
-        }
-
-        // Miniatury z cachowaniem w pamięci — jedno zapytanie do api.github.com na wizytę,
-        // nie przy każdym otwarciu drawera (limit niezalogowanych zapytań: 60/h na adres IP).
-        function renderThumbs(urls) {
-          var thumbsContainer = document.getElementById('pi-drawer-thumbs');
-          var thumbsTitle = document.getElementById('pi-thumbs-title');
-          if (thumbsContainer && urls.length > 0) {
-            if (thumbsTitle) thumbsTitle.style.display = 'block';
-            thumbsContainer.innerHTML = urls.map(function(url) {
-              return '<div class="pi-thumb-card"><img src="' + url + '" alt="Archive Record" loading="lazy"></div>';
-            }).join('');
-          }
-        }
-
-        // GitHub Contents API zwraca maksymalnie 1000 plików na jedno zapytanie.
-        // Przy większym folderze dociągamy kolejne strony (per_page=100), aż strona wróci pusta.
-        function fetchAllPhotos(page, acc) {
-          page = page || 1;
-          acc = acc || [];
-          return fetch('https://api.github.com/repos/sproutssorbets/bne-urban-index/contents/photos?per_page=100&page=' + page)
-            .then(function (res) {
-              if (!res.ok) throw new Error('GitHub contents fetch failed: ' + res.status);
-              return res.json();
-            })
-            .then(function (files) {
-              if (!Array.isArray(files) || files.length === 0) return acc;
-              var urls = files
-                .filter(f => f.type === 'file' && f.name.match(/\.(jpg|jpeg|png)$/i))
-                .map(f => f.download_url);
-              acc = acc.concat(urls);
-              if (files.length < 100 || page >= 10) return acc; // bezpiecznik: max ~1000 plików
-              return fetchAllPhotos(page + 1, acc);
-            });
-        }
-
-        if (window.PI_PHOTOS_CACHE) {
-          renderThumbs(window.PI_PHOTOS_CACHE);
-        } else {
-          fetchAllPhotos()
-            .then(function (urls) {
-              window.PI_PHOTOS_CACHE = urls;
-              renderThumbs(urls);
-            })
-            .catch(function () { /* podgląd miniatur jest opcjonalny — cichy fallback */ });
-        }
-
-        var dot = document.getElementById('pi-drawer-dot');
-        if (dot) {
-          var storageKey = 'pi_archive_seen_time_' + latestBatchId;
-          var firstSeenTime = localStorage.getItem(storageKey);
-          var now = new Date().getTime();
-          var twentyFourHours = 24 * 60 * 60 * 1000;
-
-          if (!firstSeenTime) {
-            localStorage.setItem(storageKey, now);
-            dot.classList.remove('hidden');
-            // Drawer nie otwiera się już sam — kropka wystarczy jako sygnał, że jest coś nowego.
-            // Auto-otwieranie miało sens, gdy to była jedyna wzmianka o nowościach na stronie;
-            // teraz konkuruje z sekcją "Recently Added" pod mapą.
-          } else {
-            var elapsed = now - parseInt(firstSeenTime, 10);
-            if (elapsed < twentyFourHours) { dot.classList.remove('hidden'); }
-            else { dot.classList.add('hidden'); }
-          }
-        }
-        window.CURRENT_BATCH_ID = latestBatchId;
+        });
       }
 
-      // Uzupełniamy condition/typology/urban prawdziwymi danymi ze słów kluczowych zdjęć,
-      // zamiast czekać, aż ktoś ręcznie wypełni te kolumny w locations.csv.
-      fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/medias.csv?t=' + Date.now())
-        .then(function (r) {
-          if (!r.ok) throw new Error('medias.csv fetch failed: ' + r.status);
-          return r.text();
-        })
-        .then(function (mediaCsvText) {
-          applyMediaTagsToLocations(parseMediasCsv(mediaCsvText));
-        })
-        .catch(function (err) {
-          console.warn('PhotoIndex: could not load medias.csv — condition/typology/urban filters will show as empty', err);
-        })
-        .then(function () {
-          annotateFilterCoverage();
-          if (map.loaded()) setupMap(); else map.on('load', setupMap);
-        });
-    })
-    .catch(function (err) {
-      console.error('PhotoIndex map: failed to load locations', err);
-      showErrorState();
-    });
+      var dot = document.getElementById('pi-drawer-dot');
+      if (dot) {
+        var storageKey = 'pi_archive_seen_time_' + latestBatchId;
+        var firstSeenTime = localStorage.getItem(storageKey);
+        var now = Date.now();
+        if (!firstSeenTime) {
+          localStorage.setItem(storageKey, now);
+          dot.classList.remove('hidden');
+        } else if (now - parseInt(firstSeenTime, 10) < 86400000) {
+          dot.classList.remove('hidden');
+        } else {
+          dot.classList.add('hidden');
+        }
+      }
+    }
 
-  // Przy każdej opcji filtra 2-5 pokazujemy, ile lokalizacji faktycznie ma taki tag w CSV.
-  // Opcje bez żadnego pokrycia są wyszarzone i zablokowane, żeby nie dawały fałszywego
-  // wrażenia, że filtr działa, skoro pole w locations.csv jest po prostu puste.
+    annotateFilterCoverage();
+    if (map.loaded()) setupMap(); else map.on('load', setupMap);
+  })
+  .catch(function (err) {
+    console.error('PhotoIndex load failure', err);
+    showErrorState();
+  });
+
   function annotateFilterCoverage() {
     document.querySelectorAll('.filter-check').forEach(function (cb) {
       var cat = cb.getAttribute('data-cat');
       var val = cb.value;
       var count = locations.filter(function (loc) {
-        var values = (loc[cat] || '').split(';').map(function (v) { return v.trim(); }).filter(Boolean);
+        var values = (loc[cat] || '').split(';').map(v => v.trim()).filter(Boolean);
         return values.indexOf(val) !== -1;
       }).length;
 
@@ -802,21 +628,19 @@ function initMapboxApp() {
       if (count === 0) {
         cb.disabled = true;
         label.classList.add('no-data');
-        label.title = 'No locations tagged with this yet';
       } else {
         cb.disabled = false;
         label.classList.remove('no-data');
-        label.title = '';
       }
     });
   }
 
   function setupMap() {
     var activePopup = null;
-    window.piCloseAllPopups = function() {
+    window.piCloseAllPopups = function () {
       if (activePopup) { activePopup.remove(); activePopup = null; }
     };
-    window.piOpenPopup = function(popup, coords) {
+    window.piOpenPopup = function (popup, coords) {
       window.piCloseAllPopups();
       popup.setLngLat(coords).addTo(map);
       activePopup = popup;
@@ -829,23 +653,11 @@ function initMapboxApp() {
 
       var datesList = loc.dates ? loc.dates.split(';').map(d => d.trim()).filter(Boolean) : [];
       var datesDesc = datesList.slice().reverse();
+      var rows = [['Suburb', loc.suburb], ['Photos', String(loc.count)]];
+      datesDesc.forEach((d, i) => rows.push([i === 0 ? 'Photographed' : '', d]));
 
-      var rows = [ ['Suburb', loc.suburb], ['Photos', String(loc.count)] ];
-      datesDesc.forEach(function (d, i) { rows.push([i === 0 ? 'Photographed' : '', d]); });
-
-      var rowsHtml = rows.map(function (r) {
-        return '<div style="display:flex;justify-content:space-between;gap:12px;font-size:10px;padding:3px 0;">' +
-          '<span style="color:var(--subtext);text-transform:uppercase;">' + r[0] + '</span>' +
-          '<span style="color:var(--text);font-weight:500;">' + r[1] + '</span>' +
-        '</div>';
-      }).join('');
-
-      var popupHtml =
-        '<div style="min-width:180px; position:relative;">' +
-          '<div class="pi-popup-title">' + loc.street + '</div>' +
-          '<div style="border-top:1px solid var(--text);border-bottom:1px solid var(--text);padding:6px 0;margin-bottom:8px;">' + rowsHtml + '</div>' +
-          '<a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:var(--text);color:#FFF;padding:8px;font-size:9px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;">OPEN RECORD →</a>' +
-        '</div>';
+      var rowsHtml = rows.map(r => '<div style="display:flex;justify-content:space-between;gap:12px;font-size:10px;padding:3px 0;"><span style="color:var(--subtext);text-transform:uppercase;">' + r[0] + '</span><span style="color:var(--text);font-weight:500;">' + r[1] + '</span></div>').join('');
+      var popupHtml = '<div style="min-width:180px;position:relative;"><div class="pi-popup-title">' + loc.street + '</div><div style="border-top:1px solid var(--text);border-bottom:1px solid var(--text);padding:6px 0;margin-bottom:8px;">' + rowsHtml + '</div><a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:var(--text);color:#FFF;padding:8px;font-size:9px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;">OPEN RECORD →</a></div>';
 
       loc.popup = new mapboxgl.Popup({ offset: [0, -42], closeButton: true, className: 'pi-popup' }).setHTML(popupHtml);
       loc.marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' }).setLngLat(loc.coords).addTo(map);
@@ -854,7 +666,7 @@ function initMapboxApp() {
     });
 
     applySearchState();
-    map.once('idle', () => { document.getElementById('map').classList.add('loaded'); });
+    document.getElementById('map').classList.add('loaded');
   }
 
   function updatePhotoDeckLink() {
@@ -871,42 +683,29 @@ function initMapboxApp() {
   }
 
   function countActiveFilters() {
-    var n = 0;
-    if (searchState.suburb) n++;
-    for (var cat in searchState.categories) {
-      n += (searchState.categories[cat] || []).length;
-    }
+    var n = searchState.suburb ? 1 : 0;
+    for (var cat in searchState.categories) { n += (searchState.categories[cat] || []).length; }
     return n;
   }
 
-  // --- KOMPLEKSOWA LOGIKA FILTROWANIA (TEKST + SUBURB + KATEGORIE 2-5) ---
   function applySearchState() {
     var visibleLocs = locations.filter(loc => {
-      var matchesText = !searchState.text ||
-        loc.street.toLowerCase().includes(searchState.text) ||
-        loc.suburb.toLowerCase().includes(searchState.text);
-
-      var matchesSuburb = !searchState.suburb ||
-        loc.suburb.toLowerCase() === searchState.suburb.toLowerCase();
-
+      var matchesText = !searchState.text || loc.street.toLowerCase().includes(searchState.text) || loc.suburb.toLowerCase().includes(searchState.text);
+      var matchesSuburb = !searchState.suburb || loc.suburb.toLowerCase() === searchState.suburb.toLowerCase();
       var matchesCategories = true;
       for (var cat in searchState.categories) {
         var allowed = searchState.categories[cat];
         if (allowed && allowed.length > 0) {
-          // pole może zawierać jedną wartość albo kilka rozdzielonych średnikiem (np. typology)
           var values = (loc[cat] || '').split(';').map(v => v.trim()).filter(Boolean);
-          var hasMatch = values.some(v => allowed.includes(v));
-          if (!hasMatch) { matchesCategories = false; break; }
+          if (!values.some(v => allowed.includes(v))) { matchesCategories = false; break; }
         }
       }
-
       return matchesText && matchesSuburb && matchesCategories;
     });
 
     locations.forEach(loc => {
       if (loc.marker) {
-        var isVisible = visibleLocs.indexOf(loc) !== -1;
-        loc.marker.getElement().style.display = isVisible ? '' : 'none';
+        loc.marker.getElement().style.display = (visibleLocs.indexOf(loc) !== -1) ? '' : 'none';
       }
     });
 
@@ -915,23 +714,14 @@ function initMapboxApp() {
 
     var archiveCountEl = document.getElementById('archive-count');
     if (archiveCountEl) archiveCountEl.textContent = visibleLocs.length + ' OF ' + locations.length + ' LOCATIONS';
-
     var indexCount = document.getElementById('index-count');
     if (indexCount) indexCount.textContent = '(' + visibleLocs.length + ')';
-
-    var contextText = document.getElementById('context-bar-text');
-    if (contextText) {
-      var anyFilterActive = searchState.text || countActiveFilters() > 0;
-      contextText.textContent = anyFilterActive
-        ? visibleLocs.length + ' OF ' + locations.length + ' LOCATIONS VISIBLE'
-        : 'SELECT A PIN OR A FILTER TO OPEN A RECORD';
-    }
 
     var badge = document.getElementById('mobile-filter-count');
     if (badge) {
       var n = countActiveFilters();
-      if (n > 0) { badge.textContent = n; badge.style.display = 'inline-flex'; }
-      else { badge.style.display = 'none'; }
+      badge.textContent = n;
+      badge.style.display = n > 0 ? 'inline-flex' : 'none';
     }
   }
 
@@ -945,31 +735,42 @@ function initMapboxApp() {
       return;
     }
 
-    var LIST_LIMIT = 100;
+    var LIST_LIMIT = 80;
+    var frag = document.createDocumentFragment();
     items.slice(0, LIST_LIMIT).forEach(loc => {
       var row = document.createElement('div');
       row.className = 'list-row';
       row.innerHTML = '<div class="list-street">' + loc.street + '</div><div class="list-suburb">' + loc.suburb + '</div>';
       row.addEventListener('click', () => {
-        if (window.innerWidth <= 720) {
-          document.getElementById('index-panel').classList.remove('mobile-active');
-        }
+        if (window.innerWidth <= 720) document.getElementById('index-panel').classList.remove('mobile-active');
         map.flyTo({ center: loc.coords, zoom: 15 });
         if (window.piOpenPopup && loc.popup) window.piOpenPopup(loc.popup, loc.coords);
       });
-      row.addEventListener('mouseenter', () => {
-        map.flyTo({ center: loc.coords, zoom: 15 });
-        if (window.piOpenPopup && loc.popup) window.piOpenPopup(loc.popup, loc.coords);
-      });
-      wrap.appendChild(row);
+      frag.appendChild(row);
+    });
+    wrap.appendChild(frag);
+  }
+
+  // Wyszukiwarka i filtry
+  var searchInput = document.getElementById('pi-search-input');
+  var clearBtn = document.getElementById('pi-search-clear');
+  if (searchInput && clearBtn) {
+    clearBtn.addEventListener('click', function () {
+      searchInput.value = '';
+      this.style.display = 'none';
+      var defRadio = document.querySelector('.suburb-check[value=""]');
+      if (defRadio) defRadio.checked = true;
+      searchState.suburb = '';
+      searchState.text = '';
+      applySearchState();
+      map.flyTo({ center: [153.0307, -27.4598], zoom: 13, duration: 1200 });
     });
 
-    if (items.length > LIST_LIMIT) {
-      var note = document.createElement('div');
-      note.className = 'list-truncated';
-      note.textContent = 'SHOWING FIRST ' + LIST_LIMIT + ' OF ' + items.length + ' — NARROW WITH FILTERS TO SEE MORE';
-      wrap.appendChild(note);
-    }
+    searchInput.addEventListener('input', function () {
+      clearBtn.style.display = this.value ? 'block' : 'none';
+      searchState.text = this.value.trim().toLowerCase();
+      applySearchState();
+    });
   }
 
   document.querySelectorAll('.acc-head').forEach(h => {
@@ -980,45 +781,31 @@ function initMapboxApp() {
     });
   });
 
-  // --- OBSŁUGA FILTRÓW DZIELNIC (SUBURB) ---
   document.querySelectorAll('.suburb-check').forEach(cb => {
     cb.addEventListener('change', function () {
       if (window.piCloseAllPopups) window.piCloseAllPopups();
       searchState.suburb = this.value;
-
       if (searchInput) {
         searchInput.value = this.value;
         if (clearBtn) clearBtn.style.display = this.value ? 'block' : 'none';
       }
-
       applySearchState();
-
       if (this.value) {
         fetch('https://api.mapbox.com/geocoding/v5/mapbox.places/' + encodeURIComponent(this.value + ', Brisbane, Australia') + '.json?access_token=' + mapboxgl.accessToken + '&country=au&types=place,locality,neighborhood&limit=1')
           .then(r => r.json())
           .then(data => { if (data.features && data.features[0]) frameArea(data.features[0].center, data.features[0].bbox); });
-
-        if (window.innerWidth <= 720) {
-          document.getElementById('index-panel').classList.remove('mobile-active');
-        }
       } else {
         map.flyTo({ center: [153.0307, -27.4598], zoom: 13, duration: 1200 });
       }
     });
   });
 
-  // --- OBSŁUGA CHECKBOXÓW KATEGORII (2-5) ---
   document.querySelectorAll('.filter-check').forEach(cb => {
-    cb.addEventListener('change', function() {
+    cb.addEventListener('change', function () {
       var cat = this.getAttribute('data-cat');
       if (!searchState.categories[cat]) searchState.categories[cat] = [];
-
-      if (this.checked) {
-        searchState.categories[cat].push(this.value);
-      } else {
-        searchState.categories[cat] = searchState.categories[cat].filter(v => v !== this.value);
-      }
-
+      if (this.checked) searchState.categories[cat].push(this.value);
+      else searchState.categories[cat] = searchState.categories[cat].filter(v => v !== this.value);
       applySearchState();
     });
   });
@@ -1027,9 +814,7 @@ function initMapboxApp() {
     if (!query || !locations || !locations.length) return;
     var match = locations.find(l => l.street.toLowerCase().includes(query.toLowerCase()) || l.suburb.toLowerCase() === query.toLowerCase());
     if (match) {
-      if (window.innerWidth <= 720) {
-        document.getElementById('index-panel').classList.remove('mobile-active');
-      }
+      if (window.innerWidth <= 720) document.getElementById('index-panel').classList.remove('mobile-active');
       map.flyTo({ center: match.coords, zoom: 15, speed: 1.2 });
       if (window.piOpenPopup && match.popup) window.piOpenPopup(match.popup, match.coords);
     }
@@ -1038,7 +823,7 @@ function initMapboxApp() {
 
 initMapboxApp();
 
-// --- OBSŁUGA INTERFEJSU DRAWERA I MOBILE ---
+// --- LAZY GITHUB FETCH & UI ---
 document.addEventListener('DOMContentLoaded', function () {
   var tab = document.getElementById('pi-drawer-tab');
   var panel = document.getElementById('pi-drawer-panel');
@@ -1046,12 +831,44 @@ document.addEventListener('DOMContentLoaded', function () {
   var closeBtnAlt = document.getElementById('pi-drawer-close-btn');
   var backdrop = document.getElementById('pi-drawer-backdrop');
 
+  function renderThumbs(urls) {
+    var thumbsContainer = document.getElementById('pi-drawer-thumbs');
+    var thumbsTitle = document.getElementById('pi-thumbs-title');
+    if (thumbsContainer && urls.length > 0) {
+      if (thumbsTitle) thumbsTitle.style.display = 'block';
+      thumbsContainer.innerHTML = urls.map(function(url) {
+        return '<div class="pi-thumb-card"><img src="' + url + '" alt="Record thumbnail" loading="lazy"></div>';
+      }).join('');
+    }
+  }
+
+  function fetchAllPhotos(page, acc) {
+    page = page || 1;
+    acc = acc || [];
+    return fetch('https://api.github.com/repos/sproutssorbets/bne-urban-index/contents/photos?per_page=100&page=' + page)
+      .then(res => res.ok ? res.json() : [])
+      .then(files => {
+        if (!Array.isArray(files) || files.length === 0) return acc;
+        var urls = files.filter(f => f.type === 'file' && f.name.match(/\.(jpg|jpeg|png)$/i)).map(f => f.download_url);
+        acc = acc.concat(urls);
+        if (files.length < 100 || page >= 4) return acc;
+        return fetchAllPhotos(page + 1, acc);
+      });
+  }
+
   function openDrawer() {
     panel.classList.add('open');
     backdrop.classList.add('active');
     panel.setAttribute('aria-hidden', 'false');
     tab.setAttribute('aria-expanded', 'true');
-    document.addEventListener('keydown', onKeydown);
+
+    // LAZY FETCH MINIATUR DOPIERO PO OTWARCIU SZUFLADY
+    if (!window.PI_PHOTOS_CACHE) {
+      fetchAllPhotos().then(function (urls) {
+        window.PI_PHOTOS_CACHE = urls;
+        renderThumbs(urls);
+      }).catch(function () {});
+    }
   }
 
   function closeDrawer() {
@@ -1059,24 +876,12 @@ document.addEventListener('DOMContentLoaded', function () {
     backdrop.classList.remove('active');
     panel.setAttribute('aria-hidden', 'true');
     tab.setAttribute('aria-expanded', 'false');
-    document.removeEventListener('keydown', onKeydown);
   }
 
-  function onKeydown(ev) {
-    if (ev.key === 'Escape') closeDrawer();
-  }
-
-  tab.addEventListener('click', function () {
-    if (panel.classList.contains('open')) closeDrawer();
-    else openDrawer();
-  });
-
+  tab.addEventListener('click', () => panel.classList.contains('open') ? closeDrawer() : openDrawer());
   closeBtn.addEventListener('click', closeDrawer);
   if (closeBtnAlt) closeBtnAlt.addEventListener('click', closeDrawer);
   backdrop.addEventListener('click', closeDrawer);
-
-  window.piOpenDrawer = openDrawer;
-  window.piCloseDrawer = closeDrawer;
 
   var mobileToggleBtn = document.getElementById('mobile-toggle-filters');
   var mobileIndexBtn = document.getElementById('mobile-toggle-index');
@@ -1084,51 +889,17 @@ document.addEventListener('DOMContentLoaded', function () {
   var mobileCloseBtn = document.getElementById('mobile-panel-close');
 
   if (mobileToggleBtn && indexPanel) {
-    mobileToggleBtn.addEventListener('click', function() {
-      indexPanel.classList.add('mobile-active');
-      document.body.classList.add('pi-drawer-lock');
-      indexPanel.scrollTop = 0;
-    });
+    mobileToggleBtn.addEventListener('click', () => { indexPanel.classList.add('mobile-active'); indexPanel.scrollTop = 0; });
   }
   if (mobileIndexBtn && indexPanel) {
-    mobileIndexBtn.addEventListener('click', function() {
+    mobileIndexBtn.addEventListener('click', () => {
       indexPanel.classList.add('mobile-active');
-      document.body.classList.add('pi-drawer-lock');
       var indexGroup = document.getElementById('index-group');
-      if (indexGroup) {
-        // Otwarcie panelu i przewinięcie do listy w tej samej klatce animacji bywa
-        // ignorowane przez przeglądarkę, stąd małe opóźnienie.
-        setTimeout(function () {
-          indexGroup.scrollIntoView({ behavior: 'auto', block: 'start' });
-        }, 50);
-      }
+      if (indexGroup) setTimeout(() => indexGroup.scrollIntoView({ block: 'start' }), 50);
     });
   }
   if (mobileCloseBtn && indexPanel) {
-    mobileCloseBtn.addEventListener('click', function() {
-      indexPanel.classList.remove('mobile-active');
-      document.body.classList.remove('pi-drawer-lock');
-    });
-  }
-
-  // Zamknięcie panelu przesunięciem w dół (jak w natywnym bottom sheet) — tylko mobile.
-  if (indexPanel) {
-    var touchStartY = null;
-    indexPanel.addEventListener('touchstart', function (ev) {
-      if (window.innerWidth > 720 || !indexPanel.classList.contains('mobile-active')) return;
-      if (indexPanel.scrollTop > 0) return;
-      touchStartY = ev.touches[0].clientY;
-    }, { passive: true });
-    indexPanel.addEventListener('touchmove', function (ev) {
-      if (touchStartY === null) return;
-      var delta = ev.touches[0].clientY - touchStartY;
-      if (delta > 80) {
-        indexPanel.classList.remove('mobile-active');
-        document.body.classList.remove('pi-drawer-lock');
-        touchStartY = null;
-      }
-    }, { passive: true });
-    indexPanel.addEventListener('touchend', function () { touchStartY = null; }, { passive: true });
+    mobileCloseBtn.addEventListener('click', () => indexPanel.classList.remove('mobile-active'));
   }
 });
 </script>
