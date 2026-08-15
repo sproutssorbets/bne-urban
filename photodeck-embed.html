@@ -78,7 +78,7 @@
   #pi-footer { padding: 16px 18px; background: var(--bg); border-top: 1px solid var(--text); flex-shrink: 0; }
   .pi-footer-stat { font-size: 9px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); margin-top: 10px; }
   #map-wrap { flex: 1; position: relative; height: 100%; background: #F8F8F8; margin: 0; padding: 0; }
-  #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s ease-in-out; will-change: transform; }
+  #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s ease-in-out; }
   #map.loaded { opacity: 1; }
   #map-error {
     position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
@@ -650,10 +650,10 @@ function initMapLazy() {
   mapInitiated = true;
   var css = document.createElement('link');
   css.rel = 'stylesheet';
-  css.href = 'https://api.mapbox.com/mapbox-gl-js/v3.28.1/mapbox-gl.css';
+  css.href = 'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css';
   document.head.appendChild(css);
   var js = document.createElement('script');
-  js.src = 'https://api.mapbox.com/mapbox-gl-js/v3.28.1/mapbox-gl.js';
+  js.src = 'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js';
   js.onload = function() {
     mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
     globalPopup = new mapboxgl.Popup({ offset: [0, -42], closeButton: true, className: 'pi-popup' });
@@ -703,8 +703,6 @@ function initMapLazy() {
     };
     var index = 0;
     var CHUNK = 60;
-    // Jeden szablon budowany raz. cloneNode jest tańsze niż parsowanie tego samego
-    // innerHTML osobno dla każdej lokalizacji.
     var markerTemplate = document.createElement('div');
     markerTemplate.className = 'custom-marker-hitbox';
     markerTemplate.innerHTML = '<div class="pi-pin"><div class="pi-pin-body"></div><div class="pi-pin-point"></div></div>';
@@ -762,6 +760,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (defRadio) defRadio.checked = true;
       searchState.suburb = '';
       searchState.text = '';
+      sessionStorage.removeItem(MAP_STATE_KEY);
       applySearchState();
       if (mapInstance) mapInstance.flyTo({ center: [153.0307, -27.4598], zoom: 13, duration: 800 });
     });
@@ -814,7 +813,7 @@ document.addEventListener('DOMContentLoaded', function() {
       var cat = this.getAttribute('data-cat');
       if (!searchState.categories[cat]) searchState.categories[cat] = [];
       if (this.checked) searchState.categories[cat].push(this.value);
-      else searchState.categories[cat] = searchState.categories[cat].filter(function(v) { return v !== this.value; }.bind(this));
+      else searchState.categories[cat] = searchState.categories[cat].filter(function(v) { return v !== cb.value; });
       applySearchState();
     });
   });
