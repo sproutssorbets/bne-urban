@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" class="pi-has-modal">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>PHOTOINDEX</title>
+<title>PHOTOINDEX - Spatial Database</title>
 
 <link rel="preconnect" href="https://api.mapbox.com">
 <link rel="preconnect" href="https://events.mapbox.com">
@@ -15,102 +15,22 @@
 <script defer src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
 
 <style>
-  /* --- 1. BAZA I RESET --- */
+  /* --- BAZA I RESET --- */
   *, *::before, *::after {
     box-sizing: border-box; margin: 0; padding: 0;
     border-radius: 0 !important; box-shadow: none !important;
     -webkit-tap-highlight-color: transparent;
   }
-
   :focus-visible { outline: 1px solid #111111 !important; outline-offset: -1px; }
-
   html, body {
     width: 100%; height: 100%; height: 100dvh;
     font-family: 'Inter', -apple-system, system-ui, sans-serif;
-    background: #FFFFFF; color: #111111;
-    -webkit-font-smoothing: antialiased;
+    background: #FFFFFF; color: #111111; -webkit-font-smoothing: antialiased;
   }
-
-  html.pi-has-modal, body.pi-has-modal { overflow: hidden !important; touch-action: none; }
   body { display: flex; flex-direction: column; overflow: hidden; }
+  body.pi-drawer-lock { overflow: hidden; }
 
-  /* --- 2. MODAL VIGNELLI (Modernist Grid) --- */
-  #pi-vignelli-modal {
-    position: fixed; inset: 0;
-    /* Ekstremalnie czyste, białe tło */
-    background: rgba(255, 255, 255, 0.98); 
-    z-index: 9999999; display: flex; align-items: center; justify-content: center;
-    padding: 20px; opacity: 0; pointer-events: none;
-    transition: opacity 0.3s ease;
-  }
-
-  #pi-vignelli-modal.active { opacity: 1; pointer-events: auto; }
-
-  .v-card {
-    width: 100%; max-width: 720px;
-    background: #FFFFFF; 
-    /* Gruba, rygorystyczna ramka w stylu Swiss Design */
-    border: 2px solid #111111; 
-    display: flex; flex-direction: column;
-    transform: translateY(10px); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  #pi-vignelli-modal.active .v-card { transform: translateY(0); }
-
-  .v-header {
-    display: flex; justify-content: space-between; padding: 14px 24px;
-    border-bottom: 2px solid #111111; 
-    font-weight: 600; font-size: 10px;
-    text-transform: uppercase; letter-spacing: 0.1em;
-  }
-
-  .v-header-red { color: #D72600; } /* Klasyczny szwajcarski czerwony akcent */
-
-  .v-body { padding: 48px 24px; }
-
-  .v-title {
-    font-size: 48px; font-weight: 700; line-height: 0.95;
-    text-transform: uppercase; letter-spacing: -0.04em; margin-bottom: 16px;
-  }
-
-  .v-desc {
-    font-size: 14px; font-weight: 400; color: #555555;
-    max-width: 480px; line-height: 1.4;
-  }
-
-  /* Grid ze zdjęciami: czysty, pokazujący "mięso" w kolorze od razu */
-  .v-gallery {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    border-top: 2px solid #111111; border-bottom: 2px solid #111111;
-  }
-
-  .v-gallery a { display: block; border-right: 2px solid #111111; position: relative; overflow: hidden; }
-  .v-gallery a:last-child { border-right: none; }
-  .v-gallery img {
-    width: 100%; aspect-ratio: 1; object-fit: cover; display: block;
-    transition: transform 0.4s ease, opacity 0.2s;
-  }
-  .v-gallery a:hover img { transform: scale(1.05); opacity: 0.9; }
-
-  /* Masywny przycisk akcji (Marketing CTA) */
-  #pi-ticket-ack {
-    width: 100%; padding: 24px; 
-    background: #111111; color: #FFFFFF; border: none; 
-    font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em;
-    cursor: pointer; transition: background 0.2s;
-  }
-  #pi-ticket-ack:hover { background: #333333; }
-
-  @media (max-width: 720px) {
-    .v-title { font-size: 32px; }
-    .v-body { padding: 32px 20px; }
-    .v-header { padding: 12px 20px; }
-    .v-gallery { grid-template-columns: repeat(2, 1fr); }
-    .v-gallery a:nth-child(3) { display: none; } /* Pokazujemy tylko 2 zdjęcia na mobile by uniknąć scrolowania */
-  }
-
-
-  /* --- 3. GÓRNY PASEK WYSZUKIWANIA --- */
+  /* --- GÓRNY PASEK --- */
   #topbar { background: #FFFFFF; flex-shrink: 0; z-index: 10; }
   #search-row { display: flex; align-items: center; height: 42px; padding: 0 16px; gap: 12px; border-bottom: 1px solid #111111; background: #FFFFFF; }
   .search-lead-icon { width: 14px; height: 14px; flex-shrink: 0; stroke: #111111; }
@@ -123,10 +43,9 @@
   #search-archive-btn { height: 100%; padding: 0 4px; border: none; background: transparent; color: #111111; font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; text-decoration: none; flex-shrink: 0; transition: opacity 0.15s ease; }
   #search-archive-btn:hover { opacity: 0.5; }
 
-  /* --- 4. GŁÓWNY OBSZAR ROBOCZY --- */
+  /* --- GŁÓWNY UKŁAD MAPY I FILTRÓW --- */
   #layout { width: 100%; flex: 1 1 auto; min-height: 0; background: #FFFFFF; position: relative; display: flex; overflow: hidden; }
-
-  /* --- 5. PANEL BOCZNY --- */
+  
   #index-panel { width: 320px; flex-shrink: 0; position: relative; height: 100%; border-right: 1px solid #111111; display: flex; flex-direction: column; background: #FFFFFF; overflow-y: auto; z-index: 3; }
   .acc-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid #EAEAEA; cursor: pointer; user-select: none; background: #FFFFFF; flex-shrink: 0; transition: background 0.15s ease; }
   .acc-head:hover { background: #FAFAFA; }
@@ -142,21 +61,21 @@
   .acc-body input[type="checkbox"], .acc-body input[type="radio"] { -webkit-appearance: none; appearance: none; margin: 0; width: 12px; height: 12px; border: 1px solid #111111; background: #FFFFFF; display: grid; place-content: center; flex-shrink: 0; }
   .acc-body input[type="radio"]:checked::before { content: ""; width: 6px; height: 6px; background: #111111; }
   .acc-body input[type="checkbox"]:checked { background: #111111; }
-  
+
   #list-wrap { flex: 1 1 auto; overflow-y: auto; }
   .list-row { padding: 12px 18px; border-bottom: 1px solid #EAEAEA; cursor: pointer; background: #FFFFFF; transition: background 0.15s ease; }
   .list-row:hover { background: #FAFAFA; }
   .list-street { font-size: 12px; font-weight: 500; }
-  
+
   #pi-footer { padding: 16px 18px; background: #FFFFFF; border-top: 1px solid #111111; flex-shrink: 0; }
   .pi-brand { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
   .pi-sub { font-size: 9px; color: #888888; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; }
   .pi-footer-stat { font-size: 9px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #111111; margin-top: 10px; }
 
-  /* --- 6. MAPA I PINESKI --- */
   #map-wrap { flex: 1; position: relative; height: 100%; background: #F8F8F8; }
   #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.6s ease-in-out; }
   #map.loaded { opacity: 1; }
+  
   .custom-marker-hitbox { width: 36px; height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; }
   .pi-pin { display: flex; flex-direction: column; align-items: center; }
   .pi-pin-body { min-width: 22px; height: 22px; padding: 0 5px; background: #111111; color: #FFFFFF; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
@@ -165,7 +84,57 @@
   .pi-popup .mapboxgl-popup-content { background: #FFFFFF; border: 1px solid #111111; padding: 16px; }
   .pi-popup .mapboxgl-popup-tip { border-top-color: #FFFFFF !important; border-bottom-color: #FFFFFF !important; }
 
-  /* --- 7. MOBILE OVERRIDES --- */
+  /* --- WSUWANY PANEL LOGÓW (DRAWER) --- */
+  #pi-drawer-tab {
+    position: fixed; top: 50%; right: 0; transform: translateY(-50%);
+    width: 28px; height: 116px; background: #111111; color: #FFFFFF;
+    border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    z-index: 500; transition: background 0.15s ease;
+  }
+  #pi-drawer-tab:hover { background: #333333; }
+  #pi-drawer-tab span { transform: rotate(-90deg); white-space: nowrap; font-size: 9px; font-weight: 700; letter-spacing: 0.16em; }
+  #pi-drawer-dot { position: absolute; top: 9px; right: 9px; width: 6px; height: 6px; background: #FFFFFF; transition: opacity 0.3s ease; }
+  #pi-drawer-dot.hidden { opacity: 0; }
+
+  #pi-drawer-backdrop { position: fixed; inset: 0; background: rgba(17,17,17,0.15); z-index: 600; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+  #pi-drawer-backdrop.active { opacity: 1; pointer-events: auto; }
+
+  #pi-drawer-panel {
+    position: fixed; top: 0; right: 0; height: 100%; width: 340px; max-width: calc(100vw - 40px);
+    background: #FFFFFF; border-left: 2px solid #111111; transform: translateX(100%); 
+    transition: transform 0.35s cubic-bezier(0.16,1,0.3,1); z-index: 700; display: flex; flex-direction: column;
+  }
+  #pi-drawer-panel.open { transform: translateX(0); }
+
+  .pi-drawer-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #111111; font-family: 'SF Mono', 'Roboto Mono', monospace; font-size: 10px; letter-spacing: 0.05em; color: #111111; flex-shrink: 0; }
+  .pi-drawer-close { border: none; background: transparent; cursor: pointer; width: 22px; height: 22px; font-size: 15px; color: #111111; display: flex; align-items: center; justify-content: center; padding: 0; transition: opacity 0.15s ease; }
+  .pi-drawer-close:hover { opacity: 0.5; }
+
+  .pi-drawer-body { flex: 1; overflow-y: auto; padding: 20px; }
+  .pi-drawer-title { font-size: 22px; font-weight: 700; line-height: 1.05; text-transform: uppercase; letter-spacing: -0.02em; margin-bottom: 4px; }
+  .pi-drawer-sub { font-size: 12px; color: #6B6B6B; margin-bottom: 20px; }
+  .pi-drawer-section-title { font-size: 9px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #888888; margin-bottom: 8px; }
+
+  #pi-drawer-log { display: flex; flex-direction: column; }
+  .pi-log-link {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 12px; margin: 0 -12px; border-bottom: 1px solid #DADADA;
+    font-family: 'SF Mono', 'Roboto Mono', monospace; font-size: 11px; text-decoration: none; color: #111111;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .pi-log-link:hover { background: #111111; color: #FFFFFF; }
+  .pi-log-link .loc { flex: 1; transition: color 0.2s; text-transform: lowercase; }
+  .pi-log-link .stats { display: flex; align-items: center; gap: 12px; color: #6B6B6B; transition: color 0.2s; }
+  .pi-log-link:hover .stats, .pi-log-link:hover .loc { color: #FFFFFF; }
+  .pi-log-link .arrow { opacity: 0; transform: translateX(-4px); transition: all 0.2s ease; font-family: 'Inter', sans-serif; }
+  .pi-log-link:hover .arrow { opacity: 1; transform: translateX(0); }
+
+  .pi-drawer-footer { padding: 16px 20px; border-top: 1px solid #111111; flex-shrink: 0; }
+  .pi-footer-stat { font-family: 'SF Mono', 'Roboto Mono', monospace; font-size: 9px; letter-spacing: 0.06em; color: #6B6B6B; text-transform: uppercase; margin-bottom: 12px; }
+  .pi-drawer-cta { display: block; width: 100%; text-align: center; border: 1px solid #111111; background: #111111; color: #FFFFFF; padding: 11px; font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; transition: background 0.15s ease; }
+  .pi-drawer-cta:hover { background: #333333; }
+
+  /* --- WERSJA MOBILNA --- */
   .mobile-tabs { display: none; }
   #mobile-bottom-bar { display: none; }
   @media (max-width: 720px) {
@@ -180,43 +149,17 @@
     #map-wrap { display: none; }
     #map-wrap.mobile-active { display: block; }
     #mobile-bottom-bar { display: flex; position: fixed; left: 0; right: 0; bottom: 0; height: calc(44px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); background: #111111; color: #FFFFFF; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none; z-index: 9999; }
+    #pi-drawer-tab { top: auto; bottom: calc(64px + env(safe-area-inset-bottom)); transform: none; height: 96px; }
   }
 </style>
 </head>
-<body class="pi-has-modal">
+<body>
 
-<!-- === VIGNELLI MODAL === -->
-<div id="pi-vignelli-modal">
-  <div class="v-card">
-    <div class="v-header">
-      <span class="v-header-red">● System Update</span>
-      <span id="upd-date">August 2026</span>
-    </div>
-    
-    <div class="v-body">
-      <h1 class="v-title" id="upd-title">30 NEW RECORDS<br>ADDED</h1>
-      <p class="v-desc">The archive has been updated with recent documentation from the Victoria Park / Barrambin area.</p>
-    </div>
-
-    <div class="v-gallery" id="upd-gallery">
-      <!-- Wstrzykiwane zdjęcia w czystym układzie kolumnowym -->
-    </div>
-
-    <button id="pi-ticket-ack">Enter Archive</button>
-  </div>
-</div>
-
-<!-- === GÓRNY PASEK === -->
 <div id="topbar">
   <div id="search-row">
-    <svg class="search-lead-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="square">
-      <circle cx="11" cy="11" r="7"></circle>
-      <line x1="21" y1="21" x2="16" y2="16"></line>
-    </svg>
+    <svg class="search-lead-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="square"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16" y2="16"></line></svg>
     <div id="geocoder"></div>
-    <a id="search-archive-btn" href="https://www.photoindex.au/" target="_top">
-      <span id="search-archive-text">Search</span>
-    </a>
+    <a id="search-archive-btn" href="https://www.photoindex.au/" target="_top"><span id="search-archive-text">Search</span></a>
   </div>
 
   <div class="mobile-tabs">
@@ -226,12 +169,10 @@
   </div>
 </div>
 
-<!-- === GŁÓWNY OBSZAR === -->
 <div id="layout">
-  <!-- PANEL BOCZNY (Filtry) -->
   <aside id="index-panel">
+    <!-- FILTRY -->
     <div class="panel-section-container" id="filters-group">
-      <!-- 1. LOCATION -->
       <div class="acc-head open" data-target="acc-location">
         <span class="acc-title">1. Location</span><span class="acc-icon">+</span>
       </div>
@@ -262,7 +203,6 @@
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Woolloongabba"> Woolloongabba</label>
       </div>
 
-      <!-- 2. PHYSICAL CONDITION -->
       <div class="acc-head" data-target="acc-condition">
         <span class="acc-title">2. Physical Condition</span><span class="acc-icon">+</span>
       </div>
@@ -274,7 +214,6 @@
         <label><input type="checkbox" class="filter-check" data-cat="condition" value="Completed Development"> Completed Development</label>
       </div>
 
-      <!-- 3. TYPOLOGY -->
       <div class="acc-head" data-target="acc-typology">
         <span class="acc-title">3. Typology & Architecture</span><span class="acc-icon">+</span>
       </div>
@@ -284,14 +223,6 @@
         <label><input type="checkbox" class="filter-check" data-cat="typology" value="Public & Civic"> Public & Civic</label>
         <label><input type="checkbox" class="filter-check" data-cat="typology" value="Heritage & Traditional"> Heritage & Traditional</label>
         <label><input type="checkbox" class="filter-check" data-cat="typology" value="Industrial"> Industrial</label>
-      </div>
-
-      <!-- 4. TIME -->
-      <div class="acc-head" data-target="acc-year">
-        <span class="acc-title">4. Year</span><span class="acc-icon">+</span>
-      </div>
-      <div class="acc-body" id="acc-year">
-        <label><input type="checkbox" class="filter-check" data-cat="year" value="2026"> 2026</label>
       </div>
     </div>
 
@@ -306,48 +237,45 @@
     </div>
   </aside>
 
-  <!-- MAPA -->
   <main id="map-wrap">
     <div id="map"></div>
   </main>
 </div>
 
-<a id="mobile-bottom-bar" href="https://www.photoindex.au/" target="_top">
-  SEARCH
-</a>
+<a id="mobile-bottom-bar" href="https://www.photoindex.au/" target="_top">SEARCH</a>
+
+<!-- ZAKŁADKA I SZUFLADA LOGÓW -->
+<div id="pi-drawer-backdrop"></div>
+<button id="pi-drawer-tab" type="button" aria-expanded="false" aria-controls="pi-drawer-panel">
+  <div id="pi-drawer-dot" class="hidden"></div>
+  <span>UPDATE LOG</span>
+</button>
+
+<aside id="pi-drawer-panel" role="dialog" aria-labelledby="pi-drawer-title" aria-hidden="true">
+  <div class="pi-drawer-header">
+    <span id="pi-drawer-index">LOADING...</span>
+    <button type="button" class="pi-drawer-close" id="pi-drawer-close" aria-label="Close">&times;</button>
+  </div>
+  <div class="pi-drawer-body">
+    <div class="pi-drawer-title" id="pi-drawer-title">New frames indexed</div>
+    <div class="pi-drawer-sub">Hover over records to locate on map.</div>
+    <div class="pi-drawer-section-title">By location</div>
+    <div id="pi-drawer-log"></div>
+  </div>
+  <div class="pi-drawer-footer">
+    <div class="pi-footer-stat" id="pi-drawer-total">Archive total: ...</div>
+    <a href="https://www.photoindex.au/" target="_top" class="pi-drawer-cta">View selection →</a>
+  </div>
+</aside>
 
 <script>
-// --- KONFIGURACJA AKTUALIZACJI ---
-const LATEST_UPDATE = {
-  id: "SYS.UPD.26.08",
-  date: "AUGUST 2026",
-  volume: "30",
-  defaultArchiveUrl: "https://www.photoindex.au/",
-  images: [
-    { url: "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0100.jpg", link: "https://www.photoindex.au/-/archive/brisbane/herston/victoria-park-barrambin" },
-    { url: "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0077.jpg", link: "https://www.photoindex.au/-/archive/brisbane/herston/victoria-park-barrambin" },
-    { url: "https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/photos/PX-20260620-0041.jpg", link: "https://www.photoindex.au/-/archive/brisbane/herston/victoria-park-barrambin" }
-  ]
-};
-
-// Zablokuj flash modala na wejściu jeśli widziano
-if (localStorage.getItem('pi_archive_seen_id') === LATEST_UPDATE.id) {
-  document.documentElement.classList.remove('pi-has-modal');
-  document.body && document.body.classList.remove('pi-has-modal');
-  document.write('<style>#pi-vignelli-modal { display: none !important; }</style>');
-}
-
-// --- LOGIKA MAPY I WYSZUKIWARKI ---
 function initMapboxApp() {
-  if (typeof mapboxgl === 'undefined') {
-    setTimeout(initMapboxApp, 50);
-    return;
-  }
+  if (typeof mapboxgl === 'undefined') { setTimeout(initMapboxApp, 50); return; }
 
   mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
 
   var locations = [];
-  var searchState = { suburb: '', years: [], extraFilters: [], pickedAddress: '' };
+  var searchState = { suburb: '' };
 
   var map = new mapboxgl.Map({
     container: 'map',
@@ -385,7 +313,6 @@ function initMapboxApp() {
       clearBtn.addEventListener('click', function() {
         searchInput.value = '';
         this.style.display = 'none';
-        
         var defaultRadio = document.querySelector('.suburb-check[value=""]');
         if (defaultRadio) {
           defaultRadio.checked = true;
@@ -394,7 +321,6 @@ function initMapboxApp() {
           map.flyTo({ center: [153.0307, -27.4598], zoom: 13, duration: 1200 });
         }
       });
-      
       searchInput.addEventListener('input', function() {
         clearBtn.style.display = this.value ? 'block' : 'none';
       });
@@ -402,36 +328,111 @@ function initMapboxApp() {
   }
   initCustomSearch();
 
+  // --- KLUCZOWY ELEMENT: AUTOMATYCZNE POBIERANIE Z CSV ---
   fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/locations.csv?t=' + Date.now())
     .then(r => r.text())
     .catch(() => '')
     .then(function (csvText) {
-      if (csvText) {
-        var lines = csvText.trim().split('\n');
-        var headers = lines[0].split(',');
-        locations = lines.slice(1).map(line => {
-          var cols = [];
-          let cur = '', inQ = false;
-          for (let c of line) {
-            if (c === '"') inQ = !inQ;
-            else if (c === ',' && !inQ) { cols.push(cur); cur = ''; }
-            else cur += c;
-          }
-          cols.push(cur);
-          var row = {};
-          headers.forEach((h, i) => row[h.trim()] = (cols[i] || '').trim());
+      if (!csvText) return;
 
-          return {
-            ref: row.ref || 'PX.26.000',
-            street: row.address || row.street || 'Unnamed location',
-            suburb: row.suburb || 'Brisbane City',
-            count: row.count ? parseInt(row.count) : 1,
-            dates: row.shoot_dates || row.date || '',
-            coords: [parseFloat(row.lng), parseFloat(row.lat)],
-            archiveUrl: row.archiveUrl || '#'
-          };
-        }).filter(l => !isNaN(l.coords[0]) && !isNaN(l.coords[1]));
+      var lines = csvText.trim().split('\n');
+      var headers = lines[0].split(',').map(h => h.trim());
+      
+      locations = [];
+      var totalArchiveRecords = 0; 
+      var batchesMap = {}; 
+
+      for (var i = 1; i < lines.length; i++) {
+        var line = lines[i];
+        if(!line) continue;
+        
+        var cols = [];
+        let cur = '', inQ = false;
+        for (let c of line) {
+          if (c === '"') inQ = !inQ;
+          else if (c === ',' && !inQ) { cols.push(cur); cur = ''; }
+          else cur += c;
+        }
+        cols.push(cur);
+        
+        var row = {};
+        headers.forEach((h, idx) => row[h] = (cols[idx] || '').trim());
+
+        var count = parseInt(row.count) || 1;
+        totalArchiveRecords += count; 
+
+        var locData = {
+          ref: row.ref || 'PX.26.000',
+          street: row.address || row.street || 'Unnamed location',
+          suburb: row.suburb || 'Brisbane City',
+          count: count,
+          dates: row.shoot_dates || row.date || '',
+          coords: [parseFloat(row.lng), parseFloat(row.lat)],
+          archiveUrl: row.archiveUrl || '#'
+        };
+        
+        if (!isNaN(locData.coords[0]) && !isNaN(locData.coords[1])) {
+          locations.push(locData);
+        }
+
+        // Grupowanie na potrzeby Drawera wg kolumny 'update_batch'
+        var batchId = row.update_batch || 'UNKNOWN';
+        if (!batchesMap[batchId]) batchesMap[batchId] = [];
+        batchesMap[batchId].push(locData);
       }
+
+      // --- GENEROWANIE SZUFLADY Z DANYCH CSV ---
+      var sortedBatches = Object.keys(batchesMap).filter(b => b !== 'UNKNOWN').sort().reverse();
+      var latestBatchId = sortedBatches[0]; 
+      
+      if (latestBatchId) {
+        var latestRecords = batchesMap[latestBatchId];
+        var latestTotalCount = 0;
+        var drawerLogGroup = {};
+
+        latestRecords.forEach(rec => {
+          latestTotalCount += rec.count;
+          var suburbName = rec.suburb.toLowerCase();
+          if (!drawerLogGroup[suburbName]) drawerLogGroup[suburbName] = 0;
+          drawerLogGroup[suburbName] += rec.count;
+        });
+
+        document.getElementById('pi-drawer-index').innerHTML = 'SYS.UPD.' + latestBatchId;
+        document.getElementById('pi-drawer-title').textContent = latestTotalCount + ' new frames indexed';
+        document.getElementById('pi-drawer-total').textContent = 'Archive total: ' + totalArchiveRecords + ' records';
+        
+        var logContainer = document.getElementById('pi-drawer-log');
+        if (logContainer) {
+          logContainer.innerHTML = Object.keys(drawerLogGroup).map(function(suburb) {
+            var padCount = drawerLogGroup[suburb].toString().padStart(2, '0');
+            return '<a href="javascript:void(0)" class="pi-log-link" data-query="' + suburb + '">' +
+                     '<span class="loc">' + suburb + '</span>' +
+                     '<span class="stats">' +
+                       '<span class="count">' + padCount + '</span>' +
+                       '<span class="arrow">→</span>' +
+                     '</span>' +
+                   '</a>';
+          }).join('');
+          
+          // Hover na logach przesuwa mapę!
+          logContainer.querySelectorAll('.pi-log-link').forEach(function(link) {
+            link.addEventListener('mouseenter', function() {
+              var q = this.getAttribute('data-query');
+              if (window.piFlyToQuery) window.piFlyToQuery(q);
+            });
+          });
+        }
+
+        // Obsługa czerwonej kropki powiadomienia
+        var dot = document.getElementById('pi-drawer-dot');
+        var seen = false;
+        try { seen = localStorage.getItem('pi_archive_seen_id') === latestBatchId; } catch(e) {}
+        if (!seen && dot) {
+          dot.classList.remove('hidden');
+        }
+        window.CURRENT_BATCH_ID = latestBatchId;
+      }
+
       if (map.loaded()) setupMap(); else map.on('load', setupMap);
     });
 
@@ -455,9 +456,7 @@ function initMapboxApp() {
       var datesDesc = datesList.slice().reverse();
 
       var rows = [ ['Suburb', loc.suburb], ['Photos', String(loc.count)] ];
-      datesDesc.forEach(function (d, i) {
-        rows.push([i === 0 ? 'Photographed' : '', d]);
-      });
+      datesDesc.forEach(function (d, i) { rows.push([i === 0 ? 'Photographed' : '', d]); });
 
       var rowsHtml = rows.map(function (r) {
         return '<div style="display:flex;justify-content:space-between;gap:12px;font-size:10px;padding:3px 0;">' +
@@ -481,7 +480,6 @@ function initMapboxApp() {
 
     renderList();
     applySearchState();
-
     map.once('idle', () => { document.getElementById('map').classList.add('loaded'); });
   }
 
@@ -490,7 +488,6 @@ function initMapboxApp() {
     var btnDesktop = document.getElementById('search-archive-btn');
     var txtDesktop = document.getElementById('search-archive-text');
     var btnMobile = document.getElementById('mobile-bottom-bar');
-
     var targetUrl = queryStr ? 'https://www.photoindex.au/?search=' + encodeURIComponent(queryStr) : 'https://www.photoindex.au/';
     var textValue = queryStr ? 'VIEW SELECTION' : 'SEARCH';
 
@@ -499,13 +496,10 @@ function initMapboxApp() {
   }
 
   function applySearchState() {
-    locations.forEach(loc => {
-      if (loc.marker) loc.marker.getElement().style.display = '';
-    });
+    locations.forEach(loc => { if (loc.marker) loc.marker.getElement().style.display = ''; });
     var visibleLocs = locations.filter(loc => !searchState.suburb || loc.suburb.toLowerCase() === searchState.suburb.toLowerCase());
     renderList(visibleLocs);
     updatePhotoDeckLink();
-
     var archiveCountEl = document.getElementById('archive-count');
     if (archiveCountEl) archiveCountEl.textContent = visibleLocs.length + ' LOCATIONS LINKED';
   }
@@ -539,14 +533,12 @@ function initMapboxApp() {
     cb.addEventListener('change', function () {
       if (window.piCloseAllPopups) window.piCloseAllPopups();
       searchState.suburb = this.value;
-      
       var searchInput = document.getElementById('pi-search-input');
       var clearBtn = document.getElementById('pi-search-clear');
       if (searchInput) {
-        searchInput.value = this.value; 
-        if (clearBtn) clearBtn.style.display = this.value ? 'block' : 'none'; 
+        searchInput.value = this.value;
+        if (clearBtn) clearBtn.style.display = this.value ? 'block' : 'none';
       }
-      
       applySearchState();
 
       if (this.value) {
@@ -588,61 +580,68 @@ function initMapboxApp() {
     var tm = document.getElementById('tab-map');
     if (tm) tm.click();
   }
+
+  // UDOSTĘPNIENIE FUNKCJI FLYTO DLA SZUFLADY LOGÓW
+  window.piFlyToQuery = function(query) {
+    if (!query || !locations || !locations.length) return;
+    var match = locations.find(l => l.suburb.toLowerCase() === query.toLowerCase() || l.street.toLowerCase().includes(query.toLowerCase()));
+    if (match) {
+      if (window.innerWidth <= 720) {
+        var tm = document.getElementById('tab-map');
+        if (tm) tm.click();
+      }
+      map.flyTo({ center: match.coords, zoom: 15, speed: 1.2 });
+      if (window.piOpenPopup && match.popup) window.piOpenPopup(match.popup, match.coords);
+    }
+  };
 }
 
 initMapboxApp();
 
-// --- LOGIKA MODALA VIGNELLI ---
-document.addEventListener('DOMContentLoaded', function() {
-  var modal = document.getElementById('pi-vignelli-modal');
-  var ackBtn = document.getElementById('pi-ticket-ack');
-  var gallery = document.getElementById('upd-gallery');
+// --- OBSŁUGA INTERFEJSU DRAWERA ---
+document.addEventListener('DOMContentLoaded', function () {
+  var tab = document.getElementById('pi-drawer-tab');
+  var panel = document.getElementById('pi-drawer-panel');
+  var closeBtn = document.getElementById('pi-drawer-close');
+  var backdrop = document.getElementById('pi-drawer-backdrop');
+  var dot = document.getElementById('pi-drawer-dot');
 
-  if (localStorage.getItem('pi_archive_seen_id') === LATEST_UPDATE.id) {
-    if (modal) modal.style.display = 'none';
-    document.documentElement.classList.remove('pi-has-modal');
-    document.body.classList.remove('pi-has-modal');
-    return;
-  }
-
-  function closeModal() {
-    localStorage.setItem('pi_archive_seen_id', LATEST_UPDATE.id);
-    document.documentElement.classList.remove('pi-has-modal');
-    document.body.classList.remove('pi-has-modal');
-    if (modal) {
-      modal.classList.remove('active');
-      setTimeout(function() { modal.style.display = 'none'; }, 400);
+  function openDrawer() {
+    panel.classList.add('open');
+    backdrop.classList.add('active');
+    panel.setAttribute('aria-hidden', 'false');
+    tab.setAttribute('aria-expanded', 'true');
+    
+    if (dot && !dot.classList.contains('hidden')) {
+      dot.classList.add('hidden');
+      if (window.CURRENT_BATCH_ID) {
+        try { localStorage.setItem('pi_archive_seen_id', window.CURRENT_BATCH_ID); } catch(e) {}
+      }
     }
+    document.addEventListener('keydown', onKeydown);
   }
 
-  if (modal) {
-    document.getElementById('upd-date').textContent = LATEST_UPDATE.date;
-    document.getElementById('upd-title').innerHTML = LATEST_UPDATE.volume + ' NEW RECORDS<br>ADDED';
-
-    if (gallery && LATEST_UPDATE.images.length > 0) {
-      // Ładujemy 3 obrazki na sztywno do siatki
-      gallery.innerHTML = LATEST_UPDATE.images.slice(0, 3).map(function(item) {
-        return '<a href="' + (item.link || LATEST_UPDATE.defaultArchiveUrl) + '" target="_top">' +
-               '<img src="' + item.url + '" alt="New Archive Record">' +
-               '</a>';
-      }).join('');
-      
-      // Kliknięcie w dowolne zdjęcie też zamyka modal (zapisuje cookie)
-      gallery.querySelectorAll('a').forEach(function(link) {
-        link.addEventListener('click', function() {
-          localStorage.setItem('pi_archive_seen_id', LATEST_UPDATE.id);
-        });
-      });
-    }
-
-    if (ackBtn) ackBtn.addEventListener('click', closeModal);
-
-    // Błyskawiczne wejście pop-upu po załadowaniu
-    setTimeout(function() {
-      modal.classList.add('active');
-    }, 150);
+  function closeDrawer() {
+    panel.classList.remove('open');
+    backdrop.classList.remove('active');
+    panel.setAttribute('aria-hidden', 'true');
+    tab.setAttribute('aria-expanded', 'false');
+    document.removeEventListener('keydown', onKeydown);
   }
+
+  function onKeydown(ev) {
+    if (ev.key === 'Escape') closeDrawer();
+  }
+
+  tab.addEventListener('click', function () {
+    if (panel.classList.contains('open')) closeDrawer(); 
+    else openDrawer();
+  });
+  
+  closeBtn.addEventListener('click', closeDrawer);
+  backdrop.addEventListener('click', closeDrawer);
 });
 </script>
+
 </body>
 </html>
