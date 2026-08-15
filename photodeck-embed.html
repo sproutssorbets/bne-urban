@@ -78,7 +78,7 @@
   #pi-footer { padding: 16px 18px; background: var(--bg); border-top: 1px solid var(--text); flex-shrink: 0; }
   .pi-footer-stat { font-size: 9px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); margin-top: 10px; }
   #map-wrap { flex: 1; position: relative; height: 100%; background: #F8F8F8; margin: 0; padding: 0; }
-  #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s ease-in-out; }
+  #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s ease-in-out; will-change: transform; }
   #map.loaded { opacity: 1; }
   #map-error {
     position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
@@ -514,7 +514,9 @@ function renderList(items) {
 function restoreSavedFilters() {
   var saved = loadMapState();
   if (!saved) return;
+  var hasFilters = false;
   if (saved.suburb) {
+    hasFilters = true;
     searchState.suburb = saved.suburb;
     var radio = document.querySelector('.suburb-check[value="' + saved.suburb + '"]');
     if (radio) radio.checked = true;
@@ -523,7 +525,8 @@ function restoreSavedFilters() {
     if (searchInput) { searchInput.value = saved.suburb; }
     if (clearBtn) { clearBtn.style.display = saved.suburb ? 'block' : 'none'; }
   }
-  if (saved.categories) {
+  if (saved.categories && Object.keys(saved.categories).some(function(cat) { return (saved.categories[cat] || []).length > 0; })) {
+    hasFilters = true;
     searchState.categories = saved.categories;
     for (var cat in saved.categories) {
       (saved.categories[cat] || []).forEach(function(val) {
@@ -532,13 +535,16 @@ function restoreSavedFilters() {
       });
     }
   }
-  applySearchState();
+  // applySearchState renderuje listę od nowa, więc odpalamy ją tylko gdy faktycznie
+  // jest jakiś zapisany filtr do przywrócenia. Sama pozycja mapy bez filtrów
+  // nie wymaga ponownego renderu listy lokalizacji.
+  if (hasFilters) applySearchState();
 }
 
 function loadInitialData() {
   Promise.all([
-    fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/locations.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }),
-    fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/medias.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }).catch(function() { return ''; })
+    fetch('https://cdn.jsdelivr.net/gh/sproutssorbets/bne-urban-index@main/locations.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }),
+    fetch('https://cdn.jsdelivr.net/gh/sproutssorbets/bne-urban-index@main/medias.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }).catch(function() { return ''; })
   ])
   .then(function(results) {
     var csvText = results[0];
@@ -650,10 +656,10 @@ function initMapLazy() {
   mapInitiated = true;
   var css = document.createElement('link');
   css.rel = 'stylesheet';
-  css.href = 'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css';
+  css.href = 'https://api.mapbox.com/mapbox-gl-js/v3.28.1/mapbox-gl.css';
   document.head.appendChild(css);
   var js = document.createElement('script');
-  js.src = 'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js';
+  js.src = 'https://api.mapbox.com/mapbox-gl-js/v3.28.1/mapbox-gl.js';
   js.onload = function() {
     mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
     globalPopup = new mapboxgl.Popup({ offset: [0, -42], closeButton: true, className: 'pi-popup' });
@@ -661,7 +667,6 @@ function initMapLazy() {
     var startCenter = (savedMapState && typeof savedMapState.lng === 'number' && typeof savedMapState.lat === 'number')
       ? [savedMapState.lng, savedMapState.lat] : [153.0307, -27.4598];
     var startZoom = (savedMapState && typeof savedMapState.zoom === 'number') ? savedMapState.zoom : 13;
-    
     mapInstance = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/mapbox/light-v11',
@@ -704,6 +709,8 @@ function initMapLazy() {
     };
     var index = 0;
     var CHUNK = 60;
+    // Jeden szablon budowany raz. cloneNode jest tańsze niż parsowanie tego samego
+    // innerHTML osobno dla każdej lokalizacji.
     var markerTemplate = document.createElement('div');
     markerTemplate.className = 'custom-marker-hitbox';
     markerTemplate.innerHTML = '<div class="pi-pin"><div class="pi-pin-body"></div><div class="pi-pin-point"></div></div>';
@@ -737,23 +744,17 @@ function initMapLazy() {
 
 loadInitialData();
 
-// NATYCHMIASTOWY START JEŚLI WRACAMY ZE ZDJĘCIA (SESJA ZAPISANA) LUB STANDARDOWE ODROCZENIE
-var existingSavedState = loadMapState();
-if (existingSavedState && existingSavedState.lng) {
-  initMapLazy();
-} else {
-  ['mousemove', 'scroll', 'touchstart', 'keydown', 'click'].forEach(function(evt) {
-    window.addEventListener(evt, initMapLazy, { once: true, passive: true });
-  });
+['mousemove', 'scroll', 'touchstart', 'keydown', 'click'].forEach(function(evt) {
+  window.addEventListener(evt, initMapLazy, { once: true, passive: true });
+});
 
-  window.addEventListener('load', function() {
-    if (window.requestIdleCallback) {
-      requestIdleCallback(function() { setTimeout(initMapLazy, 2500); });
-    } else {
-      setTimeout(initMapLazy, 3000);
-    }
-  });
-}
+window.addEventListener('load', function() {
+  if (window.requestIdleCallback) {
+    requestIdleCallback(function() { setTimeout(initMapLazy, 2500); });
+  } else {
+    setTimeout(initMapLazy, 3000);
+  }
+});
 
 document.addEventListener('DOMContentLoaded', function() {
   var searchInput = document.getElementById('pi-search-input');
@@ -767,7 +768,6 @@ document.addEventListener('DOMContentLoaded', function() {
       if (defRadio) defRadio.checked = true;
       searchState.suburb = '';
       searchState.text = '';
-      sessionStorage.removeItem(MAP_STATE_KEY);
       applySearchState();
       if (mapInstance) mapInstance.flyTo({ center: [153.0307, -27.4598], zoom: 13, duration: 800 });
     });
@@ -820,7 +820,7 @@ document.addEventListener('DOMContentLoaded', function() {
       var cat = this.getAttribute('data-cat');
       if (!searchState.categories[cat]) searchState.categories[cat] = [];
       if (this.checked) searchState.categories[cat].push(this.value);
-      else searchState.categories[cat] = searchState.categories[cat].filter(function(v) { return v !== cb.value; });
+      else searchState.categories[cat] = searchState.categories[cat].filter(function(v) { return v !== this.value; }.bind(this));
       applySearchState();
     });
   });
