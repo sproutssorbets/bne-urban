@@ -179,6 +179,7 @@
   .pi-drawer-footer { padding: 16px 20px; border-top: 1px solid var(--text); flex-shrink: 0; background: var(--bg); }
   .pi-drawer-cta { display: block; width: 100%; text-align: center; border: 1px solid var(--text); background: var(--text); color: #FFFFFF; padding: 12px; font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none; cursor: pointer; }
 
+  /* WERSJA MOBILNA */
   .mobile-bar { display: none; }
   @media (max-width: 720px) {
     #context-bar { display: none; }
@@ -362,6 +363,11 @@ var locations = [];
 var searchState = { text: '', suburb: '', categories: {} };
 var mapInstance = null;
 var globalPopup = null;
+var mapInitiated = false;
+
+var CONDITION_TERMS = ['Existing Condition', 'Fenced Development Site', 'Demolition & Site Works', 'Active Construction Site', 'Completed Development'];
+
+function normalizeKey(s) { return (s || '').toLowerCase().trim(); }
 
 function splitCsvLine(line, delimiter) {
   var cols = [], cur = '', inQ = false;
@@ -373,6 +379,41 @@ function splitCsvLine(line, delimiter) {
   }
   cols.push(cur);
   return cols;
+}
+
+function parseMediasCsv(text) {
+  var lines = text.trim().split('\n');
+  var headers = splitCsvLine(lines[0], ';').map(h => h.trim());
+  var rows = [];
+  for (var i = 1; i < lines.length; i++) {
+    if (!lines[i]) continue;
+    var cols = splitCsvLine(lines[i], ';');
+    var row = {};
+    headers.forEach((h, idx) => { row[h] = (cols[idx] || '').trim(); });
+    if (row.title) {
+      rows.push({
+        titleLower: normalizeKey(row.title),
+        keywordsLower: (row.keywords || '').split(',').map(k => k.trim().toLowerCase()).filter(Boolean)
+      });
+    }
+  }
+  return rows;
+}
+
+function applyMediaTagsToLocations(mediaRows) {
+  locations.forEach(loc => {
+    var streetKey = normalizeKey((loc.street || '').split('/')[0].split(',')[0]);
+    if (!streetKey) return;
+    var matched = new Set();
+    mediaRows.forEach(m => {
+      if (m.titleLower.indexOf(streetKey) !== -1) {
+        m.keywordsLower.forEach(k => matched.add(k));
+      }
+    });
+    if (matched.size === 0) return;
+    var conditions = CONDITION_TERMS.filter(t => matched.has(t.toLowerCase()));
+    if (conditions.length) loc.condition = conditions.join(';');
+  });
 }
 
 function updatePhotoDeckLink() {
@@ -431,6 +472,30 @@ function applySearchState() {
   }
 }
 
+function annotateFilterCoverage() {
+  document.querySelectorAll('.filter-check').forEach(function (cb) {
+    var cat = cb.getAttribute('data-cat');
+    var val = cb.value;
+    var count = locations.filter(loc => {
+      var values = (loc[cat] || '').split(';').map(v => v.trim()).filter(Boolean);
+      return values.indexOf(val) !== -1;
+    }).length;
+
+    var label = cb.closest('label');
+    if (!label) return;
+    var existing = label.querySelector('.filter-count');
+    if (existing) existing.remove();
+
+    var countSpan = document.createElement('span');
+    countSpan.className = 'filter-count';
+    countSpan.textContent = count;
+    label.appendChild(countSpan);
+
+    if (count === 0) { cb.disabled = true; label.classList.add('no-data'); }
+    else { cb.disabled = false; label.classList.remove('no-data'); }
+  });
+}
+
 function renderList(items) {
   var wrap = document.getElementById('list-wrap');
   if (!wrap) return;
@@ -448,7 +513,10 @@ function renderList(items) {
     row.className = 'list-row';
     row.innerHTML = '<div class="list-street">' + loc.street + '</div><div class="list-suburb">' + loc.suburb + '</div>';
     row.addEventListener('click', () => {
-      if (window.innerWidth <= 720) document.getElementById('index-panel').classList.remove('mobile-active');
+      if (window.innerWidth <= 720) {
+        document.getElementById('index-panel').classList.remove('mobile-active');
+        document.body.classList.remove('pi-drawer-lock');
+      }
       if (mapInstance) {
         mapInstance.flyTo({ center: loc.coords, zoom: 15 });
         if (window.piOpenPopupForLocation) window.piOpenPopupForLocation(loc);
@@ -459,86 +527,110 @@ function renderList(items) {
   wrap.appendChild(frag);
 }
 
-// ODCZYT DANYCH TEKSTOWYCH (NATYCHMIASTOWE WYŚWIETLENIE BEZ MAPY)
 function loadInitialData() {
-  fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/locations.csv?t=' + Date.now())
-    .then(r => r.text())
-    .then(csvText => {
-      if (!csvText || !csvText.trim()) return;
-      var lines = csvText.trim().split('\n');
-      var headers = lines[0].split(',').map(h => h.trim());
-      locations = [];
-      var totalArchiveRecords = 0;
-      var batchesMap = {};
+  var ts = Date.now();
+  Promise.all([
+    fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/locations.csv?t=' + ts).then(r => r.ok ? r.text() : ''),
+    fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/medias.csv?t=' + ts).then(r => r.ok ? r.text() : '').catch(() => '')
+  ])
+  .then(function ([csvText, mediaCsvText]) {
+    if (!csvText || !csvText.trim()) return;
+    var lines = csvText.trim().split('\n');
+    var headers = lines[0].split(',').map(h => h.trim());
+    locations = [];
+    var totalArchiveRecords = 0;
+    var batchesMap = {};
 
-      for (var i = 1; i < lines.length; i++) {
-        var line = lines[i];
-        if (!line) continue;
-        var cols = splitCsvLine(line, ',');
-        var row = {};
-        headers.forEach((h, idx) => row[h] = (cols[idx] || '').trim());
-        var count = parseInt(row.count, 10) || 1;
-        totalArchiveRecords += count;
+    for (var i = 1; i < lines.length; i++) {
+      var line = lines[i];
+      if (!line) continue;
+      var cols = splitCsvLine(line, ',');
+      var row = {};
+      headers.forEach((h, idx) => row[h] = (cols[idx] || '').trim());
+      var count = parseInt(row.count, 10) || 1;
+      totalArchiveRecords += count;
 
-        var locData = {
-          ref: row.ref || 'PX.26.000',
-          street: row.address || row.street || 'Unnamed location',
-          suburb: row.suburb || 'Brisbane City',
-          condition: row.condition || '',
-          typology: row.typology || '',
-          urban: row.urban || '',
-          year: row.year || (row.date ? row.date.slice(-4) : ''),
-          count: count,
-          dates: row.shoot_dates || row.date || '',
-          coords: [parseFloat(row.lng), parseFloat(row.lat)],
-          archiveUrl: row.archiveUrl || '#'
-        };
+      var locData = {
+        ref: row.ref || 'PX.26.000',
+        street: row.address || row.street || 'Unnamed location',
+        suburb: row.suburb || 'Brisbane City',
+        condition: row.condition || '',
+        typology: row.typology || '',
+        urban: row.urban || '',
+        year: row.year || (row.date ? row.date.slice(-4) : ''),
+        count: count,
+        dates: row.shoot_dates || row.date || '',
+        coords: [parseFloat(row.lng), parseFloat(row.lat)],
+        archiveUrl: row.archiveUrl || '#'
+      };
 
-        if (!isNaN(locData.coords[0]) && !isNaN(locData.coords[1])) {
-          locations.push(locData);
-        }
-        var batchId = row.update_batch || 'UNKNOWN';
-        if (!batchesMap[batchId]) batchesMap[batchId] = [];
-        batchesMap[batchId].push(locData);
+      if (!isNaN(locData.coords[0]) && !isNaN(locData.coords[1])) {
+        locations.push(locData);
+      }
+      var batchId = row.update_batch || 'UNKNOWN';
+      if (!batchesMap[batchId]) batchesMap[batchId] = [];
+      batchesMap[batchId].push(locData);
+    }
+
+    if (mediaCsvText) {
+      applyMediaTagsToLocations(parseMediasCsv(mediaCsvText));
+    }
+
+    var sortedBatches = Object.keys(batchesMap).filter(b => b !== 'UNKNOWN').sort((a, b) => b.localeCompare(a));
+    var latestBatchId = sortedBatches[0];
+    if (latestBatchId) {
+      var latestRecords = batchesMap[latestBatchId];
+      var latestTotalCount = latestRecords.reduce((acc, r) => acc + r.count, 0);
+
+      var elDrawerIdx = document.getElementById('pi-drawer-index');
+      if (elDrawerIdx) elDrawerIdx.innerHTML = 'UPDATE &middot; ' + latestBatchId.toUpperCase();
+      var elDrawerTitle = document.getElementById('pi-drawer-title');
+      if (elDrawerTitle) elDrawerTitle.textContent = latestTotalCount + ' new records documented';
+      var elDrawerSub = document.getElementById('pi-drawer-sub');
+      if (elDrawerSub) elDrawerSub.textContent = 'Archive total: ' + totalArchiveRecords + ' records';
+
+      var logContainer = document.getElementById('pi-drawer-log');
+      if (logContainer) {
+        logContainer.innerHTML = latestRecords.map(rec => {
+          var padCount = rec.count.toString().padStart(2, '0');
+          var linkUrl = rec.archiveUrl || 'https://www.photoindex.au/';
+          return '<a href="' + linkUrl + '" target="_top" class="pi-log-link" data-query="' + rec.street + '">' +
+                   '<span class="loc">' + rec.street + '</span>' +
+                   '<span class="stats"><span class="count">' + padCount + '</span><span class="arrow">→</span></span>' +
+                 '</a>';
+        }).join('');
       }
 
-      var sortedBatches = Object.keys(batchesMap).filter(b => b !== 'UNKNOWN').sort((a, b) => b.localeCompare(a));
-      var latestBatchId = sortedBatches[0];
-      if (latestBatchId) {
-        var latestRecords = batchesMap[latestBatchId];
-        var latestTotalCount = latestRecords.reduce((acc, r) => acc + r.count, 0);
-
-        var elDrawerIdx = document.getElementById('pi-drawer-index');
-        if (elDrawerIdx) elDrawerIdx.innerHTML = 'UPDATE &middot; ' + latestBatchId.toUpperCase();
-        var elDrawerTitle = document.getElementById('pi-drawer-title');
-        if (elDrawerTitle) elDrawerTitle.textContent = latestTotalCount + ' new records documented';
-        var elDrawerSub = document.getElementById('pi-drawer-sub');
-        if (elDrawerSub) elDrawerSub.textContent = 'Archive total: ' + totalArchiveRecords + ' records';
-
-        var logContainer = document.getElementById('pi-drawer-log');
-        if (logContainer) {
-          logContainer.innerHTML = latestRecords.map(rec => {
-            var padCount = rec.count.toString().padStart(2, '0');
-            var linkUrl = rec.archiveUrl || 'https://www.photoindex.au/';
-            return '<a href="' + linkUrl + '" target="_top" class="pi-log-link">' +
-                     '<span class="loc">' + rec.street + '</span>' +
-                     '<span class="stats"><span class="count">' + padCount + '</span><span class="arrow">→</span></span>' +
-                   '</a>';
-          }).join('');
+      var dot = document.getElementById('pi-drawer-dot');
+      if (dot) {
+        var storageKey = 'pi_archive_seen_time_' + latestBatchId;
+        var firstSeenTime = localStorage.getItem(storageKey);
+        var now = Date.now();
+        if (!firstSeenTime) {
+          localStorage.setItem(storageKey, now);
+          dot.classList.remove('hidden');
+        } else if (now - parseInt(firstSeenTime, 10) < 86400000) {
+          dot.classList.remove('hidden');
+        } else {
+          dot.classList.add('hidden');
         }
       }
+    }
 
-      renderList(locations);
-      var archiveCountEl = document.getElementById('archive-count');
-      if (archiveCountEl) archiveCountEl.textContent = locations.length + ' LOCATIONS';
-      var indexCount = document.getElementById('index-count');
-      if (indexCount) indexCount.textContent = '(' + locations.length + ')';
-    })
-    .catch(() => {});
+    annotateFilterCoverage();
+    renderList(locations);
+    var archiveCountEl = document.getElementById('archive-count');
+    if (archiveCountEl) archiveCountEl.textContent = locations.length + ' LOCATIONS';
+    var indexCount = document.getElementById('index-count');
+    if (indexCount) indexCount.textContent = '(' + locations.length + ')';
+  })
+  .catch(() => {});
 }
 
-// INICJALIZACJA MAPY W TLE
 function initMapLazy() {
+  if (mapInitiated) return;
+  mapInitiated = true;
+
   var css = document.createElement('link');
   css.rel = 'stylesheet';
   css.href = 'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css';
@@ -572,7 +664,7 @@ function initMapLazy() {
 
     var index = 0;
     function mountMarkers() {
-      var chunk = locations.slice(index, index + 30);
+      var chunk = locations.slice(index, index + 35);
       chunk.forEach(loc => {
         var el = document.createElement('div');
         el.className = 'custom-marker-hitbox';
@@ -580,9 +672,9 @@ function initMapLazy() {
         loc.marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' }).setLngLat(loc.coords).addTo(mapInstance);
         el.addEventListener('click', (ev) => { ev.stopPropagation(); window.piOpenPopupForLocation(loc); });
       });
-      index += 30;
+      index += 35;
       if (index < locations.length) {
-        setTimeout(mountMarkers, 5);
+        setTimeout(mountMarkers, 4);
       } else {
         document.getElementById('map').classList.add('loaded');
       }
@@ -594,11 +686,19 @@ function initMapLazy() {
 
 loadInitialData();
 
-window.addEventListener('load', function() {
-  setTimeout(initMapLazy, 200);
+['mousemove', 'scroll', 'touchstart', 'keydown', 'click'].forEach(evt => {
+  window.addEventListener(evt, initMapLazy, { once: true, passive: true });
 });
 
-// FILTRY I INTERFEJS
+window.addEventListener('load', function() {
+  if (window.requestIdleCallback) {
+    requestIdleCallback(() => setTimeout(initMapLazy, 1000));
+  } else {
+    setTimeout(initMapLazy, 1200);
+  }
+});
+
+// PEŁNY INTERFEJS (DESKTOP + MOBILE)
 document.addEventListener('DOMContentLoaded', function () {
   var searchInput = document.getElementById('pi-search-input');
   var clearBtn = document.getElementById('pi-search-clear');
@@ -638,6 +738,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (clearBtn) clearBtn.style.display = this.value ? 'block' : 'none';
       }
       applySearchState();
+      if (window.innerWidth <= 720) {
+        document.getElementById('index-panel').classList.remove('mobile-active');
+        document.body.classList.remove('pi-drawer-lock');
+      }
       if (this.value && mapInstance) {
         fetch('https://api.mapbox.com/geocoding/v5/mapbox.places/' + encodeURIComponent(this.value + ', Brisbane, Australia') + '.json?access_token=' + mapboxgl.accessToken + '&country=au&types=place,locality,neighborhood&limit=1')
           .then(r => r.json())
@@ -660,19 +764,115 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
+  // OBSŁUGA PASKA MOBILNEGO
+  var mobileToggleBtn = document.getElementById('mobile-toggle-filters');
+  var mobileIndexBtn = document.getElementById('mobile-toggle-index');
+  var indexPanel = document.getElementById('index-panel');
+  var mobileCloseBtn = document.getElementById('mobile-panel-close');
+
+  if (mobileToggleBtn && indexPanel) {
+    mobileToggleBtn.addEventListener('click', function() {
+      indexPanel.classList.add('mobile-active');
+      document.body.classList.add('pi-drawer-lock');
+      indexPanel.scrollTop = 0;
+    });
+  }
+  if (mobileIndexBtn && indexPanel) {
+    mobileIndexBtn.addEventListener('click', function() {
+      indexPanel.classList.add('mobile-active');
+      document.body.classList.add('pi-drawer-lock');
+      var indexGroup = document.getElementById('index-group');
+      if (indexGroup) {
+        setTimeout(function () {
+          indexGroup.scrollIntoView({ behavior: 'auto', block: 'start' });
+        }, 50);
+      }
+    });
+  }
+  if (mobileCloseBtn && indexPanel) {
+    mobileCloseBtn.addEventListener('click', function() {
+      indexPanel.classList.remove('mobile-active');
+      document.body.classList.remove('pi-drawer-lock');
+    });
+  }
+
+  // GEST SWIPE W DÓŁ NA MOBILE
+  if (indexPanel) {
+    var touchStartY = null;
+    indexPanel.addEventListener('touchstart', function (ev) {
+      if (window.innerWidth > 720 || !indexPanel.classList.contains('mobile-active')) return;
+      if (indexPanel.scrollTop > 0) return;
+      touchStartY = ev.touches[0].clientY;
+    }, { passive: true });
+
+    indexPanel.addEventListener('touchmove', function (ev) {
+      if (touchStartY === null) return;
+      var delta = ev.touches[0].clientY - touchStartY;
+      if (delta > 80) {
+        indexPanel.classList.remove('mobile-active');
+        document.body.classList.remove('pi-drawer-lock');
+        touchStartY = null;
+      }
+    }, { passive: true });
+
+    indexPanel.addEventListener('touchend', function () { touchStartY = null; }, { passive: true });
+  }
+
+  // SZUFLADA LOGÓW
   var tab = document.getElementById('pi-drawer-tab');
   var panel = document.getElementById('pi-drawer-panel');
   var closeBtn = document.getElementById('pi-drawer-close');
   var closeBtnAlt = document.getElementById('pi-drawer-close-btn');
   var backdrop = document.getElementById('pi-drawer-backdrop');
 
-  tab.addEventListener('click', () => {
-    panel.classList.toggle('open');
-    backdrop.classList.toggle('active');
-  });
-  closeBtn.addEventListener('click', () => { panel.classList.remove('open'); backdrop.classList.remove('active'); });
-  if (closeBtnAlt) closeBtnAlt.addEventListener('click', () => { panel.classList.remove('open'); backdrop.classList.remove('active'); });
-  backdrop.addEventListener('click', () => { panel.classList.remove('open'); backdrop.classList.remove('active'); });
+  function renderThumbs(urls) {
+    var thumbsContainer = document.getElementById('pi-drawer-thumbs');
+    var thumbsTitle = document.getElementById('pi-thumbs-title');
+    if (thumbsContainer && urls.length > 0) {
+      if (thumbsTitle) thumbsTitle.style.display = 'block';
+      thumbsContainer.innerHTML = urls.map(url => '<div class="pi-thumb-card"><img src="' + url + '" alt="Archive Record" loading="lazy"></div>').join('');
+    }
+  }
+
+  function fetchAllPhotos(page, acc) {
+    page = page || 1;
+    acc = acc || [];
+    return fetch('https://api.github.com/repos/sproutssorbets/bne-urban-index/contents/photos?per_page=100&page=' + page)
+      .then(res => res.ok ? res.json() : [])
+      .then(files => {
+        if (!Array.isArray(files) || files.length === 0) return acc;
+        var urls = files.filter(f => f.type === 'file' && f.name.match(/\.(jpg|jpeg|png)$/i)).map(f => f.download_url);
+        acc = acc.concat(urls);
+        if (files.length < 100 || page >= 4) return acc;
+        return fetchAllPhotos(page + 1, acc);
+      });
+  }
+
+  function openDrawer() {
+    panel.classList.add('open');
+    backdrop.classList.add('active');
+    panel.setAttribute('aria-hidden', 'false');
+    tab.setAttribute('aria-expanded', 'true');
+
+    if (!window.PI_PHOTOS_CACHE) {
+      fetchAllPhotos().then(function (urls) {
+        window.PI_PHOTOS_CACHE = urls;
+        renderThumbs(urls);
+      }).catch(function () {});
+    }
+  }
+
+  function closeDrawer() {
+    panel.classList.remove('open');
+    backdrop.classList.remove('active');
+    panel.setAttribute('aria-hidden', 'true');
+    tab.setAttribute('aria-expanded', 'false');
+  }
+
+  tab.addEventListener('click', () => panel.classList.contains('open') ? closeDrawer() : openDrawer());
+  closeBtn.addEventListener('click', closeDrawer);
+  if (closeBtnAlt) closeBtnAlt.addEventListener('click', closeDrawer);
+  backdrop.addEventListener('click', closeDrawer);
 });
 </script>
 
