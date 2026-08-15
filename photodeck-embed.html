@@ -22,6 +22,7 @@
     -webkit-tap-highlight-color: transparent;
   }
   :focus-visible { outline: 1px solid #111111 !important; outline-offset: -1px; }
+  
   html, body {
     width: 100%; height: 100%; height: 100dvh;
     font-family: 'Inter', -apple-system, system-ui, sans-serif;
@@ -36,7 +37,7 @@
   .search-lead-icon { width: 14px; height: 14px; flex-shrink: 0; stroke: #111111; }
   #geocoder { flex: 1; height: 100%; position: relative; }
   #pi-search-wrap { position: relative; width: 100%; height: 100%; display: flex; align-items: center; }
-  #pi-search-input { width: 100%; height: 100%; border: none; background: transparent; font-family: inherit; font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #111111; outline: none; }
+  #pi-search-input { width: 100%; height: 100%; border: none; background: transparent; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #111111; outline: none; }
   #pi-search-input::placeholder { color: #888888; font-weight: 400; }
   #pi-search-clear { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); border: none; background: transparent; font-size: 20px; color: #111111; cursor: pointer; display: none; line-height: 1; padding: 4px 8px; transition: opacity 0.15s ease; }
   #pi-search-clear:hover { opacity: 0.5; }
@@ -81,7 +82,17 @@
   .pi-pin-body { min-width: 22px; height: 22px; padding: 0 5px; background: #111111; color: #FFFFFF; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
   .pi-pin-point { width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 4px solid #111111; }
   .custom-marker-hitbox:hover .pi-pin-body { background: #FFFFFF; color: #111111; outline: 1px solid #111111; }
-  .pi-popup .mapboxgl-popup-content { background: #FFFFFF; border: 1px solid #111111; padding: 16px; }
+  
+  /* --- POPUP (POPRAWIONE POZYCJONOWANIE KRZYŻYKA) --- */
+  .pi-popup .mapboxgl-popup-content { 
+    background: #FFFFFF; border: 1px solid #111111; padding: 16px; 
+    font-family: 'Inter', sans-serif; position: relative;
+  }
+  .pi-popup .mapboxgl-popup-close-button {
+    position: absolute; top: 12px; right: 12px; font-size: 16px; color: #111111;
+    border: none; background: transparent; cursor: pointer; line-height: 1; padding: 4px; z-index: 10;
+  }
+  .pi-popup .mapboxgl-popup-close-button:hover { opacity: 0.5; }
   .pi-popup .mapboxgl-popup-tip { border-top-color: #FFFFFF !important; border-bottom-color: #FFFFFF !important; }
 
   /* --- WSUWANY PANEL LOGÓW (DRAWER) --- */
@@ -92,9 +103,14 @@
     z-index: 500; transition: background 0.15s ease;
   }
   #pi-drawer-tab:hover { background: #333333; }
-  #pi-drawer-tab span { transform: rotate(-90deg); white-space: nowrap; font-size: 9px; font-weight: 700; letter-spacing: 0.16em; }
-  #pi-drawer-dot { position: absolute; top: 9px; right: 9px; width: 6px; height: 6px; background: #FFFFFF; transition: opacity 0.3s ease; }
-  #pi-drawer-dot.hidden { opacity: 0; }
+  #pi-drawer-tab span { transform: rotate(-90deg); white-space: nowrap; font-size: 9px; font-weight: 700; letter-spacing: 0.16em; font-family: 'Inter', sans-serif; }
+  
+  #pi-drawer-dot {
+    position: absolute; top: 9px; right: 9px; width: 6px; height: 6px;
+    background: #00C853; box-shadow: 0 0 6px rgba(0, 200, 83, 0.6) !important;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  #pi-drawer-dot.hidden { opacity: 0; transform: scale(0); pointer-events: none; }
 
   #pi-drawer-backdrop { position: fixed; inset: 0; background: rgba(17,17,17,0.15); z-index: 600; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
   #pi-drawer-backdrop.active { opacity: 1; pointer-events: auto; }
@@ -103,35 +119,59 @@
     position: fixed; top: 0; right: 0; height: 100%; width: 340px; max-width: calc(100vw - 40px);
     background: #FFFFFF; border-left: 2px solid #111111; transform: translateX(100%); 
     transition: transform 0.35s cubic-bezier(0.16,1,0.3,1); z-index: 700; display: flex; flex-direction: column;
+    font-family: 'Inter', system-ui, sans-serif;
   }
   #pi-drawer-panel.open { transform: translateX(0); }
 
-  .pi-drawer-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #111111; font-family: 'SF Mono', 'Roboto Mono', monospace; font-size: 10px; letter-spacing: 0.05em; color: #111111; flex-shrink: 0; }
+  .pi-drawer-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 20px; border-bottom: 1px solid #111111;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #111111; flex-shrink: 0;
+  }
   .pi-drawer-close { border: none; background: transparent; cursor: pointer; width: 22px; height: 22px; font-size: 15px; color: #111111; display: flex; align-items: center; justify-content: center; padding: 0; transition: opacity 0.15s ease; }
   .pi-drawer-close:hover { opacity: 0.5; }
 
   .pi-drawer-body { flex: 1; overflow-y: auto; padding: 20px; }
-  .pi-drawer-title { font-size: 22px; font-weight: 700; line-height: 1.05; text-transform: uppercase; letter-spacing: -0.02em; margin-bottom: 4px; }
-  .pi-drawer-sub { font-size: 12px; color: #6B6B6B; margin-bottom: 20px; }
+  .pi-drawer-title { font-size: 20px; font-weight: 700; line-height: 1.1; text-transform: uppercase; letter-spacing: -0.02em; margin-bottom: 4px; color: #111111; }
+  .pi-drawer-sub { font-size: 11px; color: #6B6B6B; margin-bottom: 20px; font-weight: 400; line-height: 1.4; }
+  
   .pi-drawer-section-title { font-size: 9px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #888888; margin-bottom: 8px; }
 
-  #pi-drawer-log { display: flex; flex-direction: column; }
+  #pi-drawer-log { display: flex; flex-direction: column; margin-bottom: 24px; }
   .pi-log-link {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 10px 12px; margin: 0 -12px; border-bottom: 1px solid #DADADA;
-    font-family: 'SF Mono', 'Roboto Mono', monospace; font-size: 11px; text-decoration: none; color: #111111;
-    transition: background 0.2s ease, color 0.2s ease;
+    padding: 10px 12px; margin: 0 -12px; border-bottom: 1px solid #EAEAEA;
+    font-size: 11px; font-weight: 500; text-decoration: none; color: #111111;
+    transition: background 0.15s ease, color 0.15s ease;
   }
   .pi-log-link:hover { background: #111111; color: #FFFFFF; }
-  .pi-log-link .loc { flex: 1; transition: color 0.2s; text-transform: lowercase; }
-  .pi-log-link .stats { display: flex; align-items: center; gap: 12px; color: #6B6B6B; transition: color 0.2s; }
+  .pi-log-link .loc { flex: 1; transition: color 0.15s; text-transform: uppercase; letter-spacing: 0.04em; padding-right: 12px; }
+  .pi-log-link .stats { display: flex; align-items: center; gap: 10px; color: #6B6B6B; font-weight: 600; transition: color 0.15s; flex-shrink: 0; }
   .pi-log-link:hover .stats, .pi-log-link:hover .loc { color: #FFFFFF; }
-  .pi-log-link .arrow { opacity: 0; transform: translateX(-4px); transition: all 0.2s ease; font-family: 'Inter', sans-serif; }
+  .pi-log-link .arrow { opacity: 0; transform: translateX(-4px); transition: all 0.15s ease; font-size: 11px; }
   .pi-log-link:hover .arrow { opacity: 1; transform: translateX(0); }
 
-  .pi-drawer-footer { padding: 16px 20px; border-top: 1px solid #111111; flex-shrink: 0; }
-  .pi-footer-stat { font-family: 'SF Mono', 'Roboto Mono', monospace; font-size: 9px; letter-spacing: 0.06em; color: #6B6B6B; text-transform: uppercase; margin-bottom: 12px; }
-  .pi-drawer-cta { display: block; width: 100%; text-align: center; border: 1px solid #111111; background: #111111; color: #FFFFFF; padding: 11px; font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; transition: background 0.15s ease; }
+  /* --- MOZAIKA MINIATUR (PINTEREST STYLE) --- */
+  .pi-drawer-thumbs {
+    column-count: 2;
+    column-gap: 6px;
+    margin-top: 6px;
+  }
+  .pi-thumb-card {
+    break-inside: avoid;
+    margin-bottom: 6px;
+    background: #FAFAFA;
+    border: 1px solid #EAEAEA;
+    overflow: hidden;
+  }
+  .pi-thumb-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .pi-drawer-footer { padding: 16px 20px; border-top: 1px solid #111111; flex-shrink: 0; background: #FFFFFF; }
+  .pi-drawer-cta { display: block; width: 100%; text-align: center; border: 1px solid #111111; background: #111111; color: #FFFFFF; padding: 12px; font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none; transition: background 0.15s ease; cursor: pointer; }
   .pi-drawer-cta:hover { background: #333333; }
 
   /* --- WERSJA MOBILNA --- */
@@ -258,13 +298,18 @@
   </div>
   <div class="pi-drawer-body">
     <div class="pi-drawer-title" id="pi-drawer-title">New frames indexed</div>
-    <div class="pi-drawer-sub">Hover over records to locate on map.</div>
+    <div class="pi-drawer-sub" id="pi-drawer-sub">Archive total: ... records</div>
+    
+    <!-- 1. Lokalizacje przed miniaturami -->
     <div class="pi-drawer-section-title">By location</div>
     <div id="pi-drawer-log"></div>
+
+    <!-- 2. Mozaika zdjęć (Pinterest style, bez linków) -->
+    <div class="pi-drawer-section-title" id="pi-thumbs-title" style="display:none; margin-top:24px;">Visual preview</div>
+    <div class="pi-drawer-thumbs" id="pi-drawer-thumbs"></div>
   </div>
   <div class="pi-drawer-footer">
-    <div class="pi-footer-stat" id="pi-drawer-total">Archive total: ...</div>
-    <a href="https://www.photoindex.au/" target="_top" class="pi-drawer-cta">View selection →</a>
+    <button class="pi-drawer-cta" id="pi-drawer-close-btn">Close panel</button>
   </div>
 </aside>
 
@@ -328,7 +373,7 @@ function initMapboxApp() {
   }
   initCustomSearch();
 
-  // --- KLUCZOWY ELEMENT: AUTOMATYCZNE POBIERANIE Z CSV ---
+  // --- AUTOMATYCZNE POBIERANIE Z CSV ---
   fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/locations.csv?t=' + Date.now())
     .then(r => r.text())
     .catch(() => '')
@@ -375,41 +420,41 @@ function initMapboxApp() {
           locations.push(locData);
         }
 
-        // Grupowanie na potrzeby Drawera wg kolumny 'update_batch'
         var batchId = row.update_batch || 'UNKNOWN';
         if (!batchesMap[batchId]) batchesMap[batchId] = [];
         batchesMap[batchId].push(locData);
       }
 
-      // --- GENEROWANIE SZUFLADY Z DANYCH CSV ---
-var sortedBatches = Object.keys(batchesMap).filter(b => b !== 'UNKNOWN').sort(function(a, b) {
-  // Przekształcamy tekst "20 June 2026" na prawdziwą datę, by poprawnie sprawdzić, co jest nowsze
-  return new Date(b) - new Date(a); 
-});
+      // --- GENEROWANIE SZUFLADY DLA NAJNOWSZEJ PACZKI ---
+      var sortedBatches = Object.keys(batchesMap).filter(b => b !== 'UNKNOWN').sort(function(a, b) {
+        var dateA = new Date(a);
+        var dateB = new Date(b);
+        if (!isNaN(dateA) && !isNaN(dateB)) return dateB - dateA;
+        return b.localeCompare(a); 
+      });
+
       var latestBatchId = sortedBatches[0]; 
       
       if (latestBatchId) {
         var latestRecords = batchesMap[latestBatchId];
         var latestTotalCount = 0;
-        var drawerLogGroup = {};
 
         latestRecords.forEach(rec => {
           latestTotalCount += rec.count;
-          var suburbName = rec.suburb.toLowerCase();
-          if (!drawerLogGroup[suburbName]) drawerLogGroup[suburbName] = 0;
-          drawerLogGroup[suburbName] += rec.count;
         });
 
-        document.getElementById('pi-drawer-index').innerHTML = 'SYS.UPD.' + latestBatchId;
+        document.getElementById('pi-drawer-index').innerHTML = 'UPDATE &middot; ' + latestBatchId.toUpperCase();
         document.getElementById('pi-drawer-title').textContent = latestTotalCount + ' new frames indexed';
-        document.getElementById('pi-drawer-total').textContent = 'Archive total: ' + totalArchiveRecords + ' records';
-        
+        document.getElementById('pi-drawer-sub').textContent = 'Archive total: ' + totalArchiveRecords + ' records';
+
+        // Rejestr po pełnym adresie
         var logContainer = document.getElementById('pi-drawer-log');
         if (logContainer) {
-          logContainer.innerHTML = Object.keys(drawerLogGroup).map(function(suburb) {
-            var padCount = drawerLogGroup[suburb].toString().padStart(2, '0');
-            return '<a href="javascript:void(0)" class="pi-log-link" data-query="' + suburb + '">' +
-                     '<span class="loc">' + suburb + '</span>' +
+          logContainer.innerHTML = latestRecords.map(function(rec) {
+            var padCount = rec.count.toString().padStart(2, '0');
+            var linkUrl = rec.archiveUrl || 'https://www.photoindex.au/';
+            return '<a href="' + linkUrl + '" target="_top" class="pi-log-link" data-query="' + rec.street + '">' +
+                     '<span class="loc">' + rec.street + '</span>' +
                      '<span class="stats">' +
                        '<span class="count">' + padCount + '</span>' +
                        '<span class="arrow">→</span>' +
@@ -417,7 +462,6 @@ var sortedBatches = Object.keys(batchesMap).filter(b => b !== 'UNKNOWN').sort(fu
                    '</a>';
           }).join('');
           
-          // Hover na logach przesuwa mapę!
           logContainer.querySelectorAll('.pi-log-link').forEach(function(link) {
             link.addEventListener('mouseenter', function() {
               var q = this.getAttribute('data-query');
@@ -425,13 +469,41 @@ var sortedBatches = Object.keys(batchesMap).filter(b => b !== 'UNKNOWN').sort(fu
             });
           });
         }
+        
+        // Dynamiczne pobranie WSZYSTKICH miniatur w mozaice (bez linkowania)
+        fetch('https://api.github.com/repos/sproutssorbets/bne-urban-index/contents/photos')
+          .then(res => res.json())
+          .then(files => {
+            if (Array.isArray(files)) {
+              var photoUrls = files
+                .filter(f => f.type === 'file' && f.name.match(/\.(jpg|jpeg|png)$/i))
+                .map(f => f.download_url);
+              
+              var thumbsContainer = document.getElementById('pi-drawer-thumbs');
+              var thumbsTitle = document.getElementById('pi-thumbs-title');
 
-        // Obsługa czerwonej kropki powiadomienia
+              if (thumbsContainer && photoUrls.length > 0) {
+                if (thumbsTitle) thumbsTitle.style.display = 'block';
+                thumbsContainer.innerHTML = photoUrls.map(function(url) {
+                  return '<div class="pi-thumb-card">' +
+                           '<img src="' + url + '" alt="Archive Record" loading="lazy">' +
+                         '</div>';
+                }).join('');
+              }
+            }
+          })
+          .catch(() => {});
+
+        // Zielona kropka powiadomienia
         var dot = document.getElementById('pi-drawer-dot');
         var seen = false;
         try { seen = localStorage.getItem('pi_archive_seen_id') === latestBatchId; } catch(e) {}
+        
         if (!seen && dot) {
           dot.classList.remove('hidden');
+          if (window.piOpenDrawer) {
+            setTimeout(window.piOpenDrawer, 600);
+          }
         }
         window.CURRENT_BATCH_ID = latestBatchId;
       }
@@ -584,10 +656,9 @@ var sortedBatches = Object.keys(batchesMap).filter(b => b !== 'UNKNOWN').sort(fu
     if (tm) tm.click();
   }
 
-  // UDOSTĘPNIENIE FUNKCJI FLYTO DLA SZUFLADY LOGÓW
   window.piFlyToQuery = function(query) {
     if (!query || !locations || !locations.length) return;
-    var match = locations.find(l => l.suburb.toLowerCase() === query.toLowerCase() || l.street.toLowerCase().includes(query.toLowerCase()));
+    var match = locations.find(l => l.street.toLowerCase().includes(query.toLowerCase()) || l.suburb.toLowerCase() === query.toLowerCase());
     if (match) {
       if (window.innerWidth <= 720) {
         var tm = document.getElementById('tab-map');
@@ -606,6 +677,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var tab = document.getElementById('pi-drawer-tab');
   var panel = document.getElementById('pi-drawer-panel');
   var closeBtn = document.getElementById('pi-drawer-close');
+  var closeBtnAlt = document.getElementById('pi-drawer-close-btn');
   var backdrop = document.getElementById('pi-drawer-backdrop');
   var dot = document.getElementById('pi-drawer-dot');
 
@@ -642,7 +714,11 @@ document.addEventListener('DOMContentLoaded', function () {
   });
   
   closeBtn.addEventListener('click', closeDrawer);
+  if (closeBtnAlt) closeBtnAlt.addEventListener('click', closeDrawer);
   backdrop.addEventListener('click', closeDrawer);
+
+  window.piOpenDrawer = openDrawer;
+  window.piCloseDrawer = closeDrawer;
 });
 </script>
 
