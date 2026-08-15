@@ -184,7 +184,7 @@
   .pi-drawer-cta { display: block; width: 100%; text-align: center; border: 1px solid #111111; background: #111111; color: #FFFFFF; padding: 12px; font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none; transition: background 0.15s ease; cursor: pointer; }
   .pi-drawer-cta:hover { background: #333333; }
 
-  /* --- MOBILNY UX (BOTTOM SHEET & BOTTOM BAR) --- */
+  /* --- MOBILNY UX --- */
   .mobile-bar { display: none; }
   @media (max-width: 720px) {
     #context-bar { display: none; }
@@ -198,7 +198,6 @@
     }
     #index-panel.mobile-active { transform: translateY(0); }
 
-    /* Dolny pasek akcji mobilnych */
     .mobile-bar {
       display: flex; position: fixed; left: 0; right: 0; bottom: 0;
       height: calc(52px + env(safe-area-inset-bottom));
@@ -225,7 +224,16 @@
 <div id="topbar">
   <div id="search-row">
     <svg class="search-lead-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="square"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16" y2="16"></line></svg>
-    <div id="geocoder"></div>
+    
+    <!-- STATYCZNY INPUT ZAPOBIEGAJĄCY RESETOWANIU -->
+    <div id="geocoder">
+      <div id="pi-search-wrap">
+        <input type="text" id="pi-search-input" autocomplete="off" spellcheck="false" placeholder="SEARCH ADDRESS OR PLACE...">
+        <button type="button" id="pi-search-clear">&times;</button>
+        <div id="pi-search-dropdown"></div>
+      </div>
+    </div>
+
     <a id="search-archive-btn" href="https://www.photoindex.au/" target="_top"><span id="search-archive-text">Search</span></a>
   </div>
   <div id="context-bar">
@@ -235,13 +243,11 @@
 
 <div id="layout">
   <aside id="index-panel">
-    <!-- PANEL MOBILNY NAGŁÓWEK ZAMKNIĘCIA -->
     <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid #111111; background:#FFFFFF; flex-shrink:0;" class="mobile-only-header">
       <span style="font-size:10px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase;">Filters & Index</span>
       <button type="button" id="mobile-panel-close" style="border:none; background:transparent; font-size:18px; cursor:pointer; padding:4px;">&times;</button>
     </div>
 
-    <!-- WSZYSTKIE 5 SEKCJI FILTRÓW -->
     <div class="panel-section-container" id="filters-group">
       <!-- 1. LOCATION -->
       <div class="acc-head open" data-target="acc-location">
@@ -333,7 +339,6 @@
   </main>
 </div>
 
-<!-- DOLNY PASEK MOBILNY (UX Thumb-zone) -->
 <div class="mobile-bar">
   <button type="button" class="mobile-bar-btn" id="mobile-toggle-filters">Filters</button>
   <a id="mobile-search-btn" class="mobile-bar-btn" href="https://www.photoindex.au/" target="_top">Search</a>
@@ -373,7 +378,7 @@ function initMapboxApp() {
   mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
 
   var locations = [];
-  var searchState = { suburb: '', extraFilters: [] };
+  var searchState = { suburb: '' };
 
   var map = new mapboxgl.Map({
     container: 'map',
@@ -394,44 +399,35 @@ function initMapboxApp() {
     map.fitBounds(bounds, { padding: 60, duration: 1000, maxZoom: 14.5, essential: true });
   }
 
-  // --- WYSZUKIWARKA Z SYNCHRONIZACJĄ FILTRÓW ---
-  function initCustomSearch() {
-    var geocoderHost = document.getElementById('geocoder');
-    if (!geocoderHost) return;
-    geocoderHost.innerHTML =
-      '<div id="pi-search-wrap">' +
-        '<input type="text" id="pi-search-input" autocomplete="off" spellcheck="false" placeholder="SEARCH ADDRESS OR PLACE...">' +
-        '<button type="button" id="pi-search-clear">\u00d7</button>' +
-        '<div id="pi-search-dropdown"></div>' +
-      '</div>';
+  // --- OBSŁUGA PASKA WYSZUKIWANIA ---
+  var searchInput = document.getElementById('pi-search-input');
+  var clearBtn = document.getElementById('pi-search-clear');
+  
+  if (searchInput && clearBtn) {
+    clearBtn.addEventListener('click', function() {
+      searchInput.value = '';
+      this.style.display = 'none';
+      var defaultRadio = document.querySelector('.suburb-check[value=""]');
+      if (defaultRadio) defaultRadio.checked = true;
+      searchState.suburb = '';
+      applySearchState();
+      map.flyTo({ center: [153.0307, -27.4598], zoom: 13, duration: 1200 });
+    });
+
+    searchInput.addEventListener('input', function() {
+      clearBtn.style.display = this.value ? 'block' : 'none';
+      searchState.suburb = this.value.trim();
       
-    var searchInput = document.getElementById('pi-search-input');
-    var clearBtn = document.getElementById('pi-search-clear');
-    
-    if (clearBtn && searchInput) {
-      clearBtn.addEventListener('click', function() {
-        searchInput.value = '';
-        this.style.display = 'none';
-        
-        // Reset filtrów dzielnic
+      // Odznaczenie radio jeśli użytkownik wpisuje ręcznie
+      if (this.value.trim() === '') {
         var defaultRadio = document.querySelector('.suburb-check[value=""]');
         if (defaultRadio) defaultRadio.checked = true;
-        searchState.suburb = '';
-        
-        applySearchState();
-        map.flyTo({ center: [153.0307, -27.4598], zoom: 13, duration: 1200 });
-      });
-
-      searchInput.addEventListener('input', function() {
-        clearBtn.style.display = this.value ? 'block' : 'none';
-        searchState.suburb = this.value.trim();
-        applySearchState();
-      });
-    }
+      }
+      applySearchState();
+    });
   }
-  initCustomSearch();
 
-  // --- AUTOMATYCZNE POBIERANIE Z CSV ---
+  // --- POBIERANIE Z CSV ---
   fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/locations.csv?t=' + Date.now())
     .then(r => r.text())
     .catch(() => '')
@@ -483,7 +479,6 @@ function initMapboxApp() {
         batchesMap[batchId].push(locData);
       }
 
-      // --- GENEROWANIE SZUFLADY ---
       var sortedBatches = Object.keys(batchesMap).filter(b => b !== 'UNKNOWN').sort(function(a, b) {
         var dateA = new Date(a);
         var dateB = new Date(b);
@@ -618,7 +613,6 @@ function initMapboxApp() {
     map.once('idle', () => { document.getElementById('map').classList.add('loaded'); });
   }
 
-  // --- SYNCHRONIZACJA LINKU VIEW SELECTION / SEARCH Z FOTODECK ---
   function updatePhotoDeckLink() {
     var queryStr = searchState.suburb ? '"' + searchState.suburb + '"' : '';
     var btnDesktop = document.getElementById('search-archive-btn');
@@ -635,7 +629,6 @@ function initMapboxApp() {
   function applySearchState() {
     locations.forEach(loc => { if (loc.marker) loc.marker.getElement().style.display = ''; });
     var visibleLocs = locations.filter(loc => !searchState.suburb || loc.suburb.toLowerCase() === searchState.suburb.toLowerCase());
-    
     renderList(visibleLocs);
     updatePhotoDeckLink();
   }
@@ -650,7 +643,6 @@ function initMapboxApp() {
       row.innerHTML = '<div class="list-street">' + loc.street + '</div>';
       row.addEventListener('click', () => {
         if (window.innerWidth <= 720) {
-          // Na mobile po kliknięciu w listę schowaj panel filtrów i przejdź do mapy
           document.getElementById('index-panel').classList.remove('mobile-active');
         }
         map.flyTo({ center: loc.coords, zoom: 15 });
@@ -660,7 +652,6 @@ function initMapboxApp() {
     });
   }
 
-  // AKORDEON FILTRÓW
   document.querySelectorAll('.acc-head').forEach(h => {
     h.addEventListener('click', function () {
       this.classList.toggle('open');
@@ -669,16 +660,14 @@ function initMapboxApp() {
     });
   });
 
-  // --- AUTOMATYCZNE WPISYWANIE FILTRA DO PASKA WYSZUKIWANIA ---
+  // --- SYNCHRONIZACJA FILTRÓW Z INPUTEM ---
   document.querySelectorAll('.suburb-check').forEach(cb => {
     cb.addEventListener('change', function () {
       if (window.piCloseAllPopups) window.piCloseAllPopups();
       searchState.suburb = this.value;
       
-      var searchInput = document.getElementById('pi-search-input');
-      var clearBtn = document.getElementById('pi-search-clear');
       if (searchInput) {
-        searchInput.value = this.value; // Wskakuje do paska wyszukiwania dla PhotoDeck
+        searchInput.value = this.value; // Trafia do paska wyszukiwania
         if (clearBtn) clearBtn.style.display = this.value ? 'block' : 'none';
       }
       
@@ -710,7 +699,7 @@ function initMapboxApp() {
 
 initMapboxApp();
 
-// --- OBSŁUGA INTERFEJSU DRAWERA I MOBILE BOTTOM SHEET ---
+// --- OBSŁUGA INTERFEJSU DRAWERA I MOBILE ---
 document.addEventListener('DOMContentLoaded', function () {
   var tab = document.getElementById('pi-drawer-tab');
   var panel = document.getElementById('pi-drawer-panel');
@@ -750,7 +739,6 @@ document.addEventListener('DOMContentLoaded', function () {
   window.piOpenDrawer = openDrawer;
   window.piCloseDrawer = closeDrawer;
 
-  // Obsługa mobilnego przycisku w dolnym pasku (Bottom Sheet)
   var mobileToggleBtn = document.getElementById('mobile-toggle-filters');
   var indexPanel = document.getElementById('index-panel');
   var mobileCloseBtn = document.getElementById('mobile-panel-close');
