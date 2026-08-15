@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>PHOTOINDEX - Spatial Database</title>
 
-<!-- Preload zasobów dla błyskawicznego powrotu z podstron -->
 <link rel="preconnect" href="https://api.mapbox.com">
 <link rel="preconnect" href="https://raw.githubusercontent.com">
 <link rel="preload" href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js" as="script">
@@ -34,6 +33,7 @@
   }
   body { display: flex; flex-direction: column; }
   body.pi-drawer-lock { overflow: hidden; }
+
   #topbar { background: var(--bg); flex-shrink: 0; z-index: 10; border-bottom: 1px solid var(--text); }
   #search-row { display: flex; align-items: center; height: 42px; padding: 0 16px; gap: 12px; background: var(--bg); }
   .search-lead-icon { width: 14px; height: 14px; flex-shrink: 0; stroke: var(--text); }
@@ -83,7 +83,7 @@
   #pi-footer { padding: 16px 18px; background: var(--bg); border-top: 1px solid var(--text); flex-shrink: 0; }
   .pi-footer-stat { font-size: 9px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); margin-top: 10px; }
   #map-wrap { flex: 1; position: relative; height: 100%; background: #F8F8F8; margin: 0; padding: 0; }
-  #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.2s ease-in-out; }
+  #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
   #map.loaded { opacity: 1; }
   #map-error {
     position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
@@ -113,6 +113,8 @@
   }
   .pi-popup .mapboxgl-popup-tip { border-top-color: var(--bg) !important; border-bottom-color: var(--bg) !important; }
   .pi-popup-title { font-size: 12px; font-weight: 700; text-transform: uppercase; padding-right: 20px; line-height: 1.3; margin-bottom: 6px; }
+
+  /* SZUFLADA LOGÓW — PŁYNNE PRZEJŚCIA I STABILNY UKŁAD */
   #pi-drawer-tab {
     position: fixed; top: 50%; right: 0; transform: translateY(-50%);
     width: 28px; height: 144px; background: var(--text); color: #FFFFFF;
@@ -141,13 +143,18 @@
     display: flex; justify-content: space-between; align-items: center;
     padding: 14px 20px; border-bottom: 1px solid var(--text);
     font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text); flex-shrink: 0;
+    min-height: 48px;
   }
   .pi-drawer-close { border: none; background: transparent; cursor: pointer; width: 22px; height: 22px; font-size: 15px; color: var(--text); display: flex; align-items: center; justify-content: center; padding: 0; }
   .pi-drawer-body { flex: 1; overflow-y: auto; padding: 20px; }
-  .pi-drawer-title { font-size: 20px; font-weight: 700; line-height: 1.1; text-transform: uppercase; letter-spacing: -0.02em; margin-bottom: 4px; color: var(--text); }
-  .pi-drawer-sub { font-size: 11px; color: var(--subtext); margin-bottom: 20px; font-weight: 400; line-height: 1.4; }
+  
+  .pi-drawer-title { font-size: 20px; font-weight: 700; line-height: 1.1; text-transform: uppercase; letter-spacing: -0.02em; margin-bottom: 4px; color: var(--text); min-height: 22px; }
+  .pi-drawer-sub { font-size: 11px; color: var(--subtext); margin-bottom: 20px; font-weight: 400; line-height: 1.4; min-height: 16px; }
   .pi-drawer-section-title { font-size: 9px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--subtext); margin-bottom: 8px; }
-  #pi-drawer-log { display: flex; flex-direction: column; margin-bottom: 24px; }
+  
+  #pi-drawer-log { display: flex; flex-direction: column; margin-bottom: 24px; opacity: 0; transition: opacity 0.25s ease; }
+  #pi-drawer-log.loaded { opacity: 1; }
+  
   .pi-log-link {
     display: flex; justify-content: space-between; align-items: center;
     padding: 10px 12px; margin: 0 -12px; border-bottom: 1px solid var(--line-light);
@@ -159,11 +166,15 @@
   .pi-log-link:hover .stats, .pi-log-link:hover .loc { color: #FFFFFF; }
   .pi-log-link .arrow { opacity: 0; transform: translateX(-4px); font-size: 11px; }
   .pi-log-link:hover .arrow { opacity: 1; transform: translateX(0); }
-  .pi-drawer-thumbs { column-count: 2; column-gap: 6px; margin-top: 6px; }
+  
+  .pi-drawer-thumbs { column-count: 2; column-gap: 6px; margin-top: 6px; opacity: 0; transition: opacity 0.3s ease; }
+  .pi-drawer-thumbs.loaded { opacity: 1; }
   .pi-thumb-card { break-inside: avoid; margin-bottom: 6px; background: var(--panel); border: 1px solid var(--line-light); overflow: hidden; }
   .pi-thumb-card img { width: 100%; height: auto; display: block; }
+  
   .pi-drawer-footer { padding: 16px 20px; border-top: 1px solid var(--text); flex-shrink: 0; background: var(--bg); }
   .pi-drawer-cta { display: block; width: 100%; text-align: center; border: 1px solid var(--text); background: var(--text); color: #FFFFFF; padding: 12px; font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none; cursor: pointer; }
+
   .mobile-bar { display: none; }
   @media (max-width: 720px) {
     #context-bar { display: none; }
@@ -311,12 +322,12 @@
 </button>
 <aside id="pi-drawer-panel" role="dialog" aria-labelledby="pi-drawer-title" aria-hidden="true">
   <div class="pi-drawer-header">
-    <span id="pi-drawer-index">LOADING…</span>
+    <span id="pi-drawer-index"></span>
     <button type="button" class="pi-drawer-close" id="pi-drawer-close" aria-label="Close">&times;</button>
   </div>
   <div class="pi-drawer-body">
-    <div class="pi-drawer-title" id="pi-drawer-title">New records documented</div>
-    <div class="pi-drawer-sub" id="pi-drawer-sub">Archive total: … records</div>
+    <div class="pi-drawer-title" id="pi-drawer-title"></div>
+    <div class="pi-drawer-sub" id="pi-drawer-sub"></div>
     <div class="pi-drawer-section-title">By location</div>
     <div id="pi-drawer-log"></div>
     <div class="pi-drawer-section-title" id="pi-thumbs-title" style="display:none; margin-top:24px;">Visual preview</div>
@@ -540,7 +551,6 @@ function restoreSavedFilters() {
   applySearchState();
 }
 
-// PROMISE GWARANTUJĄCY POBRANIE I SPARSOWANIE DANYCH PRZED STARTEM MAPY
 var dataReadyPromise = Promise.all([
   fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/locations.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }),
   fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/medias.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }).catch(function() { return ''; })
@@ -617,6 +627,7 @@ var dataReadyPromise = Promise.all([
                  '<span class="stats"><span class="count">' + padCount + '</span><span class="arrow">→</span></span>' +
                '</a>';
       }).join('');
+      logContainer.classList.add('loaded');
       logContainer.querySelectorAll('.pi-log-link').forEach(function(link) {
         link.addEventListener('mouseenter', function() {
           var q = this.getAttribute('data-query');
@@ -751,7 +762,6 @@ function initMapLazy() {
   });
 }
 
-// INICJALIZACJA: BŁYSKAWICZNA JEŚLI TO POWRÓT Z PODSTRONY LUB ODROCZONA DLA NOWEGO WEJŚCIA
 var existingSavedState = loadMapState();
 if (existingSavedState && typeof existingSavedState.lng === 'number') {
   initMapLazy();
@@ -804,7 +814,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  document.querySelectorAll('.suburb-check').forEach(function(cb) {
+  document.querySelectorAll('.suburb-check').forEach(cb => {
     cb.addEventListener('change', function() {
       if (globalPopup) globalPopup.remove();
       searchState.suburb = this.value;
@@ -902,6 +912,7 @@ document.addEventListener('DOMContentLoaded', function() {
       thumbsContainer.innerHTML = urls.map(function(url) {
         return '<div class="pi-thumb-card"><img src="' + url + '" alt="Archive Record" loading="lazy"></div>';
       }).join('');
+      thumbsContainer.classList.add('loaded');
     }
   }
 
