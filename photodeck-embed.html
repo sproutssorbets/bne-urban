@@ -467,6 +467,92 @@ function initMapboxApp() {
     map.fitBounds(bounds, { padding: 60, duration: 1000, maxZoom: 14.5, essential: true });
   }
 
+  // --- SŁOWNIK KONTROLOWANY (Part I taksonomii ze skilla tagowania) ---
+  // Physical Condition to gotowe, dokładne terminy — dopasowanie 1:1.
+  // Typology i Urban Context na mapie to etykiety GRUPOWE (Residential, Urban Renewal itd.),
+  // więc grupa jest "aktywna" dla lokalizacji, jeśli KTÓREKOLWIEK realne słowo z tej grupy
+  // pojawia się w słowach kluczowych zdjęć przypisanych do tej lokalizacji.
+  var CONDITION_TERMS = ['Existing Condition', 'Fenced Development Site', 'Demolition & Site Works', 'Active Construction Site', 'Completed Development'];
+  var TYPOLOGY_GROUPS = {
+    'Residential': ['residential', 'apartment', 'residential tower', 'social housing', 'student housing'],
+    'Commercial & Retail': ['commercial', 'office', 'retail', 'hospitality', 'shopfront', 'showroom', 'market', 'supermarket', 'shopping centre', 'cafe', 'restaurant', 'bar', 'pub', 'hotel'],
+    'Public & Civic': ['public', 'civic', 'education', 'university', 'school', 'health', 'hospital', 'clinic', 'government', 'place of worship', 'community centre', 'library', 'museum', 'gallery', 'theatre', 'performance venue', 'stadium', 'arena'],
+    'Heritage & Traditional': ['heritage', 'heritage architecture', 'queenslander', 'highset house', 'lowset house', 'workers cottage', 'post war house', 'terrace house', 'duplex', 'adaptive reuse'],
+    'Industrial': ['industrial', 'warehouse', 'parking structure', 'industrial architecture']
+  };
+  var URBAN_GROUPS = {
+    'Urban Renewal': ['urban renewal', 'urban development', 'urban intensification', 'urban consolidation'],
+    'High Density': ['high density'],
+    'Riverfront': ['riverfront']
+  };
+
+  function normalizeKey(s) { return (s || '').toLowerCase().trim(); }
+
+  function splitCsvLine(line, delimiter) {
+    var cols = [], cur = '', inQ = false;
+    for (var i = 0; i < line.length; i++) {
+      var c = line[i];
+      if (c === '"') inQ = !inQ;
+      else if (c === delimiter && !inQ) { cols.push(cur); cur = ''; }
+      else cur += c;
+    }
+    cols.push(cur);
+    return cols;
+  }
+
+  function parseDelimitedCsv(text, delimiter) {
+    var lines = text.trim().split('\n');
+    var headers = splitCsvLine(lines[0], delimiter).map(function (h) { return h.trim(); });
+    var rows = [];
+    for (var i = 1; i < lines.length; i++) {
+      if (!lines[i]) continue;
+      var cols = splitCsvLine(lines[i], delimiter);
+      var row = {};
+      headers.forEach(function (h, idx) { row[h] = (cols[idx] || '').trim(); });
+      rows.push(row);
+    }
+    return rows;
+  }
+
+  function parseMediasCsv(text) {
+    return parseDelimitedCsv(text, ';').map(function (row) {
+      return {
+        titleLower: normalizeKey(row.title),
+        keywordsLower: (row.keywords || '').split(',').map(function (k) { return k.trim().toLowerCase(); }).filter(Boolean)
+      };
+    }).filter(function (r) { return r.titleLower; });
+  }
+
+  // Łączy zdjęcia z lokalizacjami po nazwie ulicy (podciąg tytułu zdjęcia), bo medias.csv
+  // nie ma kolumny referencyjnej do pineski na mapie. To dopasowanie tekstowe — przybliżone,
+  // warto zweryfikować wynik dla kilku lokalizacji po wdrożeniu.
+  function applyMediaTagsToLocations(mediaRows) {
+    locations.forEach(function (loc) {
+      var streetKey = normalizeKey((loc.street || '').split('/')[0].split(',')[0]);
+      if (!streetKey) return;
+
+      var matched = new Set();
+      mediaRows.forEach(function (m) {
+        if (m.titleLower.indexOf(streetKey) !== -1) {
+          m.keywordsLower.forEach(function (k) { matched.add(k); });
+        }
+      });
+      if (matched.size === 0) return;
+
+      var conditions = CONDITION_TERMS.filter(function (t) { return matched.has(t.toLowerCase()); });
+      var typologies = Object.keys(TYPOLOGY_GROUPS).filter(function (group) {
+        return TYPOLOGY_GROUPS[group].some(function (t) { return matched.has(t); });
+      });
+      var urbans = Object.keys(URBAN_GROUPS).filter(function (group) {
+        return URBAN_GROUPS[group].some(function (t) { return matched.has(t); });
+      });
+
+      if (conditions.length) loc.condition = conditions.join(';');
+      if (typologies.length) loc.typology = typologies.join(';');
+      if (urbans.length) loc.urban = urbans.join(';');
+    });
+  }
+
   function showErrorState() {
     var mapErr = document.getElementById('map-error');
     if (mapErr) mapErr.classList.add('visible');
@@ -675,9 +761,23 @@ function initMapboxApp() {
         window.CURRENT_BATCH_ID = latestBatchId;
       }
 
-      annotateFilterCoverage();
-
-      if (map.loaded()) setupMap(); else map.on('load', setupMap);
+      // Uzupełniamy condition/typology/urban prawdziwymi danymi ze słów kluczowych zdjęć,
+      // zamiast czekać, aż ktoś ręcznie wypełni te kolumny w locations.csv.
+      fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/medias.csv?t=' + Date.now())
+        .then(function (r) {
+          if (!r.ok) throw new Error('medias.csv fetch failed: ' + r.status);
+          return r.text();
+        })
+        .then(function (mediaCsvText) {
+          applyMediaTagsToLocations(parseMediasCsv(mediaCsvText));
+        })
+        .catch(function (err) {
+          console.warn('PhotoIndex: could not load medias.csv — condition/typology/urban filters will show as empty', err);
+        })
+        .then(function () {
+          annotateFilterCoverage();
+          if (map.loaded()) setupMap(); else map.on('load', setupMap);
+        });
     })
     .catch(function (err) {
       console.error('PhotoIndex map: failed to load locations', err);
