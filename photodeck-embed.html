@@ -155,7 +155,11 @@
   }
   #pi-drawer-dot.hidden { opacity: 0; transform: scale(0); pointer-events: none; }
 
-  #pi-drawer-backdrop { position: fixed; inset: 0; background: rgba(17,17,17,0.15); z-index: 600; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+  #pi-drawer-backdrop {
+    position: fixed; inset: 0; z-index: 600; opacity: 0; pointer-events: none;
+    background: rgba(255,255,255,0.55);
+    transition: opacity 0.3s ease;
+  }
   #pi-drawer-backdrop.active { opacity: 1; pointer-events: auto; }
 
   #pi-drawer-panel {
@@ -416,7 +420,7 @@
     <button type="button" class="pi-drawer-close" id="pi-drawer-close" aria-label="Close">&times;</button>
   </div>
   <div class="pi-drawer-body">
-    <div class="pi-drawer-title" id="pi-drawer-title">New frames documented</div>
+    <div class="pi-drawer-title" id="pi-drawer-title">New records documented</div>
     <div class="pi-drawer-sub" id="pi-drawer-sub">Archive total: … records</div>
 
     <div class="pi-drawer-section-title">By location</div>
@@ -573,8 +577,8 @@ function initMapboxApp() {
         latestRecords.forEach(rec => { latestTotalCount += rec.count; });
 
         document.getElementById('pi-drawer-index').innerHTML = 'UPDATE &middot; ' + latestBatchId.toUpperCase();
-        // "documented", nie "indexed" — zgodnie ze słownictwem PhotoIndex (archiwum dokumentuje, nie indeksuje).
-        document.getElementById('pi-drawer-title').textContent = latestTotalCount + ' new frames documented';
+        // "records", nie "frames" — zgodnie z linią "Archive total: X records" tuż poniżej.
+        document.getElementById('pi-drawer-title').textContent = latestTotalCount + ' new records documented';
         document.getElementById('pi-drawer-sub').textContent = 'Archive total: ' + totalArchiveRecords + ' records';
 
         var logContainer = document.getElementById('pi-drawer-log');
@@ -654,7 +658,9 @@ function initMapboxApp() {
           if (!firstSeenTime) {
             localStorage.setItem(storageKey, now);
             dot.classList.remove('hidden');
-            if (window.piOpenDrawer) { setTimeout(window.piOpenDrawer, 600); }
+            // Drawer nie otwiera się już sam — kropka wystarczy jako sygnał, że jest coś nowego.
+            // Auto-otwieranie miało sens, gdy to była jedyna wzmianka o nowościach na stronie;
+            // teraz konkuruje z sekcją "Recently Added" pod mapą.
           } else {
             var elapsed = now - parseInt(firstSeenTime, 10);
             if (elapsed < twentyFourHours) { dot.classList.remove('hidden'); }
