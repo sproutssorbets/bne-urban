@@ -65,7 +65,7 @@
   /* --- GŁÓWNY UKŁAD MAPY I FILTRÓW --- */
   #layout { width: 100%; flex: 1 1 auto; min-height: 0; background: var(--bg); position: relative; display: flex; overflow: hidden; margin: 0; padding: 0; }
 
-  #index-panel { width: 320px; flex-shrink: 0; position: relative; height: 100%; border-right: 1px solid var(--text); display: flex; flex-direction: column; background: var(--bg); z-index: 3; }
+  #index-panel { width: 320px; flex-shrink: 0; position: relative; height: 100%; border-right: 1px solid var(--text); display: flex; flex-direction: column; background: var(--bg); z-index: 3; overflow-y: auto; }
 
   .mobile-only-header { display: none; }
   .mobile-grip { display: none; }
@@ -92,19 +92,18 @@
   #filters-group { flex-shrink: 0; }
 
   /* LISTA (INDEX) — zawsze widoczna pod filtrami */
-  #index-group { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+  #index-group { display: flex; flex-direction: column; flex: none; min-height: 0; }
   .index-group-head { padding: 14px 18px; border-bottom: 1px solid var(--text); background: var(--bg); flex-shrink: 0; }
-  #list-wrap { flex: 1 1 auto; overflow-y: auto; }
+  #list-wrap { flex: none; overflow-y: visible; }
   .list-row { padding: 12px 18px; border-bottom: 1px solid var(--line-light); cursor: pointer; background: var(--bg); transition: background 0.15s ease; }
-  .list-row:hover { background: var(--panel); }
+  .list-row:hover { background: var(--text); }
+  .list-row:hover .list-street, .list-row:hover .list-suburb { color: #FFFFFF; }
   .list-street { font-size: 12px; font-weight: 500; text-transform: uppercase; }
   .list-suburb { font-size: 10px; color: var(--subtext); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.06em; }
   .list-empty { padding: 16px 18px; font-size: 11px; color: var(--subtext); }
   .list-truncated { padding: 12px 18px; font-size: 10px; color: var(--subtext); letter-spacing: 0.04em; border-top: 1px solid var(--line-light); }
 
   #pi-footer { padding: 16px 18px; background: var(--bg); border-top: 1px solid var(--text); flex-shrink: 0; }
-  .pi-brand { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
-  .pi-sub { font-size: 9px; color: var(--subtext); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; }
   .pi-footer-stat { font-size: 9px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); margin-top: 10px; }
 
   /* MAPA */
@@ -141,7 +140,7 @@
   /* --- WSUWANY PANEL LOGÓW (DRAWER) --- */
   #pi-drawer-tab {
     position: fixed; top: 50%; right: 0; transform: translateY(-50%);
-    width: 28px; height: 116px; background: var(--text); color: #FFFFFF;
+    width: 28px; height: 144px; background: var(--text); color: #FFFFFF;
     border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
     z-index: 500; transition: background 0.15s ease;
   }
@@ -243,18 +242,14 @@
     #index-panel {
       position: fixed; inset: 0; width: 100% !important; height: 100% !important;
       z-index: 800; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
-      border-right: none; overflow-y: auto;
+      border-right: none;
     }
-    #index-group { flex: none; min-height: 0; }
-    #list-wrap { flex: none; overflow-y: visible; }
     #index-panel.mobile-active { transform: translateY(0); }
 
     .mobile-bar {
-      display: flex; position: fixed; left: 0; right: 0; bottom: 0;
-      height: calc(52px + env(safe-area-inset-bottom));
-      padding-bottom: env(safe-area-inset-bottom);
-      background: var(--text); color: #FFFFFF; z-index: 900;
-      border-top: 1px solid var(--text);
+      display: flex; height: 52px;
+      background: var(--text); color: #FFFFFF;
+      border-bottom: 1px solid var(--text);
     }
     .mobile-bar-btn {
       flex: 1; background: transparent; border: none; color: #FFFFFF;
@@ -275,8 +270,7 @@
     /* Zakładka logu — szersza strefa dotyku (34px) bez powiększania wizualnego elementu,
        plus niewidoczny margines wewnętrzny rozszerzający hitbox w lewo. */
     #pi-drawer-tab {
-      top: auto; bottom: calc(64px + env(safe-area-inset-bottom));
-      height: 88px; width: 34px; padding-left: 6px;
+      height: 144px; width: 34px; padding-left: 6px;
     }
   }
 </style>
@@ -300,6 +294,12 @@
   <div id="context-bar">
     <span id="context-bar-text">SELECT A PIN OR A FILTER TO OPEN A RECORD</span>
   </div>
+</div>
+
+<div class="mobile-bar">
+  <button type="button" class="mobile-bar-btn" id="mobile-toggle-filters">Filters<span class="count-badge" id="mobile-filter-count" style="display:none;"></span></button>
+  <button type="button" class="mobile-bar-btn" id="mobile-toggle-index">Index</button>
+  <a id="mobile-search-btn" class="mobile-bar-btn" href="https://www.photoindex.au/" target="_top">Search</a>
 </div>
 
 <div id="layout">
@@ -392,8 +392,6 @@
       </div>
       <div id="list-wrap"></div>
       <footer id="pi-footer">
-        <div class="pi-brand">PHOTOINDEX</div>
-        <div class="pi-sub">BRISBANE URBAN ARCHIVE</div>
         <div class="pi-footer-stat" id="archive-count">LOADING…</div>
       </footer>
     </div>
@@ -405,12 +403,6 @@
       <div id="map-error-text">Archive data could not be loaded right now. Please refresh, or open the full archive directly.</div>
     </div>
   </main>
-</div>
-
-<div class="mobile-bar">
-  <button type="button" class="mobile-bar-btn" id="mobile-toggle-filters">Filters<span class="count-badge" id="mobile-filter-count" style="display:none;"></span></button>
-  <button type="button" class="mobile-bar-btn" id="mobile-toggle-index">Index</button>
-  <a id="mobile-search-btn" class="mobile-bar-btn" href="https://www.photoindex.au/" target="_top">Search</a>
 </div>
 
 <!-- ZAKŁADKA I SZUFLADA LOGÓW -->
@@ -962,6 +954,10 @@ function initMapboxApp() {
         if (window.innerWidth <= 720) {
           document.getElementById('index-panel').classList.remove('mobile-active');
         }
+        map.flyTo({ center: loc.coords, zoom: 15 });
+        if (window.piOpenPopup && loc.popup) window.piOpenPopup(loc.popup, loc.coords);
+      });
+      row.addEventListener('mouseenter', () => {
         map.flyTo({ center: loc.coords, zoom: 15 });
         if (window.piOpenPopup && loc.popup) window.piOpenPopup(loc.popup, loc.coords);
       });
