@@ -53,6 +53,9 @@
   }
   .pi-suggest-item:last-child { border-bottom: none; }
   .pi-suggest-item:hover, .pi-suggest-item.active { background: var(--text); color: #FFFFFF; }
+  .pi-suggest-mark { display: inline-block; width: 6px; height: 6px; background: var(--text); margin-right: 8px; vertical-align: middle; }
+  .pi-suggest-item:hover .pi-suggest-mark, .pi-suggest-item.active .pi-suggest-mark { background: #FFFFFF; }
+  .pi-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
   #search-archive-btn { height: 100%; padding: 0 4px; border: none; background: transparent; color: var(--text); font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; text-decoration: none; flex-shrink: 0; }
   #context-bar {
     display: flex; align-items: center; height: 32px; padding: 0 18px;
@@ -704,7 +707,7 @@ function initAddressAutocomplete() {
     activeIndex = -1;
     if (!items.length) { closeSuggest(); return; }
     suggestBox.innerHTML = items.map(function(item, i) {
-      var tag = item.source === 'archive' ? '<span style="color:var(--subtext);font-weight:600;margin-right:6px;">ARCHIVE</span>' : '';
+      var tag = item.source === 'archive' ? '<span class="pi-suggest-mark" aria-hidden="true"></span><span class="pi-sr-only">Already photographed: </span>' : '';
       return '<div class="pi-suggest-item" data-idx="' + i + '">' + tag + item.label.toUpperCase() + '</div>';
     }).join('');
     suggestBox.classList.add('open');
