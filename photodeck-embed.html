@@ -41,6 +41,18 @@
   #pi-search-input { width: 100%; height: 100%; border: none; background: transparent; font-family: inherit; font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text); outline: none; }
   #pi-search-input::placeholder { color: var(--subtext); font-weight: 400; }
   #pi-search-clear { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); border: none; background: transparent; font-size: 20px; color: var(--text); cursor: pointer; display: none; line-height: 1; padding: 4px 8px; }
+  .pi-suggest {
+    position: absolute; top: 100%; left: 0; right: 0;
+    background: var(--bg); border: 1px solid var(--text); border-top: none;
+    z-index: 50; display: none; max-height: 240px; overflow-y: auto;
+  }
+  .pi-suggest.open { display: block; }
+  .pi-suggest-item {
+    padding: 10px 16px; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase;
+    cursor: pointer; border-bottom: 1px solid var(--line-light);
+  }
+  .pi-suggest-item:last-child { border-bottom: none; }
+  .pi-suggest-item:hover, .pi-suggest-item.active { background: var(--text); color: #FFFFFF; }
   #search-archive-btn { height: 100%; padding: 0 4px; border: none; background: transparent; color: var(--text); font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; text-decoration: none; flex-shrink: 0; }
   #context-bar {
     display: flex; align-items: center; height: 32px; padding: 0 18px;
@@ -209,6 +221,7 @@
       <div id="pi-search-wrap">
         <input type="text" id="pi-search-input" autocomplete="off" spellcheck="false" placeholder="SEARCH ADDRESS OR PLACE...">
         <button type="button" id="pi-search-clear" aria-label="Clear search">&times;</button>
+        <div id="pi-suggest" class="pi-suggest"></div>
       </div>
     </div>
     <a id="search-archive-btn" href="https://www.photoindex.au/" target="_top"><span id="search-archive-text">Search</span></a>
@@ -340,6 +353,7 @@ var searchState = { text: '', suburb: '', categories: {} };
 var mapInstance = null;
 var globalPopup = null;
 var mapInitiated = false;
+var autocompleteReady = false;
 var CONDITION_TERMS = ['Existing Condition', 'Fenced Development Site', 'Demolition & Site Works', 'Active Construction Site', 'Completed Development'];
 var CAT_ARRAY_KEYS = { condition: 'conditionArr', typology: 'typologyArr', urban: 'urbanArr', year: 'yearArr' };
 var MAP_STATE_KEY = 'pi_map_state';
@@ -622,8 +636,8 @@ function loadInitialData() {
           var padCount = rec.count.toString().padStart(2, '0');
           var linkUrl = rec.archiveUrl || 'https://www.photoindex.au/';
           return '<a href="' + linkUrl + '" target="_top" class="pi-log-link" data-query="' + rec.street + '">' +
-                   '<span class="loc">' + rec.street + '</span>' +
-                   '<span class="stats"><span class="count">' + padCount + '</span><span class="arrow">→</span></span>' +
+                 '<span class="loc">' + rec.street + '</span>' +
+                 '<span class="stats"><span class="count">' + padCount + '</span><span class="arrow">→</span></span>' +
                  '</a>';
         }).join('');
         logContainer.querySelectorAll('.pi-log-link').forEach(function(link) {
@@ -657,6 +671,105 @@ function loadInitialData() {
     restoreSavedFilters();
   })
   .catch(function() {});
+}
+
+function initAddressAutocomplete() {
+  if (autocompleteReady) return;
+  autocompleteReady = true;
+  var suggestBox = document.getElementById('pi-suggest');
+  var searchInput = document.getElementById('pi-search-input');
+  if (!suggestBox || !searchInput) return;
+  var acTimeout = null;
+  var activeIndex = -1;
+  var currentItems = [];
+
+  function closeSuggest() {
+    suggestBox.classList.remove('open');
+    suggestBox.innerHTML = '';
+    currentItems = [];
+    activeIndex = -1;
+  }
+
+  function searchLocalArchive(q) {
+    var qLc = q.toLowerCase();
+    return locations.filter(function(loc) {
+      return loc.streetLc.indexOf(qLc) !== -1 || loc.suburbLc.indexOf(qLc) !== -1;
+    }).slice(0, 5).map(function(loc) {
+      return { source: 'archive', label: loc.street + ', ' + loc.suburb, loc: loc };
+    });
+  }
+
+  function renderSuggestions(items) {
+    currentItems = items;
+    activeIndex = -1;
+    if (!items.length) { closeSuggest(); return; }
+    suggestBox.innerHTML = items.map(function(item, i) {
+      var tag = item.source === 'archive' ? '<span style="color:var(--subtext);font-weight:600;margin-right:6px;">ARCHIVE</span>' : '';
+      return '<div class="pi-suggest-item" data-idx="' + i + '">' + tag + item.label.toUpperCase() + '</div>';
+    }).join('');
+    suggestBox.classList.add('open');
+    suggestBox.querySelectorAll('.pi-suggest-item').forEach(function(el) {
+      el.addEventListener('click', function() {
+        selectItem(currentItems[parseInt(this.getAttribute('data-idx'), 10)]);
+      });
+    });
+  }
+
+  function selectItem(item) {
+    if (!item || !mapInstance) return;
+    closeSuggest();
+    searchInput.value = item.label;
+    if (item.source === 'archive') {
+      mapInstance.flyTo({ center: item.loc.coords, zoom: 15.5, speed: 1.2 });
+      if (window.piOpenPopupForLocation) window.piOpenPopupForLocation(item.loc);
+    } else if (item.feature.bbox) {
+      mapInstance.fitBounds(item.feature.bbox, { padding: 60, duration: 600, maxZoom: 15.5 });
+    } else if (item.feature.center) {
+      mapInstance.flyTo({ center: item.feature.center, zoom: 15.5, speed: 1.2 });
+    }
+  }
+
+  searchInput.addEventListener('input', function() {
+    var q = this.value.trim();
+    clearTimeout(acTimeout);
+    if (q.length < 3) { closeSuggest(); return; }
+    var localMatches = searchLocalArchive(q);
+    renderSuggestions(localMatches);
+    acTimeout = setTimeout(function() {
+      fetch('https://api.mapbox.com/geocoding/v5/mapbox.places/' + encodeURIComponent(q) + '.json?access_token=' + mapboxgl.accessToken + '&country=au&proximity=153.0307,-27.4598&bbox=152.66,-27.85,153.4,-26.9&limit=5')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          var external = (data.features || []).map(function(f) {
+            return { source: 'mapbox', label: f.place_name, feature: f };
+          });
+          renderSuggestions(localMatches.concat(external).slice(0, 8));
+        })
+        .catch(function() {});
+    }, 300);
+  });
+
+  searchInput.addEventListener('keydown', function(ev) {
+    if (!suggestBox.classList.contains('open')) return;
+    var items = suggestBox.querySelectorAll('.pi-suggest-item');
+    if (ev.key === 'ArrowDown') {
+      ev.preventDefault();
+      activeIndex = Math.min(activeIndex + 1, items.length - 1);
+      items.forEach(function(el, i) { el.classList.toggle('active', i === activeIndex); });
+    } else if (ev.key === 'ArrowUp') {
+      ev.preventDefault();
+      activeIndex = Math.max(activeIndex - 1, 0);
+      items.forEach(function(el, i) { el.classList.toggle('active', i === activeIndex); });
+    } else if (ev.key === 'Enter' && activeIndex >= 0 && currentItems[activeIndex]) {
+      ev.preventDefault();
+      selectItem(currentItems[activeIndex]);
+    } else if (ev.key === 'Escape') {
+      closeSuggest();
+    }
+  });
+
+  document.addEventListener('click', function(ev) {
+    if (!suggestBox.contains(ev.target) && ev.target !== searchInput) closeSuggest();
+  });
 }
 
 function initMapLazy() {
@@ -746,6 +859,7 @@ function initMapLazy() {
       } else {
         document.getElementById('map').classList.add('loaded');
         applySearchState();
+        initAddressAutocomplete();
       }
     }
     mountMarkers();
@@ -787,18 +901,18 @@ document.addEventListener('DOMContentLoaded', function() {
       applySearchState();
       if (mapInstance) mapInstance.flyTo({ center: [153.0307, -27.4598], zoom: 13, duration: 800 });
     });
-searchInput.addEventListener('input', function() {
-  clearBtn.style.display = this.value ? 'block' : 'none';
-  clearTimeout(searchTimeout);
-  var val = this.value.trim().toLowerCase();
-  searchTimeout = setTimeout(function() {
-    searchState.text = val;
-    if (val && typeof clarity === 'function') {
-      clarity('set', 'search_query', val);
-    }
-    applySearchState();
-  }, 120);
-});
+    searchInput.addEventListener('input', function() {
+      clearBtn.style.display = this.value ? 'block' : 'none';
+      clearTimeout(searchTimeout);
+      var val = this.value.trim().toLowerCase();
+      searchTimeout = setTimeout(function() {
+        searchState.text = val;
+        if (val && typeof clarity === 'function') {
+          clarity('set', 'search_query', val);
+        }
+        applySearchState();
+      }, 120);
+    });
   }
 
   document.querySelectorAll('.acc-head').forEach(function(h) {
@@ -819,8 +933,8 @@ searchInput.addEventListener('input', function() {
       }
       applySearchState();
       if (this.value && typeof clarity === 'function') {
-clarity('set', 'suburb_filter', this.value);
-}
+        clarity('set', 'suburb_filter', this.value);
+      }
       if (window.innerWidth <= 720) {
         document.getElementById('index-panel').classList.remove('mobile-active');
         document.body.classList.remove('pi-drawer-lock');
