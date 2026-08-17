@@ -408,12 +408,26 @@
   var root = document.querySelector('.pi-pricing-embed');
   if (!root) return;
 
+  function reportHeight() {
+    var h = document.body.scrollHeight;
+    window.parent.postMessage({ type: 'pi-licensing-resize', height: h }, '*');
+  }
+
   root.querySelectorAll('.spec-row').forEach(function (row) {
     row.addEventListener('click', function () {
       var group = this.closest('.spec-group');
       group.classList.toggle('open');
+      // wait one frame for layout to settle before measuring
+      requestAnimationFrame(function () { requestAnimationFrame(reportHeight); });
     });
   });
+
+  // report once on initial load, and again after fonts/images settle
+  reportHeight();
+  window.addEventListener('load', reportHeight);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(reportHeight);
+  }
 })();
 </script>
 
