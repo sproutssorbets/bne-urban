@@ -51,6 +51,7 @@
     font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; 
     color: var(--text); outline: none; 
   }
+  #pi-search-input:focus-visible { outline: none !important; }
   #pi-search-input::placeholder { color: var(--text); font-weight: 500; }
   #pi-search-clear { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); border: none; background: transparent; font-size: 20px; color: var(--text); cursor: pointer; display: none; line-height: 1; padding: 4px 8px; transition: opacity 0.1s; }
   #pi-search-clear:hover { opacity: 0.4; }
@@ -289,7 +290,6 @@
 <div class="mobile-bar">
   <button type="button" class="mobile-bar-btn" id="mobile-toggle-filters">Filters<span class="count-badge" id="mobile-filter-count" style="display:none;"></span></button>
   <button type="button" class="mobile-bar-btn" id="mobile-toggle-index">Index</button>
-  <a id="mobile-search-btn" class="mobile-bar-btn" href="https://www.photoindex.au/" target="_top">Search</a>
 </div>
 <div id="layout">
   <aside id="index-panel">
@@ -1039,11 +1039,15 @@ document.addEventListener('DOMContentLoaded', function() {
     mobileIndexBtn.addEventListener('click', function() {
       indexPanel.classList.add('mobile-active');
       document.body.classList.add('pi-drawer-lock');
+      document.querySelectorAll('.acc-head.open').forEach(function(h) { h.classList.remove('open'); });
+      document.querySelectorAll('.acc-body.open').forEach(function(b) { b.classList.remove('open'); });
       var indexGroup = document.getElementById('index-group');
       if (indexGroup) {
-        setTimeout(function() {
-          indexGroup.scrollIntoView({ behavior: 'auto', block: 'start' });
-        }, 50);
+        requestAnimationFrame(function() {
+          requestAnimationFrame(function() {
+            indexPanel.scrollTop = indexGroup.offsetTop;
+          });
+        });
       }
     });
   }
