@@ -73,12 +73,6 @@
   #search-archive-btn { height: 100%; padding: 0 16px; margin-right:-16px; border-left: 1px solid var(--text); background: var(--bg); color: var(--text); font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; text-decoration: none; flex-shrink: 0; transition: background 0.1s, color 0.1s; }
   #search-archive-btn:hover { background: var(--text); color: var(--bg); }
 
-  #context-bar {
-    display: flex; align-items: center; height: 28px; padding: 0 16px;
-    font-size: 9px; font-weight: 500; color: var(--text); letter-spacing: 0.1em;
-    background: var(--bg); text-transform: uppercase; border-top: 1px solid var(--text);
-  }
-
   /* LAYOUT MATRIX */
   #layout { width: 100%; flex: 1 1 auto; min-height: 0; background: var(--bg); position: relative; display: flex; overflow: hidden; margin: 0; padding: 0; }
   
@@ -240,7 +234,6 @@
   /* MOBILE UX */
   .mobile-bar { display: none; }
   @media (max-width: 720px) {
-    #context-bar { display: none; }
     #search-row { height: 48px; padding: 0 14px; }
     #search-archive-btn { font-size: 9px; padding: 0 12px; margin-right: -14px;}
     
@@ -291,9 +284,6 @@
       </div>
     </div>
     <a id="search-archive-btn" href="https://www.photoindex.au/" target="_top"><span id="search-archive-text">Search</span></a>
-  </div>
-  <div id="context-bar">
-    <span id="context-bar-text">SELECT A PIN OR A FILTER TO OPEN A RECORD</span>
   </div>
 </div>
 <div class="mobile-bar">
