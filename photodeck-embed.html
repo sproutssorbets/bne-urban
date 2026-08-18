@@ -187,7 +187,7 @@
   #pi-drawer-backdrop.active { opacity: 1; pointer-events: auto; }
   
   #pi-drawer-panel {
-    position: fixed; top: 0; right: 0; height: 100%; width: 360px; max-width: calc(100vw - 40px);
+    position: fixed; top: 0; right: 0; height: 100%; height: 100dvh; width: 360px; max-width: calc(100vw - 40px);
     background: var(--bg); border-left: 1px solid var(--text); transform: translateX(100%);
     transition: transform 0.25s cubic-bezier(0.16,1,0.3,1); z-index: 700; display: flex; flex-direction: column;
   }
@@ -211,7 +211,7 @@
   /* Link hover invert */
   .pi-log-link {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 10px 12px; margin: 0 -12px; border-bottom: 1px solid var(--text);
+    padding: 10px 0; border-bottom: 1px solid var(--text);
     font-size: 11px; font-weight: 500; text-decoration: none; color: var(--text); text-transform: uppercase;
   }
   .pi-log-link:hover { background: var(--text); color: var(--bg); }
