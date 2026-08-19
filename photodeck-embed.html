@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>PHOTOINDEX - Spatial Database</title>
+<title>PHOTOINDEX</title>
 <link rel="preconnect" href="https://api.mapbox.com">
 <link rel="preconnect" href="https://raw.githubusercontent.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,11 +11,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
   /* ABSOLUTE MONOCHROME SYSTEM */
-  :root {
-    --bg: #FFFFFF;
-    --line: #000000;
-    --text: #000000;
-  }
+:root {
+  --bg: #FFFFFF;
+  --line: #000000;
+  --text: #000000;
+  --muted: #666666;
+}
 
   *, *::before, *::after {
     box-sizing: border-box; 
@@ -117,7 +118,7 @@
   .list-row:hover .list-street, .list-row:hover .list-suburb { color: var(--bg); }
   .list-row:hover .list-suburb { opacity: 0.7; color: var(--bg); }
   .list-street { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
-  .list-suburb { font-size: 9px; font-weight: 500; color: var(--text); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .list-suburb { font-size: 10px; font-weight: 500; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
   .list-empty { padding: 16px; font-size: 10px; font-weight: 500; color: var(--text); text-transform: uppercase;}
   
   #pi-footer { padding: 12px 16px; background: var(--bg); border-top: 1px solid var(--text); flex-shrink: 0; }
