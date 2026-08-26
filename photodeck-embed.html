@@ -473,6 +473,7 @@ function parseMediasCsv(text) {
       rows.push({
         titleLower: normalizeKey(row.title),
         descriptionLower: normalizeKey(row.description || ''),
+        altTextLower: normalizeKey(row.alt_text || ''),
         keywordsLower: (row.keywords || '').split(',').map(function(k) { return k.trim().toLowerCase(); }).filter(Boolean)
       });
     }
@@ -486,7 +487,7 @@ function applyMediaTagsToLocations(mediaRows) {
     if (!streetKey) return;
     var matched = new Set();
     mediaRows.forEach(function(m) {
-      if (m.titleLower.indexOf(streetKey) !== -1 || m.descriptionLower.indexOf(streetKey) !== -1) {
+      if (m.titleLower.indexOf(streetKey) !== -1 || m.descriptionLower.indexOf(streetKey) !== -1 || m.altTextLower.indexOf(streetKey) !== -1) {
         m.keywordsLower.forEach(function(k) { matched.add(k); });
       }
     });
