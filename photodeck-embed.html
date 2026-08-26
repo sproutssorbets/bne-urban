@@ -411,7 +411,17 @@ var mapInstance = null;
 var globalPopup = null;
 var mapInitiated = false;
 var autocompleteReady = false;
-var CONDITION_TERMS = ['Existing Condition', 'Fenced Development Site', 'Demolition & Site Works', 'Active Construction Site', 'Completed Development'];
+var CATEGORY_TERMS = {
+  condition: ['Existing Condition', 'Fenced Development Site', 'Demolition & Site Works', 'Active Construction Site', 'Completed Development'],
+  urban: ['Urban Renewal', 'High Density', 'Riverfront']
+};
+var TYPOLOGY_GROUPS = {
+  'Residential': ['residential', 'apartment', 'residential tower', 'social housing', 'student housing'],
+  'Commercial & Retail': ['commercial', 'office', 'retail', 'hospitality', 'shopfront', 'showroom', 'market', 'supermarket', 'shopping centre', 'cafe', 'restaurant', 'bar', 'pub', 'hotel'],
+  'Public & Civic': ['public', 'civic', 'education', 'university', 'school', 'health', 'hospital', 'clinic', 'government', 'place of worship', 'community centre', 'library', 'museum', 'gallery', 'theatre', 'performance venue', 'stadium', 'arena'],
+  'Heritage & Traditional': ['heritage', 'heritage architecture', 'queenslander', 'highset house', 'lowset house', 'workers cottage', 'post war house', 'terrace house', 'duplex', 'adaptive reuse'],
+  'Industrial': ['industrial', 'warehouse', 'parking structure', 'industrial architecture']
+};
 var CAT_ARRAY_KEYS = { condition: 'conditionArr', typology: 'typologyArr', urban: 'urbanArr', year: 'yearArr' };
 var MAP_STATE_KEY = 'pi_map_state';
 
@@ -480,8 +490,14 @@ function applyMediaTagsToLocations(mediaRows) {
       }
     });
     if (matched.size === 0) return;
-    var conditions = CONDITION_TERMS.filter(function(t) { return matched.has(t.toLowerCase()); });
-    if (conditions.length) loc.condition = conditions.join(';');
+    Object.keys(CATEGORY_TERMS).forEach(function(cat) {
+      var hits = CATEGORY_TERMS[cat].filter(function(t) { return matched.has(t.toLowerCase()); });
+      if (hits.length) loc[cat] = hits.join(';');
+    });
+    var typologyHits = Object.keys(TYPOLOGY_GROUPS).filter(function(group) {
+      return TYPOLOGY_GROUPS[group].some(function(t) { return matched.has(t.toLowerCase()); });
+    });
+    if (typologyHits.length) loc.typology = typologyHits.join(';');
   });
 }
 
@@ -657,8 +673,6 @@ function loadInitialData() {
       };
       locData.streetLc = locData.street.toLowerCase();
       locData.suburbLc = locData.suburb.toLowerCase();
-      locData.typologyArr = splitCatValue(locData.typology);
-      locData.urbanArr = splitCatValue(locData.urban);
       locData.yearArr = splitCatValue(locData.year);
       if (!isNaN(locData.coords[0]) && !isNaN(locData.coords[1])) {
         locations.push(locData);
@@ -670,7 +684,11 @@ function loadInitialData() {
     if (mediaCsvText) {
       applyMediaTagsToLocations(parseMediasCsv(mediaCsvText));
     }
-    locations.forEach(function(loc) { loc.conditionArr = splitCatValue(loc.condition); });
+    locations.forEach(function(loc) {
+      loc.conditionArr = splitCatValue(loc.condition);
+      loc.typologyArr = splitCatValue(loc.typology);
+      loc.urbanArr = splitCatValue(loc.urban);
+    });
     var sortedBatches = Object.keys(batchesMap).filter(function(b) { return b !== 'UNKNOWN'; }).sort(function(a, b) {
       var timeA = new Date(a).getTime();
       var timeB = new Date(b).getTime();
