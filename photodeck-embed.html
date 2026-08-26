@@ -334,16 +334,8 @@
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Kangaroo Point"> Kangaroo Point</label>
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Woolloongabba"> Woolloongabba</label>
       </div>
-      <div class="acc-head" data-target="acc-development">
-        <span class="acc-title">2. Development Status</span><span class="acc-icon">+</span>
-      </div>
-      <div class="acc-body" id="acc-development">
-        <label><input type="checkbox" class="filter-check" data-cat="development" value="Proposed"> Proposed</label>
-        <label><input type="checkbox" class="filter-check" data-cat="development" value="Approved"> Approved</label>
-        <label><input type="checkbox" class="filter-check" data-cat="development" value="Under Construction"> Under Construction</label>
-      </div>
       <div class="acc-head" data-target="acc-condition">
-        <span class="acc-title">3. Physical Condition</span><span class="acc-icon">+</span>
+        <span class="acc-title">2. Physical Condition</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-condition">
         <label><input type="checkbox" class="filter-check" data-cat="condition" value="Existing Condition"> Existing Condition</label>
@@ -353,7 +345,7 @@
         <label><input type="checkbox" class="filter-check" data-cat="condition" value="Completed Development"> Completed Development</label>
       </div>
       <div class="acc-head" data-target="acc-typology">
-        <span class="acc-title">4. Typology & Use</span><span class="acc-icon">+</span>
+        <span class="acc-title">3. Typology & Use</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-typology">
         <div class="sub-category-title">Residential</div>
@@ -414,7 +406,7 @@
         <label><input type="checkbox" class="filter-check" data-cat="typology" value="industrial architecture"> industrial architecture</label>
       </div>
       <div class="acc-head" data-target="acc-architecture">
-        <span class="acc-title">5. Architecture & Material</span><span class="acc-icon">+</span>
+        <span class="acc-title">4. Architecture & Material</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-architecture">
         <div class="sub-category-title">Form & Style</div>
@@ -445,7 +437,7 @@
         <label><input type="checkbox" class="filter-check" data-cat="architecture" value="grid"> grid</label>
       </div>
       <div class="acc-head" data-target="acc-urban">
-        <span class="acc-title">6. Urban Context</span><span class="acc-icon">+</span>
+        <span class="acc-title">5. Urban Context</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-urban">
         <div class="sub-category-title">Process & Transformation</div>
@@ -480,7 +472,7 @@
         <label><input type="checkbox" class="filter-check" data-cat="urban" value="legacy project"> legacy project</label>
       </div>
       <div class="acc-head" data-target="acc-year">
-        <span class="acc-title">7. Time</span><span class="acc-icon">+</span>
+        <span class="acc-title">6. Time</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body" id="acc-year">
         <label><input type="checkbox" class="filter-check" data-cat="year" value="2026"> 2026</label>
@@ -562,7 +554,7 @@ var CATEGORY_TERMS = {
     'olympic venue', 'olympic precinct', 'olympic infrastructure', 'transport upgrade', 'athlete village', 'temporary structure', 'legacy project'
   ]
 };
-var CAT_ARRAY_KEYS = { condition: 'conditionArr', typology: 'typologyArr', architecture: 'architectureArr', urban: 'urbanArr', year: 'yearArr', development: 'developmentArr' };
+var CAT_ARRAY_KEYS = { condition: 'conditionArr', typology: 'typologyArr', architecture: 'architectureArr', urban: 'urbanArr', year: 'yearArr' };
 var MAP_STATE_KEY = 'pi_map_state';
 
 function saveMapState(partial) {
@@ -639,7 +631,7 @@ function applyMediaTagsToLocations(mediaRows) {
   });
 }
 
-var SEARCHABLE_CATEGORIES = ['condition', 'typology', 'architecture', 'urban', 'year', 'development'];
+var SEARCHABLE_CATEGORIES = ['condition', 'typology', 'architecture', 'urban', 'year'];
 
 function quoteIfMultiword(v) { return /\s/.test(v) ? '"' + v + '"' : v; }
 
@@ -855,7 +847,6 @@ function loadInitialData() {
         architecture: row.architecture || '',
         urban: row.urban || '',
         year: row.year || (row.date ? row.date.slice(-4) : ''),
-        development: row.development_status || row.development || '',
         count: count,
         dates: row.shoot_dates || row.date || '',
         coords: [parseFloat(row.lng), parseFloat(row.lat)],
@@ -864,7 +855,6 @@ function loadInitialData() {
       locData.streetLc = locData.street.toLowerCase();
       locData.suburbLc = locData.suburb.toLowerCase();
       locData.yearArr = splitCatValue(locData.year);
-      locData.developmentArr = splitCatValue(locData.development);
       if (!isNaN(locData.coords[0]) && !isNaN(locData.coords[1])) {
         locations.push(locData);
       }
