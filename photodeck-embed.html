@@ -986,14 +986,7 @@ function initAddressAutocomplete() {
   });
 
   searchInput.addEventListener('keydown', function(ev) {
-    if (!suggestBox.classList.contains('open')) {
-      if (ev.key === 'Enter') {
-        ev.preventDefault();
-        var btn = document.getElementById('search-archive-btn');
-        if (btn && btn.href) window.top.location.href = btn.href;
-      }
-      return;
-    }
+    if (!suggestBox.classList.contains('open')) return;
     var items = suggestBox.querySelectorAll('.pi-suggest-item');
     if (ev.key === 'ArrowDown') {
       ev.preventDefault();
@@ -1013,6 +1006,18 @@ function initAddressAutocomplete() {
 
   document.addEventListener('click', function(ev) {
     if (!suggestBox.contains(ev.target) && ev.target !== searchInput) closeSuggest();
+  });
+
+  /* Enter triggers a search from anywhere on the page, not only while the
+     search field itself has focus — a checkbox, a suburb radio, anywhere.
+     The one exception is while the address-suggestion dropdown is open,
+     where Enter already has a specific job, confirming the highlighted
+     suggestion, handled above on the input's own keydown listener. */
+  document.addEventListener('keydown', function(ev) {
+    if (ev.key !== 'Enter') return;
+    if (suggestBox.classList.contains('open')) return;
+    var btn = document.getElementById('search-archive-btn');
+    if (btn && btn.href) { ev.preventDefault(); window.top.location.href = btn.href; }
   });
 }
 
