@@ -1312,30 +1312,35 @@ document.addEventListener('DOMContentLoaded', function() {
   var searchInput = document.getElementById('pi-search-input');
   var clearBtn = document.getElementById('pi-search-clear');
   var searchTimeout = null;
+  function resetAllFilters() {
+    searchInput.value = '';
+    clearBtn.style.display = 'none';
+    var defRadio = document.querySelector('.suburb-check[value=""]');
+    if (defRadio) defRadio.checked = true;
+    searchState.suburb = '';
+    searchState.text = '';
+    searchState.categories = {};
+    document.querySelectorAll('.filter-check:checked').forEach(function(cb) { cb.checked = false; });
+    sessionStorage.removeItem(MAP_STATE_KEY);
+    applySearchState();
+    if (mapInstance) mapInstance.flyTo({ center: [153.0307, -27.4598], zoom: 13, duration: 800 });
+  }
+
   if (searchInput && clearBtn) {
-    clearBtn.addEventListener('click', function() {
-      searchInput.value = '';
-      this.style.display = 'none';
-      var defRadio = document.querySelector('.suburb-check[value=""]');
-      if (defRadio) defRadio.checked = true;
-      searchState.suburb = '';
-      searchState.text = '';
-      /* Categories have to be cleared here too, and their checkboxes
-         unchecked, or the very next applySearchState() call below will
-         rebuild the search field from whatever is still ticked in the
-         panel, undoing the clear before the visitor even notices it
-         happened. This was fine while categories rendered as separate
-         boxed tags, but now that everything shares one text field, an
-         incomplete clear here fights with itself. */
-      searchState.categories = {};
-      document.querySelectorAll('.filter-check:checked').forEach(function(cb) { cb.checked = false; });
-      sessionStorage.removeItem(MAP_STATE_KEY);
-      applySearchState();
-      if (mapInstance) mapInstance.flyTo({ center: [153.0307, -27.4598], zoom: 13, duration: 800 });
-    });
+    clearBtn.addEventListener('click', resetAllFilters);
     searchInput.addEventListener('input', function() {
       clearBtn.style.display = this.value ? 'block' : 'none';
       clearTimeout(searchTimeout);
+      /* Clearing the field by hand, backspacing it out or selecting the
+         text with the mouse and deleting it, now resets every active
+         filter the same way the × button does, not only the free-text
+         search. Otherwise the field would just sit empty for a moment
+         and then repopulate itself from whatever is still checked in the
+         panel, which is confusing to watch happen. */
+      if (this.value.trim() === '') {
+        resetAllFilters();
+        return;
+      }
       var val = this.value.trim().toLowerCase();
       searchTimeout = setTimeout(function() {
         searchState.text = val;
@@ -1356,6 +1361,21 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   document.querySelectorAll('.suburb-check').forEach(function(cb) {
+    /* Radio buttons, unlike checkboxes, don't naturally deselect when you
+       click the one that's already chosen — 'change' doesn't even fire
+       in that case, since nothing about the checked state actually
+       changed. This catches that specific click and treats it as
+       "clear the suburb", reverting to All Locations. */
+    cb.addEventListener('click', function() {
+      if (this.value && this.value === searchState.suburb) {
+        this.checked = false;
+        var defRadio = document.querySelector('.suburb-check[value=""]');
+        if (defRadio) defRadio.checked = true;
+        if (globalPopup) globalPopup.remove();
+        searchState.suburb = '';
+        applySearchState();
+      }
+    });
     cb.addEventListener('change', function() {
       if (globalPopup) globalPopup.remove();
       searchState.suburb = this.value;
