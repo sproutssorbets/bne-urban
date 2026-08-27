@@ -157,6 +157,18 @@
   
   .custom-marker-hitbox:hover .pi-pin { transform: scale(1.15) translateY(-2px); }
 
+  /* A cluster pin represents several documented locations grouped into one
+     marker because they sit too close together on screen at the current
+     zoom. Its number is the total photo count across all locations in the
+     group — the same quantity a single pin shows for one location — so the
+     number stays meaningful and consistent as clusters split apart or
+     merge together while zooming, rather than switching between "photos"
+     and "locations" depending on how zoomed in you are. Same pin shape as
+     a single location, slightly larger and heavier border, as a visual cue
+     that this one represents more than one place. */
+  .pi-pin-cluster .pi-pin-body { min-width: 26px; height: 26px; font-size: 11px; border-width: 2px; }
+  .pi-pin-cluster .pi-pin-point { border-left-width: 4px; border-right-width: 4px; border-top-width: 5px; }
+
   /* MAPBOX POPUP */
   .pi-popup .mapboxgl-popup-content {
     background: var(--bg); border: 1px solid var(--text); padding: 12px;
@@ -717,12 +729,13 @@ function applySearchState() {
     }
     return matchesText && matchesSuburb && matchesCategories;
   });
-  var visibleSet = new Set(visibleLocs);
-  locations.forEach(function(loc) {
-    if (loc.marker) {
-      loc.marker.getElement().style.display = visibleSet.has(loc) ? '' : 'none';
-    }
-  });
+  /* Markers are re-clustered against the filtered set, not just shown or
+     hidden in place — hiding a filtered-out pin doesn't help if two
+     visible pins next to it are still overlapping. window.renderMarkers
+     is defined once the map and its markers have loaded (see below); this
+     guard covers the one call to applySearchState() that can fire earlier,
+     during initial page load, before that has happened. */
+  if (window.renderMarkers) window.renderMarkers(visibleLocs);
   renderList(visibleLocs);
   updatePhotoDeckLink();
   renderActiveTags();
@@ -1064,6 +1077,77 @@ function initMapLazy() {
       saveMapState({ lng: c.lng, lat: c.lat, zoom: mapInstance.getZoom() });
     });
     mapInstance.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
+
+    /* Curated landmark labels — background anchors visitors can use to
+       orient themselves at a glance, e.g. "that's near Story Bridge".
+       Sourced only from the CBD Background Anchors section of
+       BRISBANE_ARCHITECTURAL_LANDMARKS_EN.txt. Coordinates below are from
+       Google Places, cross-checked against Wikipedia infobox coordinates —
+       Wikipedia's are only precise to the nearest arcsecond (roughly 30m
+       in Brisbane), and for two of these that margin showed up as a
+       visibly wrong position at close zoom. Two are worth a specific note:
+       Brisbane Quarter's Wikidata coordinate turned out to point at the
+       old Law Courts building that stood on this site before, roughly
+       300m from the current complex — Google's point is used here
+       instead. Victoria Park's point is the centre of the park as a
+       whole, not the stadium construction site specifically, since the
+       label is meant to orient by the park, not by one project inside it.
+       A native Mapbox symbol layer, not another DOM marker per landmark —
+       Mapbox's own label collision detection keeps these from overlapping
+       each other or the road/place names already in the base style,
+       without any custom logic to write or maintain.
+       maxzoom:16 on both layers below — even Google's rooftop-level
+       points are for a whole building, not a photographed subject, so the
+       same margin-of-error logic applies past a certain closeness. The
+       cap hides the layer before that becomes noticeable, leaving
+       documented-location pins (which come from EXIF, not a place lookup)
+       as the only labels precise enough to trust at street level. */
+    mapInstance.on('load', function() {
+      mapInstance.addSource('landmarks', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: [
+            { type: 'Feature', properties: { name: 'Infinity Tower' }, geometry: { type: 'Point', coordinates: [153.0194754, -27.4678006] } },
+            { type: 'Feature', properties: { name: '1 William Street' }, geometry: { type: 'Point', coordinates: [153.025835, -27.4748377] } },
+            { type: 'Feature', properties: { name: 'Riverside Centre' }, geometry: { type: 'Point', coordinates: [153.0302001, -27.467152] } },
+            { type: 'Feature', properties: { name: 'Riparian Plaza' }, geometry: { type: 'Point', coordinates: [153.0303029, -27.4682608] } },
+            { type: 'Feature', properties: { name: 'One One One Eagle Street' }, geometry: { type: 'Point', coordinates: [153.0301996, -27.4676829] } },
+            { type: 'Feature', properties: { name: "Queen's Wharf" }, geometry: { type: 'Point', coordinates: [153.0245387, -27.4741509] } },
+            { type: 'Feature', properties: { name: '480 Queen Street' }, geometry: { type: 'Point', coordinates: [153.0308165, -27.4640791] } },
+            { type: 'Feature', properties: { name: 'Brisbane Quarter' }, geometry: { type: 'Point', coordinates: [153.0224282, -27.4701207] } },
+            { type: 'Feature', properties: { name: 'Story Bridge' }, geometry: { type: 'Point', coordinates: [153.0358644, -27.4636326] } },
+            { type: 'Feature', properties: { name: 'Victoria Park / Barrambin' }, geometry: { type: 'Point', coordinates: [153.0212178, -27.4529175] } }
+          ]
+        }
+      });
+      mapInstance.addLayer({
+        id: 'landmark-marks',
+        type: 'circle',
+        source: 'landmarks',
+        maxzoom: 16,
+        paint: { 'circle-radius': 3, 'circle-color': '#000000' }
+      });
+      mapInstance.addLayer({
+        id: 'landmark-labels',
+        type: 'symbol',
+        source: 'landmarks',
+        maxzoom: 16,
+        layout: {
+          'text-field': ['upcase', ['get', 'name']],
+          'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
+          'text-size': 10,
+          'text-letter-spacing': 0.08,
+          'text-offset': [0, 0.9],
+          'text-anchor': 'top'
+        },
+        paint: {
+          'text-color': '#666666',
+          'text-halo-color': '#FFFFFF',
+          'text-halo-width': 1.4
+        }
+      });
+    });
     window.piOpenPopupForLocation = function(loc) {
       var datesList = loc.dates ? loc.dates.split(';').map(function(d) { return d.trim(); }).filter(Boolean) : [];
       var datesDesc = datesList.slice().reverse();
@@ -1096,41 +1180,110 @@ function initMapLazy() {
         if (window.piOpenPopupForLocation) window.piOpenPopupForLocation(match);
       }
     };
-    var index = 0;
-    var CHUNK = 60;
     var markerTemplate = document.createElement('div');
     markerTemplate.className = 'custom-marker-hitbox';
     markerTemplate.innerHTML = '<div class="pi-pin"><div class="pi-pin-body"></div><div class="pi-pin-point"></div></div>';
-    function mountMarkers() {
+
+    /* Pins within CLUSTER_PIXEL_RADIUS screen pixels of each other at the
+       current zoom are merged into one marker showing how many documented
+       locations it represents, instead of stacking their individual
+       photo-count badges on top of one another. Grouping is done by
+       on-screen distance, not fixed geographic distance, so clusters
+       un-merge on their own as the visitor zooms in and the same
+       locations gain room to separate.
+
+       This is a simple single-pass grouping — each point joins the first
+       nearby group it finds, it does not re-check against every other
+       member already in that group — which is enough at the pin counts
+       this archive has today. A chain of pins each just under the radius
+       apart could in theory end up in one long cluster; worth revisiting
+       with proper spatial clustering if that starts showing up in practice
+       as the archive grows. */
+    var CLUSTER_PIXEL_RADIUS = 40;
+
+    function clusterByScreenDistance(map, locs, radius) {
+      var pts = locs.map(function(loc) {
+        var p = map.project(loc.coords);
+        return { loc: loc, x: p.x, y: p.y };
+      });
+      var used = new Array(pts.length).fill(false);
+      var groups = [];
+      for (var i = 0; i < pts.length; i++) {
+        if (used[i]) continue;
+        var group = [pts[i]];
+        used[i] = true;
+        for (var j = i + 1; j < pts.length; j++) {
+          if (used[j]) continue;
+          var dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
+          if (Math.sqrt(dx * dx + dy * dy) <= radius) {
+            group.push(pts[j]);
+            used[j] = true;
+          }
+        }
+        groups.push(group);
+      }
+      return groups;
+    }
+
+    var currentVisibleLocs = [];
+    var mountedMarkers = [];
+
+    window.renderMarkers = function(visibleLocs) {
+      currentVisibleLocs = visibleLocs;
+      mountedMarkers.forEach(function(m) { m.remove(); });
+      mountedMarkers = [];
+
+      var groups = clusterByScreenDistance(mapInstance, visibleLocs, CLUSTER_PIXEL_RADIUS);
+
+      groups.forEach(function(group) {
+        var el = markerTemplate.cloneNode(true);
+
+        if (group.length === 1) {
+          var loc = group[0].loc;
+          el.querySelector('.pi-pin-body').textContent = loc.count;
+          el.addEventListener('click', function(ev) {
+            ev.stopPropagation();
+            window.piOpenPopupForLocation(loc);
+          });
+          mountedMarkers.push(
+            new mapboxgl.Marker({ element: el, anchor: 'bottom' }).setLngLat(loc.coords).addTo(mapInstance)
+          );
+        } else {
+          el.classList.add('pi-pin-cluster');
+          var totalPhotos = group.reduce(function(sum, p) { return sum + (p.loc.count || 0); }, 0);
+          el.querySelector('.pi-pin-body').textContent = totalPhotos;
+          var lngSum = 0, latSum = 0;
+          group.forEach(function(p) { lngSum += p.loc.coords[0]; latSum += p.loc.coords[1]; });
+          var centroid = [lngSum / group.length, latSum / group.length];
+          el.addEventListener('click', function(ev) {
+            ev.stopPropagation();
+            var bounds = new mapboxgl.LngLatBounds();
+            group.forEach(function(p) { bounds.extend(p.loc.coords); });
+            mapInstance.fitBounds(bounds, { padding: 80, maxZoom: 18, duration: 500 });
+          });
+          mountedMarkers.push(
+            new mapboxgl.Marker({ element: el, anchor: 'bottom' }).setLngLat(centroid).addTo(mapInstance)
+          );
+        }
+      });
+    };
+
+    /* Re-cluster on pan/zoom — the filtered set of locations doesn't change
+       from this, but each pin's screen position does, so groups need
+       recomputing against the same currently-visible locations. */
+    mapInstance.on('moveend', function() { window.renderMarkers(currentVisibleLocs); });
+
+    function waitForLocationsThenRender() {
       if (!locations || locations.length === 0) {
-        setTimeout(mountMarkers, 50);
+        setTimeout(waitForLocationsThenRender, 50);
         return;
       }
-      var end = Math.min(index + CHUNK, locations.length);
-      for (var i = index; i < end; i++) {
-        var loc = locations[i];
-        var el = markerTemplate.cloneNode(true);
-        el.querySelector('.pi-pin-body').textContent = loc.count;
-        loc.marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' })
-          .setLngLat(loc.coords)
-          .addTo(mapInstance);
-        el.addEventListener('click', (function(l) {
-          return function(ev) {
-            ev.stopPropagation();
-            window.piOpenPopupForLocation(l);
-          };
-        })(loc));
-      }
-      index = end;
-      if (index < locations.length) {
-        requestAnimationFrame(mountMarkers);
-      } else {
-        document.getElementById('map').classList.add('loaded');
-        applySearchState();
-        initAddressAutocomplete();
-      }
+      window.renderMarkers(locations);
+      document.getElementById('map').classList.add('loaded');
+      applySearchState();
+      initAddressAutocomplete();
     }
-    mountMarkers();
+    waitForLocationsThenRender();
   };
   document.head.appendChild(js);
 }
