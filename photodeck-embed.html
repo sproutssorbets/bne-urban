@@ -114,22 +114,7 @@
   .acc-body input[type="checkbox"]:checked::before { content: ""; width: 4px; height: 7px; border: solid var(--bg); border-width: 0 1.5px 1.5px 0; transform: rotate(45deg) translate(-1px, -1.5px); }
   .acc-body input[type="checkbox"]:checked { background: var(--text); border-color: var(--text); }
 
-  /* INDEX LIST */
   #filters-group { flex-shrink: 0; }
-  #index-group { display: flex; flex-direction: column; flex: none; min-height: 0; }
-  .index-group-head { padding: 12px 16px; border-bottom: 1px solid var(--text); background: var(--bg); flex-shrink: 0; }
-  
-  #list-wrap { flex: none; overflow-y: visible; }
-  .list-row { padding: 12px 16px; border-bottom: 1px solid var(--text); cursor: pointer; background: var(--bg); }
-  .list-row:hover { background: var(--text); }
-  .list-row:hover .list-street, .list-row:hover .list-suburb { color: var(--bg); }
-  .list-row:hover .list-suburb { opacity: 0.7; color: var(--bg); }
-  .list-street { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
-  .list-suburb { font-size: 10px; font-weight: 500; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
-  .list-empty { padding: 16px; font-size: 10px; font-weight: 500; color: var(--text); text-transform: uppercase;}
-  
-  #pi-footer { padding: 12px 16px; background: var(--bg); border-top: 1px solid var(--text); flex-shrink: 0; }
-  .pi-footer-stat { font-size: 9px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); }
 
   /* MAP VIEWPORT */
   #map-wrap { flex: 1; position: relative; height: 100%; background: var(--bg); margin: 0; padding: 0; }
@@ -310,7 +295,6 @@
 </div>
 <div class="mobile-bar">
   <button type="button" class="mobile-bar-btn" id="mobile-toggle-filters">Filters<span class="count-badge" id="mobile-filter-count" style="display:none;"></span></button>
-  <button type="button" class="mobile-bar-btn" id="mobile-toggle-index">Index</button>
 </div>
 <div id="layout">
   <aside id="index-panel">
@@ -490,15 +474,6 @@
         <label><input type="checkbox" class="filter-check" data-cat="year" value="2026"> 2026</label>
       </div>
     </div>
-    <div id="index-group">
-      <div class="index-group-head">
-        <span class="acc-title">Index</span><span class="acc-count" id="index-count"></span>
-      </div>
-      <div id="list-wrap"></div>
-      <footer id="pi-footer">
-        <div class="pi-footer-stat" id="archive-count">LOADING…</div>
-      </footer>
-    </div>
   </aside>
   <main id="map-wrap">
     <div id="map"></div>
@@ -670,38 +645,30 @@ function updatePhotoDeckLink() {
 }
 
 function renderActiveTags() {
+  /* Filters used to render as separate boxed pills next to the search
+     field. Now everything, suburb and every category value, is written
+     directly into the search field as plain text, the same way suburb
+     selection already worked before this change. The #pi-active-tags
+     container is kept in the markup but always emptied, rather than
+     removed outright, so nothing else that references it breaks.
+     One trade-off worth knowing: this field now does double duty, typed
+     address text and the filter summary share the same box, so checking
+     a new filter overwrites whatever was manually typed, exactly as
+     selecting a suburb already did. There is no more per-filter × inside
+     the search bar; removing a filter now means unchecking it in the
+     panel, or using the single clear-all × on the field. */
   var container = document.getElementById('pi-active-tags');
-  if (!container) return;
-  var tags = [];
-  if (searchState.suburb) {
-    tags.push({ label: searchState.suburb, onRemove: function() {
-      var radio = document.querySelector('.suburb-check[value=""]');
-      if (radio) { radio.checked = true; radio.dispatchEvent(new Event('change')); }
-    }});
-  }
+  if (container) container.innerHTML = '';
+  var searchInput = document.getElementById('pi-search-input');
+  var clearBtn = document.getElementById('pi-search-clear');
+  if (!searchInput) return;
+  var labels = [];
+  if (searchState.suburb) labels.push(searchState.suburb);
   SEARCHABLE_CATEGORIES.forEach(function(cat) {
-    (searchState.categories[cat] || []).forEach(function(val) {
-      tags.push({ label: val, onRemove: function() {
-        var cb = document.querySelector('.filter-check[data-cat="' + cat + '"][value="' + val + '"]');
-        if (cb) { cb.checked = false; cb.dispatchEvent(new Event('change')); }
-      }});
-    });
+    (searchState.categories[cat] || []).forEach(function(val) { labels.push(val); });
   });
-  container.innerHTML = '';
-  tags.forEach(function(t) {
-    var el = document.createElement('span');
-    el.className = 'pi-tag';
-    var labelSpan = document.createElement('span');
-    labelSpan.textContent = t.label;
-    var removeBtn = document.createElement('button');
-    removeBtn.type = 'button';
-    removeBtn.setAttribute('aria-label', 'Remove ' + t.label + ' filter');
-    removeBtn.innerHTML = '&times;';
-    removeBtn.addEventListener('click', function(ev) { ev.stopPropagation(); t.onRemove(); });
-    el.appendChild(labelSpan);
-    el.appendChild(removeBtn);
-    container.appendChild(el);
-  });
+  searchInput.value = labels.join(', ');
+  if (clearBtn) clearBtn.style.display = searchInput.value ? 'block' : 'none';
 }
 
 function countActiveFilters() {
@@ -742,14 +709,9 @@ function applySearchState() {
      guard covers the one call to applySearchState() that can fire earlier,
      during initial page load, before that has happened. */
   if (window.renderMarkers) window.renderMarkers(visibleLocs);
-  renderList(visibleLocs);
   updatePhotoDeckLink();
   renderActiveTags();
   annotateFilterCoverage(textLc, suburbLc);
-  var archiveCountEl = document.getElementById('archive-count');
-  if (archiveCountEl) archiveCountEl.textContent = visibleLocs.length + ' OF ' + locations.length + ' LOCATIONS';
-  var indexCount = document.getElementById('index-count');
-  if (indexCount) indexCount.textContent = '(' + visibleLocs.length + ')';
   var badge = document.getElementById('mobile-filter-count');
   if (badge) {
     var n = countActiveFilters();
@@ -801,35 +763,6 @@ function annotateFilterCoverage(textLc, suburbLc) {
   });
 }
 
-function renderList(items) {
-  var wrap = document.getElementById('list-wrap');
-  if (!wrap) return;
-  wrap.innerHTML = '';
-  if (!items.length) {
-    wrap.innerHTML = '<div class="list-empty">No locations match the current filters.</div>';
-    return;
-  }
-  var LIST_LIMIT = 80;
-  var frag = document.createDocumentFragment();
-  items.slice(0, LIST_LIMIT).forEach(function(loc) {
-    var row = document.createElement('div');
-    row.className = 'list-row';
-    row.innerHTML = '<div class="list-street">' + loc.street + '</div><div class="list-suburb">' + loc.suburb + '</div>';
-    row.addEventListener('click', function() {
-      if (window.innerWidth <= 720) {
-        document.getElementById('index-panel').classList.remove('mobile-active');
-        document.body.classList.remove('pi-drawer-lock');
-      }
-      if (mapInstance) {
-        mapInstance.flyTo({ center: loc.coords, zoom: 15 });
-        if (window.piOpenPopupForLocation) window.piOpenPopupForLocation(loc);
-      }
-    });
-    frag.appendChild(row);
-  });
-  wrap.appendChild(frag);
-}
-
 function restoreSavedFilters() {
   var saved = loadMapState();
   if (!saved) return;
@@ -848,10 +781,17 @@ function restoreSavedFilters() {
     hasFilters = true;
     searchState.categories = saved.categories;
     for (var cat in saved.categories) {
-      (saved.categories[cat] || []).forEach(function(val) {
+      var values = saved.categories[cat] || [];
+      values.forEach(function(val) {
         var cb = document.querySelector('.filter-check[data-cat="' + cat + '"][value="' + val + '"]');
         if (cb) cb.checked = true;
       });
+      if (values.length > 0) {
+        var head = document.querySelector('.acc-head[data-target="acc-' + cat + '"]');
+        var body = document.getElementById('acc-' + cat);
+        if (head) head.classList.add('open');
+        if (body) body.classList.add('open');
+      }
     }
   }
   if (hasFilters) applySearchState();
@@ -965,11 +905,6 @@ function loadInitialData() {
       }
     }
     annotateFilterCoverage('', '');
-    renderList(locations);
-    var archiveCountEl = document.getElementById('archive-count');
-    if (archiveCountEl) archiveCountEl.textContent = locations.length + ' LOCATIONS';
-    var indexCount = document.getElementById('index-count');
-    if (indexCount) indexCount.textContent = '(' + locations.length + ')';
     restoreSavedFilters();
   })
   .catch(function(e) { console.error('PhotoIndex map: loadInitialData failed', e); });
@@ -1051,7 +986,14 @@ function initAddressAutocomplete() {
   });
 
   searchInput.addEventListener('keydown', function(ev) {
-    if (!suggestBox.classList.contains('open')) return;
+    if (!suggestBox.classList.contains('open')) {
+      if (ev.key === 'Enter') {
+        ev.preventDefault();
+        var btn = document.getElementById('search-archive-btn');
+        if (btn && btn.href) window.top.location.href = btn.href;
+      }
+      return;
+    }
     var items = suggestBox.querySelectorAll('.pi-suggest-item');
     if (ev.key === 'ArrowDown') {
       ev.preventDefault();
@@ -1414,7 +1356,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   var mobileToggleBtn = document.getElementById('mobile-toggle-filters');
-  var mobileIndexBtn = document.getElementById('mobile-toggle-index');
   var indexPanel = document.getElementById('index-panel');
   var mobileCloseBtn = document.getElementById('mobile-panel-close');
   if (mobileToggleBtn && indexPanel) {
@@ -1422,22 +1363,6 @@ document.addEventListener('DOMContentLoaded', function() {
       indexPanel.classList.add('mobile-active');
       document.body.classList.add('pi-drawer-lock');
       indexPanel.scrollTop = 0;
-    });
-  }
-  if (mobileIndexBtn && indexPanel) {
-    mobileIndexBtn.addEventListener('click', function() {
-      indexPanel.classList.add('mobile-active');
-      document.body.classList.add('pi-drawer-lock');
-      document.querySelectorAll('.acc-head.open').forEach(function(h) { h.classList.remove('open'); });
-      document.querySelectorAll('.acc-body.open').forEach(function(b) { b.classList.remove('open'); });
-      var indexGroup = document.getElementById('index-group');
-      if (indexGroup) {
-        requestAnimationFrame(function() {
-          requestAnimationFrame(function() {
-            indexPanel.scrollTop = indexGroup.offsetTop;
-          });
-        });
-      }
     });
   }
   if (mobileCloseBtn && indexPanel) {
