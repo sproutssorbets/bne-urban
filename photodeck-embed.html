@@ -50,7 +50,8 @@
   #pi-search-input { 
     width: 100%; height: 100%; border: none; background: transparent; 
     font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; 
-    color: var(--text); outline: none; 
+    color: var(--text); outline: none; padding-right: 30px; box-sizing: border-box;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   #pi-search-input:focus-visible { outline: none !important; }
   #pi-search-input::placeholder { color: var(--text); font-weight: 500; }
@@ -300,7 +301,7 @@
   <aside id="index-panel">
     <div class="mobile-grip"></div>
     <div class="mobile-only-header">
-      <span style="font-size:10px; font-weight: 500; letter-spacing:0.1em; text-transform:uppercase;">Filters & Index</span>
+      <span style="font-size:10px; font-weight: 500; letter-spacing:0.1em; text-transform:uppercase;">Filters</span>
       <button type="button" id="mobile-panel-close" style="border:none; background:transparent; font-size:18px; cursor:pointer; padding:4px;">&times;</button>
     </div>
     <div class="panel-section-container" id="filters-group">
@@ -554,6 +555,31 @@ function loadMapState() {
   } catch (e) { return null; }
 }
 
+/* This map is embedded cross-origin (sproutssorbets.github.io inside
+   photoindex.au), so its own sessionStorage is third-party storage from
+   the browser's point of view — Safari in particular can isolate or
+   block it per top-level page, which defeats "same filters on every
+   subpage" even though it is technically the same iframe file everywhere.
+   To make that carry over reliably, the parent page is expected to save
+   the last filter state itself (first-party, no such restrictions) and
+   hand it back in on the next load as a `state` URL parameter. This
+   reads that handoff; sessionStorage above stays as a same-tab fallback
+   for a plain reload of the iframe on its own. */
+function getStateFromUrlParam() {
+  try {
+    var raw = new URLSearchParams(window.location.search).get('state');
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+
+function broadcastFilterState(state) {
+  try {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ type: 'pi-filters', suburb: state.suburb || '', categories: state.categories || {} }, 'https://www.photoindex.au');
+    }
+  } catch (e) {}
+}
+
 function normalizeKey(s) { return (s || '').toLowerCase().trim(); }
 
 function splitCatValue(v) {
@@ -719,6 +745,7 @@ function applySearchState() {
     badge.style.display = n > 0 ? 'inline-flex' : 'none';
   }
   saveMapState({ suburb: searchState.suburb, categories: searchState.categories });
+  broadcastFilterState({ suburb: searchState.suburb, categories: searchState.categories });
 }
 
 function annotateFilterCoverage(textLc, suburbLc) {
@@ -764,7 +791,7 @@ function annotateFilterCoverage(textLc, suburbLc) {
 }
 
 function restoreSavedFilters() {
-  var saved = loadMapState();
+  var saved = getStateFromUrlParam() || loadMapState();
   if (!saved) return;
   var hasFilters = false;
   if (saved.suburb) {
