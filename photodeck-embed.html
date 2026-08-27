@@ -627,7 +627,15 @@ function parseMediasCsv(text) {
 
 function applyMediaTagsToLocations(mediaRows) {
   locations.forEach(function(loc) {
-    var streetKey = normalizeKey((loc.street || '').split('/')[0].split(',')[0]);
+    /* Full street/intersection name, only the trailing suburb after a
+       comma stripped off — never truncated at "/". Cutting an
+       intersection down to its first street name (e.g. "Edward Street /
+       Margaret Street" -> "edward street") made every other "Edward
+       Street / <something>" location match any photo anywhere that
+       merely mentions Edward Street, bleeding keywords across different
+       corners of the same street. Matching on the full name keeps each
+       intersection distinct. */
+    var streetKey = normalizeKey((loc.street || '').split(',')[0]);
     if (!streetKey) return;
     var matched = new Set();
     mediaRows.forEach(function(m) {
