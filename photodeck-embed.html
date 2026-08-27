@@ -1293,6 +1293,15 @@ document.addEventListener('DOMContentLoaded', function() {
       if (defRadio) defRadio.checked = true;
       searchState.suburb = '';
       searchState.text = '';
+      /* Categories have to be cleared here too, and their checkboxes
+         unchecked, or the very next applySearchState() call below will
+         rebuild the search field from whatever is still ticked in the
+         panel, undoing the clear before the visitor even notices it
+         happened. This was fine while categories rendered as separate
+         boxed tags, but now that everything shares one text field, an
+         incomplete clear here fights with itself. */
+      searchState.categories = {};
+      document.querySelectorAll('.filter-check:checked').forEach(function(cb) { cb.checked = false; });
       sessionStorage.removeItem(MAP_STATE_KEY);
       applySearchState();
       if (mapInstance) mapInstance.flyTo({ center: [153.0307, -27.4598], zoom: 13, duration: 800 });
