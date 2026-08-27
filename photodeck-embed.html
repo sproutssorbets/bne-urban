@@ -709,25 +709,30 @@ function countActiveFilters() {
   return n;
 }
 
+function locationMatchesState(loc, textLc, suburbLc, excludeCat) {
+  var matchesText = !textLc || loc.streetLc.indexOf(textLc) !== -1 || loc.suburbLc.indexOf(textLc) !== -1;
+  var matchesSuburb = !suburbLc || loc.suburbLc === suburbLc;
+  if (!matchesText || !matchesSuburb) return false;
+  for (var cat in searchState.categories) {
+    if (cat === excludeCat) continue;
+    var allowed = searchState.categories[cat];
+    if (allowed && allowed.length > 0) {
+      var values = loc[CAT_ARRAY_KEYS[cat]] || [];
+      var found = false;
+      for (var i = 0; i < values.length; i++) {
+        if (allowed.indexOf(values[i]) !== -1) { found = true; break; }
+      }
+      if (!found) return false;
+    }
+  }
+  return true;
+}
+
 function applySearchState() {
   var textLc = searchState.text;
   var suburbLc = searchState.suburb ? searchState.suburb.toLowerCase() : '';
   var visibleLocs = locations.filter(function(loc) {
-    var matchesText = !textLc || loc.streetLc.indexOf(textLc) !== -1 || loc.suburbLc.indexOf(textLc) !== -1;
-    var matchesSuburb = !suburbLc || loc.suburbLc === suburbLc;
-    var matchesCategories = true;
-    for (var cat in searchState.categories) {
-      var allowed = searchState.categories[cat];
-      if (allowed && allowed.length > 0) {
-        var values = loc[CAT_ARRAY_KEYS[cat]] || [];
-        var found = false;
-        for (var i = 0; i < values.length; i++) {
-          if (allowed.indexOf(values[i]) !== -1) { found = true; break; }
-        }
-        if (!found) { matchesCategories = false; break; }
-      }
-    }
-    return matchesText && matchesSuburb && matchesCategories;
+    return locationMatchesState(loc, textLc, suburbLc, null);
   });
   /* Markers are re-clustered against the filtered set, not just shown or
      hidden in place — hiding a filtered-out pin doesn't help if two
@@ -739,6 +744,7 @@ function applySearchState() {
   renderList(visibleLocs);
   updatePhotoDeckLink();
   renderActiveTags();
+  annotateFilterCoverage(textLc, suburbLc);
   var archiveCountEl = document.getElementById('archive-count');
   if (archiveCountEl) archiveCountEl.textContent = visibleLocs.length + ' OF ' + locations.length + ' LOCATIONS';
   var indexCount = document.getElementById('index-count');
@@ -752,12 +758,33 @@ function applySearchState() {
   saveMapState({ suburb: searchState.suburb, categories: searchState.categories });
 }
 
-function annotateFilterCoverage() {
+function annotateFilterCoverage(textLc, suburbLc) {
+  textLc = textLc || '';
+  suburbLc = suburbLc || '';
+  /* Counts are faceted, not global: a checkbox's number is how many
+     locations match it together with every OTHER currently active
+     filter (suburb, search text, other categories) — the same
+     "combinations that actually exist" behaviour as PhotoDeck's own
+     search. Selecting "Under Construction" and then opening Typology
+     shows counts among only the under-construction locations, not the
+     whole archive, so a typology with zero matches inside that overlap
+     goes to 0 and disables, even if it has photos elsewhere in the
+     archive. Computed once per category per call (contextCache), since
+     every checkbox within the same category shares the same "all other
+     filters" context. A checkbox that's already checked is never
+     force-disabled even if its live count reads 0, so an active
+     selection never silently vanishes out from under the visitor. */
+  var contextCache = {};
   document.querySelectorAll('.filter-check').forEach(function(cb) {
     var cat = cb.getAttribute('data-cat');
     var val = cb.value;
     var key = CAT_ARRAY_KEYS[cat];
-    var count = locations.filter(function(loc) {
+    if (!contextCache[cat]) {
+      contextCache[cat] = locations.filter(function(loc) {
+        return locationMatchesState(loc, textLc, suburbLc, cat);
+      });
+    }
+    var count = contextCache[cat].filter(function(loc) {
       return (loc[key] || []).indexOf(val) !== -1;
     }).length;
     var label = cb.closest('label');
@@ -768,7 +795,7 @@ function annotateFilterCoverage() {
     countSpan.className = 'filter-count';
     countSpan.textContent = count;
     label.appendChild(countSpan);
-    if (count === 0) { cb.disabled = true; label.classList.add('no-data'); }
+    if (count === 0 && !cb.checked) { cb.disabled = true; label.classList.add('no-data'); }
     else { cb.disabled = false; label.classList.remove('no-data'); }
   });
 }
@@ -936,7 +963,7 @@ function loadInitialData() {
         }
       }
     }
-    annotateFilterCoverage();
+    annotateFilterCoverage('', '');
     renderList(locations);
     var archiveCountEl = document.getElementById('archive-count');
     if (archiveCountEl) archiveCountEl.textContent = locations.length + ' LOCATIONS';
