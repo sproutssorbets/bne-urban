@@ -15,6 +15,7 @@ import os
 import sys
 import xml.etree.ElementTree as ET
 import urllib.request
+import urllib.error
 
 MEDIAS_URL = os.environ.get("PHOTODECK_MEDIAS_URL")
 CSV_PATH = "locations.csv"
@@ -26,8 +27,24 @@ if not MEDIAS_URL:
 
 def fetch_xml(url):
     req = urllib.request.Request(url, headers={"User-Agent": "photoindex-thumb-sync/1.0"})
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        return resp.read()
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            status = resp.status
+            body = resp.read()
+    except urllib.error.HTTPError as e:
+        print(f"HTTP error {e.code} przy pobieraniu medias.xml", file=sys.stderr)
+        print(f"Treść odpowiedzi (pierwsze 500 znaków): {e.read()[:500]!r}", file=sys.stderr)
+        sys.exit(1)
+    except urllib.error.URLError as e:
+        print(f"Błąd połączenia przy pobieraniu medias.xml: {e.reason}", file=sys.stderr)
+        sys.exit(1)
+
+    print(f"Pobrano medias.xml, status HTTP {status}, {len(body)} bajtów", file=sys.stderr)
+    if not body.lstrip().startswith(b"<"):
+        # to, co przyszło, nie wygląda na XML — pokaż fragment, żeby było
+        # widać w logu co faktycznie zwrócił serwer (np. stronę błędu HTML)
+        print(f"UWAGA: odpowiedź nie zaczyna się od '<'. Pierwsze 500 znaków: {body[:500]!r}", file=sys.stderr)
+    return body
 
 
 def strip_date(title):
