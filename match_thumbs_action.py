@@ -8,15 +8,23 @@ Różnice względem wersji ręcznej:
   jest uruchamiany (workflow robi wcześniej checkout repo)
 - logika dopasowania (ref -> tytuł -> grupowanie -> thumbs -> count)
   identyczna jak w wersji ręcznej
+- NOWE: wykrywa lokalizacje obecne w medias.xml, których jeszcze nie ma w
+  locations.csv (żaden ref nie pasuje), i dopisuje dla nich nowy wiersz
+  z gotowymi danymi. Pola, których nie da się wyciągnąć automatycznie —
+  lat, lng (PhotoDeck nie eksponuje GPS) i suburb (PhotoDeck zwraca tylko
+  ogólne "Brisbane" w polu city, nie konkretną dzielnicę) — zostają puste,
+  do ręcznego uzupełnienia.
 """
 
 import csv
 import gzip
 import os
 import sys
+import urllib.parse
 import xml.etree.ElementTree as ET
 import urllib.request
 import urllib.error
+from datetime import datetime, timezone
 
 MEDIAS_URL = os.environ.get("PHOTODECK_MEDIAS_URL")
 CSV_PATH = "locations.csv"
@@ -83,7 +91,9 @@ def main():
         date_created = m.findtext("date-created", "")
 
         media_by_filename[filename] = {"title": title_key, "thumb": thumb}
-        media_by_title.setdefault(title_key, []).append({"thumb": thumb, "date": date_created})
+        media_by_title.setdefault(title_key, []).append(
+            {"thumb": thumb, "date": date_created, "filename": filename}
+        )
 
     if not os.path.exists(CSV_PATH):
         print(f"Nie znaleziono {CSV_PATH} w repo — przerywam.", file=sys.stderr)
@@ -120,6 +130,56 @@ def main():
         print("Brak dopasowania (ref nie znaleziony w medias.xml):", file=sys.stderr)
         for street, ref in unmatched:
             print(f"  - {street} (ref: {ref})", file=sys.stderr)
+
+    # --- Wykrywanie nowych lokalizacji, których jeszcze nie ma w CSV ---
+    # Zbierz wszystkie ref-y już obecne w locations.csv (niezależnie od tego,
+    # czy się dopasowały, czy nie — liczy się sama obecność w pliku).
+    existing_refs = {row.get("ref", "").strip() for row in rows}
+
+    new_rows_added = []
+    for title_key, group in media_by_title.items():
+        group_sorted = sorted(group, key=lambda x: x["date"])
+        # jeśli którykolwiek plik z tej grupy jest już w CSV, lokalizacja
+        # jest znana — pomijamy (obsłuży ją pętla dopasowania powyżej)
+        if any(g["filename"] in existing_refs for g in group_sorted):
+            continue
+
+        anchor = group_sorted[0]  # najstarsze zdjęcie w grupie jako punkt odniesienia
+        thumbs = ";".join(g["thumb"] for g in group_sorted)
+
+        try:
+            dt = datetime.strptime(anchor["date"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+            date_str = f"{dt.day}/{dt.month}/{dt.year}"
+        except ValueError:
+            date_str = ""
+
+        today = datetime.now(timezone.utc)
+        update_batch = f"{today.day} {today.strftime('%B')} {today.year}"
+
+        new_row = {
+            "street": title_key,
+            "suburb": "",  # PhotoDeck nie podaje konkretnej dzielnicy — do uzupełnienia ręcznie
+            "lat": "",     # PhotoDeck nie eksponuje GPS — do uzupełnienia ręcznie (np. przez match_gps.py)
+            "lng": "",
+            "date": date_str,
+            "count": str(len(group_sorted)),
+            "address": title_key,
+            "ref": anchor["filename"],
+            "archiveUrl": "https://www.photoindex.au/?search=" + urllib.parse.quote_plus(title_key),
+            "licenseUrl": "https://www.photoindex.au/licensing",
+            "thumb": "",
+            "shoot_dates": date_str,
+            "update_batch": update_batch,
+            "thumbs": thumbs,
+        }
+        rows.append(new_row)
+        new_rows_added.append(title_key)
+        changed = True
+
+    if new_rows_added:
+        print(f"\nDodano {len(new_rows_added)} nowych lokalizacji (brak lat/lng/suburb — uzupełnij ręcznie):", file=sys.stderr)
+        for street in new_rows_added:
+            print(f"  - {street}", file=sys.stderr)
 
     if not changed:
         print("Brak zmian — locations.csv już aktualny.")
