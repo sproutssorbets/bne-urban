@@ -237,8 +237,9 @@ def main():
             print(f"  - {street}", file=sys.stderr)
 
     # --- Uzupełnianie GPS/suburb z folderu gps-drop/ ---
-    gps_data, processed_files = read_gps_drop_folder()
+    gps_data, extracted_files = read_gps_drop_folder()
     filled_from_drop = []
+    applied_refs = set()
     if gps_data:
         for row in rows:
             if row.get("lat", "").strip():
@@ -251,6 +252,7 @@ def main():
                 if suburb:
                     row["suburb"] = suburb
                 filled_from_drop.append(row.get("street"))
+                applied_refs.add(ref)
                 changed = True
 
     if filled_from_drop:
@@ -258,13 +260,32 @@ def main():
         for street in filled_from_drop:
             print(f"  - {street}", file=sys.stderr)
 
-    if processed_files:
-        for fname in processed_files:
-            fpath = os.path.join(GPS_DROP_DIR, fname)
+    # Usuwamy z folderu tylko te pliki, których dane faktycznie trafiły do
+    # jakiegoś wiersza — plik z poprawnym GPS, ale bez pasującego ref w CSV
+    # (literówka, już wypełniony wiersz) zostaje, żeby dało się to zauważyć
+    # i poprawić, zamiast cicho znikać bez śladu.
+    files_removed = []
+    files_kept_unused = []
+    for fname in extracted_files:
+        ref = ref_from_filename(fname)
+        fpath = os.path.join(GPS_DROP_DIR, fname)
+        if ref in applied_refs:
             if os.path.exists(fpath):
                 os.remove(fpath)
-        print(f"Usunięto {len(processed_files)} przetworzonych plików z {GPS_DROP_DIR}/", file=sys.stderr)
+            files_removed.append(fname)
+        else:
+            files_kept_unused.append(fname)
+
+    if files_removed:
+        print(f"Usunięto {len(files_removed)} przetworzonych plików z {GPS_DROP_DIR}/", file=sys.stderr)
         changed = True  # usunięcie plików z gps-drop/ też trzeba zacommitować
+
+    if files_kept_unused:
+        print(f"\nUWAGA — te pliki w {GPS_DROP_DIR}/ miały poprawny GPS, ale ich ref nie pasował do żadnego "
+              f"wiersza z pustym lat/lng (literówka w nazwie? lokalizacja już wypełniona?), zostały nietknięte:",
+              file=sys.stderr)
+        for fname in files_kept_unused:
+            print(f"  - {fname}", file=sys.stderr)
 
     if not changed:
         print("Brak zmian — locations.csv już aktualny.")
