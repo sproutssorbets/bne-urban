@@ -11,6 +11,7 @@ Różnice względem wersji ręcznej:
 """
 
 import csv
+import gzip
 import os
 import sys
 import xml.etree.ElementTree as ET
@@ -40,6 +41,15 @@ def fetch_xml(url):
         sys.exit(1)
 
     print(f"Pobrano medias.xml, status HTTP {status}, {len(body)} bajtów", file=sys.stderr)
+
+    # Serwer bywa skonfigurowany tak, by zawsze wysyłać zawartość spakowaną
+    # gzipem, niezależnie od nagłówka Accept-Encoding — urllib, w przeciwieństwie
+    # do przeglądarki, nie dekompresuje tego automatycznie. Rozpoznajemy to po
+    # sygnaturze magicznych bajtów gzipa (0x1f 0x8b) na początku odpowiedzi.
+    if body[:2] == b"\x1f\x8b":
+        body = gzip.decompress(body)
+        print(f"Odpowiedź była spakowana gzipem — rozpakowano do {len(body)} bajtów", file=sys.stderr)
+
     if not body.lstrip().startswith(b"<"):
         # to, co przyszło, nie wygląda na XML — pokaż fragment, żeby było
         # widać w logu co faktycznie zwrócił serwer (np. stronę błędu HTML)
