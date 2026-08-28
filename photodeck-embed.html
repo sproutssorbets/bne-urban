@@ -121,8 +121,12 @@
   #map-wrap { flex: 1; position: relative; height: 100%; background: var(--bg); margin: 0; padding: 0; }
   
   /* Wymuszony, absolutny grayscale na mapie, by zachować B&W interfejsu */
-  #map { position: absolute; inset: 0; opacity: 0; filter: grayscale(100%); transition: opacity 0.3s ease-in-out; }
+  #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s ease-in-out; }
   #map.loaded { opacity: 1; }
+  /* Grayscale nakładany tylko na płótno mapy (kafelki), nie na cały kontener #map —
+     markery i popupy dokładane są jako dzieci tego samego kontenera, więc filtr na
+     #map zabarwiałby też je na szaro, mimo że mają być kolorowe. */
+  #map .mapboxgl-canvas { filter: grayscale(100%); }
   
   #map-error {
     position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
@@ -1167,7 +1171,7 @@ function initMapLazy() {
       var sliderHtml = '';
       if (thumbs.length > 0) {
         var slidesHtml = thumbs.map(function(url, i) {
-          return '<img src="' + url + '" loading="lazy" style="display:' + (i === 0 ? 'block' : 'none') + ';width:100%;height:110px;object-fit:cover;" data-pi-slide="' + i + '">';
+          return '<img src="' + url + '" loading="lazy" style="display:' + (i === 0 ? 'block' : 'none') + ';width:100%;height:140px;object-fit:contain;background:var(--bg);" data-pi-slide="' + i + '">';
         }).join('');
         var navHtml = thumbs.length > 1
           ? '<button type="button" class="pi-popup-slider-prev" aria-label="Poprzednie zdjęcie" style="position:absolute;top:50%;left:4px;transform:translateY(-50%);background:rgba(0,0,0,0.55);color:#FFF;border:none;width:20px;height:20px;cursor:pointer;font-size:11px;line-height:1;">&lsaquo;</button>' +
