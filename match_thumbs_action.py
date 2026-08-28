@@ -14,11 +14,20 @@ Różnice względem wersji ręcznej:
   lat, lng (PhotoDeck nie eksponuje GPS) i suburb (PhotoDeck zwraca tylko
   ogólne "Brisbane" w polu city, nie konkretną dzielnicę) — zostają puste,
   do ręcznego uzupełnienia.
+- NOWE: przegląda folder gps-drop/ w repo w poszukiwaniu zdjęć z zapisanym
+  GPS i Sublocation (np. małych podglądów JPEG wyeksportowanych z
+  Lightrooma po ustawieniu pinezki w module Map). Dopasowuje je po nazwie
+  pliku (ref) do wierszy z pustym lat/lng/suburb, uzupełnia te pola,
+  i usuwa przetworzone zdjęcia z folderu, żeby nie przetwarzać ich
+  ponownie przy kolejnym uruchomieniu.
 """
 
 import csv
 import gzip
 import os
+import re
+import shutil
+import subprocess
 import sys
 import urllib.parse
 import xml.etree.ElementTree as ET
@@ -28,6 +37,7 @@ from datetime import datetime, timezone
 
 MEDIAS_URL = os.environ.get("PHOTODECK_MEDIAS_URL")
 CSV_PATH = "locations.csv"
+GPS_DROP_DIR = "gps-drop"
 
 if not MEDIAS_URL:
     print("Brak PHOTODECK_MEDIAS_URL w zmiennych środowiskowych — przerywam.", file=sys.stderr)
@@ -67,6 +77,51 @@ def fetch_xml(url):
 
 def strip_date(title):
     return title.rsplit(",", 1)[0].strip()
+
+
+def ref_from_filename(filename):
+    base = re.sub(r"\.[A-Za-z0-9]+$", "", filename)
+    base = re.sub(r"\s+copy$", "", base, flags=re.IGNORECASE)
+    return base.strip()
+
+
+def read_gps_drop_folder():
+    """Uruchamia ExifTool na folderze gps-drop/ i zwraca
+    {ref: (suburb, lat, lng)} dla każdego znalezionego zdjęcia z GPS."""
+    if not os.path.isdir(GPS_DROP_DIR):
+        return {}, []
+
+    files = [f for f in os.listdir(GPS_DROP_DIR) if os.path.isfile(os.path.join(GPS_DROP_DIR, f))]
+    if not files:
+        return {}, []
+
+    try:
+        result = subprocess.run(
+            ["exiftool", "-csv", "-filename", "-sublocation", "-gpslatitude", "-gpslongitude", "-n", GPS_DROP_DIR],
+            capture_output=True, text=True, check=True,
+        )
+    except FileNotFoundError:
+        print("ExifTool nie jest zainstalowany na tym runnerze — pomijam gps-drop/.", file=sys.stderr)
+        return {}, []
+    except subprocess.CalledProcessError as e:
+        print(f"ExifTool zwrócił błąd przy przetwarzaniu gps-drop/: {e.stderr}", file=sys.stderr)
+        return {}, []
+
+    gps_data = {}
+    processed_files = []
+    reader = csv.DictReader(result.stdout.splitlines())
+    for row in reader:
+        filename = row.get("FileName", "").strip()
+        lat = row.get("GPSLatitude", "").strip()
+        lng = row.get("GPSLongitude", "").strip()
+        suburb = (row.get("Sublocation") or row.get("Sub-location") or "").strip()
+        if not filename or not lat or not lng:
+            continue
+        ref = ref_from_filename(filename)
+        gps_data[ref] = (suburb, lat, lng)
+        processed_files.append(filename)
+
+    return gps_data, processed_files
 
 
 def normalize_key(title_key):
@@ -180,6 +235,36 @@ def main():
         print(f"\nDodano {len(new_rows_added)} nowych lokalizacji (brak lat/lng/suburb — uzupełnij ręcznie):", file=sys.stderr)
         for street in new_rows_added:
             print(f"  - {street}", file=sys.stderr)
+
+    # --- Uzupełnianie GPS/suburb z folderu gps-drop/ ---
+    gps_data, processed_files = read_gps_drop_folder()
+    filled_from_drop = []
+    if gps_data:
+        for row in rows:
+            if row.get("lat", "").strip():
+                continue  # to pole już ma współrzędne, nie nadpisujemy
+            ref = row.get("ref", "").strip()
+            if ref in gps_data:
+                suburb, lat, lng = gps_data[ref]
+                row["lat"] = lat
+                row["lng"] = lng
+                if suburb:
+                    row["suburb"] = suburb
+                filled_from_drop.append(row.get("street"))
+                changed = True
+
+    if filled_from_drop:
+        print(f"\nUzupełniono GPS/suburb z gps-drop/ dla {len(filled_from_drop)} lokalizacji:", file=sys.stderr)
+        for street in filled_from_drop:
+            print(f"  - {street}", file=sys.stderr)
+
+    if processed_files:
+        for fname in processed_files:
+            fpath = os.path.join(GPS_DROP_DIR, fname)
+            if os.path.exists(fpath):
+                os.remove(fpath)
+        print(f"Usunięto {len(processed_files)} przetworzonych plików z {GPS_DROP_DIR}/", file=sys.stderr)
+        changed = True  # usunięcie plików z gps-drop/ też trzeba zacommitować
 
     if not changed:
         print("Brak zmian — locations.csv już aktualny.")

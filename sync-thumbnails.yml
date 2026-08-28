@@ -1,0 +1,41 @@
+name: Sync PhotoDeck thumbnails
+
+# Uruchamia się codziennie o 5:00 UTC (ok. 15:00 w Brisbane, poza godzinami
+# szczytu), oraz ręcznie z zakładki Actions w GitHubie przyciskiem "Run workflow".
+on:
+  schedule:
+    - cron: '0 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write   # potrzebne, żeby workflow mógł zacommitować zmieniony locations.csv
+
+jobs:
+  sync-thumbnails:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install ExifTool
+        run: sudo apt-get update && sudo apt-get install -y libimage-exiftool-perl
+
+      - name: Run matching script
+        id: match
+        env:
+          PHOTODECK_MEDIAS_URL: ${{ secrets.PHOTODECK_MEDIAS_URL }}
+        run: python match_thumbs_action.py
+
+      - name: Commit and push if changed
+        if: steps.match.outputs.changed == 'true'
+        run: |
+          git config user.name "photoindex-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add locations.csv gps-drop/
+          git commit -m "Auto-update photo thumbnails, counts and GPS from gps-drop"
+          git push
