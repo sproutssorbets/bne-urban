@@ -858,7 +858,8 @@ function loadInitialData() {
         count: count,
         dates: row.shoot_dates || row.date || '',
         coords: [parseFloat(row.lng), parseFloat(row.lat)],
-        archiveUrl: row.archiveUrl || '#'
+        archiveUrl: row.archiveUrl || '#',
+        thumbs: row.thumbs ? row.thumbs.split(';').filter(Boolean) : []
       };
       locData.streetLc = locData.street.toLowerCase();
       locData.suburbLc = locData.suburb.toLowerCase();
@@ -1158,7 +1159,27 @@ function initMapLazy() {
       var rowsHtml = rows.map(function(r) {
         return '<div style="display:flex;justify-content:space-between;gap:12px;font-size:10px;padding:3px 0;"><span style="color:var(--text);text-transform:uppercase;">' + r[0] + '</span><span style="color:var(--text);font-weight: 500;">' + r[1] + '</span></div>';
       }).join('');
-      var popupHtml = '<div style="min-width:180px;position:relative;"><div class="pi-popup-title">' + loc.street + '</div><div style="border-top:1px solid var(--text);border-bottom:1px solid var(--text);padding:6px 0;margin-bottom:8px;">' + rowsHtml + '</div><a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:var(--text);color:#FFF;padding:8px;font-size:9px;font-weight: 500;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;transition:background 0.1s, color 0.1s;">OPEN RECORD →</a></div>';
+
+      /* Miniatury z popupu ładowane od razu razem z resztą danych lokalizacji
+         (CSV, nie osobny fetch), więc slider nie ma stanu "loading" —
+         obrazki są już gotowe w momencie otwarcia popupu. */
+      var thumbs = loc.thumbs || [];
+      var sliderHtml = '';
+      if (thumbs.length > 0) {
+        var slidesHtml = thumbs.map(function(url, i) {
+          return '<img src="' + url + '" loading="lazy" style="display:' + (i === 0 ? 'block' : 'none') + ';width:100%;height:110px;object-fit:cover;" data-pi-slide="' + i + '">';
+        }).join('');
+        var navHtml = thumbs.length > 1
+          ? '<button type="button" class="pi-popup-slider-prev" aria-label="Poprzednie zdjęcie" style="position:absolute;top:50%;left:4px;transform:translateY(-50%);background:rgba(0,0,0,0.55);color:#FFF;border:none;width:20px;height:20px;cursor:pointer;font-size:11px;line-height:1;">&lsaquo;</button>' +
+            '<button type="button" class="pi-popup-slider-next" aria-label="Następne zdjęcie" style="position:absolute;top:50%;right:4px;transform:translateY(-50%);background:rgba(0,0,0,0.55);color:#FFF;border:none;width:20px;height:20px;cursor:pointer;font-size:11px;line-height:1;">&rsaquo;</button>' +
+            '<div class="pi-popup-slider-dots" style="position:absolute;bottom:4px;left:50%;transform:translateX(-50%);display:flex;gap:4px;">' +
+            thumbs.map(function(u, i) { return '<span class="pi-popup-dot" data-pi-dot="' + i + '" style="width:5px;height:5px;background:' + (i === 0 ? '#FFF' : 'rgba(255,255,255,0.5)') + ';cursor:pointer;"></span>'; }).join('') +
+            '</div>'
+          : '';
+        sliderHtml = '<div class="pi-popup-slider" style="position:relative;margin-bottom:8px;overflow:hidden;">' + slidesHtml + navHtml + '</div>';
+      }
+
+      var popupHtml = '<div style="min-width:180px;position:relative;"><div class="pi-popup-title">' + loc.street + '</div>' + sliderHtml + '<div style="border-top:1px solid var(--text);border-bottom:1px solid var(--text);padding:6px 0;margin-bottom:8px;">' + rowsHtml + '</div><a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:var(--text);color:#FFF;padding:8px;font-size:9px;font-weight: 500;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;transition:background 0.1s, color 0.1s;">OPEN RECORD →</a></div>';
       globalPopup.setLngLat(loc.coords).setHTML(popupHtml).addTo(mapInstance);
       
       // Popup Button Hover
@@ -1166,6 +1187,28 @@ function initMapLazy() {
       if(btn) {
           btn.addEventListener('mouseenter', function() { this.style.background = 'var(--bg)'; this.style.color = 'var(--text)'; this.style.border = '1px solid var(--text)'; this.style.margin = '-1px'; });
           btn.addEventListener('mouseleave', function() { this.style.background = 'var(--text)'; this.style.color = '#FFF'; this.style.border = 'none'; this.style.margin = '0'; });
+      }
+
+      // Popup slider — strzałki i kropki
+      if (thumbs.length > 1) {
+        var popupEl = document.querySelector('.mapboxgl-popup');
+        var imgs = popupEl.querySelectorAll('[data-pi-slide]');
+        var dots = popupEl.querySelectorAll('[data-pi-dot]');
+        var idx = 0;
+        var showSlide = function(next) {
+          imgs[idx].style.display = 'none';
+          dots[idx].style.background = 'rgba(255,255,255,0.5)';
+          idx = (next + imgs.length) % imgs.length;
+          imgs[idx].style.display = 'block';
+          dots[idx].style.background = '#FFF';
+        };
+        var prevBtn = popupEl.querySelector('.pi-popup-slider-prev');
+        var nextBtn = popupEl.querySelector('.pi-popup-slider-next');
+        if (prevBtn) prevBtn.addEventListener('click', function(ev) { ev.stopPropagation(); showSlide(idx - 1); });
+        if (nextBtn) nextBtn.addEventListener('click', function(ev) { ev.stopPropagation(); showSlide(idx + 1); });
+        dots.forEach(function(dot, i) {
+          dot.addEventListener('click', function(ev) { ev.stopPropagation(); showSlide(i); });
+        });
       }
     };
     window.piFlyToQuery = function(query) {
