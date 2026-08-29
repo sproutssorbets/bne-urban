@@ -143,11 +143,12 @@ def main():
         title_full = m.findtext("title", "")
         title_key = normalize_key(strip_date(title_full))
         thumb = m.findtext("thumbnail-url", "")
+        image = m.findtext("image-url", "")
         date_created = m.findtext("date-created", "")
 
         media_by_filename[filename] = {"title": title_key, "thumb": thumb}
         media_by_title.setdefault(title_key, []).append(
-            {"thumb": thumb, "date": date_created, "filename": filename}
+            {"thumb": thumb, "image": image, "date": date_created, "filename": filename}
         )
 
     if not os.path.exists(CSV_PATH):
@@ -160,7 +161,10 @@ def main():
 
     with open(CSV_PATH, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
-        fieldnames = reader.fieldnames if "thumbs" in reader.fieldnames else reader.fieldnames + ["thumbs"]
+        fieldnames = list(reader.fieldnames)
+        for col in ["thumbs", "images"]:
+            if col not in fieldnames:
+                fieldnames.append(col)
         for row in reader:
             ref = row.get("ref", "").strip()
             anchor = media_by_filename.get(ref)
@@ -171,12 +175,15 @@ def main():
                 true_title = anchor["title"]
                 group = sorted(media_by_title.get(true_title, []), key=lambda x: x["date"])
                 thumbs = [g["thumb"] for g in group]
+                images = [g["image"] for g in group]
                 new_thumbs = ";".join(thumbs)
+                new_images = ";".join(images)
                 new_count = str(len(thumbs))
 
-                if row.get("thumbs", "") != new_thumbs or row.get("count", "") != new_count:
+                if row.get("thumbs", "") != new_thumbs or row.get("count", "") != new_count or row.get("images", "") != new_images:
                     changed = True
                 row["thumbs"] = new_thumbs
+                row["images"] = new_images
                 row["count"] = new_count
 
             rows.append(row)
@@ -201,6 +208,7 @@ def main():
 
         anchor = group_sorted[0]  # najstarsze zdjęcie w grupie jako punkt odniesienia
         thumbs = ";".join(g["thumb"] for g in group_sorted)
+        images = ";".join(g["image"] for g in group_sorted)
 
         try:
             dt = datetime.strptime(anchor["date"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
@@ -226,6 +234,7 @@ def main():
             "shoot_dates": date_str,
             "update_batch": update_batch,
             "thumbs": thumbs,
+            "images": images,
         }
         rows.append(new_row)
         new_rows_added.append(title_key)
