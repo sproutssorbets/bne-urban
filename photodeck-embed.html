@@ -123,9 +123,6 @@
   /* Wymuszony, absolutny grayscale na mapie, by zachować B&W interfejsu */
   #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s ease-in-out; }
   #map.loaded { opacity: 1; }
-  /* Grayscale nakładany tylko na płótno mapy (kafelki), nie na cały kontener #map —
-     markery i popupy dokładane są jako dzieci tego samego kontenera, więc filtr na
-     #map zabarwiałby też je na szaro, mimo że mają być kolorowe. */
   #map .mapboxgl-canvas { filter: grayscale(100%); }
   
   #map-error {
@@ -147,15 +144,6 @@
   
   .custom-marker-hitbox:hover .pi-pin { transform: scale(1.15) translateY(-2px); }
 
-  /* A cluster pin represents several documented locations grouped into one
-     marker because they sit too close together on screen at the current
-     zoom. Its number is the total photo count across all locations in the
-     group — the same quantity a single pin shows for one location — so the
-     number stays meaningful and consistent as clusters split apart or
-     merge together while zooming, rather than switching between "photos"
-     and "locations" depending on how zoomed in you are. Same pin shape as
-     a single location, slightly larger and heavier border, as a visual cue
-     that this one represents more than one place. */
   .pi-pin-cluster .pi-pin-body { min-width: 26px; height: 26px; font-size: 11px; border-width: 2px; }
   .pi-pin-cluster .pi-pin-point { border-left-width: 4px; border-right-width: 4px; border-top-width: 5px; }
 
@@ -186,11 +174,6 @@
     font-size: 9px; font-weight: 500; letter-spacing: 0.1em; font-family: inherit; text-transform: uppercase;
   }
   
-  /* Zielony, pulsujący wskaźnik nowych rekordów — jedyny celowy akcent
-     koloru w tym monochromatycznym interfejsie, użyty świadomie tylko
-     tutaj, żeby przyciągnąć uwagę do nowości w UPDATE LOG. Pulsowanie
-     przez opacity/transform, nie box-shadow (globalny reset wymusza
-     box-shadow: none !important na wszystkich elementach). */
   #pi-drawer-dot {
     width: 6px; height: 6px; flex-shrink: 0;
     background: #00FF00; border: 1px solid #00CC00;
@@ -202,9 +185,6 @@
     50% { opacity: 0.5; transform: scale(1.35); }
   }
   
-  /* Warstwa łapiąca kliknięcia poza panelem (żeby zamykały panel), bez
-     wizualnego przyciemniania/rozjaśniania mapy pod spodem — usunięty
-     na życzenie, mapa zostaje w pełni widoczna przy otwartym panelu. */
   #pi-drawer-backdrop {
     position: fixed; inset: 0; z-index: 600; pointer-events: none;
   }
@@ -232,7 +212,6 @@
   
   #pi-drawer-log { display: flex; flex-direction: column; margin-bottom: 24px; }
   
-  /* Link hover invert */
   .pi-log-link {
     display: flex; justify-content: space-between; align-items: center;
     padding: 10px 0; border-bottom: 1px solid var(--text);
@@ -522,8 +501,7 @@
 // temu każdy nowy dzień to naturalnie świeży parametr w URL-u do locations.csv,
 // zamiast ręcznego pilnowania, żeby ktoś podbijał tę wartość przy każdej
 // aktualizacji danych. Workflow aktualizuje dane raz dziennie, więc jeden
-// cache-bust dziennie idealnie pasuje do tego rytmu, bez wymuszania
-// pobierania pliku od nowa przy każdym pojedynczym wejściu na stronę.
+// cache-bust dziennie idealnie pasuje do tego rytmu.
 var DATA_VERSION = (function() {
   var d = new Date();
   return d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
@@ -573,16 +551,6 @@ function loadMapState() {
   } catch (e) { return null; }
 }
 
-/* This map is embedded cross-origin (sproutssorbets.github.io inside
-   photoindex.au), so its own sessionStorage is third-party storage from
-   the browser's point of view — Safari in particular can isolate or
-   block it per top-level page, which defeats "same filters on every
-   subpage" even though it is technically the same iframe file everywhere.
-   To make that carry over reliably, the parent page is expected to save
-   the last filter state itself (first-party, no such restrictions) and
-   hand it back in on the next load as a `state` URL parameter. This
-   reads that handoff; sessionStorage above stays as a same-tab fallback
-   for a plain reload of the iframe on its own. */
 function getStateFromUrlParam() {
   try {
     var raw = new URLSearchParams(window.location.search).get('state');
@@ -639,14 +607,6 @@ function parseMediasCsv(text) {
 
 function applyMediaTagsToLocations(mediaRows) {
   locations.forEach(function(loc) {
-    /* Full street/intersection name, only the trailing suburb after a
-       comma stripped off — never truncated at "/". Cutting an
-       intersection down to its first street name (e.g. "Edward Street /
-       Margaret Street" -> "edward street") made every other "Edward
-       Street / <something>" location match any photo anywhere that
-       merely mentions Edward Street, bleeding keywords across different
-       corners of the same street. Matching on the full name keeps each
-       intersection distinct. */
     var streetKey = normalizeKey((loc.street || '').split(',')[0]);
     if (!streetKey) return;
     var matched = new Set();
@@ -689,18 +649,6 @@ function updatePhotoDeckLink() {
 }
 
 function renderActiveTags() {
-  /* Filters used to render as separate boxed pills next to the search
-     field. Now everything, suburb and every category value, is written
-     directly into the search field as plain text, the same way suburb
-     selection already worked before this change. The #pi-active-tags
-     container is kept in the markup but always emptied, rather than
-     removed outright, so nothing else that references it breaks.
-     One trade-off worth knowing: this field now does double duty, typed
-     address text and the filter summary share the same box, so checking
-     a new filter overwrites whatever was manually typed, exactly as
-     selecting a suburb already did. There is no more per-filter × inside
-     the search bar; removing a filter now means unchecking it in the
-     panel, or using the single clear-all × on the field. */
   var container = document.getElementById('pi-active-tags');
   if (container) container.innerHTML = '';
   var searchInput = document.getElementById('pi-search-input');
@@ -746,12 +694,6 @@ function applySearchState() {
   var visibleLocs = locations.filter(function(loc) {
     return locationMatchesState(loc, textLc, suburbLc, null);
   });
-  /* Markers are re-clustered against the filtered set, not just shown or
-     hidden in place — hiding a filtered-out pin doesn't help if two
-     visible pins next to it are still overlapping. window.renderMarkers
-     is defined once the map and its markers have loaded (see below); this
-     guard covers the one call to applySearchState() that can fire earlier,
-     during initial page load, before that has happened. */
   if (window.renderMarkers) window.renderMarkers(visibleLocs);
   updatePhotoDeckLink();
   renderActiveTags();
@@ -769,19 +711,6 @@ function applySearchState() {
 function annotateFilterCoverage(textLc, suburbLc) {
   textLc = textLc || '';
   suburbLc = suburbLc || '';
-  /* Counts are faceted, not global: a checkbox's number is how many
-     locations match it together with every OTHER currently active
-     filter (suburb, search text, other categories) — the same
-     "combinations that actually exist" behaviour as PhotoDeck's own
-     search. Selecting "Under Construction" and then opening Typology
-     shows counts among only the under-construction locations, not the
-     whole archive, so a typology with zero matches inside that overlap
-     goes to 0 and disables, even if it has photos elsewhere in the
-     archive. Computed once per category per call (contextCache), since
-     every checkbox within the same category shares the same "all other
-     filters" context. A checkbox that's already checked is never
-     force-disabled even if its live count reads 0, so an active
-     selection never silently vanishes out from under the visitor. */
   var contextCache = {};
   document.querySelectorAll('.filter-check').forEach(function(cb) {
     var cat = cb.getAttribute('data-cat');
@@ -844,8 +773,12 @@ function restoreSavedFilters() {
 
 function loadInitialData() {
   Promise.all([
-    fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/locations.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }),
-    fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban-index/main/medias.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }).catch(function() { return ''; })
+    // Prawdziwe, jedyne repo z danymi to "bne-urban" — poprzednia nazwa
+    // działała tylko dzięki tymczasowemu przekierowaniu GitHuba, na
+    // którym nie warto polegać na stałe (może przestać działać w
+    // dowolnym momencie).
+    fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban/main/locations.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }),
+    fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban/main/medias.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }).catch(function() { return ''; })
   ])
   .then(function(results) {
     var csvText = results[0];
@@ -1055,11 +988,6 @@ function initAddressAutocomplete() {
     if (!suggestBox.contains(ev.target) && ev.target !== searchInput) closeSuggest();
   });
 
-  /* Enter triggers a search from anywhere on the page, not only while the
-     search field itself has focus — a checkbox, a suburb radio, anywhere.
-     The one exception is while the address-suggestion dropdown is open,
-     where Enter already has a specific job, confirming the highlighted
-     suggestion, handled above on the input's own keydown listener. */
   document.addEventListener('keydown', function(ev) {
     if (ev.key !== 'Enter') return;
     if (suggestBox.classList.contains('open')) return;
@@ -1100,30 +1028,6 @@ function initMapLazy() {
     });
     mapInstance.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
 
-    /* Curated landmark labels — background anchors visitors can use to
-       orient themselves at a glance, e.g. "that's near Story Bridge".
-       Sourced only from the CBD Background Anchors section of
-       BRISBANE_ARCHITECTURAL_LANDMARKS_EN.txt. Coordinates below are from
-       Google Places, cross-checked against Wikipedia infobox coordinates —
-       Wikipedia's are only precise to the nearest arcsecond (roughly 30m
-       in Brisbane), and for two of these that margin showed up as a
-       visibly wrong position at close zoom. Two are worth a specific note:
-       Brisbane Quarter's Wikidata coordinate turned out to point at the
-       old Law Courts building that stood on this site before, roughly
-       300m from the current complex — Google's point is used here
-       instead. Victoria Park's point is the centre of the park as a
-       whole, not the stadium construction site specifically, since the
-       label is meant to orient by the park, not by one project inside it.
-       A native Mapbox symbol layer, not another DOM marker per landmark —
-       Mapbox's own label collision detection keeps these from overlapping
-       each other or the road/place names already in the base style,
-       without any custom logic to write or maintain.
-       maxzoom:16 on both layers below — even Google's rooftop-level
-       points are for a whole building, not a photographed subject, so the
-       same margin-of-error logic applies past a certain closeness. The
-       cap hides the layer before that becomes noticeable, leaving
-       documented-location pins (which come from EXIF, not a place lookup)
-       as the only labels precise enough to trust at street level. */
     mapInstance.on('load', function() {
       mapInstance.addSource('landmarks', {
         type: 'geojson',
@@ -1170,23 +1074,16 @@ function initMapLazy() {
         }
       });
     });
+
     window.piOpenPopupForLocation = function(loc) {
       var datesList = loc.dates ? loc.dates.split(';').map(function(d) { return d.trim(); }).filter(Boolean) : [];
       var datesDesc = datesList.slice().reverse();
       var rows = [['Suburb', loc.suburb], ['Photos', String(loc.count)]];
       datesDesc.forEach(function(d, i) { rows.push([i === 0 ? 'Photographed' : '', d]); });
       var rowsHtml = rows.map(function(r) {
-        return '<div style="display:flex;justify-content:space-between;gap:12px;font-size:10px;padding:3px 0;"><span style="color:var(--text);text-transform:uppercase;">' + r[0] + '</span><span style="color:var(--text);font-weight: 500;">' + r[1] + '</span></div>';
+        return '<div style="display:flex;justify-content:space-between;gap:12px;font-size:10px;padding:4px 0;"><span style="color:var(--text);text-transform:uppercase;">' + r[0] + '</span><span style="color:var(--text);font-weight: 500;">' + r[1] + '</span></div>';
       }).join('');
 
-      /* Miniatury z popupu ładowane od razu razem z resztą danych lokalizacji
-         (CSV, nie osobny fetch), więc slider nie ma stanu "loading" —
-         obrazki są już gotowe w momencie otwarcia popupu.
-         Jakość progresywna: pierwszy, od razu widoczny slajd ładuje się w
-         pełnej rozdzielczości (images[]). Kolejne slajdy startują z lekkiej
-         miniatury (thumbs[]) i dopiero podmieniają się na pełną jakość w
-         momencie, gdy faktycznie się do nich przełączysz — nie pobieramy
-         ciężkich plików dla zdjęć, których nikt nie obejrzy. */
       var thumbs = loc.thumbs || [];
       var images = loc.images || [];
       var sliderHtml = '';
@@ -1195,38 +1092,29 @@ function initMapLazy() {
           var fullUrl = images[i] || url;
           var initialSrc = i === 0 ? fullUrl : url;
           var isLoaded = i === 0 ? '1' : '0';
-          return '<img src="' + initialSrc + '" data-full="' + fullUrl + '" data-loaded="' + isLoaded + '" loading="lazy" style="display:' + (i === 0 ? 'block' : 'none') + ';width:100%;height:140px;object-fit:contain;background:var(--bg);" data-pi-slide="' + i + '">';
+          return '<img src="' + initialSrc + '" data-full="' + fullUrl + '" data-loaded="' + isLoaded + '" loading="lazy" style="display:' + (i === 0 ? 'block' : 'none') + ';width:100%;height:240px;object-fit:contain;object-position:center;background:var(--bg);" data-pi-slide="' + i + '">';
         }).join('');
-        /* Strzałki dostają teraz nieprzezroczyste, kwadratowe tło (var(--bg),
-           obramowane var(--text) — zero zaokrągleń, zgodnie z resztą
-           interfejsu), żeby były czytelne niezależnie od tego, co jest pod
-           spodem. Na pionowym zdjęciu, które nie wypełnia całej szerokości
-           kontenera, poprzednia wersja bez tła ginęła na jasnym tle zdjęcia
-           poziomego, wypełniającego kontener od krawędzi do krawędzi.
-           Pozycja bez ujemnego przesunięcia (4px, nie -6px), żeby nic nie
-           obcinało ich przez overflow:hidden kontenera. */
+
         var navHtml = thumbs.length > 1
-          ? '<button type="button" class="pi-popup-slider-prev" aria-label="Poprzednie zdjęcie" style="position:absolute;top:50%;left:4px;transform:translateY(-50%);background:var(--bg);border:1px solid var(--text);padding:2px;width:20px;height:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>' +
-            '<button type="button" class="pi-popup-slider-next" aria-label="Następne zdjęcie" style="position:absolute;top:50%;right:4px;transform:translateY(-50%);background:var(--bg);border:1px solid var(--text);padding:2px;width:20px;height:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>' +
-            '<div class="pi-popup-slider-dots" style="position:absolute;bottom:4px;left:50%;transform:translateX(-50%);display:flex;gap:4px;">' +
+          ? '<button type="button" class="pi-popup-slider-prev" aria-label="Poprzednie zdjęcie" style="position:absolute;top:50%;left:0;transform:translateY(-50%);background:var(--bg);border:1px solid var(--text);border-left:none;width:24px;height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;transition:all 0.1s;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"><polyline points="15 18 9 12 15 6"></polyline></svg></button>' +
+            '<button type="button" class="pi-popup-slider-next" aria-label="Następne zdjęcie" style="position:absolute;top:50%;right:0;transform:translateY(-50%);background:var(--bg);border:1px solid var(--text);border-right:none;width:24px;height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;transition:all 0.1s;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"><polyline points="9 18 15 12 9 6"></polyline></svg></button>' +
+            '<div class="pi-popup-slider-dots" style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:2;">' +
             thumbs.map(function(u, i) { return '<span class="pi-popup-dot" data-pi-dot="' + i + '" style="width:6px;height:6px;border:1px solid var(--text);background:' + (i === 0 ? 'var(--text)' : 'var(--bg)') + ';cursor:pointer;"></span>'; }).join('') +
             '</div>'
           : '';
-        sliderHtml = '<div class="pi-popup-slider" style="position:relative;margin-bottom:8px;overflow:hidden;">' + slidesHtml + navHtml + '</div>';
+        sliderHtml = '<div class="pi-popup-slider" style="position:relative;margin-bottom:12px;overflow:hidden;border:1px solid var(--text);">' + slidesHtml + navHtml + '</div>';
       }
 
-      var popupHtml = '<div style="min-width:180px;position:relative;"><div class="pi-popup-title">' + loc.street + '</div>' + sliderHtml + '<div style="border-top:1px solid var(--text);border-bottom:1px solid var(--text);padding:6px 0;margin-bottom:8px;">' + rowsHtml + '</div><a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:var(--text);color:#FFF;padding:8px;font-size:9px;font-weight: 500;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;transition:background 0.1s, color 0.1s;">OPEN RECORD →</a></div>';
-      globalPopup.setMaxWidth('240px');
+      var popupHtml = '<div style="min-width:240px;position:relative;"><div class="pi-popup-title" style="margin-bottom:10px;font-size:12px;">' + loc.street + '</div>' + sliderHtml + '<div style="border-top:1px solid var(--text);padding:8px 0;margin-bottom:12px;">' + rowsHtml + '</div><a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:var(--text);color:var(--bg);padding:10px;font-size:10px;font-weight: 500;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;border:1px solid var(--text);transition:background 0.1s, color 0.1s;">OPEN RECORD</a></div>';
+      globalPopup.setMaxWidth('300px');
       globalPopup.setLngLat(loc.coords).setHTML(popupHtml).addTo(mapInstance);
       
-      // Popup Button Hover
       var btn = document.querySelector('.mapboxgl-popup a');
       if(btn) {
-          btn.addEventListener('mouseenter', function() { this.style.background = 'var(--bg)'; this.style.color = 'var(--text)'; this.style.border = '1px solid var(--text)'; this.style.margin = '-1px'; });
-          btn.addEventListener('mouseleave', function() { this.style.background = 'var(--text)'; this.style.color = '#FFF'; this.style.border = 'none'; this.style.margin = '0'; });
+          btn.addEventListener('mouseenter', function() { this.style.background = 'var(--bg)'; this.style.color = 'var(--text)'; });
+          btn.addEventListener('mouseleave', function() { this.style.background = 'var(--text)'; this.style.color = 'var(--bg)'; });
       }
 
-      // Popup slider — strzałki i kropki
       if (thumbs.length > 1) {
         var popupEl = document.querySelector('.mapboxgl-popup');
         var imgs = popupEl.querySelectorAll('[data-pi-slide]');
@@ -1244,15 +1132,31 @@ function initMapLazy() {
           img.style.display = 'block';
           dots[idx].style.background = 'var(--text)';
         };
+        
         var prevBtn = popupEl.querySelector('.pi-popup-slider-prev');
         var nextBtn = popupEl.querySelector('.pi-popup-slider-next');
+        
         if (prevBtn) prevBtn.addEventListener('click', function(ev) { ev.stopPropagation(); showSlide(idx - 1); });
         if (nextBtn) nextBtn.addEventListener('click', function(ev) { ev.stopPropagation(); showSlide(idx + 1); });
+        
+        var btnHoverIn = function() { this.style.background = 'var(--text)'; this.querySelector('svg').style.stroke = 'var(--bg)'; };
+        var btnHoverOut = function() { this.style.background = 'var(--bg)'; this.querySelector('svg').style.stroke = 'var(--text)'; };
+        
+        if (prevBtn) {
+            prevBtn.addEventListener('mouseenter', btnHoverIn);
+            prevBtn.addEventListener('mouseleave', btnHoverOut);
+        }
+        if (nextBtn) {
+            nextBtn.addEventListener('mouseenter', btnHoverIn);
+            nextBtn.addEventListener('mouseleave', btnHoverOut);
+        }
+
         dots.forEach(function(dot, i) {
           dot.addEventListener('click', function(ev) { ev.stopPropagation(); showSlide(i); });
         });
       }
     };
+    
     window.piFlyToQuery = function(query) {
       if (!query || !locations || !locations.length) return;
       var match = locations.find(function(l) {
@@ -1271,21 +1175,6 @@ function initMapLazy() {
     markerTemplate.className = 'custom-marker-hitbox';
     markerTemplate.innerHTML = '<div class="pi-pin"><div class="pi-pin-body"></div><div class="pi-pin-point"></div></div>';
 
-    /* Pins within CLUSTER_PIXEL_RADIUS screen pixels of each other at the
-       current zoom are merged into one marker showing how many documented
-       locations it represents, instead of stacking their individual
-       photo-count badges on top of one another. Grouping is done by
-       on-screen distance, not fixed geographic distance, so clusters
-       un-merge on their own as the visitor zooms in and the same
-       locations gain room to separate.
-
-       This is a simple single-pass grouping — each point joins the first
-       nearby group it finds, it does not re-check against every other
-       member already in that group — which is enough at the pin counts
-       this archive has today. A chain of pins each just under the radius
-       apart could in theory end up in one long cluster; worth revisiting
-       with proper spatial clustering if that starts showing up in practice
-       as the archive grows. */
     var CLUSTER_PIXEL_RADIUS = 40;
 
     function clusterByScreenDistance(map, locs, radius) {
@@ -1346,17 +1235,6 @@ function initMapLazy() {
             ev.stopPropagation();
             var bounds = new mapboxgl.LngLatBounds();
             group.forEach(function(p) { bounds.extend(p.loc.coords); });
-            /* fitBounds() sam dobiera docelowe przybliżenie na podstawie
-               rozmiaru bounds — dla lokalizacji leżących bardzo blisko
-               siebie (kilkadziesiąt metrów) potrafi to wyjść niemal
-               identyczne z obecnym widokiem, więc kliknięcie w klaster
-               wygląda jak brak reakcji. cameraForBounds() tylko liczy
-               docelowy zoom, nie stosuje go — dzięki temu możemy
-               porównać go z obecnym i wymusić przybliżenie o co
-               najmniej 3 poziomy, żeby efekt kliknięcia był zawsze
-               wyraźnie widoczny, niezależnie od odległości między
-               punktami w klastrze. (Uwaga: fitBounds() nie ma opcji
-               minZoom — to nie jest oficjalna opcja Mapbox GL JS.) */
             var currentZoom = mapInstance.getZoom();
             var camera = mapInstance.cameraForBounds(bounds, { padding: 80, maxZoom: 18 });
             var targetZoom = camera ? Math.max(camera.zoom, Math.min(currentZoom + 3, 18)) : Math.min(currentZoom + 3, 18);
@@ -1370,9 +1248,6 @@ function initMapLazy() {
       });
     };
 
-    /* Re-cluster on pan/zoom — the filtered set of locations doesn't change
-       from this, but each pin's screen position does, so groups need
-       recomputing against the same currently-visible locations. */
     mapInstance.on('moveend', function() { window.renderMarkers(currentVisibleLocs); });
 
     function waitForLocationsThenRender() {
@@ -1431,12 +1306,6 @@ document.addEventListener('DOMContentLoaded', function() {
     searchInput.addEventListener('input', function() {
       clearBtn.style.display = this.value ? 'block' : 'none';
       clearTimeout(searchTimeout);
-      /* Clearing the field by hand, backspacing it out or selecting the
-         text with the mouse and deleting it, now resets every active
-         filter the same way the × button does, not only the free-text
-         search. Otherwise the field would just sit empty for a moment
-         and then repopulate itself from whatever is still checked in the
-         panel, which is confusing to watch happen. */
       if (this.value.trim() === '') {
         resetAllFilters();
         return;
@@ -1461,11 +1330,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   document.querySelectorAll('.suburb-check').forEach(function(cb) {
-    /* Radio buttons, unlike checkboxes, don't naturally deselect when you
-       click the one that's already chosen — 'change' doesn't even fire
-       in that case, since nothing about the checked state actually
-       changed. This catches that specific click and treats it as
-       "clear the suburb", reverting to All Locations. */
     cb.addEventListener('click', function() {
       if (this.value && this.value === searchState.suburb) {
         this.checked = false;
