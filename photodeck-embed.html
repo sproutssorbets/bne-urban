@@ -156,18 +156,31 @@
   .pi-pin-cluster .pi-pin-body { min-width: 26px; height: 26px; font-size: 11px; border-width: 2px; }
   .pi-pin-cluster .pi-pin-point { border-left-width: 4px; border-right-width: 4px; border-top-width: 5px; }
 
-  /* MAPBOX POPUP */
-  .pi-popup .mapboxgl-popup-content {
-    background: var(--bg); border: 1px solid var(--text); padding: 12px;
-    font-family: inherit; position: relative;
-  }
-  .pi-popup .mapboxgl-popup-close-button {
-    position: absolute; top: 8px; right: 8px; font-size: 16px; color: var(--text);
-    border: none; background: transparent; cursor: pointer; line-height: 1; padding: 2px; z-index: 10;
-  }
-  .pi-popup .mapboxgl-popup-close-button:hover { background: var(--text); color: var(--bg); }
-  .pi-popup .mapboxgl-popup-tip { border-top-color: var(--text) !important; border-bottom-color: var(--text) !important; }
   .pi-popup-title { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; padding-right: 20px; line-height: 1.3; margin-bottom: 8px; }
+  /* Nakładka wyśrodkowana względem samej ramki mapy (nie względem
+     pinezki na mapie) — ta sama karta, ten sam wygląd, niezależnie skąd
+     została otwarta. max-height + overflow to zabezpieczenie na wypadek
+     naprawdę ciasnych wysokości, gdzie nawet po zmniejszeniu zdjęcia
+     mogłoby nie starczyć miejsca — wtedy karta staje się przewijalna
+     zamiast wychodzić poza widoczny obszar. */
+  .pi-map-overlay {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    z-index: 50; background: var(--bg); border: 1px solid var(--text);
+    padding: 16px; width: 320px; max-width: calc(100% - 32px);
+    max-height: calc(100% - 32px); overflow-y: auto; display: none;
+  }
+  .pi-map-overlay.visible { display: block; }
+  .pi-map-overlay-close {
+    position: absolute; top: 10px; right: 10px; border: none; background: transparent;
+    font-size: 18px; line-height: 1; cursor: pointer; padding: 4px; color: var(--text); z-index: 2;
+  }
+  .pi-map-overlay-close:hover { background: var(--text); color: var(--bg); }
+  @media (max-height: 700px) {
+    .pi-popup-slider img[data-pi-slide] { height: 220px !important; }
+  }
+  @media (max-height: 550px) {
+    .pi-popup-slider img[data-pi-slide] { height: 160px !important; }
+  }
   /* Przeglądarka domyślnie ustawia fokus na pierwszym klikalnym elemencie
      wewnątrz popupu przy jego otwarciu (dostępność), co razem z globalnym
      :focus-visible dawało grubą, podwójną ramkę tylko na lewej strzałce
@@ -485,6 +498,7 @@
     <div id="map-error">
       <div id="map-error-text">Archive data could not be loaded right now. Please refresh, or open the full archive directly.</div>
     </div>
+    <div id="pi-map-overlay" class="pi-map-overlay"></div>
   </main>
 </div>
 <div id="pi-drawer-backdrop"></div>
@@ -522,7 +536,6 @@ var DATA_VERSION = (function() {
 var locations = [];
 var searchState = { text: '', suburb: '', categories: {} };
 var mapInstance = null;
-var globalPopup = null;
 var mapInitiated = false;
 var autocompleteReady = false;
 var CATEGORY_TERMS = {
@@ -589,22 +602,6 @@ function refFromUrl(url) {
   if (!url) return '';
   var m = url.match(/\/([^\/]+?)(?:_medthumb|_wqxga)?\.[a-zA-Z0-9]+(?:\?.*)?$/);
   return m ? m[1] : '';
-}
-
-/* Ile w pikselach przesunąć punkt centrowania mapy w dół, żeby nad pinezką
-   zawsze zmieścił się cały, wysoki popup (zdjęcie + wiersze + przyciski,
-   ok. 480px). Liczone na bieżąco z aktualnej wysokości kontenera mapy,
-   bo ta sama strona bywa osadzona z bardzo różną dostępną wysokością —
-   pełne okno przeglądarki vs. wąski pasek wewnątrz iframe na PhotoDecku.
-   Stała wartość w pikselach nie mogła sprawdzić się w obu przypadkach naraz. */
-function popupCenterOffsetY() {
-  if (!mapInstance) return 60;
-  var mapH = mapInstance.getContainer().clientHeight;
-  var popupH = 480;
-  var margin = 20;
-  var needed = margin + popupH - mapH / 2;
-  var maxSafe = Math.max(40, mapH / 2 - 30);
-  return Math.max(40, Math.min(needed, maxSafe));
 }
 
 function splitCatValue(v) {
@@ -905,14 +902,14 @@ function loadInitialData() {
             if (window.innerWidth <= 720) {
               window.piToggleLogDetail(idx, rec);
             } else if (mapInstance) {
-              mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2, offset: [0, popupCenterOffsetY()] });
+              mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2 });
               window.piOpenPopupForLocation(rec);
             }
           });
           if (window.innerWidth > 720) {
             link.addEventListener('mouseenter', function() {
               if (!mapInstance) return;
-              mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2, offset: [0, popupCenterOffsetY()] });
+              mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2 });
               window.piOpenPopupForLocation(rec);
             });
           }
@@ -990,7 +987,7 @@ function initAddressAutocomplete() {
     closeSuggest();
     searchInput.value = item.label;
     if (item.source === 'archive') {
-      mapInstance.flyTo({ center: item.loc.coords, zoom: 15.5, speed: 1.2, offset: [0, popupCenterOffsetY()] });
+      mapInstance.flyTo({ center: item.loc.coords, zoom: 15.5, speed: 1.2 });
       if (window.piOpenPopupForLocation) window.piOpenPopupForLocation(item.loc);
     } else if (item.feature.bbox) {
       mapInstance.fitBounds(item.feature.bbox, { padding: 60, duration: 600, maxZoom: 15.5 });
@@ -1060,7 +1057,6 @@ function initMapLazy() {
   js.src = 'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js';
   js.onload = function() {
     mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
-    globalPopup = new mapboxgl.Popup({ offset: [0, -42], closeButton: true, className: 'pi-popup' });
     var savedMapState = loadMapState();
     var startCenter = (savedMapState && typeof savedMapState.lng === 'number' && typeof savedMapState.lat === 'number')
       ? [savedMapState.lng, savedMapState.lat] : [153.0307, -27.4598];
@@ -1249,10 +1245,13 @@ function initMapLazy() {
       document.querySelectorAll('.pi-log-link').forEach(function(el) {
         el.classList.toggle('active', !!loc.ref && el.getAttribute('data-ref') === loc.ref);
       });
-      var html = buildLocationCardHtml(loc);
-      globalPopup.setMaxWidth('360px');
-      globalPopup.setLngLat(loc.coords).setHTML(html).addTo(mapInstance);
-      wireLocationCard(document.querySelector('.mapboxgl-popup'), loc);
+      var overlay = document.getElementById('pi-map-overlay');
+      if (!overlay) return;
+      overlay.innerHTML = '<button type="button" class="pi-map-overlay-close" aria-label="Zamknij">&times;</button>' + buildLocationCardHtml(loc);
+      overlay.classList.add('visible');
+      var closeBtn = overlay.querySelector('.pi-map-overlay-close');
+      if (closeBtn) closeBtn.addEventListener('click', function(ev) { ev.stopPropagation(); overlay.classList.remove('visible'); });
+      wireLocationCard(overlay, loc);
     };
     
     /* Na mobile mapa jest niewidoczna pod panelem, więc podgląd rozwija
@@ -1369,7 +1368,7 @@ function initMapLazy() {
         if (!best || d < best.d) best = { loc: loc, d: d };
       });
 
-      mapInstance.flyTo({ center: [lng, lat], zoom: z, speed: 1.4, offset: [0, popupCenterOffsetY()] });
+      mapInstance.flyTo({ center: [lng, lat], zoom: z, speed: 1.4 });
       if (best && best.d < 0.001) {
         setTimeout(function() { window.piOpenPopupForLocation(best.loc); }, 600);
       }
@@ -1461,13 +1460,13 @@ document.addEventListener('DOMContentLoaded', function() {
         this.checked = false;
         var defRadio = document.querySelector('.suburb-check[value=""]');
         if (defRadio) defRadio.checked = true;
-        if (globalPopup) globalPopup.remove();
+        document.getElementById('pi-map-overlay').classList.remove('visible');
         searchState.suburb = '';
         applySearchState();
       }
     });
     cb.addEventListener('change', function() {
-      if (globalPopup) globalPopup.remove();
+      document.getElementById('pi-map-overlay').classList.remove('visible');
       searchState.suburb = this.value;
       if (searchInput) {
         searchInput.value = this.value;
