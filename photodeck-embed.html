@@ -1188,8 +1188,34 @@ function initMapLazy() {
             copyBtn.innerHTML = CHECK_ICON;
             setTimeout(function() { copyBtn.innerHTML = LINK_ICON; }, 1500);
           };
+          /* Kopiowanie do schowka wewnątrz obcego iframe'a bywa zablokowane
+             przez przeglądarkę, jeśli strona nadrzędna wyraźnie tego nie
+             odblokuje (atrybut allow="clipboard-write" na <iframe>). Zanim
+             sięgniemy po brzydki window.prompt jako ostateczność, próbujemy
+             starszej metody przez ukryte pole tekstowe, która zwykle działa
+             nawet bez tego atrybutu. */
+          var legacyCopy = function() {
+            try {
+              var ta = document.createElement('textarea');
+              ta.value = link;
+              ta.style.position = 'fixed';
+              ta.style.opacity = '0';
+              document.body.appendChild(ta);
+              ta.focus();
+              ta.select();
+              var ok = document.execCommand('copy');
+              document.body.removeChild(ta);
+              return ok;
+            } catch (e) {
+              return false;
+            }
+          };
           if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(link).then(done).catch(function() { window.prompt('Skopiuj ten link:', link); });
+            navigator.clipboard.writeText(link).then(done).catch(function() {
+              if (legacyCopy()) done(); else window.prompt('Skopiuj ten link:', link);
+            });
+          } else if (legacyCopy()) {
+            done();
           } else {
             window.prompt('Skopiuj ten link:', link);
           }
