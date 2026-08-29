@@ -518,7 +518,16 @@
   </div>
 </aside>
 <script>
-var DATA_VERSION = '20260815';
+// DATA_VERSION liczony z dzisiejszej daty, nie wpisany na sztywno — dzięki
+// temu każdy nowy dzień to naturalnie świeży parametr w URL-u do locations.csv,
+// zamiast ręcznego pilnowania, żeby ktoś podbijał tę wartość przy każdej
+// aktualizacji danych. Workflow aktualizuje dane raz dziennie, więc jeden
+// cache-bust dziennie idealnie pasuje do tego rytmu, bez wymuszania
+// pobierania pliku od nowa przy każdym pojedynczym wejściu na stronę.
+var DATA_VERSION = (function() {
+  var d = new Date();
+  return d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+})();
 var locations = [];
 var searchState = { text: '', suburb: '', categories: {} };
 var mapInstance = null;
