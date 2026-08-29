@@ -232,12 +232,10 @@
     padding: 10px 0; border-bottom: 1px solid var(--text);
     font-size: 11px; font-weight: 500; text-decoration: none; color: var(--text); text-transform: uppercase;
   }
-  .pi-log-link:hover { background: var(--text); color: var(--bg); }
+  .pi-log-link:hover, .pi-log-link.active { background: var(--text); color: var(--bg); }
   .pi-log-link .loc { flex: 1; letter-spacing: normal; padding-right: 12px; }
   .pi-log-link .stats { display: flex; align-items: center; gap: 10px; color: var(--text); font-weight: 500; flex-shrink: 0; transition: color 0.1s;}
-  .pi-log-link:hover .stats { color: var(--bg); }
-  .pi-log-link .arrow { font-size: 12px; opacity: 0; transform: translateX(-4px); transition: all 0.1s;}
-  .pi-log-link:hover .arrow { opacity: 1; transform: translateX(0); color: var(--bg); }
+  .pi-log-link:hover .stats, .pi-log-link.active .stats { color: var(--bg); }
   
   .pi-drawer-footer { padding: 16px 20px; border-top: 1px solid var(--text); flex-shrink: 0; background: var(--bg); }
   
@@ -877,9 +875,9 @@ function loadInitialData() {
       if (logContainer) {
         logContainer.innerHTML = latestRecords.map(function(rec, idx) {
           var padCount = rec.count.toString().padStart(2, '0');
-          return '<a href="#" class="pi-log-link" data-idx="' + idx + '">' +
+          return '<a href="#" class="pi-log-link" data-idx="' + idx + '" data-ref="' + (rec.ref || '') + '">' +
                  '<span class="loc">' + rec.street + '</span>' +
-                 '<span class="stats"><span class="count">' + padCount + '</span><span class="arrow">→</span></span>' +
+                 '<span class="stats"><span class="count">' + padCount + '</span></span>' +
                  '</a>' +
                  '<div class="pi-log-detail" id="pi-log-detail-' + idx + '"></div>';
         }).join('');
@@ -891,14 +889,14 @@ function loadInitialData() {
             if (window.innerWidth <= 720) {
               window.piToggleLogDetail(idx, rec);
             } else if (mapInstance) {
-              mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2 });
+              mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2, offset: [0, 120] });
               window.piOpenPopupForLocation(rec);
             }
           });
           if (window.innerWidth > 720) {
             link.addEventListener('mouseenter', function() {
               if (!mapInstance) return;
-              mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2 });
+              mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2, offset: [0, 120] });
               window.piOpenPopupForLocation(rec);
             });
           }
@@ -976,7 +974,7 @@ function initAddressAutocomplete() {
     closeSuggest();
     searchInput.value = item.label;
     if (item.source === 'archive') {
-      mapInstance.flyTo({ center: item.loc.coords, zoom: 15.5, speed: 1.2 });
+      mapInstance.flyTo({ center: item.loc.coords, zoom: 15.5, speed: 1.2, offset: [0, 120] });
       if (window.piOpenPopupForLocation) window.piOpenPopupForLocation(item.loc);
     } else if (item.feature.bbox) {
       mapInstance.fitBounds(item.feature.bbox, { padding: 60, duration: 600, maxZoom: 15.5 });
@@ -1046,7 +1044,7 @@ function initMapLazy() {
   js.src = 'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js';
   js.onload = function() {
     mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
-    globalPopup = new mapboxgl.Popup({ offset: [0, -42], closeButton: true, className: 'pi-popup' });
+    globalPopup = new mapboxgl.Popup({ offset: [0, -42], closeButton: true, className: 'pi-popup', anchor: 'bottom' });
     var savedMapState = loadMapState();
     var startCenter = (savedMapState && typeof savedMapState.lng === 'number' && typeof savedMapState.lat === 'number')
       ? [savedMapState.lng, savedMapState.lat] : [153.0307, -27.4598];
@@ -1232,6 +1230,9 @@ function initMapLazy() {
     }
 
     window.piOpenPopupForLocation = function(loc) {
+      document.querySelectorAll('.pi-log-link').forEach(function(el) {
+        el.classList.toggle('active', !!loc.ref && el.getAttribute('data-ref') === loc.ref);
+      });
       var html = buildLocationCardHtml(loc);
       globalPopup.setMaxWidth('360px');
       globalPopup.setLngLat(loc.coords).setHTML(html).addTo(mapInstance);
@@ -1352,7 +1353,7 @@ function initMapLazy() {
         if (!best || d < best.d) best = { loc: loc, d: d };
       });
 
-      mapInstance.flyTo({ center: [lng, lat], zoom: z, speed: 1.4 });
+      mapInstance.flyTo({ center: [lng, lat], zoom: z, speed: 1.4, offset: [0, 120] });
       if (best && best.d < 0.001) {
         setTimeout(function() { window.piOpenPopupForLocation(best.loc); }, 600);
       }
