@@ -131,6 +131,35 @@
   }
   #map-error.visible { display: flex; }
   #map-error-text { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text); max-width: 320px; line-height: 1.6; }
+
+  /* Wyśrodkowany podgląd lokalizacji, wywoływany z listy UPDATE LOG na
+     desktopie — niezależny od pozycji pinezki na mapie (nie "przyklejony"
+     do niej jak zwykły popup), zawsze na środku widocznego obszaru mapy. */
+  .pi-map-preview {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    z-index: 50; background: var(--bg); border: 1px solid var(--text);
+    padding: 12px; width: 280px; max-width: 85%; display: none;
+  }
+  .pi-map-preview.visible { display: block; }
+  .pi-map-preview-close {
+    position: absolute; top: 8px; right: 8px; border: none; background: transparent;
+    font-size: 16px; line-height: 1; cursor: pointer; padding: 2px; color: var(--text);
+  }
+  .pi-map-preview-close:hover { background: var(--text); color: var(--bg); }
+
+  /* Rozwijany podgląd w samej liście, tylko na mobile — mapa jest tam
+     niewidoczna pod panelem, więc podgląd nie może polegać na tym, co
+     widać na mapie. */
+  .pi-log-detail {
+    display: none; padding: 12px 0; border-bottom: 1px solid var(--text);
+    font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .pi-log-detail.open { display: block; }
+  .pi-log-detail img { width: 100%; height: 140px; object-fit: cover; margin-bottom: 8px; border: 1px solid var(--text); }
+  .pi-log-detail-cta {
+    display: block; text-align: center; background: var(--text); color: var(--bg);
+    padding: 8px; margin-top: 8px; text-decoration: none; font-weight: 500;
+  }
   
   /* PINS (Strict Contrast) */
   .custom-marker-hitbox {
@@ -159,6 +188,12 @@
   .pi-popup .mapboxgl-popup-close-button:hover { background: var(--text); color: var(--bg); }
   .pi-popup .mapboxgl-popup-tip { border-top-color: var(--text) !important; border-bottom-color: var(--text) !important; }
   .pi-popup-title { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; padding-right: 20px; line-height: 1.3; margin-bottom: 8px; }
+  /* Przeglądarka domyślnie ustawia fokus na pierwszym klikalnym elemencie
+     wewnątrz popupu przy jego otwarciu (dostępność), co razem z globalnym
+     :focus-visible dawało grubą, podwójną ramkę tylko na lewej strzałce
+     slidera. Wyłączone punktowo tylko tutaj, reszta strony zachowuje
+     widoczny fokus. */
+  .pi-popup-slider-prev:focus-visible, .pi-popup-slider-next:focus-visible { outline: none !important; }
 
   /* UPDATE DRAWER */
   #pi-drawer-tab {
@@ -472,6 +507,7 @@
     <div id="map-error">
       <div id="map-error-text">Archive data could not be loaded right now. Please refresh, or open the full archive directly.</div>
     </div>
+    <div id="pi-map-preview" class="pi-map-preview"></div>
   </main>
 </div>
 <div id="pi-drawer-backdrop"></div>
@@ -567,6 +603,16 @@ function broadcastFilterState(state) {
 }
 
 function normalizeKey(s) { return (s || '').toLowerCase().trim(); }
+
+function slugify(s) {
+  return (s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-+|-+$)/g, '');
+}
+
+function refFromUrl(url) {
+  if (!url) return '';
+  var m = url.match(/\/([^\/]+?)(?:_medthumb|_wqxga)?\.[a-zA-Z0-9]+(?:\?.*)?$/);
+  return m ? m[1] : '';
+}
 
 function splitCatValue(v) {
   return v ? v.split(';').map(function(s) { return s.trim(); }).filter(Boolean) : [];
@@ -850,19 +896,29 @@ function loadInitialData() {
       if (elDrawerSub) elDrawerSub.textContent = 'Archive total: ' + totalArchiveRecords + ' records';
       var logContainer = document.getElementById('pi-drawer-log');
       if (logContainer) {
-        logContainer.innerHTML = latestRecords.map(function(rec) {
+        logContainer.innerHTML = latestRecords.map(function(rec, idx) {
           var padCount = rec.count.toString().padStart(2, '0');
-          var linkUrl = rec.archiveUrl || 'https://www.photoindex.au/';
-          return '<a href="' + linkUrl + '" target="_top" class="pi-log-link" data-query="' + rec.street + '">' +
+          return '<a href="#" class="pi-log-link" data-idx="' + idx + '">' +
                  '<span class="loc">' + rec.street + '</span>' +
                  '<span class="stats"><span class="count">' + padCount + '</span><span class="arrow">→</span></span>' +
-                 '</a>';
+                 '</a>' +
+                 '<div class="pi-log-detail" id="pi-log-detail-' + idx + '"></div>';
         }).join('');
         logContainer.querySelectorAll('.pi-log-link').forEach(function(link) {
-          link.addEventListener('mouseenter', function() {
-            var q = this.getAttribute('data-query');
-            if (window.piFlyToQuery) window.piFlyToQuery(q);
+          var idx = parseInt(link.getAttribute('data-idx'), 10);
+          var rec = latestRecords[idx];
+          link.addEventListener('click', function(ev) {
+            ev.preventDefault();
+            if (window.innerWidth <= 720) {
+              window.piToggleLogDetail(idx, rec);
+            } else {
+              window.piFlyToRecord(rec, true);
+            }
           });
+          if (window.innerWidth > 720) {
+            link.addEventListener('mouseenter', function() { window.piFlyToRecord(rec, false); });
+            link.addEventListener('mouseleave', function() { window.piHidePreviewIfUnlocked(); });
+          }
         });
       }
       var dot = document.getElementById('pi-drawer-dot');
@@ -1078,21 +1134,22 @@ function initMapLazy() {
     window.piOpenPopupForLocation = function(loc) {
       var datesList = loc.dates ? loc.dates.split(';').map(function(d) { return d.trim(); }).filter(Boolean) : [];
       var datesDesc = datesList.slice().reverse();
-      var rows = [['Suburb', loc.suburb], ['Photos', String(loc.count)]];
+      var thumbs = loc.thumbs || [];
+      var images = loc.images || [];
+      var initialRef = thumbs.length > 0 ? (refFromUrl(thumbs[0]) || loc.ref) : loc.ref;
+      var rows = [['Suburb', loc.suburb], ['Photos', String(loc.count)], ['Ref', '<span id="pi-popup-ref-value">' + initialRef + '</span>']];
       datesDesc.forEach(function(d, i) { rows.push([i === 0 ? 'Photographed' : '', d]); });
       var rowsHtml = rows.map(function(r) {
         return '<div style="display:flex;justify-content:space-between;gap:12px;font-size:10px;padding:4px 0;"><span style="color:var(--text);text-transform:uppercase;">' + r[0] + '</span><span style="color:var(--text);font-weight: 500;">' + r[1] + '</span></div>';
       }).join('');
 
-      var thumbs = loc.thumbs || [];
-      var images = loc.images || [];
       var sliderHtml = '';
       if (thumbs.length > 0) {
         var slidesHtml = thumbs.map(function(url, i) {
           var fullUrl = images[i] || url;
           var initialSrc = i === 0 ? fullUrl : url;
           var isLoaded = i === 0 ? '1' : '0';
-          return '<img src="' + initialSrc + '" data-full="' + fullUrl + '" data-loaded="' + isLoaded + '" loading="lazy" style="display:' + (i === 0 ? 'block' : 'none') + ';width:100%;height:240px;object-fit:contain;object-position:center;background:var(--bg);" data-pi-slide="' + i + '">';
+          return '<img src="' + initialSrc + '" data-full="' + fullUrl + '" data-loaded="' + isLoaded + '" loading="lazy" style="display:' + (i === 0 ? 'block' : 'none') + ';width:100%;height:320px;object-fit:contain;object-position:center;background:var(--bg);" data-pi-slide="' + i + '">';
         }).join('');
 
         var navHtml = thumbs.length > 1
@@ -1105,8 +1162,11 @@ function initMapLazy() {
         sliderHtml = '<div class="pi-popup-slider" style="position:relative;margin-bottom:12px;overflow:hidden;border:1px solid var(--text);">' + slidesHtml + navHtml + '</div>';
       }
 
-      var popupHtml = '<div style="min-width:240px;position:relative;"><div class="pi-popup-title" style="margin-bottom:10px;font-size:12px;">' + loc.street + '</div>' + sliderHtml + '<div style="border-top:1px solid var(--text);padding:8px 0;margin-bottom:12px;">' + rowsHtml + '</div><a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:var(--text);color:var(--bg);padding:10px;font-size:10px;font-weight: 500;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;border:1px solid var(--text);transition:background 0.1s, color 0.1s;">OPEN RECORD</a></div>';
-      globalPopup.setMaxWidth('300px');
+      var LINK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>';
+      var CHECK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+
+      var popupHtml = '<div style="min-width:280px;position:relative;"><div class="pi-popup-title" style="margin-bottom:10px;font-size:12px;">' + loc.street + '</div>' + sliderHtml + '<div style="border-top:1px solid var(--text);padding:8px 0;margin-bottom:12px;">' + rowsHtml + '</div><div style="display:flex;border:1px solid var(--text);"><a href="' + loc.archiveUrl + '" target="_top" style="flex:1;text-align:center;background:var(--text);color:var(--bg);padding:10px;font-size:10px;font-weight: 500;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;transition:background 0.1s, color 0.1s;">OPEN RECORD</a><button type="button" class="pi-popup-copy-link" aria-label="Copy link" style="flex-shrink:0;width:44px;background:var(--bg);color:var(--text);border:none;border-left:1px solid var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.1s;">' + LINK_ICON + '</button></div></div>';
+      globalPopup.setMaxWidth('360px');
       globalPopup.setLngLat(loc.coords).setHTML(popupHtml).addTo(mapInstance);
       
       var btn = document.querySelector('.mapboxgl-popup a');
@@ -1115,10 +1175,31 @@ function initMapLazy() {
           btn.addEventListener('mouseleave', function() { this.style.background = 'var(--text)'; this.style.color = 'var(--bg)'; });
       }
 
+      var copyBtn = document.querySelector('.mapboxgl-popup .pi-popup-copy-link');
+      if (copyBtn) {
+        copyBtn.addEventListener('click', function(ev) {
+          ev.stopPropagation();
+          var z = Math.round(mapInstance.getZoom() * 10) / 10;
+          var link = window.location.origin + window.location.pathname + '#' + z + '/' + loc.coords[1] + '/' + loc.coords[0] + '/' + slugify(loc.street);
+          var done = function() {
+            copyBtn.innerHTML = CHECK_ICON;
+            setTimeout(function() { copyBtn.innerHTML = LINK_ICON; }, 1500);
+          };
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(link).then(done).catch(function() { window.prompt('Skopiuj ten link:', link); });
+          } else {
+            window.prompt('Skopiuj ten link:', link);
+          }
+        });
+        copyBtn.addEventListener('mouseenter', function() { this.style.background = '#eee'; });
+        copyBtn.addEventListener('mouseleave', function() { this.style.background = 'var(--bg)'; });
+      }
+
       if (thumbs.length > 1) {
         var popupEl = document.querySelector('.mapboxgl-popup');
         var imgs = popupEl.querySelectorAll('[data-pi-slide]');
         var dots = popupEl.querySelectorAll('[data-pi-dot]');
+        var refValueEl = document.getElementById('pi-popup-ref-value');
         var idx = 0;
         var showSlide = function(next) {
           imgs[idx].style.display = 'none';
@@ -1131,6 +1212,7 @@ function initMapLazy() {
           }
           img.style.display = 'block';
           dots[idx].style.background = 'var(--text)';
+          if (refValueEl) refValueEl.textContent = refFromUrl(thumbs[idx]);
         };
         
         var prevBtn = popupEl.querySelector('.pi-popup-slider-prev');
@@ -1157,19 +1239,62 @@ function initMapLazy() {
       }
     };
     
-    window.piFlyToQuery = function(query) {
-      if (!query || !locations || !locations.length) return;
-      var match = locations.find(function(l) {
-        return l.street.toLowerCase().includes(query.toLowerCase()) || l.suburb.toLowerCase() === query.toLowerCase();
-      });
-      if (match) {
-        if (window.innerWidth <= 720) {
-          document.getElementById('index-panel').classList.remove('mobile-active');
-          document.body.classList.remove('pi-drawer-lock');
-        }
-        mapInstance.flyTo({ center: match.coords, zoom: 15, speed: 1.2 });
-        if (window.piOpenPopupForLocation) window.piOpenPopupForLocation(match);
+    var previewLocked = false;
+
+    function buildPreviewHtml(rec) {
+      var thumb = (rec.thumbs && rec.thumbs[0]) || '';
+      var imgHtml = thumb ? '<img src="' + thumb + '" style="width:100%;height:140px;object-fit:cover;margin-bottom:8px;border:1px solid var(--text);" loading="lazy">' : '';
+      return '<button type="button" class="pi-map-preview-close" aria-label="Zamknij">&times;</button>' +
+        '<div class="pi-popup-title" style="margin-bottom:8px;">' + rec.street + '</div>' +
+        imgHtml +
+        '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">' + rec.suburb + ' · ' + rec.count + ' photos</div>' +
+        '<a href="' + rec.archiveUrl + '" target="_top" style="display:block;text-align:center;background:var(--text);color:var(--bg);padding:8px;font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;">OPEN RECORD</a>';
+    }
+
+    /* Podgląd z listy UPDATE LOG na desktopie — wyśrodkowany na mapie,
+       nie przyklejony do konkretnej pinezki. Najechanie pokazuje go
+       tymczasowo (locked=false), kliknięcie "zamraża" (locked=true),
+       zostaje otwarty aż do kliknięcia × albo wybrania innej pozycji. */
+    window.piFlyToRecord = function(rec, locked) {
+      if (!rec || !mapInstance) return;
+      mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2 });
+      var preview = document.getElementById('pi-map-preview');
+      if (!preview) return;
+      if (!locked && previewLocked) return;
+      preview.innerHTML = buildPreviewHtml(rec);
+      preview.classList.add('visible');
+      previewLocked = locked;
+      var closeBtn = preview.querySelector('.pi-map-preview-close');
+      if (closeBtn) {
+        closeBtn.addEventListener('click', function(ev) {
+          ev.stopPropagation();
+          preview.classList.remove('visible');
+          previewLocked = false;
+        });
       }
+    };
+
+    window.piHidePreviewIfUnlocked = function() {
+      if (previewLocked) return;
+      var preview = document.getElementById('pi-map-preview');
+      if (preview) preview.classList.remove('visible');
+    };
+
+    /* Na mobile mapa jest niewidoczna pod panelem, więc podgląd rozwija
+       się bezpośrednio w liście, pod kliknięcistalnym elementem, zamiast
+       polegać na tym, co dzieje się na mapie w tle. */
+    window.piToggleLogDetail = function(idx, rec) {
+      var detail = document.getElementById('pi-log-detail-' + idx);
+      if (!detail) return;
+      var wasOpen = detail.classList.contains('open');
+      document.querySelectorAll('.pi-log-detail.open').forEach(function(d) { d.classList.remove('open'); });
+      if (wasOpen) return;
+      var thumb = (rec.thumbs && rec.thumbs[0]) || '';
+      var imgHtml = thumb ? '<img src="' + thumb + '" loading="lazy">' : '';
+      detail.innerHTML = imgHtml +
+        '<div style="margin-bottom:4px;">' + rec.suburb + ' · ' + rec.count + ' photos</div>' +
+        '<a class="pi-log-detail-cta" href="' + rec.archiveUrl + '" target="_top">OPEN RECORD →</a>';
+      detail.classList.add('open');
     };
     var markerTemplate = document.createElement('div');
     markerTemplate.className = 'custom-marker-hitbox';
@@ -1250,6 +1375,34 @@ function initMapLazy() {
 
     mapInstance.on('moveend', function() { window.renderMarkers(currentVisibleLocs); });
 
+    /* Deep linking — jeśli adres tej mapy zawiera hash w formacie
+       #zoom/lat/lng/slug-ulicy (generowany przez przycisk "Copy link" w
+       popupie), po wczytaniu danych mapa sama przybliża się do tego
+       miejsca i otwiera właściwy popup. Dopasowanie po współrzędnych
+       (z niewielką tolerancją), nie po samym slugu, żeby drobne różnice
+       w zapisie nazwy ulicy nie psuły dopasowania. */
+    function tryOpenFromHash() {
+      var hash = window.location.hash.replace(/^#/, '');
+      if (!hash) return;
+      var parts = hash.split('/');
+      if (parts.length < 3) return;
+      var z = parseFloat(parts[0]);
+      var lat = parseFloat(parts[1]);
+      var lng = parseFloat(parts[2]);
+      if (isNaN(z) || isNaN(lat) || isNaN(lng)) return;
+
+      var best = null;
+      locations.forEach(function(loc) {
+        var d = Math.sqrt(Math.pow(loc.coords[0] - lng, 2) + Math.pow(loc.coords[1] - lat, 2));
+        if (!best || d < best.d) best = { loc: loc, d: d };
+      });
+
+      mapInstance.flyTo({ center: [lng, lat], zoom: z, speed: 1.4 });
+      if (best && best.d < 0.001) {
+        setTimeout(function() { window.piOpenPopupForLocation(best.loc); }, 600);
+      }
+    }
+
     function waitForLocationsThenRender() {
       if (!locations || locations.length === 0) {
         setTimeout(waitForLocationsThenRender, 50);
@@ -1258,6 +1411,7 @@ function initMapLazy() {
       window.renderMarkers(locations);
       document.getElementById('map').classList.add('loaded');
       applySearchState();
+      tryOpenFromHash();
       initAddressAutocomplete();
     }
     waitForLocationsThenRender();
