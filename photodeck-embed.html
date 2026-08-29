@@ -591,6 +591,22 @@ function refFromUrl(url) {
   return m ? m[1] : '';
 }
 
+/* Ile w pikselach przesunąć punkt centrowania mapy w dół, żeby nad pinezką
+   zawsze zmieścił się cały, wysoki popup (zdjęcie + wiersze + przyciski,
+   ok. 480px). Liczone na bieżąco z aktualnej wysokości kontenera mapy,
+   bo ta sama strona bywa osadzona z bardzo różną dostępną wysokością —
+   pełne okno przeglądarki vs. wąski pasek wewnątrz iframe na PhotoDecku.
+   Stała wartość w pikselach nie mogła sprawdzić się w obu przypadkach naraz. */
+function popupCenterOffsetY() {
+  if (!mapInstance) return 60;
+  var mapH = mapInstance.getContainer().clientHeight;
+  var popupH = 480;
+  var margin = 20;
+  var needed = margin + popupH - mapH / 2;
+  var maxSafe = Math.max(40, mapH / 2 - 30);
+  return Math.max(40, Math.min(needed, maxSafe));
+}
+
 function splitCatValue(v) {
   return v ? v.split(';').map(function(s) { return s.trim(); }).filter(Boolean) : [];
 }
@@ -889,14 +905,14 @@ function loadInitialData() {
             if (window.innerWidth <= 720) {
               window.piToggleLogDetail(idx, rec);
             } else if (mapInstance) {
-              mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2, offset: [0, 60] });
+              mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2, offset: [0, popupCenterOffsetY()] });
               window.piOpenPopupForLocation(rec);
             }
           });
           if (window.innerWidth > 720) {
             link.addEventListener('mouseenter', function() {
               if (!mapInstance) return;
-              mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2, offset: [0, 60] });
+              mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2, offset: [0, popupCenterOffsetY()] });
               window.piOpenPopupForLocation(rec);
             });
           }
@@ -974,7 +990,7 @@ function initAddressAutocomplete() {
     closeSuggest();
     searchInput.value = item.label;
     if (item.source === 'archive') {
-      mapInstance.flyTo({ center: item.loc.coords, zoom: 15.5, speed: 1.2, offset: [0, 60] });
+      mapInstance.flyTo({ center: item.loc.coords, zoom: 15.5, speed: 1.2, offset: [0, popupCenterOffsetY()] });
       if (window.piOpenPopupForLocation) window.piOpenPopupForLocation(item.loc);
     } else if (item.feature.bbox) {
       mapInstance.fitBounds(item.feature.bbox, { padding: 60, duration: 600, maxZoom: 15.5 });
@@ -1044,7 +1060,7 @@ function initMapLazy() {
   js.src = 'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js';
   js.onload = function() {
     mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
-    globalPopup = new mapboxgl.Popup({ offset: [0, -42], closeButton: true, className: 'pi-popup', anchor: 'bottom' });
+    globalPopup = new mapboxgl.Popup({ offset: [0, -42], closeButton: true, className: 'pi-popup' });
     var savedMapState = loadMapState();
     var startCenter = (savedMapState && typeof savedMapState.lng === 'number' && typeof savedMapState.lat === 'number')
       ? [savedMapState.lng, savedMapState.lat] : [153.0307, -27.4598];
@@ -1353,7 +1369,7 @@ function initMapLazy() {
         if (!best || d < best.d) best = { loc: loc, d: d };
       });
 
-      mapInstance.flyTo({ center: [lng, lat], zoom: z, speed: 1.4, offset: [0, 60] });
+      mapInstance.flyTo({ center: [lng, lat], zoom: z, speed: 1.4, offset: [0, popupCenterOffsetY()] });
       if (best && best.d < 0.001) {
         setTimeout(function() { window.piOpenPopupForLocation(best.loc); }, 600);
       }
