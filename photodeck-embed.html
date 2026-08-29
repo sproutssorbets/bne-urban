@@ -186,15 +186,29 @@
     font-size: 9px; font-weight: 500; letter-spacing: 0.1em; font-family: inherit; text-transform: uppercase;
   }
   
-  #pi-drawer-dot { width: 6px; height: 6px; flex-shrink: 0; background: var(--bg); border: 1px solid var(--text); }
-  #pi-drawer-tab:hover #pi-drawer-dot { background: var(--text); }
-  #pi-drawer-dot.hidden { display: none; }
-  
-  #pi-drawer-backdrop {
-    position: fixed; inset: 0; z-index: 600; opacity: 0; pointer-events: none;
-    background: rgba(255,255,255,0.7); transition: opacity 0.2s ease;
+  /* Zielony, pulsujący wskaźnik nowych rekordów — jedyny celowy akcent
+     koloru w tym monochromatycznym interfejsie, użyty świadomie tylko
+     tutaj, żeby przyciągnąć uwagę do nowości w UPDATE LOG. Pulsowanie
+     przez opacity/transform, nie box-shadow (globalny reset wymusza
+     box-shadow: none !important na wszystkich elementach). */
+  #pi-drawer-dot {
+    width: 6px; height: 6px; flex-shrink: 0;
+    background: #22c55e; border: 1px solid #16a34a;
+    animation: pi-dot-pulse 1.6s ease-in-out infinite;
   }
-  #pi-drawer-backdrop.active { opacity: 1; pointer-events: auto; }
+  #pi-drawer-dot.hidden { display: none; }
+  @keyframes pi-dot-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.35); }
+  }
+  
+  /* Warstwa łapiąca kliknięcia poza panelem (żeby zamykały panel), bez
+     wizualnego przyciemniania/rozjaśniania mapy pod spodem — usunięty
+     na życzenie, mapa zostaje w pełni widoczna przy otwartym panelu. */
+  #pi-drawer-backdrop {
+    position: fixed; inset: 0; z-index: 600; pointer-events: none;
+  }
+  #pi-drawer-backdrop.active { pointer-events: auto; }
   
   #pi-drawer-panel {
     position: fixed; top: 0; right: 0; height: 100%; height: 100dvh; width: 360px; max-width: calc(100vw - 40px);
@@ -230,12 +244,6 @@
   .pi-log-link:hover .stats { color: var(--bg); }
   .pi-log-link .arrow { font-size: 12px; opacity: 0; transform: translateX(-4px); transition: all 0.1s;}
   .pi-log-link:hover .arrow { opacity: 1; transform: translateX(0); color: var(--bg); }
-  
-  .pi-drawer-thumbs { column-count: 2; column-gap: 8px; margin-top: 12px; }
-  .pi-thumb-card { break-inside: avoid; margin-bottom: 8px; background: var(--bg); border: 1px solid var(--text); overflow: hidden; }
-  
-  /* ZDJĘCIA W NATURALNYCH KOLORACH - BRAK FILTRA */
-  .pi-thumb-card img { width: 100%; height: auto; display: block; }
   
   .pi-drawer-footer { padding: 16px 20px; border-top: 1px solid var(--text); flex-shrink: 0; background: var(--bg); }
   
@@ -504,8 +512,6 @@
     <div class="pi-drawer-sub" id="pi-drawer-sub">Archive total: … records</div>
     <div class="pi-drawer-section-title">By location</div>
     <div id="pi-drawer-log"></div>
-    <div class="pi-drawer-section-title" id="pi-thumbs-title" style="display:none; margin-top:24px;">Visual preview</div>
-    <div class="pi-drawer-thumbs" id="pi-drawer-thumbs"></div>
   </div>
   <div class="pi-drawer-footer">
     <button class="pi-drawer-cta" id="pi-drawer-close-btn">Close panel</button>
@@ -513,7 +519,6 @@
 </aside>
 <script>
 var DATA_VERSION = '20260815';
-window.PI_PHOTOS_CACHE = null;
 var locations = [];
 var searchState = { text: '', suburb: '', categories: {} };
 var mapInstance = null;
@@ -1173,17 +1178,26 @@ function initMapLazy() {
         var slidesHtml = thumbs.map(function(url, i) {
           return '<img src="' + url + '" loading="lazy" style="display:' + (i === 0 ? 'block' : 'none') + ';width:100%;height:140px;object-fit:contain;background:var(--bg);" data-pi-slide="' + i + '">';
         }).join('');
+        /* Strzałki dostają teraz nieprzezroczyste, kwadratowe tło (var(--bg),
+           obramowane var(--text) — zero zaokrągleń, zgodnie z resztą
+           interfejsu), żeby były czytelne niezależnie od tego, co jest pod
+           spodem. Na pionowym zdjęciu, które nie wypełnia całej szerokości
+           kontenera, poprzednia wersja bez tła ginęła na jasnym tle zdjęcia
+           poziomego, wypełniającego kontener od krawędzi do krawędzi.
+           Pozycja bez ujemnego przesunięcia (4px, nie -6px), żeby nic nie
+           obcinało ich przez overflow:hidden kontenera. */
         var navHtml = thumbs.length > 1
-          ? '<button type="button" class="pi-popup-slider-prev" aria-label="Poprzednie zdjęcie" style="position:absolute;top:50%;left:-6px;transform:translateY(-50%);background:none;border:none;padding:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>' +
-            '<button type="button" class="pi-popup-slider-next" aria-label="Następne zdjęcie" style="position:absolute;top:50%;right:-6px;transform:translateY(-50%);background:none;border:none;padding:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>' +
+          ? '<button type="button" class="pi-popup-slider-prev" aria-label="Poprzednie zdjęcie" style="position:absolute;top:50%;left:4px;transform:translateY(-50%);background:var(--bg);border:1px solid var(--text);padding:2px;width:20px;height:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>' +
+            '<button type="button" class="pi-popup-slider-next" aria-label="Następne zdjęcie" style="position:absolute;top:50%;right:4px;transform:translateY(-50%);background:var(--bg);border:1px solid var(--text);padding:2px;width:20px;height:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>' +
             '<div class="pi-popup-slider-dots" style="position:absolute;bottom:4px;left:50%;transform:translateX(-50%);display:flex;gap:4px;">' +
-            thumbs.map(function(u, i) { return '<span class="pi-popup-dot" data-pi-dot="' + i + '" style="width:5px;height:5px;background:' + (i === 0 ? '#FFF' : 'rgba(255,255,255,0.5)') + ';cursor:pointer;"></span>'; }).join('') +
+            thumbs.map(function(u, i) { return '<span class="pi-popup-dot" data-pi-dot="' + i + '" style="width:6px;height:6px;border:1px solid var(--text);background:' + (i === 0 ? 'var(--text)' : 'var(--bg)') + ';cursor:pointer;"></span>'; }).join('') +
             '</div>'
           : '';
         sliderHtml = '<div class="pi-popup-slider" style="position:relative;margin-bottom:8px;overflow:hidden;">' + slidesHtml + navHtml + '</div>';
       }
 
       var popupHtml = '<div style="min-width:180px;position:relative;"><div class="pi-popup-title">' + loc.street + '</div>' + sliderHtml + '<div style="border-top:1px solid var(--text);border-bottom:1px solid var(--text);padding:6px 0;margin-bottom:8px;">' + rowsHtml + '</div><a href="' + loc.archiveUrl + '" target="_top" style="display:block;text-align:center;background:var(--text);color:#FFF;padding:8px;font-size:9px;font-weight: 500;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;transition:background 0.1s, color 0.1s;">OPEN RECORD →</a></div>';
+      globalPopup.setMaxWidth('240px');
       globalPopup.setLngLat(loc.coords).setHTML(popupHtml).addTo(mapInstance);
       
       // Popup Button Hover
@@ -1201,10 +1215,10 @@ function initMapLazy() {
         var idx = 0;
         var showSlide = function(next) {
           imgs[idx].style.display = 'none';
-          dots[idx].style.background = 'rgba(255,255,255,0.5)';
+          dots[idx].style.background = 'var(--bg)';
           idx = (next + imgs.length) % imgs.length;
           imgs[idx].style.display = 'block';
-          dots[idx].style.background = '#FFF';
+          dots[idx].style.background = 'var(--text)';
         };
         var prevBtn = popupEl.querySelector('.pi-popup-slider-prev');
         var nextBtn = popupEl.querySelector('.pi-popup-slider-next');
@@ -1308,7 +1322,22 @@ function initMapLazy() {
             ev.stopPropagation();
             var bounds = new mapboxgl.LngLatBounds();
             group.forEach(function(p) { bounds.extend(p.loc.coords); });
-            mapInstance.fitBounds(bounds, { padding: 80, maxZoom: 18, duration: 500 });
+            /* fitBounds() sam dobiera docelowe przybliżenie na podstawie
+               rozmiaru bounds — dla lokalizacji leżących bardzo blisko
+               siebie (kilkadziesiąt metrów) potrafi to wyjść niemal
+               identyczne z obecnym widokiem, więc kliknięcie w klaster
+               wygląda jak brak reakcji. cameraForBounds() tylko liczy
+               docelowy zoom, nie stosuje go — dzięki temu możemy
+               porównać go z obecnym i wymusić przybliżenie o co
+               najmniej 3 poziomy, żeby efekt kliknięcia był zawsze
+               wyraźnie widoczny, niezależnie od odległości między
+               punktami w klastrze. (Uwaga: fitBounds() nie ma opcji
+               minZoom — to nie jest oficjalna opcja Mapbox GL JS.) */
+            var currentZoom = mapInstance.getZoom();
+            var camera = mapInstance.cameraForBounds(bounds, { padding: 80, maxZoom: 18 });
+            var targetZoom = camera ? Math.max(camera.zoom, Math.min(currentZoom + 3, 18)) : Math.min(currentZoom + 3, 18);
+            var targetCenter = camera ? camera.center : bounds.getCenter();
+            mapInstance.easeTo({ center: targetCenter, zoom: targetZoom, duration: 500 });
           });
           mountedMarkers.push(
             new mapboxgl.Marker({ element: el, anchor: 'bottom' }).setLngLat(centroid).addTo(mapInstance)
@@ -1505,46 +1534,11 @@ document.addEventListener('DOMContentLoaded', function() {
   var closeBtnAlt = document.getElementById('pi-drawer-close-btn');
   var backdrop = document.getElementById('pi-drawer-backdrop');
 
-  function renderThumbs(urls) {
-    var thumbsContainer = document.getElementById('pi-drawer-thumbs');
-    var thumbsTitle = document.getElementById('pi-thumbs-title');
-    if (thumbsContainer && urls.length > 0) {
-      if (thumbsTitle) thumbsTitle.style.display = 'block';
-      thumbsContainer.innerHTML = urls.map(function(url) {
-        return '<div class="pi-thumb-card"><img src="' + url + '" alt="Archive Record" loading="lazy"></div>';
-      }).join('');
-    }
-  }
-
-  function fetchAllPhotos(page, acc) {
-    page = page || 1;
-    acc = acc || [];
-    return fetch('https://api.github.com/repos/sproutssorbets/bne-urban-index/contents/photos?per_page=100&page=' + page)
-      .then(function(res) { return res.ok ? res.json() : []; })
-      .then(function(files) {
-        if (!Array.isArray(files) || files.length === 0) return acc;
-        var urls = files.filter(function(f) {
-          return f.type === 'file' && f.name.match(/\.(jpg|jpeg|png)$/i);
-        }).map(function(f) { return f.download_url; });
-        acc = acc.concat(urls);
-        if (files.length < 100 || page >= 4) return acc;
-        return fetchAllPhotos(page + 1, acc);
-      });
-  }
-
   function openDrawer() {
     panel.classList.add('open');
     backdrop.classList.add('active');
     panel.setAttribute('aria-hidden', 'false');
     tab.setAttribute('aria-expanded', 'true');
-    if (!window.PI_PHOTOS_CACHE) {
-      fetchAllPhotos().then(function(urls) {
-        window.PI_PHOTOS_CACHE = urls;
-        renderThumbs(urls);
-      }).catch(function() {});
-    } else {
-      renderThumbs(window.PI_PHOTOS_CACHE);
-    }
   }
 
   function closeDrawer() {
