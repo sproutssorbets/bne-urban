@@ -131,6 +131,25 @@ def normalize_key(title_key):
     return title_key
 
 
+def merge_titles(existing_titles_str, *new_titles):
+    """Łączy listę tytułów już zapisanych dla lokalizacji z nowymi, unikając
+       duplikatów i zachowując kolejność pierwszego pojawienia się (żeby
+       kolejne uruchomienia skryptu nie tasowały bez potrzeby kolejności
+       w pliku). Każdy tytuł, jaki kiedykolwiek pojawił się dla danej
+       lokalizacji — nazwa własna, adres, skrzyżowanie — zostaje na stałe,
+       nawet jeśli zdjęcie zostanie później przemianowane w PhotoDecku."""
+    seen = []
+    for t in (existing_titles_str or "").split(";"):
+        t = t.strip()
+        if t and t not in seen:
+            seen.append(t)
+    for t in new_titles:
+        t = (t or "").strip()
+        if t and t not in seen:
+            seen.append(t)
+    return ";".join(seen)
+
+
 def main():
     xml_bytes = fetch_xml(MEDIAS_URL)
     root = ET.fromstring(xml_bytes)
@@ -162,7 +181,7 @@ def main():
     with open(CSV_PATH, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         fieldnames = list(reader.fieldnames)
-        for col in ["thumbs", "images"]:
+        for col in ["thumbs", "images", "titles"]:
             if col not in fieldnames:
                 fieldnames.append(col)
         for row in reader:
@@ -180,11 +199,21 @@ def main():
                 new_images = ";".join(images)
                 new_count = str(len(thumbs))
 
-                if row.get("thumbs", "") != new_thumbs or row.get("count", "") != new_count or row.get("images", "") != new_images:
+                # zbierz wszystkie tytuły, jakie kiedykolwiek widzieliśmy dla
+                # tej lokalizacji (stary wpis w "street", to co już było w
+                # "titles", plus aktualny tytuł zdjęcia-kotwicy) — nic nie
+                # ginie, nawet jeśli tytuł zdjęcia zmieni się w przyszłości
+                new_titles = merge_titles(row.get("titles", ""), row.get("street", ""), true_title)
+
+                if (row.get("thumbs", "") != new_thumbs or row.get("count", "") != new_count
+                        or row.get("images", "") != new_images or row.get("titles", "") != new_titles
+                        or row.get("street", "") != true_title):
                     changed = True
                 row["thumbs"] = new_thumbs
                 row["images"] = new_images
                 row["count"] = new_count
+                row["titles"] = new_titles
+                row["street"] = true_title  # zawsze aktualny, zgodny z tym, co faktycznie widać na stronie zdjęcia
 
             rows.append(row)
 
@@ -235,6 +264,7 @@ def main():
             "update_batch": update_batch,
             "thumbs": thumbs,
             "images": images,
+            "titles": title_key,
         }
         rows.append(new_row)
         new_rows_added.append(title_key)
