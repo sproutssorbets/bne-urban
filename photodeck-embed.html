@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +8,7 @@
 <link rel="preconnect" href="https://raw.githubusercontent.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   /* ABSOLUTE MONOCHROME SYSTEM */
 :root {
@@ -23,11 +22,11 @@
     box-sizing: border-box; 
     margin: 0; 
     padding: 0;
-    border-radius: 0 !important; /* Zero zaokrągleń */
-    box-shadow: none !important; /* Zero cieni */
+    border-radius: 0 !important;
+    box-shadow: none !important;
     -webkit-tap-highlight-color: transparent;
     font-family: 'Inter', sans-serif !important;
-    font-feature-settings: "tnum"; /* Cyfry tabelaryczne */
+    font-feature-settings: "tnum";
   }
 
   :focus-visible { outline: 2px solid var(--text) !important; outline-offset: -2px; }
@@ -47,22 +46,22 @@
   .search-lead-icon { width: 14px; height: 14px; flex-shrink: 0; stroke: var(--text); }
   
   #geocoder { flex: 1; height: 100%; position: relative; }
-  #pi-search-wrap { position: relative; width: 100%; height: 100%; display: flex; align-items: center; }
+  #pi-search-wrap { position: relative; width: 100%; height: 100%; display: flex; align-items: center; gap: 6px; }
   #pi-search-input { 
-    width: 100%; height: 100%; border: none; background: transparent; 
+    flex: 1; min-width: 80px; height: 100%; border: none; background: transparent; 
     font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; 
     color: var(--text); outline: none; padding-right: 30px; box-sizing: border-box;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   #pi-search-input:focus-visible { outline: none !important; }
   #pi-search-input::placeholder { color: var(--text); font-weight: 500; }
-  #pi-search-clear { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); border: none; background: transparent; font-size: 20px; color: var(--text); cursor: pointer; display: none; line-height: 1; padding: 4px 8px; transition: opacity 0.1s; }
+  #pi-search-clear { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); border: none; background: transparent; font-size: 20px; color: var(--text); cursor: pointer; display: none; line-height: 1; padding: 4px 8px; transition: opacity 0.1s; z-index: 2; }
   #pi-search-clear:hover { opacity: 0.4; }
 
   #pi-active-tags { display: flex; align-items: center; gap: 4px; flex-shrink: 0; overflow-x: auto; max-width: 55%; scrollbar-width: none; }
   #pi-active-tags:empty { display: none; }
   #pi-active-tags::-webkit-scrollbar { display: none; }
-  .pi-tag { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--text); padding: 3px 4px 3px 8px; font-size: 9px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; background: var(--bg); color: var(--text); flex-shrink: 0; }
+  .pi-tag { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--text); padding: 3px 6px; font-size: 9px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; background: var(--bg); color: var(--text); flex-shrink: 0; }
   .pi-tag button { border: none; background: transparent; cursor: pointer; font-size: 12px; line-height: 1; padding: 0 2px; color: var(--text); }
   .pi-tag button:hover { opacity: 0.4; }
 
@@ -106,7 +105,7 @@
   .sub-category-title:first-child { margin-top: 0; }
   
   .acc-body label { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 6px 0; font-size: 11px; font-weight: 500; letter-spacing: normal; color: var(--text); transition: opacity 0.1s;}
-    .acc-body label.no-data { opacity: 0.3; cursor: default; text-decoration: none !important; }
+  .acc-body label.no-data { opacity: 0.3; cursor: default; text-decoration: none !important; }
   .filter-count { margin-left: auto; font-size: 10px; font-weight: 500; color: var(--text); }
   
   /* STRICT FORM INPUTS */
@@ -121,7 +120,6 @@
   /* MAP VIEWPORT */
   #map-wrap { flex: 1; position: relative; height: 100%; background: var(--bg); margin: 0; padding: 0; }
   
-  /* Wymuszony, absolutny grayscale na mapie, by zachować B&W interfejsu */
   #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s ease-in-out; }
   #map.loaded { opacity: 1; }
   #map .mapboxgl-canvas { filter: grayscale(100%); }
@@ -133,16 +131,13 @@
   #map-error.visible { display: flex; }
   #map-error-text { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text); max-width: 320px; line-height: 1.6; }
 
-  /* Rozwijany podgląd w samej liście, tylko na mobile — mapa jest tam
-     niewidoczna pod panelem, więc podgląd nie może polegać na tym, co
-     widać na mapie. */
   .pi-log-detail {
     display: none; padding: 12px 0; border-bottom: 1px solid var(--text);
     font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em;
   }
   .pi-log-detail.open { display: block; }
   
-  /* PINS (Strict Contrast) */
+  /* PINS */
   .custom-marker-hitbox {
     width: 24px; height: 32px;
     display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
@@ -158,12 +153,7 @@
   .pi-pin-cluster .pi-pin-point { border-left-width: 4px; border-right-width: 4px; border-top-width: 5px; }
 
   .pi-popup-title { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; padding-right: 20px; line-height: 1.3; margin-bottom: 8px; }
-  /* Nakładka wyśrodkowana względem samej ramki mapy (nie względem
-     pinezki na mapie) — ta sama karta, ten sam wygląd, niezależnie skąd
-     została otwarta. max-height + overflow to zabezpieczenie na wypadek
-     naprawdę ciasnych wysokości, gdzie nawet po zmniejszeniu zdjęcia
-     mogłoby nie starczyć miejsca — wtedy karta staje się przewijalna
-     zamiast wychodzić poza widoczny obszar. */
+
   .pi-map-overlay {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
     z-index: 50; background: var(--bg); border: 1px solid var(--text);
@@ -182,11 +172,6 @@
   @media (max-height: 550px) {
     .pi-popup-slider img[data-pi-slide] { height: 160px !important; }
   }
-  /* Przeglądarka domyślnie ustawia fokus na pierwszym klikalnym elemencie
-     wewnątrz popupu przy jego otwarciu (dostępność), co razem z globalnym
-     :focus-visible dawało grubą, podwójną ramkę tylko na lewej strzałce
-     slidera. Wyłączone punktowo tylko tutaj, reszta strony zachowuje
-     widoczny fokus. */
   .pi-popup-slider-prev:focus-visible, .pi-popup-slider-next:focus-visible { outline: none !important; }
 
   /* UPDATE DRAWER */
@@ -256,38 +241,66 @@
   .pi-drawer-cta { display: block; width: 100%; text-align: center; border: 1px solid var(--text); background: var(--text); color: var(--bg); padding: 12px; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; cursor: pointer; transition: background 0.1s, color 0.1s; }
   .pi-drawer-cta:hover { background: var(--bg); color: var(--text); }
 
-  /* MOBILE UX */
+  /* MOBILE UX & NEW ICONS */
+  .pi-global-header-mobile { display: none; }
+  .pi-icon { width: 18px; height: 18px; stroke: var(--text); stroke-width: 1.5; fill: none; stroke-linecap: square; stroke-linejoin: miter; }
+  .pi-mh-search-icon { display: none; }
+  .pi-mobile-backdrop { display: none; }
   .mobile-bar { display: none; }
+
   @media (max-width: 720px) {
-    #search-row { height: 48px; padding: 0 14px; }
-    #search-archive-btn { font-size: 9px; padding: 0 12px; margin-right: -14px;}
+    /* Global Header */
+    .pi-global-header-mobile {
+      display: flex; justify-content: space-between; align-items: center;
+      height: 56px; padding: 0 8px; border-bottom: 1px solid var(--text);
+      background: var(--bg); flex-shrink: 0;
+    }
+    .pi-global-btn { background: none; border: none; cursor: pointer; padding: 8px; display: flex; align-items: center; justify-content: center; color: var(--text); }
+    .pi-logo { font-size: 14px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; }
+
+    /* Tool Header Row 1 (Search) */
+    #topbar { border-bottom: 1px solid var(--text); flex-shrink: 0; }
+    #search-row { height: 52px; padding: 0; }
+    #search-row > .search-lead-icon { display: none; }
+    .pi-mh-search-icon { display: flex; align-items: center; justify-content: center; padding-left: 16px; flex-shrink: 0; }
+    #geocoder { padding-left: 12px; border-right: 1px solid var(--text); flex: 1; height: 100%;}
+    #pi-search-input { font-size: 14px; letter-spacing: normal; text-transform: none; font-weight: 400; }
+    #pi-search-input::placeholder { color: var(--muted); text-transform: none; font-weight: 400; }
     
-    .mobile-only-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--text); background: var(--bg); }
-    .mobile-grip { display: block; width: 40px; height: 2px; background: var(--text); margin: 12px auto 0; }
+    #search-archive-btn { width: 60px; height: 100%; display: flex; align-items: center; justify-content: center; background: transparent; border: none; margin: 0; padding: 0; flex-shrink: 0; border-left: none; }
+    #search-archive-btn:hover { background: transparent; color: var(--text); }
+
+    /* Tool Header Row 2 (Filters) */
+    .mobile-bar { display: flex; height: 44px; background: #FAFAFA; color: var(--text); border-top: none; border-bottom: 1px solid var(--text); flex-shrink: 0; }
+    .mobile-bar-btn { width: 60px; flex: none; border-right: 1px solid var(--text); color: var(--text); background: transparent; position: relative; display: flex; justify-content: center; align-items: center; cursor: pointer; border-left: none; border-top: none; border-bottom: none; }
+    .mobile-bar-btn .count-badge { position: absolute; top: 6px; right: 8px; background: var(--text); color: var(--bg); border-radius: 50% !important; border: none; min-width: 14px; height: 14px; font-size: 9px; display: flex; align-items: center; justify-content: center; padding: 0;}
+    .pi-mh-status { flex: 1; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; font-size: 10px; font-weight: 500; letter-spacing: 0.05em; color: var(--text); text-transform: uppercase; }
     
+    /* Left-sliding Filter Drawer */
     #index-panel {
-      position: fixed; inset: 0; width: 100% !important; height: 100% !important;
-      z-index: 800; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
-      border-right: none;
+      position: fixed; inset: 0; width: 85% !important; max-width: 340px; height: 100% !important;
+      z-index: 999; border-right: 1px solid var(--text); background: var(--bg);
+      transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
     }
-    #index-panel.mobile-active { transform: translateY(0); }
+    #index-panel.mobile-active { transform: translateX(0); }
     
-    .mobile-bar { display: flex; height: 48px; background: var(--text); color: var(--bg); border-top: 1px solid var(--text); }
-    .mobile-bar-btn {
-      flex: 1; background: transparent; border: none; color: var(--bg);
-      font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 6px;
-      border-right: 1px solid var(--bg); text-decoration: none; position: relative;
+    .mobile-only-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--text); background: #FAFAFA; }
+    .mobile-only-header span { font-weight: 600; }
+    .mobile-grip { display: none; }
+    #mobile-panel-close { border: none; background: transparent; font-size: 24px; cursor: pointer; padding: 0; line-height: 1; color: var(--text); }
+
+    /* Dark Backdrop */
+    body.pi-drawer-lock .pi-mobile-backdrop {
+      display: block; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      z-index: 900; pointer-events: auto; animation: pi-fade-in 0.3s ease;
     }
-    .mobile-bar-btn:last-child { border-right: none; }
-    .mobile-bar-btn .count-badge {
-      display: inline-flex; align-items: center; justify-content: center;
-      min-width: 14px; height: 14px; padding: 0 3px; font-size: 9px; font-weight: 500;
-      background: var(--bg); color: var(--text);
-    }
-    #map-wrap { height: calc(100dvh - 44px - 48px); }
+    
+    /* Map Sizing Fix */
+    #map-wrap { height: calc(100dvh - 56px - 52px - 44px); }
     #pi-drawer-tab { height: 120px; width: 32px; padding-left: 4px; }
   }
+  
+  @keyframes pi-fade-in { from { opacity: 0; } to { opacity: 1; } }
 </style>
   <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
@@ -298,23 +311,44 @@
 </script>
 </head>
 <body>
+<!-- GLOBALNY NAGŁÓWEK (Tylko Mobile) -->
+<header class="pi-global-header-mobile">
+  <button class="pi-global-btn" aria-label="Menu">
+    <svg class="pi-icon" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+  </button>
+  <div class="pi-logo">PHOTOINDEX</div>
+  <button class="pi-global-btn" aria-label="Account">
+    <svg class="pi-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+  </button>
+</header>
+
 <div id="topbar">
   <div id="search-row">
-    <svg class="search-lead-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="square"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16" y2="16"></line></svg>
+    <div class="pi-mh-search-icon">
+      <svg class="search-lead-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="square"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16" y2="16"></line></svg>
+    </div>
     <div id="geocoder">
       <div id="pi-search-wrap">
         <div id="pi-active-tags"></div>
-        <input type="text" id="pi-search-input" autocomplete="off" spellcheck="false" placeholder="SEARCH ADDRESS OR PLACE...">
+        <input type="text" id="pi-search-input" autocomplete="off" spellcheck="false" placeholder="Search archive...">
         <button type="button" id="pi-search-clear" aria-label="Clear search">&times;</button>
         <div id="pi-suggest" class="pi-suggest"></div>
       </div>
     </div>
-    <a id="search-archive-btn" href="https://www.photoindex.au/" target="_top"><span id="search-archive-text">Search</span></a>
+    <a id="search-archive-btn" href="https://www.photoindex.au/" target="_top">
+      <svg class="pi-icon" viewBox="0 0 24 24"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" y1="3" x2="9" y2="18"></line><line x1="15" y1="6" x2="15" y2="21"></line></svg>
+      <span id="search-archive-text" style="display:none;">Search</span>
+    </a>
   </div>
 </div>
 <div class="mobile-bar">
-  <button type="button" class="mobile-bar-btn" id="mobile-toggle-filters">Filters<span class="count-badge" id="mobile-filter-count" style="display:none;"></span></button>
+  <button type="button" class="mobile-bar-btn" id="mobile-toggle-filters">
+    <svg class="pi-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+    <span class="count-badge" id="mobile-filter-count" style="display:none;"></span>
+  </button>
+  <div class="pi-mh-status">MAP VIEW</div>
 </div>
+<div class="pi-mobile-backdrop" onclick="document.getElementById('mobile-panel-close').click()"></div>
 <div id="layout">
   <aside id="index-panel">
     <div class="mobile-grip"></div>
@@ -525,11 +559,6 @@
   </div>
 </aside>
 <script>
-// DATA_VERSION liczony z dzisiejszej daty, nie wpisany na sztywno — dzięki
-// temu każdy nowy dzień to naturalnie świeży parametr w URL-u do locations.csv,
-// zamiast ręcznego pilnowania, żeby ktoś podbijał tę wartość przy każdej
-// aktualizacji danych. Workflow aktualizuje dane raz dziennie, więc jeden
-// cache-bust dziennie idealnie pasuje do tego rytmu.
 var DATA_VERSION = (function() {
   var d = new Date();
   return d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
@@ -685,19 +714,54 @@ function updatePhotoDeckLink() {
   if (btnMobile) { btnMobile.href = targetUrl; btnMobile.textContent = textValue; }
 }
 
+function removeFilterTag(type, val) {
+  if (type === 'suburb') {
+    searchState.suburb = '';
+    var defRadio = document.querySelector('.suburb-check[value=""]');
+    if (defRadio) defRadio.checked = true;
+  } else {
+    if (searchState.categories[type]) {
+      searchState.categories[type] = searchState.categories[type].filter(function(v) { return v !== val; });
+    }
+    var cb = document.querySelector('.filter-check[data-cat="' + type + '"][value="' + val + '"]');
+    if (cb) cb.checked = false;
+  }
+  applySearchState();
+}
+
 function renderActiveTags() {
   var container = document.getElementById('pi-active-tags');
-  if (container) container.innerHTML = '';
   var searchInput = document.getElementById('pi-search-input');
   var clearBtn = document.getElementById('pi-search-clear');
-  if (!searchInput) return;
-  var labels = [];
-  if (searchState.suburb) labels.push(searchState.suburb);
-  SEARCHABLE_CATEGORIES.forEach(function(cat) {
-    (searchState.categories[cat] || []).forEach(function(val) { labels.push(val); });
-  });
-  searchInput.value = labels.join(', ');
-  if (clearBtn) clearBtn.style.display = searchInput.value ? 'block' : 'none';
+  
+  if (container) {
+    container.innerHTML = '';
+    var tags = [];
+    if (searchState.suburb) {
+      tags.push({ type: 'suburb', label: searchState.suburb, val: searchState.suburb });
+    }
+    SEARCHABLE_CATEGORIES.forEach(function(cat) {
+      (searchState.categories[cat] || []).forEach(function(val) {
+        tags.push({ type: cat, label: val, val: val });
+      });
+    });
+
+    tags.forEach(function(t) {
+      var tagEl = document.createElement('span');
+      tagEl.className = 'pi-tag';
+      tagEl.innerHTML = t.label + '<button type="button" aria-label="Remove filter">&times;</button>';
+      tagEl.querySelector('button').addEventListener('click', function(e) {
+        e.stopPropagation();
+        removeFilterTag(t.type, t.val);
+      });
+      container.appendChild(tagEl);
+    });
+  }
+
+  if (clearBtn) {
+    var hasActiveContent = (searchInput && searchInput.value.length > 0) || !!searchState.suburb || countActiveFilters() > 0;
+    clearBtn.style.display = hasActiveContent ? 'block' : 'none';
+  }
 }
 
 function countActiveFilters() {
@@ -783,10 +847,6 @@ function restoreSavedFilters() {
     searchState.suburb = saved.suburb;
     var radio = document.querySelector('.suburb-check[value="' + saved.suburb + '"]');
     if (radio) radio.checked = true;
-    var searchInput = document.getElementById('pi-search-input');
-    var clearBtn = document.getElementById('pi-search-clear');
-    if (searchInput) { searchInput.value = saved.suburb; }
-    if (clearBtn) { clearBtn.style.display = saved.suburb ? 'block' : 'none'; }
   }
   if (saved.categories && Object.keys(saved.categories).some(function(cat) { return (saved.categories[cat] || []).length > 0; })) {
     hasFilters = true;
@@ -810,10 +870,6 @@ function restoreSavedFilters() {
 
 function loadInitialData() {
   Promise.all([
-    // Prawdziwe, jedyne repo z danymi to "bne-urban" — poprzednia nazwa
-    // działała tylko dzięki tymczasowemu przekierowaniu GitHuba, na
-    // którym nie warto polegać na stałe (może przestać działać w
-    // dowolnym momencie).
     fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban/main/locations.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }),
     fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban/main/medias.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }).catch(function() { return ''; })
   ])
@@ -987,6 +1043,8 @@ function initAddressAutocomplete() {
     if (!item || !mapInstance) return;
     closeSuggest();
     searchInput.value = item.label;
+    searchState.text = item.label.toLowerCase();
+    applySearchState();
     if (item.source === 'archive') {
       mapInstance.flyTo({ center: item.loc.coords, zoom: 15.5, speed: 1.2 });
       if (window.piOpenPopupForLocation) window.piOpenPopupForLocation(item.loc);
@@ -1128,10 +1186,6 @@ function initMapLazy() {
     var LINK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>';
     var CHECK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
 
-    /* Budowanie karty lokalizacji (tytuł, slider, wiersze danych, przyciski)
-       wydzielone do wspólnej funkcji — dokładnie ta sama karta trafia do
-       popupu na mapie po kliknięciu pinezki i do rozwijanego panelu na
-       mobile, żeby nie utrzymywać dwóch wersji tej samej rzeczy. */
     function buildLocationCardHtml(loc) {
       var datesList = loc.dates ? loc.dates.split(';').map(function(d) { return d.trim(); }).filter(Boolean) : [];
       var datesDesc = datesList.slice().reverse();
@@ -1166,9 +1220,6 @@ function initMapLazy() {
       return '<div style="min-width:280px;position:relative;"><div class="pi-popup-title" style="margin-bottom:10px;font-size:12px;">' + loc.street + '</div>' + sliderHtml + '<div style="border-top:1px solid var(--text);padding:8px 0;margin-bottom:12px;">' + rowsHtml + '</div><div style="display:flex;border:1px solid var(--text);"><a href="' + loc.archiveUrl + '" target="_top" style="flex:1;text-align:center;background:var(--text);color:var(--bg);padding:10px;font-size:10px;font-weight: 500;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;transition:background 0.1s, color 0.1s;">OPEN RECORD</a><button type="button" class="pi-popup-copy-link" aria-label="Copy link" style="flex-shrink:0;width:44px;background:var(--bg);color:var(--text);border:none;border-left:1px solid var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.1s;">' + LINK_ICON + '</button></div></div>';
     }
 
-    /* Podpina interaktywność (slider, kopiowanie linku, hover) do karty
-       osadzonej w dowolnym kontenerze — popup na mapie i panel na mobile
-       współdzielą tę samą logikę, różni je tylko to, gdzie karta wylądowała. */
     function wireLocationCard(root, loc) {
       if (!root) return;
       var thumbs = loc.thumbs || [];
@@ -1189,12 +1240,6 @@ function initMapLazy() {
             copyBtn.innerHTML = CHECK_ICON;
             setTimeout(function() { copyBtn.innerHTML = LINK_ICON; }, 1500);
           };
-          /* Kopiowanie do schowka wewnątrz obcego iframe'a bywa zablokowane
-             przez przeglądarkę, jeśli strona nadrzędna wyraźnie tego nie
-             odblokuje (atrybut allow="clipboard-write" na <iframe>). Zanim
-             sięgniemy po brzydki window.prompt jako ostateczność, próbujemy
-             starszej metody przez ukryte pole tekstowe, która zwykle działa
-             nawet bez tego atrybutu. */
           var legacyCopy = function() {
             try {
               var ta = document.createElement('textarea');
@@ -1213,12 +1258,12 @@ function initMapLazy() {
           };
           if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(link).then(done).catch(function() {
-              if (legacyCopy()) done(); else window.prompt('Skopiuj ten link:', link);
+              if (legacyCopy()) done(); else window.prompt('Copy link:', link);
             });
           } else if (legacyCopy()) {
             done();
           } else {
-            window.prompt('Skopiuj ten link:', link);
+            window.prompt('Copy link:', link);
           }
         });
         copyBtn.addEventListener('mouseenter', function() { this.style.background = '#eee'; });
@@ -1274,16 +1319,13 @@ function initMapLazy() {
       });
       var overlay = document.getElementById('pi-map-overlay');
       if (!overlay) return;
-      overlay.innerHTML = '<button type="button" class="pi-map-overlay-close" aria-label="Zamknij">&times;</button>' + buildLocationCardHtml(loc);
+      overlay.innerHTML = '<button type="button" class="pi-map-overlay-close" aria-label="Close">&times;</button>' + buildLocationCardHtml(loc);
       overlay.classList.add('visible');
       var closeBtn = overlay.querySelector('.pi-map-overlay-close');
       if (closeBtn) closeBtn.addEventListener('click', function(ev) { ev.stopPropagation(); overlay.classList.remove('visible'); });
       wireLocationCard(overlay, loc);
     };
     
-    /* Na mobile mapa jest niewidoczna pod panelem, więc podgląd rozwija
-       się bezpośrednio w liście, pod kliknięcistalnym elementem, zamiast
-       polegać na tym, co dzieje się na mapie w tle. */
     window.piToggleLogDetail = function(idx, rec) {
       var detail = document.getElementById('pi-log-detail-' + idx);
       if (!detail) return;
@@ -1373,12 +1415,6 @@ function initMapLazy() {
 
     mapInstance.on('moveend', function() { window.renderMarkers(currentVisibleLocs); });
 
-    /* Deep linking — jeśli adres tej mapy zawiera hash w formacie
-       #zoom/lat/lng/slug-ulicy (generowany przez przycisk "Copy link" w
-       popupie), po wczytaniu danych mapa sama przybliża się do tego
-       miejsca i otwiera właściwy popup. Dopasowanie po współrzędnych
-       (z niewielką tolerancją), nie po samym slugu, żeby drobne różnice
-       w zapisie nazwy ulicy nie psuły dopasowania. */
     function tryOpenFromHash() {
       var hash = window.location.hash.replace(/^#/, '');
       if (!hash) return;
@@ -1439,9 +1475,10 @@ document.addEventListener('DOMContentLoaded', function() {
   var searchInput = document.getElementById('pi-search-input');
   var clearBtn = document.getElementById('pi-search-clear');
   var searchTimeout = null;
+
   function resetAllFilters() {
-    searchInput.value = '';
-    clearBtn.style.display = 'none';
+    if (searchInput) searchInput.value = '';
+    if (clearBtn) clearBtn.style.display = 'none';
     var defRadio = document.querySelector('.suburb-check[value=""]');
     if (defRadio) defRadio.checked = true;
     searchState.suburb = '';
@@ -1456,13 +1493,9 @@ document.addEventListener('DOMContentLoaded', function() {
   if (searchInput && clearBtn) {
     clearBtn.addEventListener('click', resetAllFilters);
     searchInput.addEventListener('input', function() {
-      clearBtn.style.display = this.value ? 'block' : 'none';
-      clearTimeout(searchTimeout);
-      if (this.value.trim() === '') {
-        resetAllFilters();
-        return;
-      }
       var val = this.value.trim().toLowerCase();
+      clearBtn.style.display = (this.value.length > 0 || countActiveFilters() > 0) ? 'block' : 'none';
+      clearTimeout(searchTimeout);
       searchTimeout = setTimeout(function() {
         searchState.text = val;
         if (val && typeof clarity === 'function') {
@@ -1495,10 +1528,6 @@ document.addEventListener('DOMContentLoaded', function() {
     cb.addEventListener('change', function() {
       document.getElementById('pi-map-overlay').classList.remove('visible');
       searchState.suburb = this.value;
-      if (searchInput) {
-        searchInput.value = this.value;
-        if (clearBtn) clearBtn.style.display = this.value ? 'block' : 'none';
-      }
       applySearchState();
       if (this.value && typeof clarity === 'function') {
         clarity('set', 'suburb_filter', this.value);
