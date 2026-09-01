@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,11 +23,11 @@
     box-sizing: border-box; 
     margin: 0; 
     padding: 0;
-    border-radius: 0 !important;
-    box-shadow: none !important;
+    border-radius: 0 !important; /* Zero zaokrągleń */
+    box-shadow: none !important; /* Zero cieni */
     -webkit-tap-highlight-color: transparent;
     font-family: 'Inter', sans-serif !important;
-    font-feature-settings: "tnum";
+    font-feature-settings: "tnum"; /* Cyfry tabelaryczne */
   }
 
   :focus-visible { outline: 2px solid var(--text) !important; outline-offset: -2px; }
@@ -46,15 +47,9 @@
   .search-lead-icon { width: 14px; height: 14px; flex-shrink: 0; stroke: var(--text); }
   
   #geocoder { flex: 1; height: 100%; position: relative; }
-  #pi-search-wrap { position: relative; width: 100%; height: 100%; display: flex; align-items: center; gap: 6px; }
-  #pi-active-tags { display: flex; align-items: center; gap: 4px; flex-shrink: 0; overflow-x: auto; max-width: 45%; scrollbar-width: none; }
-  #pi-active-tags:empty { display: none; }
-  #pi-active-tags::-webkit-scrollbar { display: none; }
-  .pi-tag { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--text); padding: 3px 4px 3px 8px; font-size: 9px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; background: var(--bg); color: var(--text); flex-shrink: 0; }
-  .pi-tag button { border: none; background: transparent; cursor: pointer; font-size: 12px; line-height: 1; padding: 0 2px; color: var(--text); }
-  .pi-tag button:hover { opacity: 0.4; }
+  #pi-search-wrap { position: relative; width: 100%; height: 100%; display: flex; align-items: center; }
   #pi-search-input { 
-    flex: 1; min-width: 60px; height: 100%; border: none; background: transparent; 
+    width: 100%; height: 100%; border: none; background: transparent; 
     font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; 
     color: var(--text); outline: none; padding-right: 30px; box-sizing: border-box;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -63,6 +58,13 @@
   #pi-search-input::placeholder { color: var(--text); font-weight: 500; }
   #pi-search-clear { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); border: none; background: transparent; font-size: 20px; color: var(--text); cursor: pointer; display: none; line-height: 1; padding: 4px 8px; transition: opacity 0.1s; }
   #pi-search-clear:hover { opacity: 0.4; }
+
+  #pi-active-tags { display: flex; align-items: center; gap: 4px; flex-shrink: 0; overflow-x: auto; max-width: 55%; scrollbar-width: none; }
+  #pi-active-tags:empty { display: none; }
+  #pi-active-tags::-webkit-scrollbar { display: none; }
+  .pi-tag { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--text); padding: 3px 4px 3px 8px; font-size: 9px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; background: var(--bg); color: var(--text); flex-shrink: 0; }
+  .pi-tag button { border: none; background: transparent; cursor: pointer; font-size: 12px; line-height: 1; padding: 0 2px; color: var(--text); }
+  .pi-tag button:hover { opacity: 0.4; }
 
   .pi-suggest {
     position: absolute; top: 100%; left: -42px; right: 0;
@@ -78,46 +80,9 @@
   .pi-suggest-item:hover, .pi-suggest-item.active { background: var(--text); color: var(--bg); }
   .pi-suggest-mark { display: inline-block; width: 6px; height: 6px; background: currentColor; margin-right: 10px; vertical-align: middle; }
   .pi-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-
-  /* GÓRNY PASEK - UPDATE LOG + SEARCH */
-  #topbar-actions { display: flex; height: 100%; border-left: 1px solid var(--text); margin-right: -16px; }
-  #pi-drawer-tab-header {
-    height: 100%; padding: 0 16px; background: var(--bg); color: var(--text); border: none; border-right: 1px solid var(--text);
-    font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer;
-    display: flex; align-items: center; gap: 8px; transition: background 0.1s, color 0.1s;
-  }
-  #pi-drawer-tab-header:hover { background: var(--text); color: var(--bg); }
-  #pi-drawer-dot {
-    width: 6px; height: 6px; flex-shrink: 0;
-    background: #00FF00; border: 1px solid #00CC00;
-    animation: pi-dot-pulse 1.6s ease-in-out infinite;
-  }
-  #pi-drawer-dot.hidden { display: none; }
-  @keyframes pi-dot-pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(1.35); }
-  }
   
-  #search-archive-btn { height: 100%; padding: 0 16px; background: var(--bg); color: var(--text); font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; text-decoration: none; flex-shrink: 0; transition: background 0.1s, color 0.1s; }
+  #search-archive-btn { height: 100%; padding: 0 16px; margin-right:-16px; border-left: 1px solid var(--text); background: var(--bg); color: var(--text); font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; text-decoration: none; flex-shrink: 0; transition: background 0.1s, color 0.1s; }
   #search-archive-btn:hover { background: var(--text); color: var(--bg); }
-
-  /* PŁYWAJĄCY PRZEŁĄCZNIK WIDOKÓW (MAP/GRID) */
-  #pi-floating-toggle {
-    position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
-    display: flex; background: var(--bg); border: 1px solid var(--text);
-    z-index: 1000; height: 40px; box-shadow: 4px 4px 0px rgba(0,0,0,0.1) !important;
-  }
-  #pi-floating-toggle .view-toggle-btn {
-    height: 100%; padding: 0 24px; border: none; border-right: 1px solid var(--text);
-    background: transparent; color: var(--text); font-size: 11px; font-weight: 500;
-    letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-    transition: background 0.1s, color 0.1s;
-  }
-  #pi-floating-toggle .view-toggle-btn:last-child { border-right: none; }
-  #pi-floating-toggle .view-toggle-btn.active { background: var(--text); color: var(--bg); }
-  #pi-floating-toggle .view-toggle-btn:not(.active):hover { background: #EEEEEE; }
-  .mobile-only { display: none !important; }
 
   /* LAYOUT MATRIX */
   #layout { width: 100%; flex: 1 1 auto; min-height: 0; background: var(--bg); position: relative; display: flex; overflow: hidden; margin: 0; padding: 0; }
@@ -155,83 +120,8 @@
 
   /* MAP VIEWPORT */
   #map-wrap { flex: 1; position: relative; height: 100%; background: var(--bg); margin: 0; padding: 0; }
-
-  /* GRID VIEWPORT */
-  #grid-wrap { flex: 1; position: relative; height: 100%; background: var(--bg); margin: 0; padding: 12px; overflow-y: auto; }
-  #grid-count { font-size: 10px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; padding-bottom: 12px; }
-  #grid-status { font-size: 12px; color: var(--muted); padding: 24px 0; }
-  #grid-status.hidden { display: none; }
-  #grid-status.error { color: #C74B00; }
   
-  /* KLASYCZNE MASONRY (Bez przycinania, zachowane proporcje) — GAP jeden i
-     ten sam wszedzie: miedzy kolumnami, miedzy kartami w pionie, i na
-     krawedziach calego kontenera (padding #grid-wrap wyzej). Zmiana tej
-     jednej wartosci (12px, w trzech miejscach) zmienia odstep wszedzie
-     naraz, spojnie. */
-  #grid-masonry { 
-    column-count: 4; 
-    column-gap: 12px; 
-    width: 100%; 
-  }
-  @media (max-width: 1200px) { #grid-masonry { column-count: 3; } }
-  @media (max-width: 860px)  { #grid-masonry { column-count: 2; } }
-  @media (max-width: 500px)  { #grid-masonry { column-count: 1; } }
-
-  .grid-card { 
-    break-inside: avoid; 
-    margin-bottom: 12px; 
-    position: relative; 
-    display: block; 
-    overflow: hidden; 
-    background: #E4E4E0; 
-  }
-  .grid-card img { 
-    width: 100%; 
-    height: auto; 
-    display: block; 
-  }
-  .grid-card::after {
-    content: ""; position: absolute; inset: 0; background: rgba(0,0,0,0);
-    transition: background 0.18s ease; pointer-events: none; z-index: 1;
-  }
-  .grid-card:hover::after { background: rgba(0,0,0,0.15); }
-
-  .grid-caption {
-    position: absolute; left: 12px; bottom: 12px; right: 44px;
-    padding: 0 !important; background: transparent !important; 
-    box-shadow: none !important; border: none !important;
-    z-index: 2; opacity: 0; transform: translateY(4px);
-    transition: opacity 0.18s ease, transform 0.18s ease;
-    pointer-events: none;
-  }
-  .grid-card:hover .grid-caption { opacity: 1; transform: translateY(0); }
-
-  .grid-caption-title { 
-    font-size: 9px !important; font-weight: 500 !important; color: #FFFFFF !important; 
-    letter-spacing: 0.04em !important; text-transform: uppercase !important; 
-    line-height: 1.25 !important; margin: 0 !important; 
-    text-shadow: 0 1px 2px rgba(0,0,0,0.6) !important; 
-    background: transparent !important;
-  }
-  .grid-caption-meta { 
-    font-size: 9px !important; font-weight: 500 !important; color: #FFFFFF !important; 
-    opacity: 0.85 !important; margin-top: 2px !important; letter-spacing: 0.04em !important; 
-    text-transform: uppercase !important; text-shadow: 0 1px 2px rgba(0,0,0,0.6) !important; 
-    background: transparent !important;
-  }
-
-  .grid-card-actions {
-    position: absolute; top: 12px; right: 12px; display: flex; flex-direction: column; gap: 6px;
-    opacity: 0; transition: opacity 0.15s; z-index: 3;
-  }
-  .grid-card:hover .grid-card-actions { opacity: 1; }
-  .pi-fp-icon-btn {
-    width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
-    background: transparent !important; color: #FFFFFF !important; text-decoration: none; border: none !important;
-  }
-  .pi-fp-icon-btn svg { width: 22px; height: 22px; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6)); }
-
-  /* Wymuszony grayscale na mapie */
+  /* Wymuszony, absolutny grayscale na mapie, by zachować B&W interfejsu */
   #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s ease-in-out; }
   #map.loaded { opacity: 1; }
   #map .mapboxgl-canvas { filter: grayscale(100%); }
@@ -243,13 +133,16 @@
   #map-error.visible { display: flex; }
   #map-error-text { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text); max-width: 320px; line-height: 1.6; }
 
+  /* Rozwijany podgląd w samej liście, tylko na mobile — mapa jest tam
+     niewidoczna pod panelem, więc podgląd nie może polegać na tym, co
+     widać na mapie. */
   .pi-log-detail {
     display: none; padding: 12px 0; border-bottom: 1px solid var(--text);
     font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em;
   }
   .pi-log-detail.open { display: block; }
   
-  /* PINS */
+  /* PINS (Strict Contrast) */
   .custom-marker-hitbox {
     width: 24px; height: 32px;
     display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
@@ -265,7 +158,12 @@
   .pi-pin-cluster .pi-pin-point { border-left-width: 4px; border-right-width: 4px; border-top-width: 5px; }
 
   .pi-popup-title { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; padding-right: 20px; line-height: 1.3; margin-bottom: 8px; }
-
+  /* Nakładka wyśrodkowana względem samej ramki mapy (nie względem
+     pinezki na mapie) — ta sama karta, ten sam wygląd, niezależnie skąd
+     została otwarta. max-height + overflow to zabezpieczenie na wypadek
+     naprawdę ciasnych wysokości, gdzie nawet po zmniejszeniu zdjęcia
+     mogłoby nie starczyć miejsca — wtedy karta staje się przewijalna
+     zamiast wychodzić poza widoczny obszar. */
   .pi-map-overlay {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
     z-index: 50; background: var(--bg); border: 1px solid var(--text);
@@ -284,9 +182,38 @@
   @media (max-height: 550px) {
     .pi-popup-slider img[data-pi-slide] { height: 160px !important; }
   }
+  /* Przeglądarka domyślnie ustawia fokus na pierwszym klikalnym elemencie
+     wewnątrz popupu przy jego otwarciu (dostępność), co razem z globalnym
+     :focus-visible dawało grubą, podwójną ramkę tylko na lewej strzałce
+     slidera. Wyłączone punktowo tylko tutaj, reszta strony zachowuje
+     widoczny fokus. */
   .pi-popup-slider-prev:focus-visible, .pi-popup-slider-next:focus-visible { outline: none !important; }
 
-  /* DRAWER */
+  /* UPDATE DRAWER */
+  #pi-drawer-tab {
+    position: fixed; top: 50%; right: 0; transform: translateY(-50%);
+    width: 28px; height: 144px; background: var(--text); color: var(--bg);
+    border: 1px solid var(--text); border-right: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    z-index: 500; transition: background 0.1s, color 0.1s;
+  }
+  #pi-drawer-tab:hover { background: var(--bg); color: var(--text); }
+  #pi-drawer-tab-inner {
+    display: inline-flex; align-items: center; gap: 8px;
+    transform: rotate(-90deg); white-space: nowrap;
+    font-size: 9px; font-weight: 500; letter-spacing: 0.1em; font-family: inherit; text-transform: uppercase;
+  }
+  
+  #pi-drawer-dot {
+    width: 6px; height: 6px; flex-shrink: 0;
+    background: #00FF00; border: 1px solid #00CC00;
+    animation: pi-dot-pulse 1.6s ease-in-out infinite;
+  }
+  #pi-drawer-dot.hidden { display: none; }
+  @keyframes pi-dot-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.35); }
+  }
+  
   #pi-drawer-backdrop {
     position: fixed; inset: 0; z-index: 600; pointer-events: none;
   }
@@ -330,6 +257,7 @@
   .pi-drawer-cta:hover { background: var(--bg); color: var(--text); }
 
   /* MOBILE UX */
+  .mobile-bar { display: none; }
   @media (max-width: 720px) {
     #search-row { height: 48px; padding: 0 14px; }
     #search-archive-btn { font-size: 9px; padding: 0 12px; margin-right: -14px;}
@@ -344,17 +272,21 @@
     }
     #index-panel.mobile-active { transform: translateY(0); }
     
-    #map-wrap, #grid-wrap { height: calc(100dvh - 44px); }
-    
-    .mobile-only { display: flex !important; }
-    #pi-drawer-tab-header .label-txt { display: none; }
-    #pi-drawer-tab-header::before { content: "LOG"; }
-    
-    .count-badge {
-      display: inline-flex; align-items: center; justify-content: center;
-      min-width: 16px; height: 16px; padding: 0 4px; font-size: 9px; font-weight: 600;
-      background: var(--text); color: var(--bg);
+    .mobile-bar { display: flex; height: 48px; background: var(--text); color: var(--bg); border-top: 1px solid var(--text); }
+    .mobile-bar-btn {
+      flex: 1; background: transparent; border: none; color: var(--bg);
+      font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      border-right: 1px solid var(--bg); text-decoration: none; position: relative;
     }
+    .mobile-bar-btn:last-child { border-right: none; }
+    .mobile-bar-btn .count-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 14px; height: 14px; padding: 0 3px; font-size: 9px; font-weight: 500;
+      background: var(--bg); color: var(--text);
+    }
+    #map-wrap { height: calc(100dvh - 44px - 48px); }
+    #pi-drawer-tab { height: 120px; width: 32px; padding-left: 4px; }
   }
 </style>
   <script type="text/javascript">
@@ -377,17 +309,12 @@
         <div id="pi-suggest" class="pi-suggest"></div>
       </div>
     </div>
-    
-    <div id="topbar-actions">
-      <button id="pi-drawer-tab-header" type="button" aria-expanded="false" aria-controls="pi-drawer-panel">
-        <span class="label-txt">UPDATE LOG</span>
-        <span id="pi-drawer-dot" class="hidden"></span>
-      </button>
-      <a id="search-archive-btn" href="https://www.photoindex.au/" target="_top"><span id="search-archive-text">Search</span></a>
-    </div>
+    <a id="search-archive-btn" href="https://www.photoindex.au/" target="_top"><span id="search-archive-text">Search</span></a>
   </div>
 </div>
-
+<div class="mobile-bar">
+  <button type="button" class="mobile-bar-btn" id="mobile-toggle-filters">Filters<span class="count-badge" id="mobile-filter-count" style="display:none;"></span></button>
+</div>
 <div id="layout">
   <aside id="index-panel">
     <div class="mobile-grip"></div>
@@ -567,31 +494,21 @@
       </div>
     </div>
   </aside>
-  <main id="map-wrap" style="display:none;">
+  <main id="map-wrap">
     <div id="map"></div>
     <div id="map-error">
       <div id="map-error-text">Archive data could not be loaded right now. Please refresh, or open the full archive directly.</div>
     </div>
     <div id="pi-map-overlay" class="pi-map-overlay"></div>
   </main>
-  <main id="grid-wrap">
-    <div id="grid-count"></div>
-    <div id="grid-status">Loading archive…</div>
-    <div id="grid-masonry" class="pi-fp-masonry"></div>
-  </main>
-  
-  <!-- PŁYWAJĄCY PRZEŁĄCZNIK WIDOKÓW -->
-  <div id="pi-floating-toggle">
-    <button type="button" id="mobile-toggle-filters-float" class="view-toggle-btn mobile-only">
-      FILTERS
-      <span class="count-badge" id="mobile-filter-count-float" style="display:none;"></span>
-    </button>
-    <button type="button" id="view-map-btn" class="view-toggle-btn" aria-pressed="false">MAP VIEW</button>
-    <button type="button" id="view-grid-btn" class="view-toggle-btn active" aria-pressed="true">GRID VIEW</button>
-  </div>
-  
 </div>
 <div id="pi-drawer-backdrop"></div>
+<button id="pi-drawer-tab" type="button" aria-expanded="false" aria-controls="pi-drawer-panel">
+  <span id="pi-drawer-tab-inner">
+    UPDATE LOG
+    <span id="pi-drawer-dot" class="hidden"></span>
+  </span>
+</button>
 <aside id="pi-drawer-panel" role="dialog" aria-labelledby="pi-drawer-title" aria-hidden="true">
   <div class="pi-drawer-header">
     <span id="pi-drawer-index">LOADING…</span>
@@ -608,13 +525,17 @@
   </div>
 </aside>
 <script>
+// DATA_VERSION liczony z dzisiejszej daty, nie wpisany na sztywno — dzięki
+// temu każdy nowy dzień to naturalnie świeży parametr w URL-u do locations.csv,
+// zamiast ręcznego pilnowania, żeby ktoś podbijał tę wartość przy każdej
+// aktualizacji danych. Workflow aktualizuje dane raz dziennie, więc jeden
+// cache-bust dziennie idealnie pasuje do tego rytmu.
 var DATA_VERSION = (function() {
   var d = new Date();
   return d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
 })();
 var locations = [];
 var searchState = { text: '', suburb: '', categories: {} };
-var currentView = 'grid'; 
 var mapInstance = null;
 var mapInitiated = false;
 var autocompleteReady = false;
@@ -743,27 +664,11 @@ var SEARCHABLE_CATEGORIES = ['condition', 'typology', 'architecture', 'urban', '
 
 function quoteIfMultiword(v) { return /\s/.test(v) ? '"' + v + '"' : v; }
 
-// Natywna wyszukiwarka PhotoDecka szuka jednym plaskim zapytaniem tekstowym,
-// bez podzialu na kategorie. Jesli w jednej kategorii zaznaczysz dwie
-// wartosci naraz (u nas to znaczy "dowolna z nich"), PhotoDeck moze
-// potraktowac wszystkie slowa w zapytaniu jako wymagane naraz, wiec wyniki
-// moga wyjsc wezsze niz to, co widac w naszym gridzie. To ograniczenie
-// cudzego silnika wyszukiwania, nie cos co da sie tu naprawic — ale zgodnie
-// z prosba, kategorie wracaja do zapytania.
 function buildPhotoDeckQueryParts() {
   var parts = [];
   if (searchState.suburb) parts.push(quoteIfMultiword(searchState.suburb));
   SEARCHABLE_CATEGORIES.forEach(function(cat) {
-    var vals = searchState.categories[cat] || [];
-    // PhotoDeck traktuje kazde slowo w zapytaniu jako wymagane naraz (AND).
-    // U nas kilka zaznaczonych wartosci w jednej kategorii znaczy "dowolna
-    // z nich" (OR). Wyslanie ich wszystkich razem do PhotoDecka gwarantuje
-    // zero wynikow za kazdym razem, gdy kategoria jest wzajemnie
-    // wykluczajaca sie (np. Physical Condition), bo zadne pojedyncze
-    // zdjecie nie moze pasowac do dwoch wartosci naraz. Zamiast obiecywac
-    // wynik, ktorego PhotoDeck nigdy nie znajdzie, kategorie z wiecej niz
-    // jedna zaznaczona wartoscia po prostu pomijamy w tym zapytaniu.
-    if (vals.length === 1) parts.push(quoteIfMultiword(vals[0]));
+    (searchState.categories[cat] || []).forEach(function(val) { parts.push(quoteIfMultiword(val)); });
   });
   if (searchState.text) parts.push(searchState.text);
   return parts;
@@ -773,196 +678,26 @@ function updatePhotoDeckLink() {
   var queryStr = buildPhotoDeckQueryParts().join(' ');
   var btnDesktop = document.getElementById('search-archive-btn');
   var txtDesktop = document.getElementById('search-archive-text');
+  var btnMobile = document.getElementById('mobile-search-btn');
   var targetUrl = queryStr ? 'https://www.photoindex.au/?search=' + encodeURIComponent(queryStr) : 'https://www.photoindex.au/';
   var textValue = queryStr ? 'VIEW SELECTION' : 'SEARCH';
   if (btnDesktop) { btnDesktop.href = targetUrl; if (txtDesktop) txtDesktop.textContent = textValue; }
-}
-
-var photosData = [];
-var photosDataLoaded = false;
-
-function photoMatchesState(p, textLc, suburbLc, excludeCat) {
-  var matchesText = !textLc || (p.title || '').toLowerCase().indexOf(textLc) !== -1 ||
-    (p.suburb || '').toLowerCase().indexOf(textLc) !== -1 || (p.photoId || '').toLowerCase().indexOf(textLc) !== -1;
-  var matchesSuburb = !suburbLc || (p.suburb || '').toLowerCase() === suburbLc;
-  if (!matchesText || !matchesSuburb) return false;
-  for (var cat in searchState.categories) {
-    if (cat === excludeCat) continue;
-    var allowed = searchState.categories[cat];
-    if (!allowed || allowed.length === 0) continue;
-    if (cat === 'condition') {
-      var cond = (p.condition || '').toLowerCase();
-      var ok = allowed.some(function(v) { return v.toLowerCase() === cond; });
-      if (!ok) return false;
-      continue;
-    }
-    if (cat === 'year') continue; 
-    var values = p[cat] || [];
-    var found = allowed.some(function(v) { return values.indexOf(v) !== -1; });
-    if (!found) return false;
-  }
-  return true;
-}
-
-function renderGrid() {
-  var textLc = searchState.text;
-  var suburbLc = searchState.suburb ? searchState.suburb.toLowerCase() : '';
-
-  var anyFeatured = photosDataLoaded && photosData.some(function(p) { return p.isFeatured; });
-  var isSearching = textLc !== '' || countActiveFilters() > 0;
-
-  var countEl = document.getElementById('grid-count');
-  var statusEl = document.getElementById('grid-status');
-  var masonry = document.getElementById('grid-masonry');
-  if (!masonry) return;
-
-  if (!photosDataLoaded) {
-    if (statusEl) { statusEl.textContent = 'Loading archive…'; statusEl.classList.remove('hidden', 'error'); }
-    if (countEl) countEl.textContent = '';
-    masonry.innerHTML = '';
-    return;
-  }
-
-  var filtered = photosData.filter(function(p) { 
-    if (!isSearching && anyFeatured && !p.isFeatured) {
-      return false;
-    }
-    return photoMatchesState(p, textLc, suburbLc); 
-  });
-
-  if (countEl) countEl.textContent = filtered.length + (filtered.length === 1 ? ' result' : ' results');
-  if (statusEl) statusEl.classList.add('hidden');
-
-  masonry.innerHTML = '';
-  filtered.forEach(function(p) {
-    var card = document.createElement('div');
-    card.className = 'grid-card';
-
-    // Link owija tylko samo zdjecie, nie cala karte — przyciski akcji maja
-    // wlasne linki, a zagniezdzone <a> w <a> jest niepoprawnym HTML-em i
-    // przegladarka sama przycina/lamie strukture, przez co klikniecie
-    // czesto w ogole nie dzialalo.
-    var imgHtml = p.pageUrl
-      ? '<a href="' + p.pageUrl + '" target="_top" style="display:block;"><img src="' + p.thumb + '" loading="lazy" style="width: 100%; height: auto; display: block;" alt=""></a>'
-      : '<img src="' + p.thumb + '" loading="lazy" style="width: 100%; height: auto; display: block;" alt="">';
-
-    var actionsHtml = p.pageUrl
-      ? '<div class="grid-card-actions">' +
-          '<a class="pi-fp-icon-btn" href="' + p.pageUrl + '" target="_top" aria-label="View on PhotoIndex" title="View">' +
-            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>' +
-          '</a>' +
-          '<a class="pi-fp-icon-btn" href="' + p.pageUrl + '" target="_top" aria-label="Add to selection" title="Add to selection">' +
-            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 5v14M5 12h14"/></svg>' +
-          '</a>' +
-        '</div>'
-      : '';
-
-    card.innerHTML =
-      imgHtml +
-      actionsHtml +
-      '<div class="grid-caption">' +
-        '<div class="grid-caption-title">' + p.title + ', ' + p.date + '</div>' +
-        '<div class="grid-caption-meta">' + p.photoId + '</div>' +
-      '</div>';
-    masonry.appendChild(card);
-  });
-}
-
-function loadPhotosData() {
-  fetch('https://www.photoindex.au/api/photos.json')
-    .then(function(res) { if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); })
-    .then(function(data) {
-      if (data && data.error) {
-        var statusEl = document.getElementById('grid-status');
-        if (statusEl) { statusEl.textContent = 'Archive is still building. Try again shortly.'; statusEl.classList.add('error'); statusEl.classList.remove('hidden'); }
-        return;
-      }
-      photosData = data;
-      photosDataLoaded = true;
-      renderGrid();
-      annotateFilterCoverage(searchState.text, searchState.suburb ? searchState.suburb.toLowerCase() : '');
-    })
-    .catch(function() {
-      var statusEl = document.getElementById('grid-status');
-      if (statusEl) { statusEl.textContent = "Couldn't load the archive right now."; statusEl.classList.add('error'); statusEl.classList.remove('hidden'); }
-    });
-}
-
-// ==================== PRZELACZNIK WIDOKU ====================
-
-function showView(view) {
-  var mapWrap = document.getElementById('map-wrap');
-  var gridWrap = document.getElementById('grid-wrap');
-  var mapBtn = document.getElementById('view-map-btn');
-  var gridBtn = document.getElementById('view-grid-btn');
-  if (!mapWrap || !gridWrap) return;
-
-  currentView = view;
-  var showMap = view === 'map';
-  mapWrap.style.display = showMap ? '' : 'none';
-  gridWrap.style.display = showMap ? 'none' : '';
-  if (mapBtn) { mapBtn.classList.toggle('active', showMap); mapBtn.setAttribute('aria-pressed', String(showMap)); }
-  if (gridBtn) { gridBtn.classList.toggle('active', !showMap); gridBtn.setAttribute('aria-pressed', String(!showMap)); }
-
-  if (showMap) {
-    initMapLazy();
-  } else {
-    if (!photosDataLoaded) loadPhotosData();
-  }
-
-  annotateFilterCoverage(searchState.text, searchState.suburb ? searchState.suburb.toLowerCase() : '');
-}
-
-function resetSuburbOnly() {
-  searchState.suburb = '';
-  var defRadio = document.querySelector('.suburb-check[value=""]');
-  if (defRadio) defRadio.checked = true;
-  var overlay = document.getElementById('pi-map-overlay');
-  if (overlay) overlay.classList.remove('visible');
-  applySearchState();
-}
-
-function removeCategoryValue(cat, val) {
-  if (!searchState.categories[cat]) return;
-  searchState.categories[cat] = searchState.categories[cat].filter(function(v) { return v !== val; });
-  if (searchState.categories[cat].length === 0) delete searchState.categories[cat];
-  var cb = document.querySelector('.filter-check[data-cat="' + cat + '"][value="' + val + '"]');
-  if (cb) cb.checked = false;
-  applySearchState();
+  if (btnMobile) { btnMobile.href = targetUrl; btnMobile.textContent = textValue; }
 }
 
 function renderActiveTags() {
   var container = document.getElementById('pi-active-tags');
-  var clearBtn = document.getElementById('pi-search-clear');
-  if (!container) return;
-  container.innerHTML = '';
-  var entries = [];
-  if (searchState.suburb) {
-    entries.push({ label: searchState.suburb, remove: resetSuburbOnly });
-  }
-  SEARCHABLE_CATEGORIES.forEach(function(cat) {
-    (searchState.categories[cat] || []).forEach(function(val) {
-      entries.push({ label: val, remove: function() { removeCategoryValue(cat, val); } });
-    });
-  });
-  entries.forEach(function(entry) {
-    var tag = document.createElement('span');
-    tag.className = 'pi-tag';
-    var span = document.createElement('span');
-    span.textContent = entry.label.toUpperCase();
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.setAttribute('aria-label', 'Remove filter: ' + entry.label);
-    btn.textContent = '\u00d7';
-    btn.addEventListener('click', function(ev) { ev.stopPropagation(); entry.remove(); });
-    tag.appendChild(span);
-    tag.appendChild(btn);
-    container.appendChild(tag);
-  });
+  if (container) container.innerHTML = '';
   var searchInput = document.getElementById('pi-search-input');
-  if (clearBtn) {
-    clearBtn.style.display = (entries.length > 0 || (searchInput && searchInput.value)) ? 'block' : 'none';
-  }
+  var clearBtn = document.getElementById('pi-search-clear');
+  if (!searchInput) return;
+  var labels = [];
+  if (searchState.suburb) labels.push(searchState.suburb);
+  SEARCHABLE_CATEGORIES.forEach(function(cat) {
+    (searchState.categories[cat] || []).forEach(function(val) { labels.push(val); });
+  });
+  searchInput.value = labels.join(', ');
+  if (clearBtn) clearBtn.style.display = searchInput.value ? 'block' : 'none';
 }
 
 function countActiveFilters() {
@@ -998,17 +733,14 @@ function applySearchState() {
   });
   if (window.renderMarkers) window.renderMarkers(visibleLocs);
   updatePhotoDeckLink();
-  renderGrid();
   renderActiveTags();
   annotateFilterCoverage(textLc, suburbLc);
-  
-  var floatBadge = document.getElementById('mobile-filter-count-float');
-  var n = countActiveFilters();
-  if (floatBadge) {
-    floatBadge.textContent = n;
-    floatBadge.style.display = n > 0 ? 'inline-flex' : 'none';
+  var badge = document.getElementById('mobile-filter-count');
+  if (badge) {
+    var n = countActiveFilters();
+    badge.textContent = n;
+    badge.style.display = n > 0 ? 'inline-flex' : 'none';
   }
-  
   saveMapState({ suburb: searchState.suburb, categories: searchState.categories });
   broadcastFilterState({ suburb: searchState.suburb, categories: searchState.categories });
 }
@@ -1016,70 +748,19 @@ function applySearchState() {
 function annotateFilterCoverage(textLc, suburbLc) {
   textLc = textLc || '';
   suburbLc = suburbLc || '';
-  var useGrid = currentView === 'grid' && photosDataLoaded;
   var contextCache = {};
   document.querySelectorAll('.filter-check').forEach(function(cb) {
     var cat = cb.getAttribute('data-cat');
     var val = cb.value;
-    var count;
-    if (useGrid) {
-      if (!contextCache[cat]) {
-        contextCache[cat] = photosData.filter(function(p) {
-          return photoMatchesState(p, textLc, suburbLc, cat);
-        });
-      }
-      if (cat === 'condition') {
-        var valLc = val.toLowerCase();
-        count = contextCache[cat].filter(function(p) { return (p.condition || '').toLowerCase() === valLc; }).length;
-      } else if (cat === 'year') {
-        count = 0; 
-      } else {
-        count = contextCache[cat].filter(function(p) { return (p[cat] || []).indexOf(val) !== -1; }).length;
-      }
-    } else {
-      var key = CAT_ARRAY_KEYS[cat];
-      if (!contextCache[cat]) {
-        contextCache[cat] = locations.filter(function(loc) {
-          return locationMatchesState(loc, textLc, suburbLc, cat);
-        });
-      }
-      count = contextCache[cat].filter(function(loc) {
-        return (loc[key] || []).indexOf(val) !== -1;
-      }).length;
+    var key = CAT_ARRAY_KEYS[cat];
+    if (!contextCache[cat]) {
+      contextCache[cat] = locations.filter(function(loc) {
+        return locationMatchesState(loc, textLc, suburbLc, cat);
+      });
     }
-    var label = cb.closest('label');
-    if (!label) return;
-    var existing = label.querySelector('.filter-count');
-    if (existing) existing.remove();
-    var countSpan = document.createElement('span');
-    countSpan.className = 'filter-count';
-    countSpan.textContent = count;
-    label.appendChild(countSpan);
-    if (count === 0 && !cb.checked) { cb.disabled = true; label.classList.add('no-data'); }
-    else { cb.disabled = false; label.classList.remove('no-data'); }
-  });
-
-  // Te same liczniki i wygaszanie "brak danych" dla dzielnic w sekcji
-  // Location — licza ile wynikow byloby, gdyby wybrac dana dzielnice,
-  // razem z pozostalymi aktywnymi filtrami, ale ignorujac aktualnie
-  // wybrana dzielnice (inaczej dzielnica juz zaznaczona zawsze liczylaby
-  // sama siebie, a pozostale zawsze pokazywalyby zero).
-  document.querySelectorAll('.suburb-check').forEach(function(cb) {
-    var val = cb.value;
-    if (!val) return; // "All Locations" zawsze dostepne
-    var valLc = val.toLowerCase();
-    var count;
-    if (useGrid) {
-      count = photosData.filter(function(p) {
-        if ((p.suburb || '').toLowerCase() !== valLc) return false;
-        return photoMatchesState(p, textLc, '', null);
-      }).length;
-    } else {
-      count = locations.filter(function(loc) {
-        if (loc.suburbLc !== valLc) return false;
-        return locationMatchesState(loc, textLc, '', null);
-      }).length;
-    }
+    var count = contextCache[cat].filter(function(loc) {
+      return (loc[key] || []).indexOf(val) !== -1;
+    }).length;
     var label = cb.closest('label');
     if (!label) return;
     var existing = label.querySelector('.filter-count');
@@ -1102,6 +783,10 @@ function restoreSavedFilters() {
     searchState.suburb = saved.suburb;
     var radio = document.querySelector('.suburb-check[value="' + saved.suburb + '"]');
     if (radio) radio.checked = true;
+    var searchInput = document.getElementById('pi-search-input');
+    var clearBtn = document.getElementById('pi-search-clear');
+    if (searchInput) { searchInput.value = saved.suburb; }
+    if (clearBtn) { clearBtn.style.display = saved.suburb ? 'block' : 'none'; }
   }
   if (saved.categories && Object.keys(saved.categories).some(function(cat) { return (saved.categories[cat] || []).length > 0; })) {
     hasFilters = true;
@@ -1125,6 +810,10 @@ function restoreSavedFilters() {
 
 function loadInitialData() {
   Promise.all([
+    // Prawdziwe, jedyne repo z danymi to "bne-urban" — poprzednia nazwa
+    // działała tylko dzięki tymczasowemu przekierowaniu GitHuba, na
+    // którym nie warto polegać na stałe (może przestać działać w
+    // dowolnym momencie).
     fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban/main/locations.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }),
     fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban/main/medias.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }).catch(function() { return ''; })
   ])
@@ -1206,15 +895,25 @@ function loadInitialData() {
                  '</a>' +
                  '<div class="pi-log-detail" id="pi-log-detail-' + idx + '"></div>';
         }).join('');
-        
         logContainer.querySelectorAll('.pi-log-link').forEach(function(link) {
           var idx = parseInt(link.getAttribute('data-idx'), 10);
           var rec = latestRecords[idx];
-          
           link.addEventListener('click', function(ev) {
             ev.preventDefault();
-            window.piToggleLogDetail(idx, rec);
+            if (window.innerWidth <= 720) {
+              window.piToggleLogDetail(idx, rec);
+            } else if (mapInstance) {
+              mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2 });
+              window.piOpenPopupForLocation(rec);
+            }
           });
+          if (window.innerWidth > 720) {
+            link.addEventListener('mouseenter', function() {
+              if (!mapInstance) return;
+              mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2 });
+              window.piOpenPopupForLocation(rec);
+            });
+          }
         });
       }
       var dot = document.getElementById('pi-drawer-dot');
@@ -1391,7 +1090,7 @@ function initMapLazy() {
             { type: 'Feature', properties: { name: 'Riparian Plaza' }, geometry: { type: 'Point', coordinates: [153.0303029, -27.4682608] } },
             { type: 'Feature', properties: { name: 'One One One Eagle Street' }, geometry: { type: 'Point', coordinates: [153.0301996, -27.4676829] } },
             { type: 'Feature', properties: { name: "Queen's Wharf" }, geometry: { type: 'Point', coordinates: [153.0245387, -27.4741509] } },
-            { type: 'Feature', properties: { name: '480 Queen Street' }, geometry: { type: 'Point', coordinates: [153.0224282, -27.4701207] } },
+            { type: 'Feature', properties: { name: '480 Queen Street' }, geometry: { type: 'Point', coordinates: [153.0308165, -27.4640791] } },
             { type: 'Feature', properties: { name: 'Brisbane Quarter' }, geometry: { type: 'Point', coordinates: [153.0224282, -27.4701207] } },
             { type: 'Feature', properties: { name: 'Story Bridge' }, geometry: { type: 'Point', coordinates: [153.0358644, -27.4636326] } },
             { type: 'Feature', properties: { name: 'Victoria Park / Barrambin' }, geometry: { type: 'Point', coordinates: [153.0212178, -27.4529175] } }
@@ -1429,6 +1128,10 @@ function initMapLazy() {
     var LINK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>';
     var CHECK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
 
+    /* Budowanie karty lokalizacji (tytuł, slider, wiersze danych, przyciski)
+       wydzielone do wspólnej funkcji — dokładnie ta sama karta trafia do
+       popupu na mapie po kliknięciu pinezki i do rozwijanego panelu na
+       mobile, żeby nie utrzymywać dwóch wersji tej samej rzeczy. */
     function buildLocationCardHtml(loc) {
       var datesList = loc.dates ? loc.dates.split(';').map(function(d) { return d.trim(); }).filter(Boolean) : [];
       var datesDesc = datesList.slice().reverse();
@@ -1463,6 +1166,9 @@ function initMapLazy() {
       return '<div style="min-width:280px;position:relative;"><div class="pi-popup-title" style="margin-bottom:10px;font-size:12px;">' + loc.street + '</div>' + sliderHtml + '<div style="border-top:1px solid var(--text);padding:8px 0;margin-bottom:12px;">' + rowsHtml + '</div><div style="display:flex;border:1px solid var(--text);"><a href="' + loc.archiveUrl + '" target="_top" style="flex:1;text-align:center;background:var(--text);color:var(--bg);padding:10px;font-size:10px;font-weight: 500;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;transition:background 0.1s, color 0.1s;">OPEN RECORD</a><button type="button" class="pi-popup-copy-link" aria-label="Copy link" style="flex-shrink:0;width:44px;background:var(--bg);color:var(--text);border:none;border-left:1px solid var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.1s;">' + LINK_ICON + '</button></div></div>';
     }
 
+    /* Podpina interaktywność (slider, kopiowanie linku, hover) do karty
+       osadzonej w dowolnym kontenerze — popup na mapie i panel na mobile
+       współdzielą tę samą logikę, różni je tylko to, gdzie karta wylądowała. */
     function wireLocationCard(root, loc) {
       if (!root) return;
       var thumbs = loc.thumbs || [];
@@ -1483,6 +1189,12 @@ function initMapLazy() {
             copyBtn.innerHTML = CHECK_ICON;
             setTimeout(function() { copyBtn.innerHTML = LINK_ICON; }, 1500);
           };
+          /* Kopiowanie do schowka wewnątrz obcego iframe'a bywa zablokowane
+             przez przeglądarkę, jeśli strona nadrzędna wyraźnie tego nie
+             odblokuje (atrybut allow="clipboard-write" na <iframe>). Zanim
+             sięgniemy po brzydki window.prompt jako ostateczność, próbujemy
+             starszej metody przez ukryte pole tekstowe, która zwykle działa
+             nawet bez tego atrybutu. */
           var legacyCopy = function() {
             try {
               var ta = document.createElement('textarea');
@@ -1569,6 +1281,9 @@ function initMapLazy() {
       wireLocationCard(overlay, loc);
     };
     
+    /* Na mobile mapa jest niewidoczna pod panelem, więc podgląd rozwija
+       się bezpośrednio w liście, pod kliknięcistalnym elementem, zamiast
+       polegać na tym, co dzieje się na mapie w tle. */
     window.piToggleLogDetail = function(idx, rec) {
       var detail = document.getElementById('pi-log-detail-' + idx);
       if (!detail) return;
@@ -1658,6 +1373,12 @@ function initMapLazy() {
 
     mapInstance.on('moveend', function() { window.renderMarkers(currentVisibleLocs); });
 
+    /* Deep linking — jeśli adres tej mapy zawiera hash w formacie
+       #zoom/lat/lng/slug-ulicy (generowany przez przycisk "Copy link" w
+       popupie), po wczytaniu danych mapa sama przybliża się do tego
+       miejsca i otwiera właściwy popup. Dopasowanie po współrzędnych
+       (z niewielką tolerancją), nie po samym slugu, żeby drobne różnice
+       w zapisie nazwy ulicy nie psuły dopasowania. */
     function tryOpenFromHash() {
       var hash = window.location.hash.replace(/^#/, '');
       if (!hash) return;
@@ -1697,15 +1418,21 @@ function initMapLazy() {
 }
 
 loadInitialData();
-loadPhotosData();
 
 var existingSavedState = loadMapState();
 if (existingSavedState && typeof existingSavedState.lng === 'number') {
-  // Uzytkownik byl juz wczesniej na mapie — cichy preload w tle, zeby
-  // przelaczenie na MAP VIEW bylo natychmiastowe. W przeciwnym razie mapa
-  // laduje sie dopiero na klikniecie przycisku, bo Grid jest teraz widokiem
-  // domyslnym i nie ma sensu wczytywac Mapboxa zanim ktos o to poprosi.
   initMapLazy();
+} else {
+  ['mousemove', 'scroll', 'touchstart', 'keydown', 'click'].forEach(function(evt) {
+    window.addEventListener(evt, initMapLazy, { once: true, passive: true });
+  });
+  window.addEventListener('load', function() {
+    if (window.requestIdleCallback) {
+      requestIdleCallback(function() { setTimeout(initMapLazy, 2500); });
+    } else {
+      setTimeout(initMapLazy, 3000);
+    }
+  });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -1714,6 +1441,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var searchTimeout = null;
   function resetAllFilters() {
     searchInput.value = '';
+    clearBtn.style.display = 'none';
     var defRadio = document.querySelector('.suburb-check[value=""]');
     if (defRadio) defRadio.checked = true;
     searchState.suburb = '';
@@ -1728,6 +1456,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (searchInput && clearBtn) {
     clearBtn.addEventListener('click', resetAllFilters);
     searchInput.addEventListener('input', function() {
+      clearBtn.style.display = this.value ? 'block' : 'none';
       clearTimeout(searchTimeout);
       if (this.value.trim() === '') {
         resetAllFilters();
@@ -1758,16 +1487,18 @@ document.addEventListener('DOMContentLoaded', function() {
         this.checked = false;
         var defRadio = document.querySelector('.suburb-check[value=""]');
         if (defRadio) defRadio.checked = true;
-        var overlay = document.getElementById('pi-map-overlay');
-        if (overlay) overlay.classList.remove('visible');
+        document.getElementById('pi-map-overlay').classList.remove('visible');
         searchState.suburb = '';
         applySearchState();
       }
     });
     cb.addEventListener('change', function() {
-      var overlay = document.getElementById('pi-map-overlay');
-      if (overlay) overlay.classList.remove('visible');
+      document.getElementById('pi-map-overlay').classList.remove('visible');
       searchState.suburb = this.value;
+      if (searchInput) {
+        searchInput.value = this.value;
+        if (clearBtn) clearBtn.style.display = this.value ? 'block' : 'none';
+      }
       applySearchState();
       if (this.value && typeof clarity === 'function') {
         clarity('set', 'suburb_filter', this.value);
@@ -1801,7 +1532,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  var mobileToggleBtn = document.getElementById('mobile-toggle-filters-float');
+  var mobileToggleBtn = document.getElementById('mobile-toggle-filters');
   var indexPanel = document.getElementById('index-panel');
   var mobileCloseBtn = document.getElementById('mobile-panel-close');
   if (mobileToggleBtn && indexPanel) {
@@ -1837,7 +1568,7 @@ document.addEventListener('DOMContentLoaded', function() {
     indexPanel.addEventListener('touchend', function() { touchStartY = null; }, { passive: true });
   }
 
-  var tab = document.getElementById('pi-drawer-tab-header');
+  var tab = document.getElementById('pi-drawer-tab');
   var panel = document.getElementById('pi-drawer-panel');
   var closeBtn = document.getElementById('pi-drawer-close');
   var closeBtnAlt = document.getElementById('pi-drawer-close-btn');
@@ -1857,19 +1588,12 @@ document.addEventListener('DOMContentLoaded', function() {
     tab.setAttribute('aria-expanded', 'false');
   }
 
-  if (tab) {
-    tab.addEventListener('click', function() {
-      panel.classList.contains('open') ? closeDrawer() : openDrawer();
-    });
-  }
+  tab.addEventListener('click', function() {
+    panel.classList.contains('open') ? closeDrawer() : openDrawer();
+  });
   closeBtn.addEventListener('click', closeDrawer);
   if (closeBtnAlt) closeBtnAlt.addEventListener('click', closeDrawer);
   backdrop.addEventListener('click', closeDrawer);
-
-  var mapBtn = document.getElementById('view-map-btn');
-  var gridBtn = document.getElementById('view-grid-btn');
-  if (mapBtn) mapBtn.addEventListener('click', function() { showView('map'); });
-  if (gridBtn) gridBtn.addEventListener('click', function() { showView('grid'); });
 });
 </script>
 </body>
