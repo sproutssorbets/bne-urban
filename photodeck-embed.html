@@ -80,8 +80,9 @@
   .pi-suggest-mark { display: inline-block; width: 6px; height: 6px; background: currentColor; margin-right: 10px; vertical-align: middle; }
   .pi-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
   
-  #search-archive-btn { height: 100%; padding: 0 16px; margin-right:-16px; border-left: 1px solid var(--text); background: var(--bg); color: var(--text); font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; text-decoration: none; flex-shrink: 0; transition: background 0.1s, color 0.1s; }
-  #search-archive-btn:hover { background: var(--text); color: var(--bg); }
+  #search-archive-btn, #grid-link-btn { height: 100%; padding: 0 16px; border-left: 1px solid var(--text); background: var(--bg); color: var(--text); font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; text-decoration: none; flex-shrink: 0; transition: background 0.1s, color 0.1s; }
+  #search-archive-btn { margin-right:-16px; }
+  #search-archive-btn:hover, #grid-link-btn:hover { background: var(--text); color: var(--bg); }
 
   /* LAYOUT MATRIX */
   #layout { width: 100%; flex: 1 1 auto; min-height: 0; background: var(--bg); position: relative; display: flex; overflow: hidden; margin: 0; padding: 0; }
@@ -260,6 +261,7 @@
   @media (max-width: 720px) {
     #search-row { height: 48px; padding: 0 14px; }
     #search-archive-btn { font-size: 9px; padding: 0 12px; margin-right: -14px;}
+    #grid-link-btn { display: none; }
     
     .mobile-only-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--text); background: var(--bg); }
     .mobile-grip { display: block; width: 40px; height: 2px; background: var(--text); margin: 12px auto 0; }
@@ -308,6 +310,7 @@
         <div id="pi-suggest" class="pi-suggest"></div>
       </div>
     </div>
+    <a id="grid-link-btn" href="https://www.photoindex.au/index" target="_top">GRID</a>
     <a id="search-archive-btn" href="https://www.photoindex.au/" target="_top"><span id="search-archive-text">Search</span></a>
   </div>
 </div>
@@ -684,19 +687,79 @@ function updatePhotoDeckLink() {
   if (btnMobile) { btnMobile.href = targetUrl; btnMobile.textContent = textValue; }
 }
 
+// Kategorie, ktore faktycznie znaczy to samo po obu stronach (mapa i panel
+// siatki uzywaja tych samych, malych liter dla typology/architecture/urban).
+// "condition" swiadomie pominiete — mapa uzywa etykiet w Title Case
+// ("Existing Condition"), panel wykrywa surowe, male litery ze slow
+// kluczowych zdjec ("existing condition"), to dwa rozne slowniki.
+var GRID_SHARED_CATEGORIES = ['typology', 'architecture', 'urban'];
+
+function updateGridLink() {
+  var btn = document.getElementById('grid-link-btn');
+  if (!btn) return;
+  var categories = {};
+  GRID_SHARED_CATEGORIES.forEach(function(cat) {
+    var vals = searchState.categories[cat];
+    if (vals && vals.length) categories[cat] = vals;
+  });
+  var qs = encodeURIComponent(JSON.stringify({ suburb: searchState.suburb || '', categories: categories }));
+  btn.href = 'https://www.photoindex.au/index?state=' + qs;
+}
+
+function resetSuburbOnly() {
+  searchState.suburb = '';
+  var defRadio = document.querySelector('.suburb-check[value=""]');
+  if (defRadio) defRadio.checked = true;
+  var overlay = document.getElementById('pi-map-overlay');
+  if (overlay) overlay.classList.remove('visible');
+  applySearchState();
+}
+
+function removeCategoryValue(cat, val) {
+  if (!searchState.categories[cat]) return;
+  searchState.categories[cat] = searchState.categories[cat].filter(function(v) { return v !== val; });
+  if (searchState.categories[cat].length === 0) delete searchState.categories[cat];
+  var cb = document.querySelector('.filter-check[data-cat="' + cat + '"][value="' + val + '"]');
+  if (cb) cb.checked = false;
+  applySearchState();
+}
+
+// Aktywne filtry pokazuja sie jako osobne, usuwalne etykiety obok pola
+// wyszukiwania — pole tekstowe sluzy wylacznie do wpisywania adresu albo
+// slowa kluczowego i nie jest juz nigdy nadpisywane przez wybor filtra,
+// dzieki czemu mozna wpisac adres i zaznaczyc filtr jednoczesnie.
 function renderActiveTags() {
   var container = document.getElementById('pi-active-tags');
-  if (container) container.innerHTML = '';
-  var searchInput = document.getElementById('pi-search-input');
   var clearBtn = document.getElementById('pi-search-clear');
-  if (!searchInput) return;
-  var labels = [];
-  if (searchState.suburb) labels.push(searchState.suburb);
+  if (!container) return;
+  container.innerHTML = '';
+  var entries = [];
+  if (searchState.suburb) {
+    entries.push({ label: searchState.suburb, remove: resetSuburbOnly });
+  }
   SEARCHABLE_CATEGORIES.forEach(function(cat) {
-    (searchState.categories[cat] || []).forEach(function(val) { labels.push(val); });
+    (searchState.categories[cat] || []).forEach(function(val) {
+      entries.push({ label: val, remove: function() { removeCategoryValue(cat, val); } });
+    });
   });
-  searchInput.value = labels.join(', ');
-  if (clearBtn) clearBtn.style.display = searchInput.value ? 'block' : 'none';
+  entries.forEach(function(entry) {
+    var tag = document.createElement('span');
+    tag.className = 'pi-tag';
+    var span = document.createElement('span');
+    span.textContent = entry.label.toUpperCase();
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.setAttribute('aria-label', 'Remove filter: ' + entry.label);
+    btn.textContent = '\u00d7';
+    btn.addEventListener('click', function(ev) { ev.stopPropagation(); entry.remove(); });
+    tag.appendChild(span);
+    tag.appendChild(btn);
+    container.appendChild(tag);
+  });
+  var searchInput = document.getElementById('pi-search-input');
+  if (clearBtn) {
+    clearBtn.style.display = (entries.length > 0 || (searchInput && searchInput.value)) ? 'block' : 'none';
+  }
 }
 
 function countActiveFilters() {
@@ -732,6 +795,7 @@ function applySearchState() {
   });
   if (window.renderMarkers) window.renderMarkers(visibleLocs);
   updatePhotoDeckLink();
+  updateGridLink();
   renderActiveTags();
   annotateFilterCoverage(textLc, suburbLc);
   var badge = document.getElementById('mobile-filter-count');
@@ -782,10 +846,6 @@ function restoreSavedFilters() {
     searchState.suburb = saved.suburb;
     var radio = document.querySelector('.suburb-check[value="' + saved.suburb + '"]');
     if (radio) radio.checked = true;
-    var searchInput = document.getElementById('pi-search-input');
-    var clearBtn = document.getElementById('pi-search-clear');
-    if (searchInput) { searchInput.value = saved.suburb; }
-    if (clearBtn) { clearBtn.style.display = saved.suburb ? 'block' : 'none'; }
   }
   if (saved.categories && Object.keys(saved.categories).some(function(cat) { return (saved.categories[cat] || []).length > 0; })) {
     hasFilters = true;
@@ -1440,7 +1500,6 @@ document.addEventListener('DOMContentLoaded', function() {
   var searchTimeout = null;
   function resetAllFilters() {
     searchInput.value = '';
-    clearBtn.style.display = 'none';
     var defRadio = document.querySelector('.suburb-check[value=""]');
     if (defRadio) defRadio.checked = true;
     searchState.suburb = '';
@@ -1455,7 +1514,6 @@ document.addEventListener('DOMContentLoaded', function() {
   if (searchInput && clearBtn) {
     clearBtn.addEventListener('click', resetAllFilters);
     searchInput.addEventListener('input', function() {
-      clearBtn.style.display = this.value ? 'block' : 'none';
       clearTimeout(searchTimeout);
       if (this.value.trim() === '') {
         resetAllFilters();
@@ -1494,10 +1552,6 @@ document.addEventListener('DOMContentLoaded', function() {
     cb.addEventListener('change', function() {
       document.getElementById('pi-map-overlay').classList.remove('visible');
       searchState.suburb = this.value;
-      if (searchInput) {
-        searchInput.value = this.value;
-        if (clearBtn) clearBtn.style.display = this.value ? 'block' : 'none';
-      }
       applySearchState();
       if (this.value && typeof clarity === 'function') {
         clarity('set', 'suburb_filter', this.value);
