@@ -162,14 +162,14 @@
   .pi-map-overlay {
     position: relative; width: 638px; flex-shrink: 0; height: 100%;
     background: var(--bg); border-left: 1px solid var(--text);
-    display: none; flex-direction: column; overflow-y: auto; z-index: 800; /* Większe niż drawer (700) */
+    display: none; flex-direction: column; overflow: hidden; z-index: 800; /* Większe niż drawer (700) */
   }
   .pi-map-overlay.visible { display: flex; }
 
   /* ARCHITEKTURA WNĘTRZA PANELA SZCZEGÓŁÓW */
   .pi-record-meta-top {
     display: flex; justify-content: space-between; align-items: baseline;
-    border-bottom: 1px solid #000000; padding-bottom: 8px; margin-bottom: 16px;
+    padding-bottom: 8px; margin-bottom: 16px;
     font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
   }
   .pi-record-meta-top .pi-ref-label { color: #000000; font-weight: 600; }
@@ -182,26 +182,17 @@
     font-size: 12px; line-height: 1.6; color: #444444; margin-bottom: 24px;
   }
   
-  /* GŁÓWNE PRZYCISKI AKCJI W PANELU */
-  .pi-cta-block { margin-bottom: 28px; display: flex; flex-direction: column; gap: 8px; }
-  
-  .pi-btn-action {
-    height: 44px; background: #000000; color: #FFFFFF; border: 1px solid #000000;
-    font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
-    text-decoration: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
-    text-align: center; transition: background 0.15s ease, color 0.15s ease;
-  }
-  .pi-btn-action:hover { background: #333333; }
-
-  /* PRZYCISK ŁĄCZONY: OPEN RECORD + COPY LINK (ikona) */
+  /* GŁÓWNE PRZYCISKI AKCJI W PANELU — jeden rząd: ADD TO SELECTION + OPEN RECORD + COPY LINK */
+  .pi-cta-block { margin-bottom: 28px; }
   .pi-cta-combined { display: flex; border: 1px solid #000000; }
-  .pi-btn-open {
+  .pi-btn-add, .pi-btn-open {
     flex: 1; height: 44px; background: #000000; color: #FFFFFF; border: none;
-    font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
+    font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
     text-decoration: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
-    text-align: center; transition: background 0.15s ease;
+    text-align: center; transition: background 0.15s ease; white-space: nowrap;
   }
-  .pi-btn-open:hover { background: #333333; }
+  .pi-btn-add:hover, .pi-btn-open:hover { background: #333333; }
+  .pi-btn-open { border-left: 1px solid #FFFFFF; }
   .pi-btn-copy-icon {
     width: 44px; height: 44px; flex-shrink: 0; background: #FFFFFF; border: none;
     border-left: 1px solid #000000; color: #000000; cursor: pointer;
@@ -221,6 +212,10 @@
   .pi-spec-acc-icon { font-size: 14px; font-weight: 400; line-height: 1; }
   .pi-spec-acc-body { display: none; padding: 14px 0 20px 0; border-bottom: 1px solid #000000; font-size: 11px; }
   .pi-spec-acc-body.open { display: block; }
+  .pi-map-overlay-close-btn { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border: 1px solid #000000; background: #FFFFFF; cursor: pointer; font-size: 16px; color: #000000; display: flex; align-items: center; justify-content: center; z-index: 5; transition: background 0.1s, color 0.1s; }
+  .pi-map-overlay-close-btn:hover { background: #000000; color: #FFFFFF; }
+  .pi-overlay-slider-wrap { flex-shrink: 0; height: 45vh; background: #FAFAFA; border-bottom: 1px solid #000000; overflow: hidden; }
+  .pi-overlay-body-wrap { flex: 1; overflow-y: auto; }
 
   /* GRID DANYCH */
   .pi-data-grid { display: flex; flex-direction: column; gap: 9px; }
@@ -257,7 +252,7 @@
   #pi-drawer-backdrop.active { pointer-events: auto; }
   
   #pi-drawer-panel {
-    position: fixed; top: 0; right: 0; height: 100%; height: 100dvh; width: 360px; max-width: calc(100vw - 40px);
+    position: fixed; top: 0; right: 0; height: 100%; height: 100dvh; width: 638px; max-width: calc(100vw - 40px);
     background: var(--bg); border-left: 1px solid var(--text); transform: translateX(100%);
     transition: transform 0.25s cubic-bezier(0.16,1,0.3,1); z-index: 700; display: flex; flex-direction: column;
   }
@@ -273,16 +268,17 @@
   .pi-drawer-title { font-size: 14px; font-weight: 500; line-height: 1.2; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; color: var(--text); }
   .pi-drawer-sub { font-size: 10px; font-weight: 500; color: var(--text); margin-bottom: 24px; text-transform: uppercase; letter-spacing: 0.06em;}
   .pi-drawer-section-title { font-size: 9px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); margin-bottom: 8px; border-bottom: 1px solid var(--text); padding-bottom: 4px; }
-  #pi-drawer-log { display: flex; flex-direction: column; margin-bottom: 24px; }
+  #pi-drawer-log { display: flex; flex-direction: column; margin: 0 -20px 24px -20px; }
   .pi-log-link {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 10px 0; border-bottom: 1px solid var(--text);
-    font-size: 11px; font-weight: 500; text-decoration: none; color: var(--text); text-transform: uppercase;
+    padding: 16px 20px; border-bottom: 1px solid var(--text);
+    font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-decoration: none; color: var(--text); text-transform: uppercase;
+    cursor: pointer; user-select: none;
   }
-  .pi-log-link:hover, .pi-log-link.active { background: var(--text); color: var(--bg); }
-  .pi-log-link .loc { flex: 1; letter-spacing: normal; padding-right: 12px; }
-  .pi-log-link .stats { display: flex; align-items: center; gap: 10px; color: var(--text); font-weight: 500; flex-shrink: 0; transition: color 0.1s;}
-  .pi-log-link:hover .stats, .pi-log-link.active .stats { color: var(--bg); }
+  .pi-log-link.active { background: var(--text); color: var(--bg); }
+  .pi-log-link .loc { flex: 1; letter-spacing: 0.02em; padding-right: 12px; }
+  .pi-log-link .stats { display: flex; align-items: center; gap: 10px; color: var(--text); font-weight: 500; flex-shrink: 0; }
+  .pi-log-link.active .stats { color: var(--bg); }
   .pi-drawer-footer { padding: 16px 20px; border-top: 1px solid var(--text); flex-shrink: 0; background: var(--bg); }
   .pi-drawer-cta { display: block; width: 100%; text-align: center; border: 1px solid var(--text); background: var(--text); color: var(--bg); padding: 12px; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; cursor: pointer; transition: background 0.1s, color 0.1s; }
   .pi-drawer-cta:hover { background: var(--bg); color: var(--text); }
@@ -599,25 +595,6 @@ var searchState = { text: '', suburb: '', categories: {} };
 var mapInstance = null;
 var mapInitiated = false;
 var autocompleteReady = false;
-var CATEGORY_TERMS = {
-  condition: ['Existing Condition', 'Fenced Development Site', 'Demolition & Site Works', 'Active Construction Site', 'Completed Development'],
-  typology: [
-    'residential', 'apartment', 'residential tower', 'social housing', 'student housing',
-    'commercial', 'office', 'retail', 'hospitality', 'shopfront', 'showroom', 'market', 'supermarket', 'shopping centre', 'cafe', 'restaurant', 'bar', 'pub', 'hotel',
-    'public', 'civic', 'education', 'university', 'school', 'health', 'hospital', 'clinic', 'government', 'place of worship', 'community centre', 'library', 'museum', 'gallery', 'theatre', 'performance venue', 'stadium', 'arena',
-    'heritage', 'heritage architecture', 'queenslander', 'highset house', 'lowset house', 'workers cottage', 'post war house', 'terrace house', 'duplex', 'adaptive reuse',
-    'industrial', 'warehouse', 'parking structure', 'industrial architecture'
-  ],
-  architecture: [
-    'high rise', 'mid rise', 'low rise', 'tower', 'podium', 'corner building', 'corner tower', 'curved facade', 'modern architecture', 'contemporary architecture', 'heritage architecture', 'postwar architecture',
-    'glass', 'brick', 'face brick', 'painted brick', 'concrete', 'timber', 'metal', 'stone', 'rendered finish', 'corrugated iron', 'screen', 'grid'
-  ],
-  urban: [
-    'urban renewal', 'urban development', 'urban intensification', 'urban consolidation', 'high density', 'riverfront', 'transport corridor', 'construction impact', 'flood resilience',
-    'pedestrian zone', 'shared zone', 'arcade', 'passage', 'public art', 'mural', 'outdoor dining', 'streetscape', 'street level', 'laneway', 'street activation',
-    'olympic venue', 'olympic precinct', 'olympic infrastructure', 'transport upgrade', 'athlete village', 'temporary structure', 'legacy project'
-  ]
-};
 var CAT_ARRAY_KEYS = { condition: 'conditionArr', typology: 'typologyArr', architecture: 'architectureArr', urban: 'urbanArr', year: 'yearArr' };
 var MAP_STATE_KEY = 'pi_map_state';
 
@@ -679,45 +656,6 @@ function splitCsvLine(line, delimiter) {
   }
   cols.push(cur);
   return cols;
-}
-
-function parseMediasCsv(text) {
-  var lines = text.trim().split('\n');
-  var headers = splitCsvLine(lines[0], ';').map(function(h) { return h.trim(); });
-  var rows = [];
-  for (var i = 1; i < lines.length; i++) {
-    if (!lines[i]) continue;
-    var cols = splitCsvLine(lines[i], ';');
-    var row = {};
-    headers.forEach(function(h, idx) { row[h] = (cols[idx] || '').trim(); });
-    if (row.title) {
-      rows.push({
-        titleLower: normalizeKey(row.title),
-        descriptionLower: normalizeKey(row.description || ''),
-        altTextLower: normalizeKey(row.alt_text || ''),
-        keywordsLower: (row.keywords || '').split(',').map(function(k) { return k.trim().toLowerCase(); }).filter(Boolean)
-      });
-    }
-  }
-  return rows;
-}
-
-function applyMediaTagsToLocations(mediaRows) {
-  locations.forEach(function(loc) {
-    var streetKey = normalizeKey((loc.street || '').split(',')[0]);
-    if (!streetKey) return;
-    var matched = new Set();
-    mediaRows.forEach(function(m) {
-      if (m.titleLower.indexOf(streetKey) !== -1 || m.descriptionLower.indexOf(streetKey) !== -1 || m.altTextLower.indexOf(streetKey) !== -1) {
-        m.keywordsLower.forEach(function(k) { matched.add(k); });
-      }
-    });
-    if (matched.size === 0) return;
-    Object.keys(CATEGORY_TERMS).forEach(function(cat) {
-      var hits = CATEGORY_TERMS[cat].filter(function(t) { return matched.has(t.toLowerCase()); });
-      if (hits.length) loc[cat] = hits.join(';');
-    });
-  });
 }
 
 var SEARCHABLE_CATEGORIES = ['condition', 'typology', 'architecture', 'urban', 'year'];
@@ -934,12 +872,21 @@ function restoreSavedFilters() {
 function loadInitialData() {
   Promise.all([
     fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban/main/locations.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }),
-    fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban/main/medias.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }).catch(function() { return ''; })
+    fetch('https://www.photoindex.au/api/photos.json?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.json() : []; }).catch(function() { return []; })
   ])
   .then(function(results) {
     var csvText = results[0];
-    var mediaCsvText = results[1];
+    var allPhotos = Array.isArray(results[1]) ? results[1] : [];
     if (!csvText || !csvText.trim()) return;
+
+    var photosByTitle = {};
+    allPhotos.forEach(function(p) {
+      var key = normalizeKey(p.title);
+      if (!key) return;
+      if (!photosByTitle[key]) photosByTitle[key] = [];
+      photosByTitle[key].push(p);
+    });
+
     var lines = csvText.trim().split('\n');
     var headers = lines[0].split(',').map(function(h) { return h.trim(); });
     locations = [];
@@ -951,27 +898,65 @@ function loadInitialData() {
       var cols = splitCsvLine(line, ',');
       var row = {};
       headers.forEach(function(h, idx) { row[h] = (cols[idx] || '').trim(); });
-      var count = parseInt(row.count, 10) || 1;
+
+      var street = row.address || row.street || 'Unnamed location';
+      var matchedPhotos = photosByTitle[normalizeKey(street)] || [];
+
+      var thumbsFallback = row.thumbs ? row.thumbs.split(';').filter(Boolean) : [];
+      var imagesFallback = row.images ? row.images.split(';').filter(Boolean) : [];
+      var fallbackDate = row.shoot_dates ? row.shoot_dates.split(';').pop().trim() : (row.date || '');
+
+      var photosArr;
+      if (matchedPhotos.length) {
+        photosArr = matchedPhotos.map(function(p) {
+          return { ref: p.photoId || '', thumb: p.thumb || '', pageUrl: p.pageUrl || '', date: p.date || '', description: p.description || '' };
+        });
+      } else if (thumbsFallback.length) {
+        photosArr = thumbsFallback.map(function(url, idx) {
+          return { ref: refFromUrl(url) || row.ref || '', thumb: imagesFallback[idx] || url, pageUrl: row.archiveUrl || '#', date: fallbackDate, description: row.description || '' };
+        });
+      } else {
+        photosArr = [{ ref: row.ref || '', thumb: '', pageUrl: row.archiveUrl || '#', date: fallbackDate, description: row.description || '' }];
+      }
+
+      var count = matchedPhotos.length || parseInt(row.count, 10) || 1;
       totalArchiveRecords += count;
+
       var locData = {
         ref: row.ref || 'PX.26.000',
-        street: row.address || row.street || 'Unnamed location',
+        street: street,
         suburb: row.suburb || 'Brisbane City',
-        condition: row.condition || '',
-        typology: row.typology || '',
-        architecture: row.architecture || '',
-        urban: row.urban || '',
-        year: row.year || (row.date ? row.date.slice(-4) : ''),
+        description: photosArr[0].description || '',
         count: count,
         dates: row.shoot_dates || row.date || '',
         coords: [parseFloat(row.lng), parseFloat(row.lat)],
         archiveUrl: row.archiveUrl || '#',
-        thumbs: row.thumbs ? row.thumbs.split(';').filter(Boolean) : [],
-        images: row.images ? row.images.split(';').filter(Boolean) : []
+        photos: photosArr
       };
+
+      if (matchedPhotos.length) {
+        var condSet = {}, typSet = {}, archSet = {}, urbSet = {};
+        matchedPhotos.forEach(function(p) {
+          if (p.condition) condSet[p.condition] = true;
+          (p.typology || []).forEach(function(v) { typSet[v] = true; });
+          (p.architecture || []).forEach(function(v) { archSet[v] = true; });
+          (p.urban || []).forEach(function(v) { urbSet[v] = true; });
+        });
+        locData.conditionArr = Object.keys(condSet);
+        locData.typologyArr = Object.keys(typSet);
+        locData.architectureArr = Object.keys(archSet);
+        locData.urbanArr = Object.keys(urbSet);
+      } else {
+        locData.conditionArr = splitCatValue(row.condition || '');
+        locData.typologyArr = splitCatValue(row.typology || '');
+        locData.architectureArr = splitCatValue(row.architecture || '');
+        locData.urbanArr = splitCatValue(row.urban || '');
+      }
+
       locData.streetLc = locData.street.toLowerCase();
       locData.suburbLc = locData.suburb.toLowerCase();
-      locData.yearArr = splitCatValue(locData.year);
+      locData.yearArr = splitCatValue(row.year || (row.date ? row.date.slice(-4) : ''));
+
       if (!isNaN(locData.coords[0]) && !isNaN(locData.coords[1])) {
         locations.push(locData);
       }
@@ -979,15 +964,6 @@ function loadInitialData() {
       if (!batchesMap[batchId]) batchesMap[batchId] = [];
       batchesMap[batchId].push(locData);
     }
-    if (mediaCsvText) {
-      applyMediaTagsToLocations(parseMediasCsv(mediaCsvText));
-    }
-    locations.forEach(function(loc) {
-      loc.conditionArr = splitCatValue(loc.condition);
-      loc.typologyArr = splitCatValue(loc.typology);
-      loc.architectureArr = splitCatValue(loc.architecture);
-      loc.urbanArr = splitCatValue(loc.urban);
-    });
     var sortedBatches = Object.keys(batchesMap).filter(function(b) { return b !== 'UNKNOWN'; }).sort(function(a, b) {
       var timeA = new Date(a).getTime();
       var timeB = new Date(b).getTime();
@@ -1026,13 +1002,6 @@ function loadInitialData() {
               window.piOpenPopupForLocation(rec);
             }
           });
-          if (window.innerWidth > 720) {
-            link.addEventListener('mouseenter', function() {
-              if (!mapInstance) return;
-              mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2 });
-              window.piOpenPopupForLocation(rec);
-            });
-          }
         });
       }
       var dot = document.getElementById('pi-drawer-dot');
@@ -1247,55 +1216,51 @@ function initMapLazy() {
       });
     });
 
+    function getCardPhotos(loc) {
+      return (loc.photos && loc.photos.length) ? loc.photos : [{ ref: loc.ref || '', thumb: '', pageUrl: loc.archiveUrl || '#', date: '', description: loc.description || '' }];
+    }
+
     function buildLocationCardHtml(loc) {
-      var datesList = loc.dates ? loc.dates.split(';').map(function(d) { return d.trim(); }).filter(Boolean) : [];
-      var latestDate = datesList.length > 0 ? datesList[datesList.length - 1] : 'Unknown';
-      var thumbs = loc.thumbs || [];
-      var images = loc.images || [];
-      var refsArr = thumbs.length > 0
-        ? thumbs.map(function(url) { return refFromUrl(url) || loc.ref; })
-        : [loc.ref];
-      var initialRef = refsArr[0];
+      var allPhotos = getCardPhotos(loc);
+      var displayPhotos = allPhotos.filter(function(p) { return p.thumb; });
+      var initial = displayPhotos.length ? displayPhotos[0] : allPhotos[0];
+
+      var closeBtnHtml = '<button type="button" class="pi-map-overlay-close-btn" aria-label="Close">&times;</button>';
 
       var sliderHtml = '';
-      if (thumbs.length > 0) {
-        var slidesHtml = thumbs.map(function(url, i) {
-          var fullUrl = images[i] || url;
-          var initialSrc = i === 0 ? fullUrl : url;
-          var isLoaded = i === 0 ? '1' : '0';
-          return '<img src="' + initialSrc + '" data-full="' + fullUrl + '" data-ref="' + refsArr[i] + '" data-loaded="' + isLoaded + '" loading="lazy" style="display:' + (i === 0 ? 'block' : 'none') + ';width:100%;height:auto;object-fit:contain;object-position:center;background:#FAFAFA;" data-pi-slide="' + i + '">';
+      if (displayPhotos.length > 0) {
+        var slidesHtml = displayPhotos.map(function(p, i) {
+          return '<img src="' + p.thumb + '" loading="lazy" style="display:' + (i === 0 ? 'block' : 'none') + ';width:100%;height:100%;object-fit:contain;object-position:center;" data-pi-slide="' + i + '">';
         }).join('');
 
-        var navHtml = thumbs.length > 1
+        var navHtml = displayPhotos.length > 1
           ? '<button type="button" class="pi-popup-slider-prev" style="position:absolute;top:50%;left:0;transform:translateY(-50%);background:var(--bg);border:1px solid var(--text);border-left:none;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg></button>' +
             '<button type="button" class="pi-popup-slider-next" style="position:absolute;top:50%;right:0;transform:translateY(-50%);background:var(--bg);border:1px solid var(--text);border-right:none;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg></button>'
           : '';
 
-        sliderHtml = '<div class="pi-popup-slider" style="position:relative;width:100%;border-bottom:1px solid var(--text);">' + slidesHtml + navHtml + '</div>';
+        sliderHtml = '<div class="pi-overlay-slider-wrap"><div class="pi-popup-slider" style="position:relative;width:100%;height:100%;">' + slidesHtml + navHtml + '</div></div>';
       }
-
-      var headerHtml = '<div style="display:flex; justify-content:space-between; align-items:center; height: 44px; border-bottom: 1px solid var(--text); padding-left: 20px; flex-shrink: 0; background: var(--bg);">' +
-        '<div style="font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">REF. <span class="pi-card-ref-value">' + initialRef + '</span></div>' +
-        '<button type="button" class="pi-map-overlay-close-btn" style="width:44px; height:100%; border:none; background:transparent; border-left:1px solid var(--text); cursor:pointer; font-size:18px; color:var(--text); display:flex; justify-content:center; align-items:center; transition: background 0.1s;">&times;</button>' +
-      '</div>';
 
       var allTags = [].concat(loc.typologyArr || [], loc.architectureArr || [], loc.urbanArr || [], loc.conditionArr || []).filter(Boolean);
       var tagsHtml = allTags.map(function(t) {
           return '<span style="border: 1px solid #DADADA; padding: 3px 6px; font-size: 9px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: #000;">' + t + '</span>';
       }).join('');
 
-      var bodyContent = '<div style="padding: 24px; flex: 1; overflow-y: auto;">' +
+      var initialDate = initial.date || 'Unknown';
+      var initialDesc = initial.description || 'Close street view documented in morning daylight. High-density urban architecture and development recording.';
+
+      var bodyContent = '<div class="pi-overlay-body-wrap"><div style="padding: 24px;">' +
         '<div class="pi-record-meta-top">' +
-          '<span class="pi-ref-label">REF. <span class="pi-card-ref-value">' + initialRef + '</span></span>' +
+          '<span class="pi-ref-label">REF. <span class="pi-card-ref-value">' + (initial.ref || loc.ref || '') + '</span></span>' +
           '<span class="pi-loc-label">' + (loc.suburb || '').toUpperCase() + ', QLD, AUSTRALIA</span>' +
         '</div>' +
-        '<h2 class="pi-record-title">' + loc.street + ', ' + latestDate + '</h2>' +
-        '<p class="pi-record-caption">' + (loc.description || 'Close street view documented in morning daylight. High-density urban architecture and development recording.') + '</p>' +
+        '<h2 class="pi-record-title">' + loc.street + ', <span class="pi-card-date-value">' + initialDate + '</span></h2>' +
+        '<p class="pi-record-caption"><span class="pi-card-desc-value">' + initialDesc + '</span></p>' +
 
         '<div class="pi-cta-block">' +
-          '<button type="button" class="pi-btn-action" style="width:100%;">ADD TO SELECTION</button>' +
           '<div class="pi-cta-combined">' +
-            '<a href="' + loc.archiveUrl + '" target="_top" class="pi-btn-open">OPEN RECORD</a>' +
+            '<button type="button" class="pi-btn-add">ADD TO SELECTION</button>' +
+            '<a href="' + (initial.pageUrl || loc.archiveUrl) + '" target="_top" class="pi-btn-open">OPEN RECORD</a>' +
             '<button type="button" class="pi-btn-copy-icon pi-popup-copy-link" aria-label="Copy archive reference link" title="Copy archive reference link">' +
               '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>' +
             '</button>' +
@@ -1303,13 +1268,11 @@ function initMapLazy() {
         '</div>' +
 
         '<div class="pi-spec-acc-group">' +
-          '<div class="pi-spec-acc-head"><span class="pi-spec-acc-title">1. Archival &amp; Technical Data</span><span class="pi-spec-acc-icon">&minus;</span></div>' +
-          '<div class="pi-spec-acc-body open">' +
+          '<div class="pi-spec-acc-head"><span class="pi-spec-acc-title">1. Archival &amp; Technical Data</span><span class="pi-spec-acc-icon">+</span></div>' +
+          '<div class="pi-spec-acc-body">' +
             '<div class="pi-data-grid">' +
-              '<div class="pi-data-row"><span class="pi-data-key">Date</span><span class="pi-data-val">' + latestDate + '</span></div>' +
-              '<div class="pi-data-row"><span class="pi-data-key">Dimensions</span><span class="pi-data-val">27.8 Mpixels (79.6 MB uncompressed)</span></div>' +
-              '<div class="pi-data-row"><span class="pi-data-key">Print Output (300 PPI)</span><span class="pi-data-val">4485x6205 pixels (15x20.7 in / 38x52.5 cm at 300 ppi)</span></div>' +
-              '<div class="pi-data-row"><span class="pi-data-key">Author</span><span class="pi-data-val">PhotoIndex Archive</span></div>' +
+              '<div class="pi-data-row"><span class="pi-data-key">Date</span><span class="pi-data-val pi-card-date-value">' + initialDate + '</span></div>' +
+              '<div class="pi-data-row"><span class="pi-data-key">Author</span><span class="pi-data-val">Anka Boychev</span></div>' +
               '<div class="pi-data-row"><span class="pi-data-key">Copyright</span><span class="pi-data-val">© 2026 All rights reserved.</span></div>' +
             '</div>' +
           '</div>' +
@@ -1328,14 +1291,15 @@ function initMapLazy() {
              '<div class="pi-tags-flex" style="display:flex; flex-wrap:wrap; gap:4px;">' + tagsHtml + '</div>' +
           '</div>' +
         '</div>' +
-      '</div>';
+      '</div></div>';
 
-      return headerHtml + sliderHtml + bodyContent;
+      return closeBtnHtml + sliderHtml + bodyContent;
     }
 
     function wireLocationCard(root, loc) {
       if (!root) return;
-      var thumbs = loc.thumbs || [];
+      var allPhotos = getCardPhotos(loc);
+      var displayPhotos = allPhotos.filter(function(p) { return p.thumb; });
 
       root.querySelectorAll('.pi-spec-acc-head').forEach(function(head) {
         head.addEventListener('click', function() {
@@ -1368,21 +1332,23 @@ function initMapLazy() {
         });
       }
 
-      if (thumbs.length > 1) {
+      var openBtn = root.querySelector('.pi-btn-open');
+
+      if (displayPhotos.length > 1) {
         var imgs = root.querySelectorAll('[data-pi-slide]');
         var refEls = root.querySelectorAll('.pi-card-ref-value');
+        var dateEls = root.querySelectorAll('.pi-card-date-value');
+        var descEls = root.querySelectorAll('.pi-card-desc-value');
         var idx = 0;
         var showSlide = function(next) {
           imgs[idx].style.display = 'none';
           idx = (next + imgs.length) % imgs.length;
-          var img = imgs[idx];
-          if (img.dataset.loaded !== '1') {
-            img.src = img.dataset.full;
-            img.dataset.loaded = '1';
-          }
-          img.style.display = 'block';
-          var newRef = img.dataset.ref || loc.ref;
-          refEls.forEach(function(el) { el.textContent = newRef; });
+          imgs[idx].style.display = 'block';
+          var p = displayPhotos[idx];
+          refEls.forEach(function(el) { el.textContent = p.ref || loc.ref || ''; });
+          dateEls.forEach(function(el) { el.textContent = p.date || 'Unknown'; });
+          descEls.forEach(function(el) { el.textContent = p.description || 'Close street view documented in morning daylight. High-density urban architecture and development recording.'; });
+          if (openBtn && p.pageUrl) openBtn.setAttribute('href', p.pageUrl);
         };
 
         var prevBtn = root.querySelector('.pi-popup-slider-prev');
