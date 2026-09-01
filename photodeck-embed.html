@@ -157,16 +157,20 @@
   #map-wrap { flex: 1; position: relative; height: 100%; background: var(--bg); margin: 0; padding: 0; }
 
   /* GRID VIEWPORT */
-  #grid-wrap { flex: 1; position: relative; height: 100%; background: var(--bg); margin: 0; padding: 20px; overflow-y: auto; }
+  #grid-wrap { flex: 1; position: relative; height: 100%; background: var(--bg); margin: 0; padding: 12px; overflow-y: auto; }
   #grid-count { font-size: 10px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; padding-bottom: 12px; }
   #grid-status { font-size: 12px; color: var(--muted); padding: 24px 0; }
   #grid-status.hidden { display: none; }
   #grid-status.error { color: #C74B00; }
   
-  /* KLASYCZNE MASONRY (Bez przycinania, zachowane proporcje) */
+  /* KLASYCZNE MASONRY (Bez przycinania, zachowane proporcje) — GAP jeden i
+     ten sam wszedzie: miedzy kolumnami, miedzy kartami w pionie, i na
+     krawedziach calego kontenera (padding #grid-wrap wyzej). Zmiana tej
+     jednej wartosci (12px, w trzech miejscach) zmienia odstep wszedzie
+     naraz, spojnie. */
   #grid-masonry { 
     column-count: 4; 
-    column-gap: 4px; 
+    column-gap: 12px; 
     width: 100%; 
   }
   @media (max-width: 1200px) { #grid-masonry { column-count: 3; } }
@@ -175,7 +179,7 @@
 
   .grid-card { 
     break-inside: avoid; 
-    margin-bottom: 4px; 
+    margin-bottom: 12px; 
     position: relative; 
     display: block; 
     overflow: hidden; 
@@ -740,18 +744,18 @@ var SEARCHABLE_CATEGORIES = ['condition', 'typology', 'architecture', 'urban', '
 function quoteIfMultiword(v) { return /\s/.test(v) ? '"' + v + '"' : v; }
 
 // Natywna wyszukiwarka PhotoDecka szuka jednym plaskim zapytaniem tekstowym,
-// bez podzialu na kategorie i bez gwarantowanej logiki "dowolna z zaznaczonych
-// wartosci" wewnatrz jednej kategorii. Wczesniej ta funkcja wrzucala do
-// jednego zapytania dzielnice plus wartosci ze wszystkich kategorii naraz,
-// co przy zaznaczeniu wiecej niz jednej wartosci w tej samej kategorii
-// (mysl OR) w praktyce zawezalo wyniki PhotoDecka bardziej niz to, co widac
-// w naszym gridzie/mapie (mysl AND na plaskim zapytaniu). Zamiast probowac
-// odtworzyc nasza strukturalna logike w cudzym, nieudokumentowanym silniku
-// wyszukiwania, ograniczamy to zapytanie do dzielnicy i wpisanego tekstu —
-// mniej precyzyjne, ale nie wprowadza w blad co do liczby wynikow.
+// bez podzialu na kategorie. Jesli w jednej kategorii zaznaczysz dwie
+// wartosci naraz (u nas to znaczy "dowolna z nich"), PhotoDeck moze
+// potraktowac wszystkie slowa w zapytaniu jako wymagane naraz, wiec wyniki
+// moga wyjsc wezsze niz to, co widac w naszym gridzie. To ograniczenie
+// cudzego silnika wyszukiwania, nie cos co da sie tu naprawic — ale zgodnie
+// z prosba, kategorie wracaja do zapytania.
 function buildPhotoDeckQueryParts() {
   var parts = [];
   if (searchState.suburb) parts.push(quoteIfMultiword(searchState.suburb));
+  SEARCHABLE_CATEGORIES.forEach(function(cat) {
+    (searchState.categories[cat] || []).forEach(function(val) { parts.push(quoteIfMultiword(val)); });
+  });
   if (searchState.text) parts.push(searchState.text);
   return parts;
 }
@@ -823,7 +827,7 @@ function renderGrid() {
   masonry.innerHTML = '';
   filtered.forEach(function(p) {
     var card = document.createElement('div');
-    card.className = 'pi-fp-card';
+    card.className = 'grid-card';
 
     // Link owija tylko samo zdjecie, nie cala karte — przyciski akcji maja
     // wlasne linki, a zagniezdzone <a> w <a> jest niepoprawnym HTML-em i
