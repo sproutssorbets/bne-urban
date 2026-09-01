@@ -1249,7 +1249,8 @@ function initMapLazy() {
       var sliderHtml = '';
       if (displayPhotos.length > 0) {
         var slidesHtml = displayPhotos.map(function(p, i) {
-          return '<img src="' + p.thumb + '" loading="lazy" style="display:' + (i === 0 ? 'block' : 'none') + ';width:100%;height:100%;object-fit:contain;object-position:center;" data-pi-slide="' + i + '">';
+          var slideHref = p.pageUrl || loc.archiveUrl || '#';
+          return '<a href="' + slideHref + '" target="_top" class="pi-popup-slide-link" style="display:' + (i === 0 ? 'block' : 'none') + ';width:100%;height:100%;" data-pi-slide="' + i + '"><img src="' + p.thumb + '" loading="lazy" style="width:100%;height:100%;object-fit:contain;object-position:center;display:block;" alt=""></a>';
         }).join('');
 
         var navHtml = displayPhotos.length > 1
