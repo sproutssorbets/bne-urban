@@ -68,7 +68,7 @@
   .pi-tag button { border: none; background: transparent; cursor: pointer; font-size: 12px; line-height: 1; padding: 0 2px; color: var(--text); }
   .pi-tag button:hover { opacity: 0.4; }
 
-  /* Dropdown rozciągający się od brzegu do brzegu */
+  /* Dropdown */
   .pi-suggest {
     position: absolute; top: 100%; left: 0; width: 100%;
     background: var(--bg); border-bottom: 1px solid var(--text);
@@ -85,21 +85,11 @@
   .pi-suggest-mark { display: inline-block; width: 6px; height: 6px; background: currentColor; margin-right: 12px; vertical-align: middle; }
   .pi-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
   
-  /* Desktop Login Button */
-  .desktop-login-btn {
-    height: 100%; padding: 0 16px; display: flex; align-items: center; gap: 8px;
-    border-left: 1px solid var(--text); color: var(--text); text-decoration: none;
-    font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
-    transition: background 0.1s, color 0.1s; flex-shrink: 0;
-  }
-  .desktop-login-btn:hover { background: var(--text); color: var(--bg); }
-  .desktop-login-btn .pi-icon { width: 14px; height: 14px; stroke: currentColor; }
-
   #search-archive-btn { height: 100%; padding: 0 16px; margin-right:-16px; border-left: 1px solid var(--text); background: var(--bg); color: var(--text); font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; text-decoration: none; flex-shrink: 0; transition: background 0.1s, color 0.1s; }
   #search-archive-btn:hover { background: var(--text); color: var(--bg); }
   .pi-search-action-icon { display: none; width: 18px; height: 18px; }
 
-  /* LAYOUT MATRIX */
+  /* LAYOUT MATRIX: STAŁY TRÓJKOLUMNOWY UKŁAD */
   #layout { width: 100%; flex: 1 1 auto; min-height: 0; background: var(--bg); position: relative; display: flex; overflow: hidden; margin: 0; padding: 0; }
   
   #index-panel { width: 340px; flex-shrink: 0; position: relative; height: 100%; border-right: 1px solid var(--text); display: flex; flex-direction: column; background: var(--bg); z-index: 3; overflow-y: auto; }
@@ -168,27 +158,65 @@
   .pi-pin-cluster .pi-pin-body { min-width: 26px; height: 26px; font-size: 11px; border-width: 2px; }
   .pi-pin-cluster .pi-pin-point { border-left-width: 4px; border-right-width: 4px; border-top-width: 5px; }
 
-  .pi-popup-title { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; padding-right: 20px; line-height: 1.3; margin-bottom: 8px; }
-
+  /* PRAWY STAŁY PANEL SZCZEGÓŁÓW (500px) - ZE ZDJĘCIEM NA GÓRZE */
   .pi-map-overlay {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    z-index: 50; background: var(--bg); border: 1px solid var(--text);
-    padding: 16px; width: 320px; max-width: calc(100% - 32px);
-    max-height: calc(100% - 32px); overflow-y: auto; display: none;
+    position: relative; width: 500px; flex-shrink: 0; height: 100%;
+    background: var(--bg); border-left: 1px solid var(--text);
+    display: none; flex-direction: column; overflow-y: auto; z-index: 800; /* Większe niż drawer (700) */
   }
-  .pi-map-overlay.visible { display: block; }
-  .pi-map-overlay-close {
-    position: absolute; top: 10px; right: 10px; border: none; background: transparent;
-    font-size: 18px; line-height: 1; cursor: pointer; padding: 4px; color: var(--text); z-index: 2;
+  .pi-map-overlay.visible { display: flex; }
+
+  /* ARCHITEKTURA WNĘTRZA PANELA SZCZEGÓŁÓW */
+  .pi-record-meta-top {
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-bottom: 1px solid #000000; padding-bottom: 8px; margin-bottom: 16px;
+    font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
   }
-  .pi-map-overlay-close:hover { background: var(--text); color: var(--bg); }
-  @media (max-height: 700px) {
-    .pi-popup-slider img[data-pi-slide] { height: 220px !important; }
+  .pi-record-title {
+    font-size: 14px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+    line-height: 1.35; margin: 0 0 12px 0; color: #000000;
   }
-  @media (max-height: 550px) {
-    .pi-popup-slider img[data-pi-slide] { height: 160px !important; }
+  .pi-record-caption {
+    font-size: 12px; line-height: 1.6; color: #444444; margin-bottom: 24px;
   }
-  .pi-popup-slider-prev:focus-visible, .pi-popup-slider-next:focus-visible { outline: none !important; }
+  
+  /* GŁÓWNE PRZYCISKI AKCJI W PANELU */
+  .pi-cta-block { margin-bottom: 28px; display: flex; flex-direction: column; gap: 8px; }
+  .pi-cta-row { display: flex; gap: 8px; width: 100%; }
+  
+  .pi-btn-action, .pi-btn-link {
+    flex: 1; height: 44px; background: #000000; color: #FFFFFF; border: 1px solid #000000;
+    font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
+    text-decoration: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    text-align: center; transition: background 0.15s ease, color 0.15s ease;
+  }
+  .pi-btn-action:hover, .pi-btn-link:hover { background: #333333; }
+  
+  .pi-btn-copy-ref {
+    width: 100%; height: 38px; background: #FFFFFF; color: #000000; border: 1px solid #DADADA;
+    font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: border-color 0.15s ease;
+  }
+  .pi-btn-copy-ref:hover { border-color: #000000; }
+
+  /* AKORDEONY W PANELU */
+  .pi-spec-acc-group { border-top: 1px solid #000000; }
+  .pi-spec-acc-head {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 0; border-bottom: 1px solid #000000; cursor: pointer; user-select: none;
+  }
+  .pi-spec-acc-head:hover .pi-spec-acc-title { text-decoration: underline; }
+  .pi-spec-acc-title { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #000000; }
+  .pi-spec-acc-icon { font-size: 14px; font-weight: 400; line-height: 1; }
+  .pi-spec-acc-body { display: none; padding: 14px 0 20px 0; border-bottom: 1px solid #000000; font-size: 11px; }
+  .pi-spec-acc-body.open { display: block; }
+
+  /* GRID DANYCH */
+  .pi-data-grid { display: flex; flex-direction: column; gap: 9px; }
+  .pi-data-row { display: grid; grid-template-columns: 140px 1fr; align-items: baseline; column-gap: 12px; font-size: 11px; line-height: 1.5; }
+  .pi-data-key { color: #666666; text-transform: uppercase; letter-spacing: 0.05em; font-size: 10px; }
+  .pi-data-val { color: #000000; font-weight: 500; text-align: right; word-break: break-word; }
 
   /* UPDATE DRAWER */
   #pi-drawer-tab {
@@ -203,7 +231,6 @@
     transform: rotate(-90deg); white-space: nowrap;
     font-size: 9px; font-weight: 500; letter-spacing: 0.1em; font-family: inherit; text-transform: uppercase;
   }
-  
   #pi-drawer-dot {
     width: 6px; height: 6px; flex-shrink: 0;
     background: #00FF00; border: 1px solid #00CC00;
@@ -214,10 +241,7 @@
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.5; transform: scale(1.35); }
   }
-  
-  #pi-drawer-backdrop {
-    position: fixed; inset: 0; z-index: 600; pointer-events: none;
-  }
+  #pi-drawer-backdrop { position: fixed; inset: 0; z-index: 600; pointer-events: none; }
   #pi-drawer-backdrop.active { pointer-events: auto; }
   
   #pi-drawer-panel {
@@ -226,7 +250,6 @@
     transition: transform 0.25s cubic-bezier(0.16,1,0.3,1); z-index: 700; display: flex; flex-direction: column;
   }
   #pi-drawer-panel.open { transform: translateX(0); }
-  
   .pi-drawer-header {
     display: flex; justify-content: space-between; align-items: center;
     padding: 14px 20px; border-bottom: 1px solid var(--text); background: var(--bg);
@@ -234,14 +257,11 @@
   }
   .pi-drawer-close { border: none; background: transparent; cursor: pointer; width: 22px; height: 22px; font-size: 18px; color: var(--text); display: flex; align-items: center; justify-content: center; padding: 0; }
   .pi-drawer-close:hover { background: var(--text); color: var(--bg); }
-  
   .pi-drawer-body { flex: 1; overflow-y: auto; padding: 20px; }
   .pi-drawer-title { font-size: 14px; font-weight: 500; line-height: 1.2; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; color: var(--text); }
   .pi-drawer-sub { font-size: 10px; font-weight: 500; color: var(--text); margin-bottom: 24px; text-transform: uppercase; letter-spacing: 0.06em;}
   .pi-drawer-section-title { font-size: 9px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); margin-bottom: 8px; border-bottom: 1px solid var(--text); padding-bottom: 4px; }
-  
   #pi-drawer-log { display: flex; flex-direction: column; margin-bottom: 24px; }
-  
   .pi-log-link {
     display: flex; justify-content: space-between; align-items: center;
     padding: 10px 0; border-bottom: 1px solid var(--text);
@@ -251,9 +271,7 @@
   .pi-log-link .loc { flex: 1; letter-spacing: normal; padding-right: 12px; }
   .pi-log-link .stats { display: flex; align-items: center; gap: 10px; color: var(--text); font-weight: 500; flex-shrink: 0; transition: color 0.1s;}
   .pi-log-link:hover .stats, .pi-log-link.active .stats { color: var(--bg); }
-  
   .pi-drawer-footer { padding: 16px 20px; border-top: 1px solid var(--text); flex-shrink: 0; background: var(--bg); }
-  
   .pi-drawer-cta { display: block; width: 100%; text-align: center; border: 1px solid var(--text); background: var(--text); color: var(--bg); padding: 12px; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; cursor: pointer; transition: background 0.1s, color 0.1s; }
   .pi-drawer-cta:hover { background: var(--bg); color: var(--text); }
 
@@ -263,69 +281,50 @@
   .mobile-bar { display: none; }
 
   @media (max-width: 720px) {
-    /* Ukrywamy tagi w pasku wyszukiwania na telefonie, ukrywamy tekstowy login na rzecz ikonki */
     #pi-active-tags { display: none !important; }
-    .desktop-login-btn { display: none; }
-
-    /* Tool Header Row 1 (Search) */
     #topbar { border-bottom: 1px solid var(--text); flex-shrink: 0; }
     #search-row { height: 52px; padding: 0; }
     #search-row > .search-lead-icon { display: none; }
     .pi-mh-search-icon { display: flex; align-items: center; justify-content: center; padding-left: 16px; flex-shrink: 0; }
-    
     #geocoder { padding-left: 12px; border-right: 1px solid var(--text); flex: 1; height: 100%; min-width: 0; }
     #pi-search-wrap { min-width: 0; }
-    
     #pi-search-input { font-size: 14px; letter-spacing: normal; text-transform: none; font-weight: 400; }
     #pi-search-input::placeholder { color: var(--muted); text-transform: none; font-weight: 400; }
-    
     #search-archive-btn { width: 60px; height: 100%; display: flex; align-items: center; justify-content: center; background: transparent; border: none; margin: 0; padding: 0; flex-shrink: 0; border-left: none; }
-    #search-archive-btn:hover { background: transparent; color: var(--text); }
-
     .pi-search-action-icon { display: block; }
     #search-archive-text { display: none; }
-
-    /* WYNIKI WYSZUKIWANIA (ZWIĘKSZONE ODSTĘPY MOBILE) */
     .pi-suggest-item { padding: 16px 20px; font-size: 12px; }
-
-    /* Tool Header Row 2 (Filters & Mobile Login) */
     .mobile-bar { display: flex; height: 44px; background: #FAFAFA; color: var(--text); border-top: none; border-bottom: 1px solid var(--text); flex-shrink: 0; }
     .mobile-bar-btn { width: 60px; flex: none; color: var(--text); background: transparent; position: relative; display: flex; justify-content: center; align-items: center; cursor: pointer; border: none; }
     #mobile-toggle-filters { border-right: 1px solid var(--text); }
-    #mobile-login-btn { border-left: 1px solid var(--text); }
     .mobile-bar-btn .count-badge { position: absolute; top: 6px; right: 8px; background: var(--text); color: var(--bg); border-radius: 50% !important; border: none; min-width: 14px; height: 14px; font-size: 9px; display: flex; align-items: center; justify-content: center; padding: 0;}
     .pi-mh-status { flex: 1; display: flex; align-items: center; justify-content: center; padding: 0 16px; font-size: 10px; font-weight: 500; letter-spacing: 0.05em; color: var(--text); text-transform: uppercase; text-align: center; }
-    
-    /* Left-sliding Filter Drawer */
     #index-panel {
       position: fixed; inset: 0; width: 85% !important; max-width: 340px; height: 100% !important;
       z-index: 999; border-right: 1px solid var(--text); background: var(--bg);
       transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
     }
     #index-panel.mobile-active { transform: translateX(0); }
-    
-    /* MOBILE AKORDEON I ETYKIETY - WIĘKSZE DLA PALCA */
     .acc-head { padding: 18px 20px; }
     .acc-body label { padding: 14px 0; font-size: 13px; gap: 14px; }
-    
     .mobile-only-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--text); background: #FAFAFA; }
-    .mobile-grip { display: none; }
-    #mobile-panel-close { display: none; } /* Przycisk APPLY zamyka okno */
-
-    /* Dark Backdrop */
     body.pi-drawer-lock .pi-mobile-backdrop {
       display: block; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
       z-index: 900; pointer-events: auto; animation: pi-fade-in 0.3s ease;
     }
-    
-    /* Map Sizing Fix */
     #map-wrap { height: calc(100dvh - 52px - 44px); }
     #pi-drawer-tab { height: 120px; width: 32px; padding-left: 4px; }
+    
+    .pi-map-overlay {
+      position: fixed !important; inset: 0 !important; width: 100% !important; max-width: 100% !important;
+      height: 100% !important; z-index: 9999 !important; transform: translateX(100%);
+      transition: transform 0.3s ease;
+    }
+    .pi-map-overlay.visible { transform: translateX(0) !important; display: flex !important; }
   }
-  
   @keyframes pi-fade-in { from { opacity: 0; } to { opacity: 1; } }
 </style>
-  <script type="text/javascript">
+<script type="text/javascript">
     (function(c,l,a,r,i,t,y){
         c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
         t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
@@ -347,10 +346,6 @@
         <button type="button" id="pi-search-clear" aria-label="Clear search">&times;</button>
       </div>
     </div>
-    <a href="https://www.photoindex.au/login" target="_top" class="desktop-login-btn">
-      <svg class="pi-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-      <span>Login / Sign Up</span>
-    </a>
     <a id="search-archive-btn" href="https://www.photoindex.au/" target="_top">
       <svg class="pi-search-action-icon" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="1.5" stroke-linecap="square"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
       <span id="search-archive-text">Search</span>
@@ -365,9 +360,6 @@
     <span class="count-badge" id="mobile-filter-count" style="display:none;"></span>
   </button>
   <div class="pi-mh-status">SHOWING 0 RECORDS</div>
-  <a href="https://www.photoindex.au/login" target="_top" class="mobile-bar-btn" id="mobile-login-btn">
-    <svg class="pi-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-  </a>
 </div>
 
 <div class="pi-mobile-backdrop" onclick="document.getElementById('mobile-panel-apply').click()"></div>
@@ -551,14 +543,17 @@
       </div>
     </div>
   </aside>
+
   <main id="map-wrap">
     <div id="map"></div>
     <div id="map-error">
       <div id="map-error-text">Archive data could not be loaded right now. Please refresh, or open the full archive directly.</div>
     </div>
-    <div id="pi-map-overlay" class="pi-map-overlay"></div>
   </main>
+
+  <aside id="pi-map-overlay" class="pi-map-overlay"></aside>
 </div>
+
 <div id="pi-drawer-backdrop"></div>
 <button id="pi-drawer-tab" type="button" aria-expanded="false" aria-controls="pi-drawer-panel">
   <span id="pi-drawer-tab-inner">
@@ -581,6 +576,7 @@
     <button class="pi-drawer-cta" id="pi-drawer-close-btn">Close panel</button>
   </div>
 </aside>
+
 <script>
 var DATA_VERSION = (function() {
   var d = new Date();
@@ -730,11 +726,9 @@ function updatePhotoDeckLink() {
   var queryStr = buildPhotoDeckQueryParts().join(' ');
   var btnDesktop = document.getElementById('search-archive-btn');
   var txtDesktop = document.getElementById('search-archive-text');
-  var btnMobile = document.getElementById('mobile-search-btn');
   var targetUrl = queryStr ? 'https://www.photoindex.au/?search=' + encodeURIComponent(queryStr) : 'https://www.photoindex.au/';
   var textValue = queryStr ? 'VIEW SELECTION' : 'SEARCH';
   if (btnDesktop) { btnDesktop.href = targetUrl; if (txtDesktop) txtDesktop.textContent = textValue; }
-  if (btnMobile) { btnMobile.href = targetUrl; btnMobile.textContent = textValue; }
 }
 
 function removeFilterTag(type, val) {
@@ -1241,20 +1235,12 @@ function initMapLazy() {
       });
     });
 
-    var LINK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>';
-    var CHECK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-
     function buildLocationCardHtml(loc) {
       var datesList = loc.dates ? loc.dates.split(';').map(function(d) { return d.trim(); }).filter(Boolean) : [];
-      var datesDesc = datesList.slice().reverse();
+      var latestDate = datesList.length > 0 ? datesList[datesList.length - 1] : 'Unknown';
       var thumbs = loc.thumbs || [];
       var images = loc.images || [];
       var initialRef = thumbs.length > 0 ? (refFromUrl(thumbs[0]) || loc.ref) : loc.ref;
-      var rows = [['Suburb', loc.suburb], ['Photos', String(loc.count)], ['Ref', '<span class="pi-card-ref-value">' + initialRef + '</span>']];
-      datesDesc.forEach(function(d, i) { rows.push([i === 0 ? 'Photographed' : '', d]); });
-      var rowsHtml = rows.map(function(r) {
-        return '<div style="display:flex;justify-content:space-between;gap:12px;font-size:10px;padding:4px 0;"><span style="color:var(--text);text-transform:uppercase;">' + r[0] + '</span><span style="color:var(--text);font-weight: 500;">' + r[1] + '</span></div>';
-      }).join('');
 
       var sliderHtml = '';
       if (thumbs.length > 0) {
@@ -1262,31 +1248,94 @@ function initMapLazy() {
           var fullUrl = images[i] || url;
           var initialSrc = i === 0 ? fullUrl : url;
           var isLoaded = i === 0 ? '1' : '0';
-          return '<img src="' + initialSrc + '" data-full="' + fullUrl + '" data-loaded="' + isLoaded + '" loading="lazy" style="display:' + (i === 0 ? 'block' : 'none') + ';width:100%;height:320px;object-fit:contain;object-position:center;background:var(--bg);" data-pi-slide="' + i + '">';
+          return '<img src="' + initialSrc + '" data-full="' + fullUrl + '" data-loaded="' + isLoaded + '" loading="lazy" style="display:' + (i === 0 ? 'block' : 'none') + ';width:100%;height:auto;max-height:600px;object-fit:contain;object-position:center;background:#FAFAFA;" data-pi-slide="' + i + '">';
         }).join('');
 
         var navHtml = thumbs.length > 1
-          ? '<button type="button" class="pi-popup-slider-prev" aria-label="Poprzednie zdjęcie" style="position:absolute;top:50%;left:0;transform:translateY(-50%);background:var(--bg);border:1px solid var(--text);border-left:none;width:24px;height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;transition:all 0.1s;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"><polyline points="15 18 9 12 15 6"></polyline></svg></button>' +
-            '<button type="button" class="pi-popup-slider-next" aria-label="Następne zdjęcie" style="position:absolute;top:50%;right:0;transform:translateY(-50%);background:var(--bg);border:1px solid var(--text);border-right:none;width:24px;height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;transition:all 0.1s;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"><polyline points="9 18 15 12 9 6"></polyline></svg></button>' +
-            '<div class="pi-popup-slider-dots" style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:2;">' +
-            thumbs.map(function(u, i) { return '<span class="pi-popup-dot" data-pi-dot="' + i + '" style="width:6px;height:6px;border:1px solid var(--text);background:' + (i === 0 ? 'var(--text)' : 'var(--bg)') + ';cursor:pointer;"></span>'; }).join('') +
-            '</div>'
+          ? '<button type="button" class="pi-popup-slider-prev" style="position:absolute;top:50%;left:0;transform:translateY(-50%);background:var(--bg);border:1px solid var(--text);border-left:none;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg></button>' +
+            '<button type="button" class="pi-popup-slider-next" style="position:absolute;top:50%;right:0;transform:translateY(-50%);background:var(--bg);border:1px solid var(--text);border-right:none;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg></button>'
           : '';
-        sliderHtml = '<div class="pi-popup-slider" style="position:relative;margin-bottom:12px;overflow:hidden;border:1px solid var(--text);">' + slidesHtml + navHtml + '</div>';
+          
+        sliderHtml = '<div class="pi-popup-slider" style="position:relative;width:100%;border-bottom:1px solid var(--text);">' + slidesHtml + navHtml + '</div>';
       }
 
-      return '<div style="min-width:280px;position:relative;"><div class="pi-popup-title" style="margin-bottom:10px;font-size:12px;">' + loc.street + '</div>' + sliderHtml + '<div style="border-top:1px solid var(--text);padding:8px 0;margin-bottom:12px;">' + rowsHtml + '</div><div style="display:flex;border:1px solid var(--text);"><a href="' + loc.archiveUrl + '" target="_top" style="flex:1;text-align:center;background:var(--text);color:var(--bg);padding:10px;font-size:10px;font-weight: 500;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;transition:background 0.1s, color 0.1s;">OPEN RECORD</a><button type="button" class="pi-popup-copy-link" aria-label="Copy link" style="flex-shrink:0;width:44px;background:var(--bg);color:var(--text);border:none;border-left:1px solid var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.1s;">' + LINK_ICON + '</button></div></div>';
+      var headerHtml = '<div style="display:flex; justify-content:space-between; align-items:center; height: 44px; border-bottom: 1px solid var(--text); padding-left: 20px; flex-shrink: 0; background: var(--bg);">' +
+        '<div style="font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">REF. <span class="pi-card-ref-value">' + initialRef + '</span></div>' +
+        '<button type="button" class="pi-map-overlay-close-btn" style="width:44px; height:100%; border:none; background:transparent; border-left:1px solid var(--text); cursor:pointer; font-size:18px; color:var(--text); display:flex; justify-content:center; align-items:center; transition: background 0.1s;">&times;</button>' +
+      '</div>';
+
+      var allTags = [].concat(loc.typologyArr || [], loc.architectureArr || [], loc.urbanArr || [], loc.conditionArr || []).filter(Boolean);
+      var tagsHtml = allTags.map(function(t) { 
+          return '<span style="border: 1px solid #DADADA; padding: 3px 6px; font-size: 9px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: #000;">' + t + '</span>'; 
+      }).join('');
+
+      // UWAGA: Usunięto wadliwe style "display:none;" i zaktualizowano zawartość, żeby pasowała do specyfikacji archiwum
+      var bodyContent = '<div style="padding: 24px; flex: 1; overflow-y: auto;">' +
+        '<div class="pi-record-meta-top" style="display:flex; justify-content:space-between; border-bottom: 1px solid #000; padding-bottom: 8px; margin-bottom: 16px; font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;">' +
+          '<span class="pi-ref-label" style="color:#000; font-weight:600;">REF. ' + initialRef + '</span>' +
+          '<span class="pi-loc-label" style="color:#666; font-weight:400; letter-spacing:0.06em;">' + (loc.suburb || '').toUpperCase() + ', QLD, AUSTRALIA</span>' +
+        '</div>' +
+        '<h2 class="pi-record-title" style="font-size:14px; font-weight:600; letter-spacing:0.04em; text-transform:uppercase; margin:0 0 12px 0;">' + loc.street + ', ' + latestDate + '</h2>' +
+        '<p class="pi-record-caption" style="font-size:12px; line-height:1.6; color:#444; margin-bottom:24px;">' + (loc.description || 'Close street view documented in morning daylight. High-density urban architecture and development recording.') + '</p>' +
+        
+        '<div class="pi-cta-block">' +
+          '<div class="pi-cta-row">' +
+            '<button type="button" class="pi-btn-action">ADD TO SELECTION</button>' +
+            '<a href="' + loc.archiveUrl + '" target="_top" class="pi-btn-link">OPEN FULL RECORD</a>' +
+          '</div>' +
+          '<button type="button" class="pi-btn-copy-ref pi-popup-copy-link">' +
+            '<svg width="14" height="14" style="flex-shrink: 0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>' +
+            '<span style="margin-top:1px;">COPY ARCHIVE REFERENCE LINK</span>' +
+          '</button>' +
+        '</div>' +
+
+        '<div class="pi-spec-acc-group" style="border-top: 1px solid #000;">' +
+          // Accordion 1
+          '<div class="pi-spec-acc-head"><span class="pi-spec-acc-title">1. Archival & Technical Data</span><span class="pi-spec-acc-icon">&minus;</span></div>' +
+          '<div class="pi-spec-acc-body open">' +
+            '<div class="pi-data-grid">' +
+              '<div class="pi-data-row"><span class="pi-data-key">Date / Time</span><span class="pi-data-val">' + latestDate + '</span></div>' +
+              '<div class="pi-data-row"><span class="pi-data-key">Sensor Dimensions</span><span class="pi-data-val">27.8 Mpixels (79.6 MB uncompressed)</span></div>' +
+              '<div class="pi-data-row"><span class="pi-data-key">Print Output (300 PPI)</span><span class="pi-data-val">4485x6205 pixels (15x20.7 in / 38x52.5 cm at 300 ppi)</span></div>' +
+              '<div class="pi-data-row"><span class="pi-data-key">Author / Provenance</span><span class="pi-data-val">PhotoIndex Archive</span></div>' +
+              '<div class="pi-data-row"><span class="pi-data-key">Copyright</span><span class="pi-data-val">© 2026 All rights reserved.</span></div>' +
+            '</div>' +
+          '</div>' +
+          
+          // Accordion 2
+          '<div class="pi-spec-acc-head"><span class="pi-spec-acc-title">2. Processing Protocol</span><span class="pi-spec-acc-icon">+</span></div>' +
+          '<div class="pi-spec-acc-body">' +
+            '<p style="margin:0 0 12px 0;font-weight:500;color:#111111;"> Processing protocol </p>' +
+            '<p style="margin:0 0 8px 0;"> <span style="color:#6B6B6B;">AI tools:</span> None used at any stage </p>' +
+            '<p style="margin:0 0 8px 0;"> <span style="color:#6B6B6B;">Adjustments:</span> Exposure, white balance, perspective, slight cropping </p>' +
+            '<p style="margin:0 0 8px 0;"> <span style="color:#6B6B6B;">Elements added, removed, composited:</span> None </p>' +
+            '<p style="margin:0;"> <span style="color:#6B6B6B;">Provenance:</span> Embedded and verifiable via Content Credentials (C2PA) from initial processing onward </p>' +
+          '</div>' +
+
+          // Accordion 3
+          '<div class="pi-spec-acc-head"><span class="pi-spec-acc-title">3. Taxonomy & Keywords</span><span class="pi-spec-acc-icon">+</span></div>' +
+          '<div class="pi-spec-acc-body">' +
+             '<div style="display:flex; flex-wrap:wrap; gap:4px;">' + tagsHtml + '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+      return headerHtml + sliderHtml + bodyContent;
     }
 
     function wireLocationCard(root, loc) {
       if (!root) return;
       var thumbs = loc.thumbs || [];
 
-      var btn = root.querySelector('a');
-      if (btn) {
-        btn.addEventListener('mouseenter', function() { this.style.background = 'var(--bg)'; this.style.color = 'var(--text)'; });
-        btn.addEventListener('mouseleave', function() { this.style.background = 'var(--text)'; this.style.color = 'var(--bg)'; });
-      }
+      root.querySelectorAll('.pi-spec-acc-head').forEach(function(head) {
+        head.addEventListener('click', function() {
+          var body = this.nextElementSibling;
+          var icon = this.querySelector('.pi-spec-acc-icon');
+          var isOpen = body.classList.contains('open');
+          body.classList.toggle('open', !isOpen);
+          icon.innerHTML = isOpen ? '+' : '&minus;';
+        });
+      });
 
       var copyBtn = root.querySelector('.pi-popup-copy-link');
       if (copyBtn) {
@@ -1294,48 +1343,19 @@ function initMapLazy() {
           ev.stopPropagation();
           var z = Math.round(mapInstance.getZoom() * 10) / 10;
           var link = window.location.origin + window.location.pathname + '#' + z + '/' + loc.coords[1] + '/' + loc.coords[0] + '/' + slugify(loc.street);
-          var done = function() {
-            copyBtn.innerHTML = CHECK_ICON;
-            setTimeout(function() { copyBtn.innerHTML = LINK_ICON; }, 1500);
-          };
-          var legacyCopy = function() {
-            try {
-              var ta = document.createElement('textarea');
-              ta.value = link;
-              ta.style.position = 'fixed';
-              ta.style.opacity = '0';
-              document.body.appendChild(ta);
-              ta.focus();
-              ta.select();
-              var ok = document.execCommand('copy');
-              document.body.removeChild(ta);
-              return ok;
-            } catch (e) {
-              return false;
-            }
-          };
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(link).then(done).catch(function() {
-              if (legacyCopy()) done(); else window.prompt('Copy link:', link);
-            });
-          } else if (legacyCopy()) {
-            done();
-          } else {
-            window.prompt('Copy link:', link);
-          }
+          navigator.clipboard.writeText(link).then(function() {
+            var labelSpan = copyBtn.querySelector('span');
+            if(labelSpan) labelSpan.textContent = 'COPIED!';
+            setTimeout(function() { if(labelSpan) labelSpan.textContent = 'COPY ARCHIVE REFERENCE LINK'; }, 1500);
+          });
         });
-        copyBtn.addEventListener('mouseenter', function() { this.style.background = '#eee'; });
-        copyBtn.addEventListener('mouseleave', function() { this.style.background = 'var(--bg)'; });
       }
 
       if (thumbs.length > 1) {
         var imgs = root.querySelectorAll('[data-pi-slide]');
-        var dots = root.querySelectorAll('[data-pi-dot]');
-        var refValueEl = root.querySelector('.pi-card-ref-value');
         var idx = 0;
         var showSlide = function(next) {
           imgs[idx].style.display = 'none';
-          dots[idx].style.background = 'var(--bg)';
           idx = (next + imgs.length) % imgs.length;
           var img = imgs[idx];
           if (img.dataset.loaded !== '1') {
@@ -1343,8 +1363,6 @@ function initMapLazy() {
             img.dataset.loaded = '1';
           }
           img.style.display = 'block';
-          dots[idx].style.background = 'var(--text)';
-          if (refValueEl) refValueEl.textContent = refFromUrl(thumbs[idx]);
         };
 
         var prevBtn = root.querySelector('.pi-popup-slider-prev');
@@ -1352,22 +1370,6 @@ function initMapLazy() {
 
         if (prevBtn) prevBtn.addEventListener('click', function(ev) { ev.stopPropagation(); showSlide(idx - 1); });
         if (nextBtn) nextBtn.addEventListener('click', function(ev) { ev.stopPropagation(); showSlide(idx + 1); });
-
-        var btnHoverIn = function() { this.style.background = 'var(--text)'; this.querySelector('svg').style.stroke = 'var(--bg)'; };
-        var btnHoverOut = function() { this.style.background = 'var(--bg)'; this.querySelector('svg').style.stroke = 'var(--text)'; };
-
-        if (prevBtn) {
-          prevBtn.addEventListener('mouseenter', btnHoverIn);
-          prevBtn.addEventListener('mouseleave', btnHoverOut);
-        }
-        if (nextBtn) {
-          nextBtn.addEventListener('mouseenter', btnHoverIn);
-          nextBtn.addEventListener('mouseleave', btnHoverOut);
-        }
-
-        dots.forEach(function(dot, i) {
-          dot.addEventListener('click', function(ev) { ev.stopPropagation(); showSlide(i); });
-        });
       }
     }
 
@@ -1377,10 +1379,17 @@ function initMapLazy() {
       });
       var overlay = document.getElementById('pi-map-overlay');
       if (!overlay) return;
-      overlay.innerHTML = '<button type="button" class="pi-map-overlay-close" aria-label="Close">&times;</button>' + buildLocationCardHtml(loc);
+      overlay.innerHTML = buildLocationCardHtml(loc);
       overlay.classList.add('visible');
-      var closeBtn = overlay.querySelector('.pi-map-overlay-close');
-      if (closeBtn) closeBtn.addEventListener('click', function(ev) { ev.stopPropagation(); overlay.classList.remove('visible'); });
+      
+      if (mapInstance) setTimeout(function() { mapInstance.resize(); }, 150);
+
+      var closeBtn = overlay.querySelector('.pi-map-overlay-close-btn');
+      if (closeBtn) closeBtn.addEventListener('click', function(ev) { 
+        ev.stopPropagation(); 
+        overlay.classList.remove('visible'); 
+        if (mapInstance) setTimeout(function() { mapInstance.resize(); }, 150);
+      });
       wireLocationCard(overlay, loc);
     };
     
@@ -1394,6 +1403,7 @@ function initMapLazy() {
       detail.classList.add('open');
       wireLocationCard(detail, rec);
     };
+
     var markerTemplate = document.createElement('div');
     markerTemplate.className = 'custom-marker-hitbox';
     markerTemplate.innerHTML = '<div class="pi-pin"><div class="pi-pin-body"></div><div class="pi-pin-point"></div></div>';
@@ -1579,12 +1589,14 @@ document.addEventListener('DOMContentLoaded', function() {
         var defRadio = document.querySelector('.suburb-check[value=""]');
         if (defRadio) defRadio.checked = true;
         document.getElementById('pi-map-overlay').classList.remove('visible');
+        if (mapInstance) setTimeout(function() { mapInstance.resize(); }, 150);
         searchState.suburb = '';
         applySearchState();
       }
     });
     cb.addEventListener('change', function() {
       document.getElementById('pi-map-overlay').classList.remove('visible');
+      if (mapInstance) setTimeout(function() { mapInstance.resize(); }, 150);
       searchState.suburb = this.value;
       applySearchState();
       if (this.value && typeof clarity === 'function') {
@@ -1682,6 +1694,19 @@ document.addEventListener('DOMContentLoaded', function() {
   closeBtn.addEventListener('click', closeDrawer);
   if (closeBtnAlt) closeBtnAlt.addEventListener('click', closeDrawer);
   backdrop.addEventListener('click', closeDrawer);
+
+  document.addEventListener('keydown', function(ev) {
+    var overlay = document.getElementById('pi-map-overlay');
+    if (overlay && overlay.classList.contains('visible')) {
+      if (ev.key === 'ArrowLeft') {
+        var prevBtn = overlay.querySelector('.pi-popup-slider-prev');
+        if (prevBtn) prevBtn.click();
+      } else if (ev.key === 'ArrowRight') {
+        var nextBtn = overlay.querySelector('.pi-popup-slider-next');
+        if (nextBtn) nextBtn.click();
+      }
+    }
+  });
 });
 </script>
 </body>
