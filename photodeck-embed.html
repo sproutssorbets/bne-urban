@@ -754,7 +754,16 @@ function buildPhotoDeckQueryParts() {
   var parts = [];
   if (searchState.suburb) parts.push(quoteIfMultiword(searchState.suburb));
   SEARCHABLE_CATEGORIES.forEach(function(cat) {
-    (searchState.categories[cat] || []).forEach(function(val) { parts.push(quoteIfMultiword(val)); });
+    var vals = searchState.categories[cat] || [];
+    // PhotoDeck traktuje kazde slowo w zapytaniu jako wymagane naraz (AND).
+    // U nas kilka zaznaczonych wartosci w jednej kategorii znaczy "dowolna
+    // z nich" (OR). Wyslanie ich wszystkich razem do PhotoDecka gwarantuje
+    // zero wynikow za kazdym razem, gdy kategoria jest wzajemnie
+    // wykluczajaca sie (np. Physical Condition), bo zadne pojedyncze
+    // zdjecie nie moze pasowac do dwoch wartosci naraz. Zamiast obiecywac
+    // wynik, ktorego PhotoDeck nigdy nie znajdzie, kategorie z wiecej niz
+    // jedna zaznaczona wartoscia po prostu pomijamy w tym zapytaniu.
+    if (vals.length === 1) parts.push(quoteIfMultiword(vals[0]));
   });
   if (searchState.text) parts.push(searchState.text);
   return parts;
