@@ -40,13 +40,14 @@
   body { display: flex; flex-direction: column; border-bottom: 1px solid var(--text); }
   body.pi-drawer-lock { overflow: hidden; }
 
+  /* ICONS */
+  .pi-icon { width: 18px; height: 18px; stroke: var(--text); stroke-width: 1.5; fill: none; stroke-linecap: square; stroke-linejoin: miter; }
+
   /* TOP CONTROL BAR */
-  /* Dodano position: relative, aby dropdown rozciągał się na całą szerokość */
   #topbar { background: var(--bg); flex-shrink: 0; z-index: 10; border-bottom: 1px solid var(--text); position: relative; }
   #search-row { display: flex; align-items: center; height: 44px; padding: 0 16px; gap: 12px; background: var(--bg); }
   .search-lead-icon { width: 14px; height: 14px; flex-shrink: 0; stroke: var(--text); }
   
-  /* Usunięto position: relative z wewnętrznych wrapperów */
   #geocoder { flex: 1; height: 100%; min-width: 0; }
   #pi-search-wrap { width: 100%; height: 100%; display: flex; align-items: center; gap: 6px; min-width: 0; }
   #pi-search-input { 
@@ -69,7 +70,7 @@
 
   /* Dropdown rozciągający się od brzegu do brzegu */
   .pi-suggest {
-    position: absolute; top: 100%; left: 0; right: 0; width: 100%;
+    position: absolute; top: 100%; left: 0; width: 100%;
     background: var(--bg); border-bottom: 1px solid var(--text);
     z-index: 50; display: none; max-height: 45vh; overflow-y: auto;
   }
@@ -77,12 +78,23 @@
   .pi-suggest-item {
     padding: 14px 24px; font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
     cursor: pointer; border-bottom: 1px solid var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .pi-suggest-item:last-child { border-bottom: none; }
   .pi-suggest-item:hover, .pi-suggest-item.active { background: var(--text); color: var(--bg); }
   .pi-suggest-mark { display: inline-block; width: 6px; height: 6px; background: currentColor; margin-right: 12px; vertical-align: middle; }
   .pi-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
   
+  /* Desktop Login Button */
+  .desktop-login-btn {
+    height: 100%; padding: 0 16px; display: flex; align-items: center; gap: 8px;
+    border-left: 1px solid var(--text); color: var(--text); text-decoration: none;
+    font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+    transition: background 0.1s, color 0.1s; flex-shrink: 0;
+  }
+  .desktop-login-btn:hover { background: var(--text); color: var(--bg); }
+  .desktop-login-btn .pi-icon { width: 14px; height: 14px; stroke: currentColor; }
+
   #search-archive-btn { height: 100%; padding: 0 16px; margin-right:-16px; border-left: 1px solid var(--text); background: var(--bg); color: var(--text); font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; text-decoration: none; flex-shrink: 0; transition: background 0.1s, color 0.1s; }
   #search-archive-btn:hover { background: var(--text); color: var(--bg); }
   .pi-search-action-icon { display: none; width: 18px; height: 18px; }
@@ -93,7 +105,7 @@
   #index-panel { width: 340px; flex-shrink: 0; position: relative; height: 100%; border-right: 1px solid var(--text); display: flex; flex-direction: column; background: var(--bg); z-index: 3; overflow-y: auto; }
   .mobile-only-header, .mobile-grip { display: none; }
 
-  /* SIDEBAR ACCORDION (ZWIĘKSZONE ODSTĘPY DLA LEPSZEGO KLIKANIA) */
+  /* SIDEBAR ACCORDION */
   .acc-head { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--text); cursor: pointer; user-select: none; background: var(--bg); flex-shrink: 0; transition: background 0.1s; }
   .acc-head:hover { background: var(--text); color: var(--bg); }
   .acc-head:hover .acc-title, .acc-head:hover .acc-icon { color: var(--bg); }
@@ -245,25 +257,15 @@
   .pi-drawer-cta { display: block; width: 100%; text-align: center; border: 1px solid var(--text); background: var(--text); color: var(--bg); padding: 12px; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; cursor: pointer; transition: background 0.1s, color 0.1s; }
   .pi-drawer-cta:hover { background: var(--bg); color: var(--text); }
 
-  /* MOBILE UX & NEW ICONS */
-  .pi-global-header-mobile { display: none; }
-  .pi-icon { width: 18px; height: 18px; stroke: var(--text); stroke-width: 1.5; fill: none; stroke-linecap: square; stroke-linejoin: miter; }
+  /* MOBILE UX */
   .pi-mh-search-icon { display: none; }
   .pi-mobile-backdrop { display: none; }
   .mobile-bar { display: none; }
 
   @media (max-width: 720px) {
-    /* Global Header */
-    .pi-global-header-mobile {
-      display: flex; justify-content: space-between; align-items: center;
-      height: 56px; padding: 0 8px; border-bottom: 1px solid var(--text);
-      background: var(--bg); flex-shrink: 0;
-    }
-    .pi-global-btn { background: none; border: none; cursor: pointer; padding: 8px; display: flex; align-items: center; justify-content: center; color: var(--text); }
-    .pi-logo { font-size: 14px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; }
-
-    /* Ukrywamy tagi w pasku wyszukiwania na telefonie */
+    /* Ukrywamy tagi w pasku wyszukiwania na telefonie, ukrywamy tekstowy login na rzecz ikonki */
     #pi-active-tags { display: none !important; }
+    .desktop-login-btn { display: none; }
 
     /* Tool Header Row 1 (Search) */
     #topbar { border-bottom: 1px solid var(--text); flex-shrink: 0; }
@@ -286,11 +288,13 @@
     /* WYNIKI WYSZUKIWANIA (ZWIĘKSZONE ODSTĘPY MOBILE) */
     .pi-suggest-item { padding: 16px 20px; font-size: 12px; }
 
-    /* Tool Header Row 2 (Filters) */
+    /* Tool Header Row 2 (Filters & Mobile Login) */
     .mobile-bar { display: flex; height: 44px; background: #FAFAFA; color: var(--text); border-top: none; border-bottom: 1px solid var(--text); flex-shrink: 0; }
-    .mobile-bar-btn { width: 60px; flex: none; border-right: 1px solid var(--text); color: var(--text); background: transparent; position: relative; display: flex; justify-content: center; align-items: center; cursor: pointer; border-left: none; border-top: none; border-bottom: none; }
+    .mobile-bar-btn { width: 60px; flex: none; color: var(--text); background: transparent; position: relative; display: flex; justify-content: center; align-items: center; cursor: pointer; border: none; }
+    #mobile-toggle-filters { border-right: 1px solid var(--text); }
+    #mobile-login-btn { border-left: 1px solid var(--text); }
     .mobile-bar-btn .count-badge { position: absolute; top: 6px; right: 8px; background: var(--text); color: var(--bg); border-radius: 50% !important; border: none; min-width: 14px; height: 14px; font-size: 9px; display: flex; align-items: center; justify-content: center; padding: 0;}
-    .pi-mh-status { flex: 1; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; font-size: 10px; font-weight: 500; letter-spacing: 0.05em; color: var(--text); text-transform: uppercase; }
+    .pi-mh-status { flex: 1; display: flex; align-items: center; justify-content: center; padding: 0 16px; font-size: 10px; font-weight: 500; letter-spacing: 0.05em; color: var(--text); text-transform: uppercase; text-align: center; }
     
     /* Left-sliding Filter Drawer */
     #index-panel {
@@ -315,7 +319,7 @@
     }
     
     /* Map Sizing Fix */
-    #map-wrap { height: calc(100dvh - 56px - 52px - 44px); }
+    #map-wrap { height: calc(100dvh - 52px - 44px); }
     #pi-drawer-tab { height: 120px; width: 32px; padding-left: 4px; }
   }
   
@@ -330,16 +334,6 @@
 </script>
 </head>
 <body>
-<!-- GLOBALNY NAGŁÓWEK (Tylko Mobile) -->
-<header class="pi-global-header-mobile">
-  <button class="pi-global-btn" aria-label="Menu">
-    <svg class="pi-icon" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-  </button>
-  <div class="pi-logo">PHOTOINDEX</div>
-  <a class="pi-global-btn" aria-label="Account" href="https://www.photoindex.au/login" target="_top">
-    <svg class="pi-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-  </a>
-</header>
 
 <div id="topbar">
   <div id="search-row">
@@ -351,23 +345,33 @@
         <div id="pi-active-tags"></div>
         <input type="text" id="pi-search-input" autocomplete="off" spellcheck="false" placeholder="Search archive...">
         <button type="button" id="pi-search-clear" aria-label="Clear search">&times;</button>
-        <div id="pi-suggest" class="pi-suggest"></div>
       </div>
     </div>
+    <a href="https://www.photoindex.au/login" target="_top" class="desktop-login-btn">
+      <svg class="pi-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      <span>Login / Sign Up</span>
+    </a>
     <a id="search-archive-btn" href="https://www.photoindex.au/" target="_top">
       <svg class="pi-search-action-icon" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="1.5" stroke-linecap="square"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
       <span id="search-archive-text">Search</span>
     </a>
   </div>
+  <div id="pi-suggest" class="pi-suggest"></div>
 </div>
+
 <div class="mobile-bar">
   <button type="button" class="mobile-bar-btn" id="mobile-toggle-filters">
     <svg class="pi-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
     <span class="count-badge" id="mobile-filter-count" style="display:none;"></span>
   </button>
   <div class="pi-mh-status">SHOWING 0 RECORDS</div>
+  <a href="https://www.photoindex.au/login" target="_top" class="mobile-bar-btn" id="mobile-login-btn">
+    <svg class="pi-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+  </a>
 </div>
+
 <div class="pi-mobile-backdrop" onclick="document.getElementById('mobile-panel-apply').click()"></div>
+
 <div id="layout">
   <aside id="index-panel">
     <div class="mobile-grip"></div>
@@ -703,7 +707,7 @@ function applyMediaTagsToLocations(mediaRows) {
     if (matched.size === 0) return;
     Object.keys(CATEGORY_TERMS).forEach(function(cat) {
       var hits = CATEGORY_TERMS[cat].filter(function(t) { return matched.has(t.toLowerCase()); });
-      if (hits.length) loc[cat] = join(';');
+      if (hits.length) loc[cat] = hits.join(';');
     });
   });
 }
@@ -864,6 +868,33 @@ function annotateFilterCoverage(textLc, suburbLc) {
   });
 }
 
+function filterSuburbOptions() {
+  var container = document.getElementById('acc-location');
+  if (!container) return;
+  var suburbsWithData = {};
+  locations.forEach(function(loc) {
+    if (loc.suburb) suburbsWithData[loc.suburb] = true;
+  });
+  var children = Array.prototype.slice.call(container.children);
+  var currentGroupDivider = null;
+  var groupHasVisible = false;
+  children.forEach(function(el) {
+    if (el.classList.contains('sub-category-title')) {
+      if (currentGroupDivider) currentGroupDivider.style.display = groupHasVisible ? '' : 'none';
+      currentGroupDivider = el;
+      groupHasVisible = false;
+    } else if (el.tagName === 'LABEL') {
+      var input = el.querySelector('.suburb-check');
+      if (!input) return;
+      if (input.value === '') return;
+      var visible = !!suburbsWithData[input.value];
+      el.style.display = visible ? '' : 'none';
+      if (visible) groupHasVisible = true;
+    }
+  });
+  if (currentGroupDivider) currentGroupDivider.style.display = groupHasVisible ? '' : 'none';
+}
+
 function restoreSavedFilters() {
   var saved = getStateFromUrlParam() || loadMapState();
   if (!saved) return;
@@ -1018,6 +1049,7 @@ function loadInitialData() {
       }
     }
     annotateFilterCoverage('', '');
+    filterSuburbOptions();
     restoreSavedFilters();
   })
   .catch(function(e) { console.error('PhotoIndex map: loadInitialData failed', e); });
@@ -1175,7 +1207,7 @@ function initMapLazy() {
             { type: 'Feature', properties: { name: 'One One One Eagle Street' }, geometry: { type: 'Point', coordinates: [153.0301996, -27.4676829] } },
             { type: 'Feature', properties: { name: "Queen's Wharf" }, geometry: { type: 'Point', coordinates: [153.0245387, -27.4741509] } },
             { type: 'Feature', properties: { name: '480 Queen Street' }, geometry: { type: 'Point', coordinates: [153.0308165, -27.4640791] } },
-            { type: 'Feature', properties: { name: 'Brisbane Quarter' }, geometry: { type: 'Point', coordinates: [153.0224282, -27.4701207] } },
+            { type: 'Feature', properties: { name: 'Bris Quarter' }, geometry: { type: 'Point', coordinates: [153.0224282, -27.4701207] } },
             { type: 'Feature', properties: { name: 'Story Bridge' }, geometry: { type: 'Point', coordinates: [153.0358644, -27.4636326] } },
             { type: 'Feature', properties: { name: 'Victoria Park / Barrambin' }, geometry: { type: 'Point', coordinates: [153.0212178, -27.4529175] } }
           ]
