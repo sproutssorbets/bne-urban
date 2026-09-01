@@ -632,6 +632,22 @@ function broadcastFilterState(state) {
 
 function normalizeKey(s) { return (s || '').toLowerCase().trim(); }
 
+function escapeRegExp(s) {
+  return (s || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function findPhotosByDescription(street, allPhotos) {
+  var trimmed = (street || '').trim();
+  if (!trimmed) return [];
+  var pattern;
+  try {
+    pattern = new RegExp('\\b' + escapeRegExp(trimmed) + '\\b', 'i');
+  } catch (e) {
+    return [];
+  }
+  return allPhotos.filter(function(p) { return p.description && pattern.test(p.description); });
+}
+
 function slugify(s) {
   return (s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-+|-+$)/g, '');
 }
@@ -901,6 +917,9 @@ function loadInitialData() {
 
       var street = row.address || row.street || 'Unnamed location';
       var matchedPhotos = photosByTitle[normalizeKey(street)] || [];
+      if (!matchedPhotos.length) {
+        matchedPhotos = findPhotosByDescription(street, allPhotos);
+      }
 
       var thumbsFallback = row.thumbs ? row.thumbs.split(';').filter(Boolean) : [];
       var imagesFallback = row.images ? row.images.split(';').filter(Boolean) : [];
