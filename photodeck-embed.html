@@ -158,9 +158,9 @@
   .pi-pin-cluster .pi-pin-body { min-width: 26px; height: 26px; font-size: 11px; border-width: 2px; }
   .pi-pin-cluster .pi-pin-point { border-left-width: 4px; border-right-width: 4px; border-top-width: 5px; }
 
-  /* PRAWY STAŁY PANEL SZCZEGÓŁÓW (500px) - ZE ZDJĘCIEM NA GÓRZE */
+  /* PRAWY STAŁY PANEL SZCZEGÓŁÓW - identyczna szerokość jak panel pojedynczego zdjęcia (638px) */
   .pi-map-overlay {
-    position: relative; width: 500px; flex-shrink: 0; height: 100%;
+    position: relative; width: 638px; flex-shrink: 0; height: 100%;
     background: var(--bg); border-left: 1px solid var(--text);
     display: none; flex-direction: column; overflow-y: auto; z-index: 800; /* Większe niż drawer (700) */
   }
@@ -172,6 +172,8 @@
     border-bottom: 1px solid #000000; padding-bottom: 8px; margin-bottom: 16px;
     font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
   }
+  .pi-record-meta-top .pi-ref-label { color: #000000; font-weight: 600; }
+  .pi-record-meta-top .pi-loc-label { color: #666666; font-weight: 400; letter-spacing: 0.06em; }
   .pi-record-title {
     font-size: 14px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
     line-height: 1.35; margin: 0 0 12px 0; color: #000000;
@@ -182,23 +184,31 @@
   
   /* GŁÓWNE PRZYCISKI AKCJI W PANELU */
   .pi-cta-block { margin-bottom: 28px; display: flex; flex-direction: column; gap: 8px; }
-  .pi-cta-row { display: flex; gap: 8px; width: 100%; }
   
-  .pi-btn-action, .pi-btn-link {
-    flex: 1; height: 44px; background: #000000; color: #FFFFFF; border: 1px solid #000000;
+  .pi-btn-action {
+    height: 44px; background: #000000; color: #FFFFFF; border: 1px solid #000000;
     font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
     text-decoration: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
     text-align: center; transition: background 0.15s ease, color 0.15s ease;
   }
-  .pi-btn-action:hover, .pi-btn-link:hover { background: #333333; }
-  
-  .pi-btn-copy-ref {
-    width: 100%; height: 38px; background: #FFFFFF; color: #000000; border: 1px solid #DADADA;
-    font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
-    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
-    transition: border-color 0.15s ease;
+  .pi-btn-action:hover { background: #333333; }
+
+  /* PRZYCISK ŁĄCZONY: OPEN RECORD + COPY LINK (ikona) */
+  .pi-cta-combined { display: flex; border: 1px solid #000000; }
+  .pi-btn-open {
+    flex: 1; height: 44px; background: #000000; color: #FFFFFF; border: none;
+    font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
+    text-decoration: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    text-align: center; transition: background 0.15s ease;
   }
-  .pi-btn-copy-ref:hover { border-color: #000000; }
+  .pi-btn-open:hover { background: #333333; }
+  .pi-btn-copy-icon {
+    width: 44px; height: 44px; flex-shrink: 0; background: #FFFFFF; border: none;
+    border-left: 1px solid #000000; color: #000000; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .pi-btn-copy-icon:hover, .pi-btn-copy-icon.copied { background: #000000; color: #FFFFFF; }
 
   /* AKORDEONY W PANELU */
   .pi-spec-acc-group { border-top: 1px solid #000000; }
@@ -217,6 +227,8 @@
   .pi-data-row { display: grid; grid-template-columns: 140px 1fr; align-items: baseline; column-gap: 12px; font-size: 11px; line-height: 1.5; }
   .pi-data-key { color: #666666; text-transform: uppercase; letter-spacing: 0.05em; font-size: 10px; }
   .pi-data-val { color: #000000; font-weight: 500; text-align: right; word-break: break-word; }
+
+  .pi-tags-flex { display: flex; flex-wrap: wrap; gap: 4px; }
 
   /* UPDATE DRAWER */
   #pi-drawer-tab {
@@ -1240,7 +1252,10 @@ function initMapLazy() {
       var latestDate = datesList.length > 0 ? datesList[datesList.length - 1] : 'Unknown';
       var thumbs = loc.thumbs || [];
       var images = loc.images || [];
-      var initialRef = thumbs.length > 0 ? (refFromUrl(thumbs[0]) || loc.ref) : loc.ref;
+      var refsArr = thumbs.length > 0
+        ? thumbs.map(function(url) { return refFromUrl(url) || loc.ref; })
+        : [loc.ref];
+      var initialRef = refsArr[0];
 
       var sliderHtml = '';
       if (thumbs.length > 0) {
@@ -1248,14 +1263,14 @@ function initMapLazy() {
           var fullUrl = images[i] || url;
           var initialSrc = i === 0 ? fullUrl : url;
           var isLoaded = i === 0 ? '1' : '0';
-          return '<img src="' + initialSrc + '" data-full="' + fullUrl + '" data-loaded="' + isLoaded + '" loading="lazy" style="display:' + (i === 0 ? 'block' : 'none') + ';width:100%;height:auto;max-height:600px;object-fit:contain;object-position:center;background:#FAFAFA;" data-pi-slide="' + i + '">';
+          return '<img src="' + initialSrc + '" data-full="' + fullUrl + '" data-ref="' + refsArr[i] + '" data-loaded="' + isLoaded + '" loading="lazy" style="display:' + (i === 0 ? 'block' : 'none') + ';width:100%;height:auto;object-fit:contain;object-position:center;background:#FAFAFA;" data-pi-slide="' + i + '">';
         }).join('');
 
         var navHtml = thumbs.length > 1
           ? '<button type="button" class="pi-popup-slider-prev" style="position:absolute;top:50%;left:0;transform:translateY(-50%);background:var(--bg);border:1px solid var(--text);border-left:none;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg></button>' +
             '<button type="button" class="pi-popup-slider-next" style="position:absolute;top:50%;right:0;transform:translateY(-50%);background:var(--bg);border:1px solid var(--text);border-right:none;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg></button>'
           : '';
-          
+
         sliderHtml = '<div class="pi-popup-slider" style="position:relative;width:100%;border-bottom:1px solid var(--text);">' + slidesHtml + navHtml + '</div>';
       }
 
@@ -1265,44 +1280,40 @@ function initMapLazy() {
       '</div>';
 
       var allTags = [].concat(loc.typologyArr || [], loc.architectureArr || [], loc.urbanArr || [], loc.conditionArr || []).filter(Boolean);
-      var tagsHtml = allTags.map(function(t) { 
-          return '<span style="border: 1px solid #DADADA; padding: 3px 6px; font-size: 9px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: #000;">' + t + '</span>'; 
+      var tagsHtml = allTags.map(function(t) {
+          return '<span style="border: 1px solid #DADADA; padding: 3px 6px; font-size: 9px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: #000;">' + t + '</span>';
       }).join('');
 
-      // UWAGA: Usunięto wadliwe style "display:none;" i zaktualizowano zawartość, żeby pasowała do specyfikacji archiwum
       var bodyContent = '<div style="padding: 24px; flex: 1; overflow-y: auto;">' +
-        '<div class="pi-record-meta-top" style="display:flex; justify-content:space-between; border-bottom: 1px solid #000; padding-bottom: 8px; margin-bottom: 16px; font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;">' +
-          '<span class="pi-ref-label" style="color:#000; font-weight:600;">REF. ' + initialRef + '</span>' +
-          '<span class="pi-loc-label" style="color:#666; font-weight:400; letter-spacing:0.06em;">' + (loc.suburb || '').toUpperCase() + ', QLD, AUSTRALIA</span>' +
+        '<div class="pi-record-meta-top">' +
+          '<span class="pi-ref-label">REF. <span class="pi-card-ref-value">' + initialRef + '</span></span>' +
+          '<span class="pi-loc-label">' + (loc.suburb || '').toUpperCase() + ', QLD, AUSTRALIA</span>' +
         '</div>' +
-        '<h2 class="pi-record-title" style="font-size:14px; font-weight:600; letter-spacing:0.04em; text-transform:uppercase; margin:0 0 12px 0;">' + loc.street + ', ' + latestDate + '</h2>' +
-        '<p class="pi-record-caption" style="font-size:12px; line-height:1.6; color:#444; margin-bottom:24px;">' + (loc.description || 'Close street view documented in morning daylight. High-density urban architecture and development recording.') + '</p>' +
-        
+        '<h2 class="pi-record-title">' + loc.street + ', ' + latestDate + '</h2>' +
+        '<p class="pi-record-caption">' + (loc.description || 'Close street view documented in morning daylight. High-density urban architecture and development recording.') + '</p>' +
+
         '<div class="pi-cta-block">' +
-          '<div class="pi-cta-row">' +
-            '<button type="button" class="pi-btn-action">ADD TO SELECTION</button>' +
-            '<a href="' + loc.archiveUrl + '" target="_top" class="pi-btn-link">OPEN FULL RECORD</a>' +
+          '<button type="button" class="pi-btn-action" style="width:100%;">ADD TO SELECTION</button>' +
+          '<div class="pi-cta-combined">' +
+            '<a href="' + loc.archiveUrl + '" target="_top" class="pi-btn-open">OPEN RECORD</a>' +
+            '<button type="button" class="pi-btn-copy-icon pi-popup-copy-link" aria-label="Copy archive reference link" title="Copy archive reference link">' +
+              '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>' +
+            '</button>' +
           '</div>' +
-          '<button type="button" class="pi-btn-copy-ref pi-popup-copy-link">' +
-            '<svg width="14" height="14" style="flex-shrink: 0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>' +
-            '<span style="margin-top:1px;">COPY ARCHIVE REFERENCE LINK</span>' +
-          '</button>' +
         '</div>' +
 
-        '<div class="pi-spec-acc-group" style="border-top: 1px solid #000;">' +
-          // Accordion 1
-          '<div class="pi-spec-acc-head"><span class="pi-spec-acc-title">1. Archival & Technical Data</span><span class="pi-spec-acc-icon">&minus;</span></div>' +
+        '<div class="pi-spec-acc-group">' +
+          '<div class="pi-spec-acc-head"><span class="pi-spec-acc-title">1. Archival &amp; Technical Data</span><span class="pi-spec-acc-icon">&minus;</span></div>' +
           '<div class="pi-spec-acc-body open">' +
             '<div class="pi-data-grid">' +
-              '<div class="pi-data-row"><span class="pi-data-key">Date / Time</span><span class="pi-data-val">' + latestDate + '</span></div>' +
-              '<div class="pi-data-row"><span class="pi-data-key">Sensor Dimensions</span><span class="pi-data-val">27.8 Mpixels (79.6 MB uncompressed)</span></div>' +
+              '<div class="pi-data-row"><span class="pi-data-key">Date</span><span class="pi-data-val">' + latestDate + '</span></div>' +
+              '<div class="pi-data-row"><span class="pi-data-key">Dimensions</span><span class="pi-data-val">27.8 Mpixels (79.6 MB uncompressed)</span></div>' +
               '<div class="pi-data-row"><span class="pi-data-key">Print Output (300 PPI)</span><span class="pi-data-val">4485x6205 pixels (15x20.7 in / 38x52.5 cm at 300 ppi)</span></div>' +
-              '<div class="pi-data-row"><span class="pi-data-key">Author / Provenance</span><span class="pi-data-val">PhotoIndex Archive</span></div>' +
+              '<div class="pi-data-row"><span class="pi-data-key">Author</span><span class="pi-data-val">PhotoIndex Archive</span></div>' +
               '<div class="pi-data-row"><span class="pi-data-key">Copyright</span><span class="pi-data-val">© 2026 All rights reserved.</span></div>' +
             '</div>' +
           '</div>' +
-          
-          // Accordion 2
+
           '<div class="pi-spec-acc-head"><span class="pi-spec-acc-title">2. Processing Protocol</span><span class="pi-spec-acc-icon">+</span></div>' +
           '<div class="pi-spec-acc-body">' +
             '<p style="margin:0 0 12px 0;font-weight:500;color:#111111;"> Processing protocol </p>' +
@@ -1312,10 +1323,9 @@ function initMapLazy() {
             '<p style="margin:0;"> <span style="color:#6B6B6B;">Provenance:</span> Embedded and verifiable via Content Credentials (C2PA) from initial processing onward </p>' +
           '</div>' +
 
-          // Accordion 3
-          '<div class="pi-spec-acc-head"><span class="pi-spec-acc-title">3. Taxonomy & Keywords</span><span class="pi-spec-acc-icon">+</span></div>' +
+          '<div class="pi-spec-acc-head"><span class="pi-spec-acc-title">3. Taxonomy &amp; Keywords</span><span class="pi-spec-acc-icon">+</span></div>' +
           '<div class="pi-spec-acc-body">' +
-             '<div style="display:flex; flex-wrap:wrap; gap:4px;">' + tagsHtml + '</div>' +
+             '<div class="pi-tags-flex" style="display:flex; flex-wrap:wrap; gap:4px;">' + tagsHtml + '</div>' +
           '</div>' +
         '</div>' +
       '</div>';
@@ -1339,20 +1349,28 @@ function initMapLazy() {
 
       var copyBtn = root.querySelector('.pi-popup-copy-link');
       if (copyBtn) {
+        var defaultCopyIcon = copyBtn.innerHTML;
+        var checkIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><polyline points="20 6 9 17 4 12"></polyline></svg>';
         copyBtn.addEventListener('click', function(ev) {
           ev.stopPropagation();
           var z = Math.round(mapInstance.getZoom() * 10) / 10;
           var link = window.location.origin + window.location.pathname + '#' + z + '/' + loc.coords[1] + '/' + loc.coords[0] + '/' + slugify(loc.street);
           navigator.clipboard.writeText(link).then(function() {
-            var labelSpan = copyBtn.querySelector('span');
-            if(labelSpan) labelSpan.textContent = 'COPIED!';
-            setTimeout(function() { if(labelSpan) labelSpan.textContent = 'COPY ARCHIVE REFERENCE LINK'; }, 1500);
+            copyBtn.classList.add('copied');
+            copyBtn.innerHTML = checkIcon;
+            copyBtn.setAttribute('title', 'Link copied');
+            setTimeout(function() {
+              copyBtn.classList.remove('copied');
+              copyBtn.innerHTML = defaultCopyIcon;
+              copyBtn.setAttribute('title', 'Copy archive reference link');
+            }, 1500);
           });
         });
       }
 
       if (thumbs.length > 1) {
         var imgs = root.querySelectorAll('[data-pi-slide]');
+        var refEls = root.querySelectorAll('.pi-card-ref-value');
         var idx = 0;
         var showSlide = function(next) {
           imgs[idx].style.display = 'none';
@@ -1363,6 +1381,8 @@ function initMapLazy() {
             img.dataset.loaded = '1';
           }
           img.style.display = 'block';
+          var newRef = img.dataset.ref || loc.ref;
+          refEls.forEach(function(el) { el.textContent = newRef; });
         };
 
         var prevBtn = root.querySelector('.pi-popup-slider-prev');
