@@ -89,15 +89,6 @@
   #search-archive-btn:hover { background: var(--text); color: var(--bg); }
   .pi-search-action-icon { display: none; width: 18px; height: 18px; }
 
-  #pi-fullscreen-toggle {
-    width: 44px; height: 100%; flex-shrink: 0;
-    border-left: 1px solid var(--text);
-    background: var(--bg); color: var(--text);
-    cursor: pointer; display: none; align-items: center; justify-content: center;
-    transition: background 0.1s, color 0.1s;
-  }
-  #pi-fullscreen-toggle:hover { background: var(--text); color: var(--bg); }
-
   /* LAYOUT MATRIX: STAŁY TRÓJKOLUMNOWY UKŁAD */
   #layout { width: 100%; flex: 1 1 auto; min-height: 0; background: var(--bg); position: relative; display: flex; overflow: hidden; margin: 0; padding: 0; }
   
@@ -318,7 +309,6 @@
 
   @media (max-width: 720px) {
     #pi-active-tags { display: none !important; }
-    #pi-fullscreen-toggle { display: none !important; }
     #topbar { border-bottom: 1px solid var(--text); flex-shrink: 0; }
     #search-row { height: 52px; padding: 0; }
     #search-row > .search-lead-icon { display: none; }
@@ -387,11 +377,6 @@
       <svg class="pi-search-action-icon" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="1.5" stroke-linecap="square"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
       <span id="search-archive-text">Search</span>
     </a>
-    <button type="button" id="pi-fullscreen-toggle" aria-label="Expand map to full screen" title="Expand map to full screen">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" style="width:16px;height:16px;">
-        <path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/>
-      </svg>
-    </button>
   </div>
   <div id="pi-suggest" class="pi-suggest"></div>
 </div>
@@ -1802,43 +1787,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-(function () {
-  var isInIframe = window.self !== window.top;
-  var toggleBtn = document.getElementById('pi-fullscreen-toggle');
-  if (!isInIframe || !toggleBtn) return;
-  if (window.innerWidth <= 720) return;
-
-  var isFullscreen = false;
-  var EXPAND_SVG = toggleBtn.innerHTML;
-  var COMPRESS_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" style="width:16px;height:16px;"><path d="M9 3v5H4M15 3v5h5M9 21v-5H4M15 21v-5h5"/></svg>';
-
-  toggleBtn.style.display = 'flex';
-
-  function postToParent(action) {
-    try { window.parent.postMessage({ type: 'pi-map-fullscreen', action: action }, '*'); } catch (e) {}
-  }
-
-  function setState(fullscreen) {
-    isFullscreen = fullscreen;
-    toggleBtn.innerHTML = fullscreen ? COMPRESS_SVG : EXPAND_SVG;
-    toggleBtn.setAttribute('aria-label', fullscreen ? 'Exit full screen map' : 'Expand map to full screen');
-    toggleBtn.setAttribute('title', fullscreen ? 'Exit full screen map' : 'Expand map to full screen');
-    setTimeout(function () { if (mapInstance) mapInstance.resize(); }, 260);
-  }
-
-  toggleBtn.addEventListener('click', function () {
-    var next = !isFullscreen;
-    postToParent(next ? 'expand' : 'collapse');
-    setState(next);
-  });
-
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && isFullscreen) {
-      postToParent('collapse');
-      setState(false);
-    }
-  });
-})();
 </script>
 </body>
 </html>
