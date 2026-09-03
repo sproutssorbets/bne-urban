@@ -98,7 +98,7 @@
   }
   #pi-fullscreen-toggle:hover { background: var(--text); color: var(--bg); }
 
-  /* LAYOUT MATRIX: STAŁY TRÓJKOLUMNOWY UKŁAD */
+  /* LAYOUT MATRIX */
   #layout { width: 100%; flex: 1 1 auto; min-height: 0; background: var(--bg); position: relative; display: flex; overflow: hidden; margin: 0; padding: 0; }
   
   #index-panel { width: 340px; flex-shrink: 0; position: relative; height: 100%; border-right: 1px solid var(--text); display: flex; flex-direction: column; background: var(--bg); z-index: 3; overflow-y: auto; }
@@ -167,15 +167,14 @@
   .pi-pin-cluster .pi-pin-body { min-width: 26px; height: 26px; font-size: 11px; border-width: 2px; }
   .pi-pin-cluster .pi-pin-point { border-left-width: 4px; border-right-width: 4px; border-top-width: 5px; }
 
-  /* PRAWY STAŁY PANEL SZCZEGÓŁÓW - identyczna szerokość jak panel pojedynczego zdjęcia (638px) */
+  /* OVERLAY PANEL */
   .pi-map-overlay {
     position: relative; width: 638px; flex-shrink: 0; height: 100%;
     background: var(--bg); border-left: 1px solid var(--text);
-    display: none; flex-direction: column; overflow: hidden; z-index: 800; /* Większe niż drawer (700) */
+    display: none; flex-direction: column; overflow: hidden; z-index: 800;
   }
   .pi-map-overlay.visible { display: flex; }
 
-  /* ARCHITEKTURA WNĘTRZA PANELA SZCZEGÓŁÓW */
   .pi-record-meta-top {
     display: flex; justify-content: space-between; align-items: baseline;
     padding-bottom: 8px; margin-bottom: 16px;
@@ -191,7 +190,6 @@
     font-size: 12px; line-height: 1.6; color: #444444; margin-bottom: 24px;
   }
   
-  /* GŁÓWNE PRZYCISKI AKCJI W PANELU — jeden rząd: ADD TO SELECTION + OPEN RECORD + COPY LINK */
   .pi-cta-block { margin-bottom: 28px; }
   .pi-cta-combined { display: flex; border: 1px solid #000000; }
   .pi-btn-add, .pi-btn-open {
@@ -210,7 +208,6 @@
   }
   .pi-btn-copy-icon:hover, .pi-btn-copy-icon.copied { background: #000000; color: #FFFFFF; }
 
-  /* AKORDEONY W PANELU */
   .pi-spec-acc-group { border-top: 1px solid #000000; }
   .pi-spec-acc-head {
     display: flex; justify-content: space-between; align-items: center;
@@ -245,7 +242,6 @@
   .pi-overlay-slider-wrap { flex-shrink: 0; height: 58vh; background: #FAFAFA; border-bottom: 1px solid #000000; overflow: hidden; }
   .pi-overlay-body-wrap { flex: 1; overflow-y: auto; }
 
-  /* GRID DANYCH */
   .pi-data-grid { display: flex; flex-direction: column; gap: 9px; }
   .pi-data-row { display: grid; grid-template-columns: 140px 1fr; align-items: baseline; column-gap: 12px; font-size: 11px; line-height: 1.5; }
   .pi-data-key { color: #666666; text-transform: uppercase; letter-spacing: 0.05em; font-size: 10px; }
@@ -1077,10 +1073,10 @@ function loadInitialData() {
         logContainer.innerHTML = latestRecords.map(function(rec, idx) {
           var padCount = rec.count.toString().padStart(2, '0');
           return '<a href="#" class="pi-log-link" data-idx="' + idx + '" data-ref="' + (rec.ref || '') + '">' +
-                 '<span class="loc">' + rec.street + '</span>' +
-                 '<span class="stats"><span class="count">' + padCount + '</span></span>' +
-                 '</a>' +
-                 '<div class="pi-log-detail" id="pi-log-detail-' + idx + '"></div>';
+                   '<span class="loc">' + rec.street + '</span>' +
+                   '<span class="stats"><span class="count">' + padCount + '</span></span>' +
+                   '</a>' +
+                   '<div class="pi-log-detail" id="pi-log-detail-' + idx + '"></div>';
         }).join('');
         logContainer.querySelectorAll('.pi-log-link').forEach(function(link) {
           var idx = parseInt(link.getAttribute('data-idx'), 10);
@@ -1369,7 +1365,7 @@ function initMapLazy() {
             '<div class="pi-data-grid">' +
               '<div class="pi-data-row"><span class="pi-data-key">Date</span><span class="pi-data-val pi-card-date-value">' + initialDate + '</span></div>' +
               '<div class="pi-data-row"><span class="pi-data-key">Author</span><span class="pi-data-val">Anka Boychev</span></div>' +
-              '<div class="pi-data-row"><span class="pi-data-key">Copyright</span><span class="pi-data-val">© 2026 All rights reserved.</span></div>' +
+              '<div class="pi-data-row"><span class="pi-data-key">Copyright</span><span class="pi-data-val">&copy; 2026 All rights reserved.</span></div>' +
             '</div>' +
           '</div>' +
 
@@ -1786,7 +1782,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.addEventListener('keydown', function(ev) {
     var overlay = document.getElementById('pi-map-overlay');
-    if (overlay && overlay.classList.contains('visible')) {
+    if (overlay && overlay.classList.visible) {
       if (ev.key === 'ArrowLeft') {
         var prevBtn = overlay.querySelector('.pi-popup-slider-prev');
         if (prevBtn) { prevBtn.click(); return; }
@@ -1802,70 +1798,44 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+/* BEZPIECZNA OBSŁUGA PEŁNEGO EKRANU (POSTMESSAGE) */
 (function () {
-  var isInIframe = window.self !== window.top;
   var toggleBtn = document.getElementById('pi-fullscreen-toggle');
-  if (!isInIframe || !toggleBtn) return;
+  if (!toggleBtn) return;
 
   var isFullscreen = false;
-  var parentDoc = null;
-  try { parentDoc = window.parent.document; } catch (e) {}
-  if (!parentDoc) return;
-
   var EXPAND_SVG = toggleBtn.innerHTML;
   var COMPRESS_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" style="width:16px;height:16px;"><path d="M9 3v5H4M15 3v5h5M9 21v-5H4M15 21v-5h5"/></svg>';
 
+  // Zawsze pokaż przycisk w iframe
   toggleBtn.style.display = 'flex';
 
-  function getIframeEl() {
-    var iframes = parentDoc.getElementsByTagName('iframe');
-    for (var i = 0; i < iframes.length; i++) {
-      if (iframes[i].contentWindow === window) return iframes[i];
-    }
-    return null;
-  }
-
-  function getHeaderHeight() {
-    var header = parentDoc.querySelector('#component_menu') || parentDoc.querySelector('#block_navib') || parentDoc.querySelector('header');
-    return header ? Math.ceil(header.getBoundingClientRect().height) : 44;
-  }
-
-  function expandMap() {
-    var iframe = getIframeEl();
-    if (!iframe) return;
-    iframe.dataset.piOrigStyle = iframe.getAttribute('style') || '';
-    var h = getHeaderHeight();
-    iframe.setAttribute('style',
-      'position:fixed !important; top:' + h + 'px !important; left:0 !important; right:0 !important; ' +
-      'width:100vw !important; height:calc(100vh - ' + h + 'px) !important; ' +
-      'z-index:100000 !important; border:none !important;'
-    );
-    parentDoc.body.style.overflow = 'hidden';
-    isFullscreen = true;
-    toggleBtn.innerHTML = COMPRESS_SVG;
-    toggleBtn.setAttribute('aria-label', 'Exit full screen map');
-    toggleBtn.setAttribute('title', 'Exit full screen map');
-    setTimeout(function () { if (mapInstance) mapInstance.resize(); }, 260);
-  }
-
-  function collapseMap() {
-    var iframe = getIframeEl();
-    if (!iframe) return;
-    iframe.setAttribute('style', iframe.dataset.piOrigStyle || '');
-    parentDoc.body.style.overflow = '';
-    isFullscreen = false;
-    toggleBtn.innerHTML = EXPAND_SVG;
-    toggleBtn.setAttribute('aria-label', 'Expand map to full screen');
-    toggleBtn.setAttribute('title', 'Expand map to full screen');
-    setTimeout(function () { if (mapInstance) mapInstance.resize(); }, 260);
-  }
-
   toggleBtn.addEventListener('click', function () {
-    isFullscreen ? collapseMap() : expandMap();
+    isFullscreen = !isFullscreen;
+    
+    // Wysyłamy sygnał do PhotoDeck (strony nadrzędnej) za pomocą postMessage
+    try {
+      window.parent.postMessage({ type: 'pi-toggle-fullscreen', fullscreen: isFullscreen }, '*');
+    } catch (e) {}
+
+    // Zmiana ikony i opisu wewnątrz iframe
+    if (isFullscreen) {
+      toggleBtn.innerHTML = COMPRESS_SVG;
+      toggleBtn.setAttribute('aria-label', 'Exit full screen map');
+      toggleBtn.setAttribute('title', 'Exit full screen map');
+    } else {
+      toggleBtn.innerHTML = EXPAND_SVG;
+      toggleBtn.setAttribute('aria-label', 'Expand map to full screen');
+      toggleBtn.setAttribute('title', 'Expand map to full screen');
+    }
+
+    setTimeout(function () { if (mapInstance) mapInstance.resize(); }, 260);
   });
 
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && isFullscreen) collapseMap();
+    if (e.key === 'Escape' && isFullscreen) {
+      toggleBtn.click();
+    }
   });
 })();
 </script>
