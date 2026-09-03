@@ -89,6 +89,15 @@
   #search-archive-btn:hover { background: var(--text); color: var(--bg); }
   .pi-search-action-icon { display: none; width: 18px; height: 18px; }
 
+  #pi-fullscreen-toggle {
+    width: 44px; height: 100%; flex-shrink: 0;
+    border-left: 1px solid var(--text);
+    background: var(--bg); color: var(--text);
+    cursor: pointer; display: none; align-items: center; justify-content: center;
+    transition: background 0.1s, color 0.1s;
+  }
+  #pi-fullscreen-toggle:hover { background: var(--text); color: var(--bg); }
+
   /* LAYOUT MATRIX: STAŁY TRÓJKOLUMNOWY UKŁAD */
   #layout { width: 100%; flex: 1 1 auto; min-height: 0; background: var(--bg); position: relative; display: flex; overflow: hidden; margin: 0; padding: 0; }
   
@@ -214,7 +223,26 @@
   .pi-spec-acc-body.open { display: block; }
   .pi-map-overlay-close-btn { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border: 1px solid #000000; background: #FFFFFF; cursor: pointer; font-size: 16px; color: #000000; display: flex; align-items: center; justify-content: center; z-index: 5; transition: background 0.1s, color 0.1s; }
   .pi-map-overlay-close-btn:hover { background: #000000; color: #FFFFFF; }
-  .pi-overlay-slider-wrap { flex-shrink: 0; height: 45vh; background: #FAFAFA; border-bottom: 1px solid #000000; overflow: hidden; }
+
+  .pi-overlay-update-nav {
+    position: absolute; top: 12px; left: 12px; z-index: 6;
+    display: flex; align-items: center; border: 1px solid #000000; background: #FFFFFF;
+  }
+  .pi-overlay-nav-btn {
+    width: 32px; height: 32px; border: none; background: transparent; color: #000000;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background 0.1s, color 0.1s;
+  }
+  .pi-overlay-nav-btn:hover:not(:disabled) { background: #000000; color: #FFFFFF; }
+  .pi-overlay-nav-btn:disabled { opacity: 0.25; cursor: default; }
+  .pi-overlay-nav-btn svg { width: 14px; height: 14px; }
+  .pi-overlay-nav-count {
+    font-size: 9px; font-weight: 500; letter-spacing: 0.06em; padding: 0 10px;
+    border-left: 1px solid #DADADA; border-right: 1px solid #DADADA; color: #000000;
+    white-space: nowrap; user-select: none;
+  }
+
+  .pi-overlay-slider-wrap { flex-shrink: 0; height: 58vh; background: #FAFAFA; border-bottom: 1px solid #000000; overflow: hidden; }
   .pi-overlay-body-wrap { flex: 1; overflow-y: auto; }
 
   /* GRID DANYCH */
@@ -290,6 +318,7 @@
 
   @media (max-width: 720px) {
     #pi-active-tags { display: none !important; }
+    #pi-fullscreen-toggle { display: none !important; }
     #topbar { border-bottom: 1px solid var(--text); flex-shrink: 0; }
     #search-row { height: 52px; padding: 0; }
     #search-row > .search-lead-icon { display: none; }
@@ -358,6 +387,11 @@
       <svg class="pi-search-action-icon" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="1.5" stroke-linecap="square"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
       <span id="search-archive-text">Search</span>
     </a>
+    <button type="button" id="pi-fullscreen-toggle" aria-label="Expand map to full screen" title="Expand map to full screen">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" style="width:16px;height:16px;">
+        <path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/>
+      </svg>
+    </button>
   </div>
   <div id="pi-suggest" class="pi-suggest"></div>
 </div>
@@ -597,6 +631,8 @@ var mapInitiated = false;
 var autocompleteReady = false;
 var CAT_ARRAY_KEYS = { condition: 'conditionArr', typology: 'typologyArr', architecture: 'architectureArr', urban: 'urbanArr', year: 'yearArr' };
 var MAP_STATE_KEY = 'pi_map_state';
+var piUpdateRecords = [];
+var piUpdateIndex = -1;
 
 function saveMapState(partial) {
   var existing = {};
@@ -628,6 +664,41 @@ function broadcastFilterState(state) {
       window.parent.postMessage({ type: 'pi-filters', suburb: state.suburb || '', categories: state.categories || {} }, 'https://www.photoindex.au');
     }
   } catch (e) {}
+}
+
+function openUpdateRecordAt(index) {
+  if (!piUpdateRecords.length || index < 0 || index >= piUpdateRecords.length) return;
+  piUpdateIndex = index;
+  var rec = piUpdateRecords[index];
+  document.querySelectorAll('.pi-log-link').forEach(function(el) {
+    el.classList.toggle('active', !!rec.ref && el.getAttribute('data-ref') === rec.ref);
+  });
+  if (window.innerWidth <= 720) {
+    if (window.piToggleLogDetail) window.piToggleLogDetail(index, rec);
+  } else {
+    if (mapInstance) mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2 });
+    if (window.piOpenPopupForLocation) window.piOpenPopupForLocation(rec, true);
+  }
+}
+
+function injectUpdateNav(overlay) {
+  var existing = overlay.querySelector('.pi-overlay-update-nav');
+  if (existing) existing.remove();
+  var nav = document.createElement('div');
+  nav.className = 'pi-overlay-update-nav';
+  nav.innerHTML =
+    '<button type="button" class="pi-overlay-nav-btn" id="pi-overlay-nav-prev" aria-label="Previous new record"' + (piUpdateIndex <= 0 ? ' disabled' : '') + '>' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
+    '</button>' +
+    '<span class="pi-overlay-nav-count">' + (piUpdateIndex + 1) + ' / ' + piUpdateRecords.length + '</span>' +
+    '<button type="button" class="pi-overlay-nav-btn" id="pi-overlay-nav-next" aria-label="Next new record"' + (piUpdateIndex >= piUpdateRecords.length - 1 ? ' disabled' : '') + '>' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
+    '</button>';
+  overlay.appendChild(nav);
+  var prevBtn = nav.querySelector('#pi-overlay-nav-prev');
+  var nextBtn = nav.querySelector('#pi-overlay-nav-next');
+  if (prevBtn) prevBtn.addEventListener('click', function(ev) { ev.stopPropagation(); openUpdateRecordAt(piUpdateIndex - 1); });
+  if (nextBtn) nextBtn.addEventListener('click', function(ev) { ev.stopPropagation(); openUpdateRecordAt(piUpdateIndex + 1); });
 }
 
 function normalizeKey(s) { return (s || '').toLowerCase().trim(); }
@@ -992,6 +1063,7 @@ function loadInitialData() {
     var latestBatchId = sortedBatches[0];
     if (latestBatchId) {
       var latestRecords = batchesMap[latestBatchId];
+      piUpdateRecords = latestRecords;
       var latestTotalCount = latestRecords.reduce(function(acc, r) { return acc + r.count; }, 0);
       var elDrawerIdx = document.getElementById('pi-drawer-index');
       if (elDrawerIdx) elDrawerIdx.innerHTML = 'UPDATE &middot; ' + latestBatchId.toUpperCase();
@@ -1014,11 +1086,13 @@ function loadInitialData() {
           var rec = latestRecords[idx];
           link.addEventListener('click', function(ev) {
             ev.preventDefault();
+            piUpdateRecords = latestRecords;
+            piUpdateIndex = idx;
             if (window.innerWidth <= 720) {
               window.piToggleLogDetail(idx, rec);
             } else if (mapInstance) {
               mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2 });
-              window.piOpenPopupForLocation(rec);
+              window.piOpenPopupForLocation(rec, true);
             }
           });
         });
@@ -1239,12 +1313,12 @@ function initMapLazy() {
       return (loc.photos && loc.photos.length) ? loc.photos : [{ ref: loc.ref || '', thumb: '', pageUrl: loc.archiveUrl || '#', date: '', description: loc.description || '' }];
     }
 
-    function buildLocationCardHtml(loc) {
+    function buildLocationCardHtml(loc, showClose) {
       var allPhotos = getCardPhotos(loc);
       var displayPhotos = allPhotos.filter(function(p) { return p.thumb; });
       var initial = displayPhotos.length ? displayPhotos[0] : allPhotos[0];
 
-      var closeBtnHtml = '<button type="button" class="pi-map-overlay-close-btn" aria-label="Close">&times;</button>';
+      var closeBtnHtml = showClose === false ? '' : '<button type="button" class="pi-map-overlay-close-btn" aria-label="Close">&times;</button>';
 
       var sliderHtml = '';
       if (displayPhotos.length > 0) {
@@ -1379,13 +1453,14 @@ function initMapLazy() {
       }
     }
 
-    window.piOpenPopupForLocation = function(loc) {
+    window.piOpenPopupForLocation = function(loc, fromUpdates) {
+      if (!fromUpdates) { piUpdateIndex = -1; }
       document.querySelectorAll('.pi-log-link').forEach(function(el) {
         el.classList.toggle('active', !!loc.ref && el.getAttribute('data-ref') === loc.ref);
       });
       var overlay = document.getElementById('pi-map-overlay');
       if (!overlay) return;
-      overlay.innerHTML = buildLocationCardHtml(loc);
+      overlay.innerHTML = buildLocationCardHtml(loc, true);
       overlay.classList.add('visible');
       
       if (mapInstance) setTimeout(function() { mapInstance.resize(); }, 150);
@@ -1394,9 +1469,14 @@ function initMapLazy() {
       if (closeBtn) closeBtn.addEventListener('click', function(ev) { 
         ev.stopPropagation(); 
         overlay.classList.remove('visible'); 
+        piUpdateIndex = -1;
         if (mapInstance) setTimeout(function() { mapInstance.resize(); }, 150);
       });
       wireLocationCard(overlay, loc);
+
+      if (piUpdateIndex !== -1 && piUpdateRecords.length > 1) {
+        injectUpdateNav(overlay);
+      }
     };
     
     window.piToggleLogDetail = function(idx, rec) {
@@ -1405,7 +1485,7 @@ function initMapLazy() {
       var wasOpen = detail.classList.contains('open');
       document.querySelectorAll('.pi-log-detail.open').forEach(function(d) { d.classList.remove('open'); });
       if (wasOpen) return;
-      detail.innerHTML = buildLocationCardHtml(rec);
+      detail.innerHTML = buildLocationCardHtml(rec, false);
       detail.classList.add('open');
       wireLocationCard(detail, rec);
     };
@@ -1706,14 +1786,85 @@ document.addEventListener('DOMContentLoaded', function() {
     if (overlay && overlay.classList.contains('visible')) {
       if (ev.key === 'ArrowLeft') {
         var prevBtn = overlay.querySelector('.pi-popup-slider-prev');
-        if (prevBtn) prevBtn.click();
+        if (prevBtn) { prevBtn.click(); return; }
+        var navPrev = overlay.querySelector('#pi-overlay-nav-prev');
+        if (navPrev && !navPrev.disabled) navPrev.click();
       } else if (ev.key === 'ArrowRight') {
         var nextBtn = overlay.querySelector('.pi-popup-slider-next');
-        if (nextBtn) nextBtn.click();
+        if (nextBtn) { nextBtn.click(); return; }
+        var navNext = overlay.querySelector('#pi-overlay-nav-next');
+        if (navNext && !navNext.disabled) navNext.click();
       }
     }
   });
 });
+
+(function () {
+  var isInIframe = window.self !== window.top;
+  var toggleBtn = document.getElementById('pi-fullscreen-toggle');
+  if (!isInIframe || !toggleBtn) return;
+
+  var isFullscreen = false;
+  var parentDoc = null;
+  try { parentDoc = window.parent.document; } catch (e) {}
+  if (!parentDoc) return;
+
+  var EXPAND_SVG = toggleBtn.innerHTML;
+  var COMPRESS_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" style="width:16px;height:16px;"><path d="M9 3v5H4M15 3v5h5M9 21v-5H4M15 21v-5h5"/></svg>';
+
+  toggleBtn.style.display = 'flex';
+
+  function getIframeEl() {
+    var iframes = parentDoc.getElementsByTagName('iframe');
+    for (var i = 0; i < iframes.length; i++) {
+      if (iframes[i].contentWindow === window) return iframes[i];
+    }
+    return null;
+  }
+
+  function getHeaderHeight() {
+    var header = parentDoc.querySelector('#component_menu') || parentDoc.querySelector('#block_navib') || parentDoc.querySelector('header');
+    return header ? Math.ceil(header.getBoundingClientRect().height) : 44;
+  }
+
+  function expandMap() {
+    var iframe = getIframeEl();
+    if (!iframe) return;
+    iframe.dataset.piOrigStyle = iframe.getAttribute('style') || '';
+    var h = getHeaderHeight();
+    iframe.setAttribute('style',
+      'position:fixed !important; top:' + h + 'px !important; left:0 !important; right:0 !important; ' +
+      'width:100vw !important; height:calc(100vh - ' + h + 'px) !important; ' +
+      'z-index:100000 !important; border:none !important;'
+    );
+    parentDoc.body.style.overflow = 'hidden';
+    isFullscreen = true;
+    toggleBtn.innerHTML = COMPRESS_SVG;
+    toggleBtn.setAttribute('aria-label', 'Exit full screen map');
+    toggleBtn.setAttribute('title', 'Exit full screen map');
+    setTimeout(function () { if (mapInstance) mapInstance.resize(); }, 260);
+  }
+
+  function collapseMap() {
+    var iframe = getIframeEl();
+    if (!iframe) return;
+    iframe.setAttribute('style', iframe.dataset.piOrigStyle || '');
+    parentDoc.body.style.overflow = '';
+    isFullscreen = false;
+    toggleBtn.innerHTML = EXPAND_SVG;
+    toggleBtn.setAttribute('aria-label', 'Expand map to full screen');
+    toggleBtn.setAttribute('title', 'Expand map to full screen');
+    setTimeout(function () { if (mapInstance) mapInstance.resize(); }, 260);
+  }
+
+  toggleBtn.addEventListener('click', function () {
+    isFullscreen ? collapseMap() : expandMap();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && isFullscreen) collapseMap();
+  });
+})();
 </script>
 </body>
 </html>
