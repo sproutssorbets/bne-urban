@@ -93,12 +93,12 @@
     width: 44px; height: 100%; flex-shrink: 0;
     border-left: 1px solid var(--text);
     background: var(--bg); color: var(--text);
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; display: none; align-items: center; justify-content: center;
     transition: background 0.1s, color 0.1s;
   }
   #pi-fullscreen-toggle:hover { background: var(--text); color: var(--bg); }
 
-  /* LAYOUT MATRIX */
+  /* LAYOUT MATRIX: STAŁY TRÓJKOLUMNOWY UKŁAD */
   #layout { width: 100%; flex: 1 1 auto; min-height: 0; background: var(--bg); position: relative; display: flex; overflow: hidden; margin: 0; padding: 0; }
   
   #index-panel { width: 340px; flex-shrink: 0; position: relative; height: 100%; border-right: 1px solid var(--text); display: flex; flex-direction: column; background: var(--bg); z-index: 3; overflow-y: auto; }
@@ -167,14 +167,15 @@
   .pi-pin-cluster .pi-pin-body { min-width: 26px; height: 26px; font-size: 11px; border-width: 2px; }
   .pi-pin-cluster .pi-pin-point { border-left-width: 4px; border-right-width: 4px; border-top-width: 5px; }
 
-  /* OVERLAY PANEL */
+  /* PRAWY STAŁY PANEL SZCZEGÓŁÓW - identyczna szerokość jak panel pojedynczego zdjęcia (638px) */
   .pi-map-overlay {
     position: relative; width: 638px; flex-shrink: 0; height: 100%;
     background: var(--bg); border-left: 1px solid var(--text);
-    display: none; flex-direction: column; overflow: hidden; z-index: 800;
+    display: none; flex-direction: column; overflow: hidden; z-index: 800; /* Większe niż drawer (700) */
   }
   .pi-map-overlay.visible { display: flex; }
 
+  /* ARCHITEKTURA WNĘTRZA PANELA SZCZEGÓŁÓW */
   .pi-record-meta-top {
     display: flex; justify-content: space-between; align-items: baseline;
     padding-bottom: 8px; margin-bottom: 16px;
@@ -190,6 +191,7 @@
     font-size: 12px; line-height: 1.6; color: #444444; margin-bottom: 24px;
   }
   
+  /* GŁÓWNE PRZYCISKI AKCJI W PANELU — jeden rząd: ADD TO SELECTION + OPEN RECORD + COPY LINK */
   .pi-cta-block { margin-bottom: 28px; }
   .pi-cta-combined { display: flex; border: 1px solid #000000; }
   .pi-btn-add, .pi-btn-open {
@@ -208,6 +210,7 @@
   }
   .pi-btn-copy-icon:hover, .pi-btn-copy-icon.copied { background: #000000; color: #FFFFFF; }
 
+  /* AKORDEONY W PANELU */
   .pi-spec-acc-group { border-top: 1px solid #000000; }
   .pi-spec-acc-head {
     display: flex; justify-content: space-between; align-items: center;
@@ -221,9 +224,28 @@
   .pi-map-overlay-close-btn { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border: 1px solid #000000; background: #FFFFFF; cursor: pointer; font-size: 16px; color: #000000; display: flex; align-items: center; justify-content: center; z-index: 5; transition: background 0.1s, color 0.1s; }
   .pi-map-overlay-close-btn:hover { background: #000000; color: #FFFFFF; }
 
+  .pi-overlay-update-nav {
+    position: absolute; top: 12px; left: 12px; z-index: 6;
+    display: flex; align-items: center; border: 1px solid #000000; background: #FFFFFF;
+  }
+  .pi-overlay-nav-btn {
+    width: 32px; height: 32px; border: none; background: transparent; color: #000000;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background 0.1s, color 0.1s;
+  }
+  .pi-overlay-nav-btn:hover:not(:disabled) { background: #000000; color: #FFFFFF; }
+  .pi-overlay-nav-btn:disabled { opacity: 0.25; cursor: default; }
+  .pi-overlay-nav-btn svg { width: 14px; height: 14px; }
+  .pi-overlay-nav-count {
+    font-size: 9px; font-weight: 500; letter-spacing: 0.06em; padding: 0 10px;
+    border-left: 1px solid #DADADA; border-right: 1px solid #DADADA; color: #000000;
+    white-space: nowrap; user-select: none;
+  }
+
   .pi-overlay-slider-wrap { flex-shrink: 0; height: 58vh; background: #FAFAFA; border-bottom: 1px solid #000000; overflow: hidden; }
   .pi-overlay-body-wrap { flex: 1; overflow-y: auto; }
 
+  /* GRID DANYCH */
   .pi-data-grid { display: flex; flex-direction: column; gap: 9px; }
   .pi-data-row { display: grid; grid-template-columns: 140px 1fr; align-items: baseline; column-gap: 12px; font-size: 11px; line-height: 1.5; }
   .pi-data-key { color: #666666; text-transform: uppercase; letter-spacing: 0.05em; font-size: 10px; }
@@ -296,6 +318,7 @@
 
   @media (max-width: 720px) {
     #pi-active-tags { display: none !important; }
+    #pi-fullscreen-toggle { display: none !important; }
     #topbar { border-bottom: 1px solid var(--text); flex-shrink: 0; }
     #search-row { height: 52px; padding: 0; }
     #search-row > .search-lead-icon { display: none; }
@@ -1054,10 +1077,10 @@ function loadInitialData() {
         logContainer.innerHTML = latestRecords.map(function(rec, idx) {
           var padCount = rec.count.toString().padStart(2, '0');
           return '<a href="#" class="pi-log-link" data-idx="' + idx + '" data-ref="' + (rec.ref || '') + '">' +
-                   '<span class="loc">' + rec.street + '</span>' +
-                   '<span class="stats"><span class="count">' + padCount + '</span></span>' +
-                   '</a>' +
-                   '<div class="pi-log-detail" id="pi-log-detail-' + idx + '"></div>';
+                 '<span class="loc">' + rec.street + '</span>' +
+                 '<span class="stats"><span class="count">' + padCount + '</span></span>' +
+                 '</a>' +
+                 '<div class="pi-log-detail" id="pi-log-detail-' + idx + '"></div>';
         }).join('');
         logContainer.querySelectorAll('.pi-log-link').forEach(function(link) {
           var idx = parseInt(link.getAttribute('data-idx'), 10);
@@ -1346,7 +1369,7 @@ function initMapLazy() {
             '<div class="pi-data-grid">' +
               '<div class="pi-data-row"><span class="pi-data-key">Date</span><span class="pi-data-val pi-card-date-value">' + initialDate + '</span></div>' +
               '<div class="pi-data-row"><span class="pi-data-key">Author</span><span class="pi-data-val">Anka Boychev</span></div>' +
-              '<div class="pi-data-row"><span class="pi-data-key">Copyright</span><span class="pi-data-val">&copy; 2026 All rights reserved.</span></div>' +
+              '<div class="pi-data-row"><span class="pi-data-key">Copyright</span><span class="pi-data-val">© 2026 All rights reserved.</span></div>' +
             '</div>' +
           '</div>' +
 
@@ -1779,34 +1802,41 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-/* ROZWIĄZANIE NATIVNE: FULLSCREEN API WEWNĄTRZ IFRAME */
 (function () {
+  var isInIframe = window.self !== window.top;
   var toggleBtn = document.getElementById('pi-fullscreen-toggle');
-  if (!toggleBtn) return;
+  if (!isInIframe || !toggleBtn) return;
+  if (window.innerWidth <= 720) return;
 
+  var isFullscreen = false;
   var EXPAND_SVG = toggleBtn.innerHTML;
   var COMPRESS_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" style="width:16px;height:16px;"><path d="M9 3v5H4M15 3v5h5M9 21v-5H4M15 21v-5h5"/></svg>';
 
   toggleBtn.style.display = 'flex';
 
+  function postToParent(action) {
+    try { window.parent.postMessage({ type: 'pi-map-fullscreen', action: action }, '*'); } catch (e) {}
+  }
+
+  function setState(fullscreen) {
+    isFullscreen = fullscreen;
+    toggleBtn.innerHTML = fullscreen ? COMPRESS_SVG : EXPAND_SVG;
+    toggleBtn.setAttribute('aria-label', fullscreen ? 'Exit full screen map' : 'Expand map to full screen');
+    toggleBtn.setAttribute('title', fullscreen ? 'Exit full screen map' : 'Expand map to full screen');
+    setTimeout(function () { if (mapInstance) mapInstance.resize(); }, 260);
+  }
+
   toggleBtn.addEventListener('click', function () {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(function(err) {
-        console.error("Fullscreen error:", err);
-      });
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      }
-    }
+    var next = !isFullscreen;
+    postToParent(next ? 'expand' : 'collapse');
+    setState(next);
   });
 
-  document.addEventListener('fullscreenchange', function () {
-    var isFull = !!document.fullscreenElement;
-    toggleBtn.innerHTML = isFull ? COMPRESS_SVG : EXPAND_SVG;
-    toggleBtn.setAttribute('aria-label', isFull ? 'Exit full screen map' : 'Expand map to full screen');
-    toggleBtn.setAttribute('title', isFull ? 'Exit full screen map' : 'Expand map to full screen');
-    setTimeout(function () { if (mapInstance) mapInstance.resize(); }, 260);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && isFullscreen) {
+      postToParent('collapse');
+      setState(false);
+    }
   });
 })();
 </script>
