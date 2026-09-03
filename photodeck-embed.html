@@ -676,6 +676,7 @@ function openUpdateRecordAt(index) {
   if (window.innerWidth <= 720) {
     if (window.piToggleLogDetail) window.piToggleLogDetail(index, rec);
   } else {
+    if (window.piCloseDrawer) window.piCloseDrawer();
     if (mapInstance) mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2 });
     if (window.piOpenPopupForLocation) window.piOpenPopupForLocation(rec, true);
   }
@@ -1091,6 +1092,7 @@ function loadInitialData() {
             if (window.innerWidth <= 720) {
               window.piToggleLogDetail(idx, rec);
             } else if (mapInstance) {
+              if (window.piCloseDrawer) window.piCloseDrawer();
               mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2 });
               window.piOpenPopupForLocation(rec, true);
             }
@@ -1780,6 +1782,7 @@ document.addEventListener('DOMContentLoaded', function() {
   closeBtn.addEventListener('click', closeDrawer);
   if (closeBtnAlt) closeBtnAlt.addEventListener('click', closeDrawer);
   backdrop.addEventListener('click', closeDrawer);
+  window.piCloseDrawer = closeDrawer;
 
   document.addEventListener('keydown', function(ev) {
     var overlay = document.getElementById('pi-map-overlay');
