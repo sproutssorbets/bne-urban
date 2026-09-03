@@ -1,781 +1,1873 @@
-const MAP_SOURCE_URL = "https://raw.githubusercontent.com/sproutssorbets/bne-urban/main/photodeck-embed.html";
-
-const GRID_PAGE_PATH = "/index";
-
-const BLINKING_FAVICON_HEAD_SNIPPET = `<script type="text/javascript">
-  (function() {
-    if (window.__piFaviconInstalled) return;
-    window.__piFaviconInstalled = true;
-
-    var framePos = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='white'/><rect x='19' width='7' height='100' fill='black'/><rect x='47' width='7' height='100' fill='black'/><rect x='74' width='7' height='100' fill='black'/></svg>";
-    var frameNeg = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='black'/><rect x='19' width='7' height='100' fill='white'/><rect x='47' width='7' height='100' fill='white'/><rect x='74' width='7' height='100' fill='white'/></svg>";
-
-    var iconLink = document.querySelector("link[rel*='icon']");
-    if (!iconLink) {
-      iconLink = document.createElement('link');
-      iconLink.rel = 'icon';
-      document.head.appendChild(iconLink);
-    }
-    iconLink.type = 'image/svg+xml';
-
-    var isInverted = false;
-    iconLink.href = framePos;
-
-    setInterval(function() {
-      isInverted = !isInverted;
-      iconLink.href = isInverted ? frameNeg : framePos;
-    }, 500);
-  })();
-</script>`;
-
-const CLARITY_HEAD_SNIPPET = `<script type="text/javascript">
-  if (!window.__piClarityInstalled) {
-    window.__piClarityInstalled = true;
-    (function(c,l,a,r,i,t,y){
-      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "y34xppm08p");
-  }
-</script>`;
-
-const MAP_FALLBACK_HTML = `<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Map Layer Loading — PhotoIndex</title>
-${BLINKING_FAVICON_HEAD_SNIPPET}
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>PHOTOINDEX</title>
+<link rel="preconnect" href="https://api.mapbox.com">
+<link rel="preconnect" href="https://raw.githubusercontent.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; border-radius: 0 !important; box-shadow: none !important; }
-  body { min-height: 100vh; background-color: #F8F8F6; color: #000000; font-family: 'Inter', -apple-system, sans-serif; display: flex; align-items: center; justify-content: center; padding: 24px; -webkit-font-smoothing: antialiased; overflow-x: hidden; position: relative; }
-  .pi-geo-grid { position: fixed; inset: 0; pointer-events: none; background-image: linear-gradient(to right, rgba(0,0,0,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.04) 1px, transparent 1px); background-size: 40px 40px; background-position: center center; z-index: 1; }
-  .pi-stage { position: relative; z-index: 10; max-width: 580px; width: 100%; background: #FFFFFF; border: 1px solid #000000; padding: 36px 40px; }
-  .pi-status-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; }
-  .pi-status-dot { width: 6px; height: 6px; flex-shrink: 0; background: #FF0000; border: 1px solid #CC0000; animation: pi-dot-pulse 1.6s ease-in-out infinite; }
-  @keyframes pi-dot-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.35); } }
-  .pi-coords { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #666666; }
-  .pi-heading { font-size: 18px; font-weight: 600; letter-spacing: 0.02em; line-height: 1.35; text-transform: uppercase; margin-bottom: 14px; }
-  .pi-lead { font-size: 13px; line-height: 1.65; color: #444444; margin-bottom: 24px; }
-  .pi-sync-box { border: 1px dashed #CCCCCC; padding: 14px 16px; margin-bottom: 28px; background: #FAFAFA; display: flex; flex-direction: column; gap: 8px; }
-  .pi-sync-text { font-size: 10px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; display: flex; justify-content: space-between; color: #555555; }
-  .pi-sync-progress { width: 100%; height: 2px; background: #E5E5E5; position: relative; overflow: hidden; }
-  .pi-sync-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 0%; background: #000000; transition: width 0.1s linear; }
-  .pi-action-row { display: flex; flex-wrap: wrap; gap: 10px; }
-  .pi-btn-main { display: inline-flex; align-items: center; justify-content: center; height: 44px; padding: 0 18px; background: #000000; color: #FFFFFF; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; cursor: pointer; border: 1px solid #000000; transition: background 0.15s ease; white-space: nowrap; }
-  .pi-btn-main:hover { background: #333333; }
-  .pi-btn-alt { display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 44px; padding: 0 16px; background: #FFFFFF; color: #000000; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; cursor: pointer; border: 1px solid #000000; transition: background 0.15s ease, color 0.15s ease; white-space: nowrap; appearance: none; outline: none; }
-  .pi-btn-alt:hover { background: #000000; color: #FFFFFF; }
+  /* ABSOLUTE MONOCHROME SYSTEM */
+:root {
+  --bg: #FFFFFF;
+  --line: #000000;
+  --text: #000000;
+  --muted: #666666;
+}
+
+  *, *::before, *::after {
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    -webkit-tap-highlight-color: transparent;
+    font-family: 'Inter', sans-serif !important;
+    font-feature-settings: "tnum";
+  }
+
+  :focus-visible { outline: 2px solid var(--text) !important; outline-offset: -2px; }
+  
+  html, body {
+    width: 100%; height: 100%; height: 100dvh;
+    background: var(--bg); color: var(--text); 
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+  body { display: flex; flex-direction: column; border-bottom: 1px solid var(--text); }
+  body.pi-drawer-lock { overflow: hidden; }
+
+  /* ICONS */
+  .pi-icon { width: 18px; height: 18px; stroke: var(--text); stroke-width: 1.5; fill: none; stroke-linecap: square; stroke-linejoin: miter; }
+
+  /* TOP CONTROL BAR */
+  #topbar { background: var(--bg); flex-shrink: 0; z-index: 10; border-bottom: 1px solid var(--text); position: relative; }
+  #search-row { display: flex; align-items: center; height: 44px; padding: 0 16px; gap: 12px; background: var(--bg); }
+  .search-lead-icon { width: 14px; height: 14px; flex-shrink: 0; stroke: var(--text); }
+  
+  #geocoder { flex: 1; height: 100%; min-width: 0; }
+  #pi-search-wrap { width: 100%; height: 100%; display: flex; align-items: center; gap: 6px; min-width: 0; position: relative; }
+  #pi-search-input { 
+    flex: 1; min-width: 80px; height: 100%; border: none; background: transparent; 
+    font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; 
+    color: var(--text); outline: none; padding-right: 30px; box-sizing: border-box;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  #pi-search-input:focus-visible { outline: none !important; }
+  #pi-search-input::placeholder { color: var(--text); font-weight: 500; }
+  #pi-search-clear { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); border: none; background: transparent; font-size: 20px; color: var(--text); cursor: pointer; display: none; line-height: 1; padding: 4px 8px; transition: opacity 0.1s; z-index: 2; }
+  #pi-search-clear:hover { opacity: 0.4; }
+
+  #pi-active-tags { display: flex; align-items: center; gap: 4px; flex-shrink: 0; overflow-x: auto; max-width: 55%; scrollbar-width: none; }
+  #pi-active-tags:empty { display: none; }
+  #pi-active-tags::-webkit-scrollbar { display: none; }
+  .pi-tag { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--text); padding: 3px 6px; font-size: 9px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; background: var(--bg); color: var(--text); flex-shrink: 0; }
+  .pi-tag button { border: none; background: transparent; cursor: pointer; font-size: 12px; line-height: 1; padding: 0 2px; color: var(--text); }
+  .pi-tag button:hover { opacity: 0.4; }
+
+  /* Dropdown */
+  .pi-suggest {
+    position: absolute; top: 100%; left: 0; width: 100%;
+    background: var(--bg); border-bottom: 1px solid var(--text);
+    z-index: 50; display: none; max-height: 45vh; overflow-y: auto;
+  }
+  .pi-suggest.open { display: block; }
+  .pi-suggest-item {
+    padding: 14px 24px; font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+    cursor: pointer; border-bottom: 1px solid var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .pi-suggest-item:last-child { border-bottom: none; }
+  .pi-suggest-item:hover, .pi-suggest-item.active { background: var(--text); color: var(--bg); }
+  .pi-suggest-mark { display: inline-block; width: 6px; height: 6px; background: currentColor; margin-right: 12px; vertical-align: middle; }
+  .pi-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  
+  #search-archive-btn { height: 100%; padding: 0 16px; margin-right:-16px; border-left: 1px solid var(--text); background: var(--bg); color: var(--text); font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; text-decoration: none; flex-shrink: 0; transition: background 0.1s, color 0.1s; }
+  #search-archive-btn:hover { background: var(--text); color: var(--bg); }
+  .pi-search-action-icon { display: none; width: 18px; height: 18px; }
+
+  #pi-fullscreen-toggle {
+    width: 44px; height: 100%; flex-shrink: 0;
+    border-left: 1px solid var(--text);
+    background: var(--bg); color: var(--text);
+    cursor: pointer; display: none; align-items: center; justify-content: center;
+    transition: background 0.1s, color 0.1s;
+  }
+  #pi-fullscreen-toggle:hover { background: var(--text); color: var(--bg); }
+
+  /* LAYOUT MATRIX: STAŁY TRÓJKOLUMNOWY UKŁAD */
+  #layout { width: 100%; flex: 1 1 auto; min-height: 0; background: var(--bg); position: relative; display: flex; overflow: hidden; margin: 0; padding: 0; }
+  
+  #index-panel { width: 340px; flex-shrink: 0; position: relative; height: 100%; border-right: 1px solid var(--text); display: flex; flex-direction: column; background: var(--bg); z-index: 3; overflow-y: auto; }
+  .mobile-only-header, .mobile-grip { display: none; }
+
+  /* SIDEBAR ACCORDION */
+  .acc-head { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--text); cursor: pointer; user-select: none; background: var(--bg); flex-shrink: 0; transition: background 0.1s; }
+  .acc-head:hover { background: var(--text); color: var(--bg); }
+  .acc-head:hover .acc-title, .acc-head:hover .acc-icon { color: var(--bg); }
+  .acc-title { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); }
+  .acc-count { font-size: 11px; font-weight: 500; color: var(--text); margin-left: 6px; }
+  .acc-head:hover .acc-count { color: var(--bg); }
+  .acc-icon { font-size: 16px; font-weight: 400; color: var(--text); line-height: 1; transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+  .acc-head.open .acc-icon { transform: rotate(45deg); }
+  
+  .acc-body { display: none; padding: 16px 20px 24px 20px; border-bottom: 1px solid var(--text); font-size: 12px; color: var(--text); background: var(--bg); }
+  .acc-body.open { display: block; }
+  .sub-category-title { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); margin: 24px 0 12px 0; border-bottom: 1px solid var(--text); padding-bottom: 6px;}
+  .sub-category-title:first-child { margin-top: 0; }
+  
+  .acc-body label { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 10px 0; font-size: 12px; font-weight: 500; letter-spacing: normal; color: var(--text); transition: opacity 0.1s;}
+  .acc-body label.no-data { opacity: 0.3; cursor: default; text-decoration: none !important; }
+  .filter-count { margin-left: auto; font-size: 10px; font-weight: 500; color: var(--text); }
+  
+  /* STRICT FORM INPUTS */
+  .acc-body input[type="checkbox"], .acc-body input[type="radio"] { -webkit-appearance: none; appearance: none; margin: 0; width: 14px; height: 14px; border: 1px solid var(--text); background: var(--bg); display: grid; place-content: center; flex-shrink: 0; cursor: pointer;}
+  .acc-body input[type="radio"]:checked::before { content: ""; width: 6px; height: 6px; background: var(--bg); }
+  .acc-body input[type="radio"]:checked { background: var(--text); border-color: var(--text); }
+  .acc-body input[type="checkbox"]:checked::before { content: ""; width: 5px; height: 8px; border: solid var(--bg); border-width: 0 1.5px 1.5px 0; transform: rotate(45deg) translate(-1px, -1px); }
+  .acc-body input[type="checkbox"]:checked { background: var(--text); border-color: var(--text); }
+
+  #filters-group { flex-shrink: 0; }
+
+  /* MAP VIEWPORT */
+  #map-wrap { flex: 1; position: relative; height: 100%; background: var(--bg); margin: 0; padding: 0; }
+  
+  #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s ease-in-out; }
+  #map.loaded { opacity: 1; }
+  #map .mapboxgl-canvas { filter: grayscale(100%); }
+  
+  #map-error {
+    position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
+    background: var(--bg); text-align: center; padding: 40px; z-index: 5;
+  }
+  #map-error.visible { display: flex; }
+  #map-error-text { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text); max-width: 320px; line-height: 1.6; }
+
+  .pi-log-detail {
+    display: none; padding: 12px 0; border-bottom: 1px solid var(--text);
+    font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .pi-log-detail.open { display: block; }
+  
+  /* PINS */
+  .custom-marker-hitbox {
+    width: 24px; height: 32px;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+    cursor: pointer; transform: translate3d(0,0,0); will-change: transform; contain: layout style;
+  }
+  .pi-pin { display: flex; flex-direction: column; align-items: center; transition: transform 0.15s ease; }
+  .pi-pin-body { min-width: 20px; height: 20px; padding: 0 4px; background: var(--text); border: 1px solid var(--text); color: var(--bg); font-size: 10px; font-weight: 500; display: flex; align-items: center; justify-content: center; }
+  .pi-pin-point { width: 0; height: 0; border-left: 3px solid transparent; border-right: 3px solid transparent; border-top: 4px solid var(--text); }
+  
+  .custom-marker-hitbox:hover .pi-pin { transform: scale(1.15) translateY(-2px); }
+
+  .pi-pin-cluster .pi-pin-body { min-width: 26px; height: 26px; font-size: 11px; border-width: 2px; }
+  .pi-pin-cluster .pi-pin-point { border-left-width: 4px; border-right-width: 4px; border-top-width: 5px; }
+
+  /* PRAWY STAŁY PANEL SZCZEGÓŁÓW - identyczna szerokość jak panel pojedynczego zdjęcia (638px) */
+  .pi-map-overlay {
+    position: relative; width: 638px; flex-shrink: 0; height: 100%;
+    background: var(--bg); border-left: 1px solid var(--text);
+    display: none; flex-direction: column; overflow: hidden; z-index: 800; /* Większe niż drawer (700) */
+  }
+  .pi-map-overlay.visible { display: flex; }
+
+  /* ARCHITEKTURA WNĘTRZA PANELA SZCZEGÓŁÓW */
+  .pi-record-meta-top {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding-bottom: 8px; margin-bottom: 16px;
+    font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .pi-record-meta-top .pi-ref-label { color: #000000; font-weight: 600; }
+  .pi-record-meta-top .pi-loc-label { color: #666666; font-weight: 400; letter-spacing: 0.06em; }
+  .pi-record-title {
+    font-size: 14px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+    line-height: 1.35; margin: 0 0 12px 0; color: #000000;
+  }
+  .pi-record-caption {
+    font-size: 12px; line-height: 1.6; color: #444444; margin-bottom: 24px;
+  }
+  
+  /* GŁÓWNE PRZYCISKI AKCJI W PANELU — jeden rząd: ADD TO SELECTION + OPEN RECORD + COPY LINK */
+  .pi-cta-block { margin-bottom: 28px; }
+  .pi-cta-combined { display: flex; border: 1px solid #000000; }
+  .pi-btn-add, .pi-btn-open {
+    flex: 1; height: 44px; background: #000000; color: #FFFFFF; border: none;
+    font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+    text-decoration: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    text-align: center; transition: background 0.15s ease; white-space: nowrap;
+  }
+  .pi-btn-add:hover, .pi-btn-open:hover { background: #333333; }
+  .pi-btn-open { border-left: 1px solid #FFFFFF; }
+  .pi-btn-copy-icon {
+    width: 44px; height: 44px; flex-shrink: 0; background: #FFFFFF; border: none;
+    border-left: 1px solid #000000; color: #000000; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .pi-btn-copy-icon:hover, .pi-btn-copy-icon.copied { background: #000000; color: #FFFFFF; }
+
+  /* AKORDEONY W PANELU */
+  .pi-spec-acc-group { border-top: 1px solid #000000; }
+  .pi-spec-acc-head {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 0; border-bottom: 1px solid #000000; cursor: pointer; user-select: none;
+  }
+  .pi-spec-acc-head:hover .pi-spec-acc-title { text-decoration: underline; }
+  .pi-spec-acc-title { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #000000; }
+  .pi-spec-acc-icon { font-size: 14px; font-weight: 400; line-height: 1; }
+  .pi-spec-acc-body { display: none; padding: 14px 0 20px 0; border-bottom: 1px solid #000000; font-size: 11px; }
+  .pi-spec-acc-body.open { display: block; }
+  .pi-map-overlay-close-btn { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border: 1px solid #000000; background: #FFFFFF; cursor: pointer; font-size: 16px; color: #000000; display: flex; align-items: center; justify-content: center; z-index: 5; transition: background 0.1s, color 0.1s; }
+  .pi-map-overlay-close-btn:hover { background: #000000; color: #FFFFFF; }
+
+  .pi-overlay-update-nav {
+    position: absolute; top: 12px; left: 12px; z-index: 6;
+    display: flex; align-items: center; border: 1px solid #000000; background: #FFFFFF;
+  }
+  .pi-overlay-nav-btn {
+    width: 32px; height: 32px; border: none; background: transparent; color: #000000;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background 0.1s, color 0.1s;
+  }
+  .pi-overlay-nav-btn:hover:not(:disabled) { background: #000000; color: #FFFFFF; }
+  .pi-overlay-nav-btn:disabled { opacity: 0.25; cursor: default; }
+  .pi-overlay-nav-btn svg { width: 14px; height: 14px; }
+  .pi-overlay-nav-count {
+    font-size: 9px; font-weight: 500; letter-spacing: 0.06em; padding: 0 10px;
+    border-left: 1px solid #DADADA; border-right: 1px solid #DADADA; color: #000000;
+    white-space: nowrap; user-select: none;
+  }
+
+  .pi-overlay-slider-wrap { flex-shrink: 0; height: 58vh; background: #FAFAFA; border-bottom: 1px solid #000000; overflow: hidden; }
+  .pi-overlay-body-wrap { flex: 1; overflow-y: auto; }
+
+  /* GRID DANYCH */
+  .pi-data-grid { display: flex; flex-direction: column; gap: 9px; }
+  .pi-data-row { display: grid; grid-template-columns: 140px 1fr; align-items: baseline; column-gap: 12px; font-size: 11px; line-height: 1.5; }
+  .pi-data-key { color: #666666; text-transform: uppercase; letter-spacing: 0.05em; font-size: 10px; }
+  .pi-data-val { color: #000000; font-weight: 500; text-align: right; word-break: break-word; }
+
+  .pi-tags-flex { display: flex; flex-wrap: wrap; gap: 4px; }
+
+  /* UPDATE DRAWER */
+  #pi-drawer-tab {
+    position: fixed; top: 50%; right: 0; transform: translateY(-50%);
+    width: 28px; height: 144px; background: var(--text); color: var(--bg);
+    border: 1px solid var(--text); border-right: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    z-index: 500; transition: background 0.1s, color 0.1s;
+  }
+  #pi-drawer-tab:hover { background: var(--bg); color: var(--text); }
+  #pi-drawer-tab-inner {
+    display: inline-flex; align-items: center; gap: 8px;
+    transform: rotate(-90deg); white-space: nowrap;
+    font-size: 9px; font-weight: 500; letter-spacing: 0.1em; font-family: inherit; text-transform: uppercase;
+  }
+  #pi-drawer-dot {
+    width: 6px; height: 6px; flex-shrink: 0;
+    background: #00FF00; border: 1px solid #00CC00;
+    animation: pi-dot-pulse 1.6s ease-in-out infinite;
+  }
+  #pi-drawer-dot.hidden { display: none; }
+  @keyframes pi-dot-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.35); }
+  }
+  #pi-drawer-backdrop { position: fixed; inset: 0; z-index: 600; pointer-events: none; }
+  #pi-drawer-backdrop.active { pointer-events: auto; }
+  
+  #pi-drawer-panel {
+    position: fixed; top: 0; right: 0; height: 100%; height: 100dvh; width: 638px; max-width: calc(100vw - 40px);
+    background: var(--bg); border-left: 1px solid var(--text); transform: translateX(100%);
+    transition: transform 0.25s cubic-bezier(0.16,1,0.3,1); z-index: 700; display: flex; flex-direction: column;
+  }
+  #pi-drawer-panel.open { transform: translateX(0); }
+  .pi-drawer-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 20px; border-bottom: 1px solid var(--text); background: var(--bg);
+    font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); flex-shrink: 0;
+  }
+  .pi-drawer-close { border: none; background: transparent; cursor: pointer; width: 22px; height: 22px; font-size: 18px; color: var(--text); display: flex; align-items: center; justify-content: center; padding: 0; }
+  .pi-drawer-close:hover { background: var(--text); color: var(--bg); }
+  .pi-drawer-body { flex: 1; overflow-y: auto; padding: 20px; }
+  .pi-drawer-title { font-size: 14px; font-weight: 500; line-height: 1.2; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; color: var(--text); }
+  .pi-drawer-sub { font-size: 10px; font-weight: 500; color: var(--text); margin-bottom: 24px; text-transform: uppercase; letter-spacing: 0.06em;}
+  .pi-drawer-section-title { font-size: 9px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); margin-bottom: 8px; border-bottom: 1px solid var(--text); padding-bottom: 4px; }
+  #pi-drawer-log { display: flex; flex-direction: column; margin: 0 -20px 24px -20px; }
+  .pi-log-link {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 20px; border-bottom: 1px solid var(--text);
+    font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-decoration: none; color: var(--text); text-transform: uppercase;
+    cursor: pointer; user-select: none;
+  }
+  .pi-log-link.active { background: var(--text); color: var(--bg); }
+  .pi-log-link .loc { flex: 1; letter-spacing: 0.02em; padding-right: 12px; }
+  .pi-log-link .stats { display: flex; align-items: center; gap: 10px; color: var(--text); font-weight: 500; flex-shrink: 0; }
+  .pi-log-link.active .stats { color: var(--bg); }
+  .pi-drawer-footer { padding: 16px 20px; border-top: 1px solid var(--text); flex-shrink: 0; background: var(--bg); }
+  .pi-drawer-cta { display: block; width: 100%; text-align: center; border: 1px solid var(--text); background: var(--text); color: var(--bg); padding: 12px; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; cursor: pointer; transition: background 0.1s, color 0.1s; }
+  .pi-drawer-cta:hover { background: var(--bg); color: var(--text); }
+
+  /* MOBILE UX */
+  .pi-mh-search-icon { display: none; }
+  .pi-mobile-backdrop { display: none; }
+  .mobile-bar { display: none; }
+
+  @media (max-width: 720px) {
+    #pi-active-tags { display: none !important; }
+    #pi-fullscreen-toggle { display: none !important; }
+    #topbar { border-bottom: 1px solid var(--text); flex-shrink: 0; }
+    #search-row { height: 52px; padding: 0; }
+    #search-row > .search-lead-icon { display: none; }
+    .pi-mh-search-icon { display: flex; align-items: center; justify-content: center; padding-left: 16px; flex-shrink: 0; }
+    #geocoder { padding-left: 12px; border-right: 1px solid var(--text); flex: 1; height: 100%; min-width: 0; }
+    #pi-search-wrap { min-width: 0; }
+    #pi-search-input { font-size: 14px; letter-spacing: normal; text-transform: none; font-weight: 400; }
+    #pi-search-input::placeholder { color: var(--muted); text-transform: none; font-weight: 400; }
+    #search-archive-btn { width: 60px; height: 100%; display: flex; align-items: center; justify-content: center; background: transparent; border: none; margin: 0; padding: 0; flex-shrink: 0; border-left: none; }
+    .pi-search-action-icon { display: block; }
+    #search-archive-text { display: none; }
+    .pi-suggest-item { padding: 16px 20px; font-size: 12px; }
+    .mobile-bar { display: flex; height: 44px; background: #FAFAFA; color: var(--text); border-top: none; border-bottom: 1px solid var(--text); flex-shrink: 0; }
+    .mobile-bar-btn { width: 60px; flex: none; color: var(--text); background: transparent; position: relative; display: flex; justify-content: center; align-items: center; cursor: pointer; border: none; }
+    #mobile-toggle-filters { border-right: 1px solid var(--text); }
+    .mobile-bar-btn .count-badge { position: absolute; top: 6px; right: 8px; background: var(--text); color: var(--bg); border-radius: 50% !important; border: none; min-width: 14px; height: 14px; font-size: 9px; display: flex; align-items: center; justify-content: center; padding: 0;}
+    .pi-mh-status { flex: 1; display: flex; align-items: center; justify-content: center; padding: 0 16px; font-size: 10px; font-weight: 500; letter-spacing: 0.05em; color: var(--text); text-transform: uppercase; text-align: center; }
+    #index-panel {
+      position: fixed; inset: 0; width: 85% !important; max-width: 340px; height: 100% !important;
+      z-index: 999; border-right: 1px solid var(--text); background: var(--bg);
+      transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+    }
+    #index-panel.mobile-active { transform: translateX(0); }
+    .acc-head { padding: 18px 20px; }
+    .acc-body label { padding: 14px 0; font-size: 13px; gap: 14px; }
+    .mobile-only-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--text); background: #FAFAFA; }
+    body.pi-drawer-lock .pi-mobile-backdrop {
+      display: block; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      z-index: 900; pointer-events: auto; animation: pi-fade-in 0.3s ease;
+    }
+    #map-wrap { height: calc(100dvh - 52px - 44px); }
+    #pi-drawer-tab { height: 120px; width: 32px; padding-left: 4px; }
+    
+    .pi-map-overlay {
+      position: fixed !important; inset: 0 !important; width: 100% !important; max-width: 100% !important;
+      height: 100% !important; z-index: 9999 !important; transform: translateX(100%);
+      transition: transform 0.3s ease;
+    }
+    .pi-map-overlay.visible { transform: translateX(0) !important; display: flex !important; }
+  }
+  @keyframes pi-fade-in { from { opacity: 0; } to { opacity: 1; } }
 </style>
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "y34xppm08p");
+</script>
 </head>
 <body>
-  <div class="pi-geo-grid"></div>
-  <main class="pi-stage">
-    <div class="pi-status-bar"><span class="pi-status-dot"></span><span class="pi-coords">BRISBANE URBAN ARCHIVE &middot; 27.4705&deg; S, 153.0260&deg; E</span></div>
-    <h1 class="pi-heading">Connecting to the Interactive Map</h1>
-    <p class="pi-lead">We're having trouble loading the map layer right now. This usually resolves within a minute.</p>
+
+<div id="topbar">
+  <div id="search-row">
+    <div class="pi-mh-search-icon">
+      <svg class="search-lead-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="square"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16" y2="16"></line></svg>
+    </div>
+    <div id="geocoder">
+      <div id="pi-search-wrap">
+        <div id="pi-active-tags"></div>
+        <input type="text" id="pi-search-input" autocomplete="off" spellcheck="false" placeholder="Search archive...">
+        <button type="button" id="pi-search-clear" aria-label="Clear search">&times;</button>
+      </div>
+    </div>
+    <a id="search-archive-btn" href="https://www.photoindex.au/" target="_top">
+      <svg class="pi-search-action-icon" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="1.5" stroke-linecap="square"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+      <span id="search-archive-text">Search</span>
+    </a>
+    <button type="button" id="pi-fullscreen-toggle" aria-label="Expand map to full screen" title="Expand map to full screen">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" style="width:16px;height:16px;">
+        <path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/>
+      </svg>
+    </button>
+  </div>
+  <div id="pi-suggest" class="pi-suggest"></div>
+</div>
+
+<div class="mobile-bar">
+  <button type="button" class="mobile-bar-btn" id="mobile-toggle-filters">
+    <svg class="pi-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+    <span class="count-badge" id="mobile-filter-count" style="display:none;"></span>
+  </button>
+  <div class="pi-mh-status">SHOWING 0 RECORDS</div>
+</div>
+
+<div class="pi-mobile-backdrop" onclick="document.getElementById('mobile-panel-apply').click()"></div>
+
+<div id="layout">
+  <aside id="index-panel">
+    <div class="mobile-grip"></div>
+    <div class="mobile-only-header">
+      <span style="font-size:12px; font-weight: 600; text-transform:uppercase; letter-spacing:0.1em;">Filters</span>
+      <button type="button" id="mobile-panel-apply" style="background:var(--text); color:var(--bg); border:none; padding:10px 16px; font-size:10px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer;">APPLY</button>
+    </div>
+    <div class="panel-section-container" id="filters-group">
+      <div class="acc-head open" data-target="acc-location">
+        <span class="acc-title">1. Location</span><span class="acc-icon">+</span>
+      </div>
+      <div class="acc-body open" id="acc-location">
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="" checked> All Locations</label>
+        <div class="sub-category-title">Inner North & CBD</div>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Brisbane City"> Brisbane City</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Spring Hill"> Spring Hill</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Fortitude Valley"> Fortitude Valley</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Newstead"> Newstead</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Teneriffe"> Teneriffe</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="New Farm"> New Farm</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Bowen Hills"> Bowen Hills</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Herston"> Herston</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Albion"> Albion</label>
+        <div class="sub-category-title">Inner West</div>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Milton"> Milton</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Paddington"> Paddington</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Red Hill"> Red Hill</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Kelvin Grove"> Kelvin Grove</label>
+        <div class="sub-category-title">Inner South</div>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="South Brisbane"> South Brisbane</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="West End"> West End</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Kangaroo Point"> Kangaroo Point</label>
+        <label><input type="radio" name="suburb-group" class="suburb-check" value="Woolloongabba"> Woolloongabba</label>
+      </div>
+      <div class="acc-head" data-target="acc-condition">
+        <span class="acc-title">2. Physical Condition</span><span class="acc-icon">+</span>
+      </div>
+      <div class="acc-body" id="acc-condition">
+        <label><input type="checkbox" class="filter-check" data-cat="condition" value="Existing Condition"> Existing Condition</label>
+        <label><input type="checkbox" class="filter-check" data-cat="condition" value="Fenced Development Site"> Fenced Development Site</label>
+        <label><input type="checkbox" class="filter-check" data-cat="condition" value="Demolition & Site Works"> Demolition & Site Works</label>
+        <label><input type="checkbox" class="filter-check" data-cat="condition" value="Active Construction Site"> Active Construction Site</label>
+        <label><input type="checkbox" class="filter-check" data-cat="condition" value="Completed Development"> Completed Development</label>
+      </div>
+      <div class="acc-head" data-target="acc-typology">
+        <span class="acc-title">3. Typology & Use</span><span class="acc-icon">+</span>
+      </div>
+      <div class="acc-body" id="acc-typology">
+        <div class="sub-category-title">Residential</div>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="residential"> residential</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="apartment"> apartment</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="residential tower"> residential tower</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="social housing"> social housing</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="student housing"> student housing</label>
+        <div class="sub-category-title">Commercial & Retail</div>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="commercial"> commercial</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="office"> office</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="retail"> retail</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="hospitality"> hospitality</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="shopfront"> shopfront</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="showroom"> showroom</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="market"> market</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="supermarket"> supermarket</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="shopping centre"> shopping centre</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="cafe"> cafe</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="restaurant"> restaurant</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="bar"> bar</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="pub"> pub</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="hotel"> hotel</label>
+        <div class="sub-category-title">Public & Civic</div>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="public"> public</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="civic"> civic</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="education"> education</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="university"> university</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="school"> school</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="health"> health</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="hospital"> hospital</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="clinic"> clinic</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="government"> government</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="place of worship"> place of worship</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="community centre"> community centre</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="library"> library</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="museum"> museum</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="gallery"> gallery</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="theatre"> theatre</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="performance venue"> performance venue</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="stadium"> stadium</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="arena"> arena</label>
+        <div class="sub-category-title">Heritage & Traditional</div>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="heritage"> heritage</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="heritage architecture"> heritage architecture</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="queenslander"> queenslander</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="highset house"> highset house</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="lowset house"> lowset house</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="workers cottage"> workers cottage</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="post war house"> post war house</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="terrace house"> terrace house</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="duplex"> duplex</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="adaptive reuse"> adaptive reuse</label>
+        <div class="sub-category-title">Industrial</div>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="industrial"> industrial</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="warehouse"> warehouse</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="parking structure"> parking structure</label>
+        <label><input type="checkbox" class="filter-check" data-cat="typology" value="industrial architecture"> industrial architecture</label>
+      </div>
+      <div class="acc-head" data-target="acc-architecture">
+        <span class="acc-title">4. Architecture & Material</span><span class="acc-icon">+</span>
+      </div>
+      <div class="acc-body" id="acc-architecture">
+        <div class="sub-category-title">Form & Style</div>
+        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="high rise"> high rise</label>
+        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="mid rise"> mid rise</label>
+        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="low rise"> low rise</label>
+        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="tower"> tower</label>
+        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="podium"> podium</label>
+        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="corner building"> corner building</label>
+        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="corner tower"> corner tower</label>
+        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="curved facade"> curved facade</label>
+        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="modern architecture"> modern architecture</label>
+        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="contemporary architecture"> contemporary architecture</label>
+        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="heritage architecture"> heritage architecture</label>
+        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="postwar architecture"> postwar architecture</label>
+        <div class="sub-category-title">Material</div>
+        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="glass"> glass</label>
+        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="brick"> brick</label>
+        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="face brick"> face brick</label>
+        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="painted brick"> painted brick</label>
+        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="concrete"> concrete</label>
+        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="timber"> timber</label>
+        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="metal"> metal</label>
+        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="stone"> stone</label>
+        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="rendered finish"> rendered finish</label>
+        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="corrugated iron"> corrugated iron</label>
+        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="screen"> screen</label>
+        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="grid"> grid</label>
+      </div>
+      <div class="acc-head" data-target="acc-urban">
+        <span class="acc-title">5. Urban Context</span><span class="acc-icon">+</span>
+      </div>
+      <div class="acc-body" id="acc-urban">
+        <div class="sub-category-title">Process & Transformation</div>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="urban renewal"> urban renewal</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="urban development"> urban development</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="urban intensification"> urban intensification</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="urban consolidation"> urban consolidation</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="high density"> high density</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="riverfront"> riverfront</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="transport corridor"> transport corridor</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="construction impact"> construction impact</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="flood resilience"> flood resilience</label>
+        <div class="sub-category-title">Public Realm & Streetscape</div>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="pedestrian zone"> pedestrian zone</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="shared zone"> shared zone</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="arcade"> arcade</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="passage"> passage</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="public art"> public art</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="mural"> mural</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="outdoor dining"> outdoor dining</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="streetscape"> streetscape</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="street level"> street level</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="laneway"> laneway</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="street activation"> street activation</label>
+        <div class="sub-category-title">Brisbane 2032</div>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="olympic venue"> olympic venue</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="olympic precinct"> olympic precinct</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="olympic infrastructure"> olympic infrastructure</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="transport upgrade"> transport upgrade</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="athlete village"> athlete village</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="temporary structure"> temporary structure</label>
+        <label><input type="checkbox" class="filter-check" data-cat="urban" value="legacy project"> legacy project</label>
+      </div>
+      <div class="acc-head" data-target="acc-year">
+        <span class="acc-title">6. Time</span><span class="acc-icon">+</span>
+      </div>
+      <div class="acc-body" id="acc-year">
+        <label><input type="checkbox" class="filter-check" data-cat="year" value="2026"> 2026</label>
+      </div>
+    </div>
+  </aside>
+
+  <main id="map-wrap">
+    <div id="map"></div>
+    <div id="map-error">
+      <div id="map-error-text">Archive data could not be loaded right now. Please refresh, or open the full archive directly.</div>
+    </div>
   </main>
-</body>
-</html>`;
 
-async function fetchMapSource() {
-  for (let attempt = 1; attempt <= 2; attempt++) {
-    try {
-      const upstream = await fetch(MAP_SOURCE_URL + "?cf=" + Date.now(), {
-        cf: { cacheTtl: attempt === 1 ? 300 : 0, cacheEverything: attempt === 1 },
+  <aside id="pi-map-overlay" class="pi-map-overlay"></aside>
+</div>
+
+<div id="pi-drawer-backdrop"></div>
+<button id="pi-drawer-tab" type="button" aria-expanded="false" aria-controls="pi-drawer-panel">
+  <span id="pi-drawer-tab-inner">
+    UPDATE LOG
+    <span id="pi-drawer-dot" class="hidden"></span>
+  </span>
+</button>
+<aside id="pi-drawer-panel" role="dialog" aria-labelledby="pi-drawer-title" aria-hidden="true">
+  <div class="pi-drawer-header">
+    <span id="pi-drawer-index">LOADING…</span>
+    <button type="button" class="pi-drawer-close" id="pi-drawer-close" aria-label="Close">&times;</button>
+  </div>
+  <div class="pi-drawer-body">
+    <div class="pi-drawer-title" id="pi-drawer-title">New records documented</div>
+    <div class="pi-drawer-sub" id="pi-drawer-sub">Archive total: … records</div>
+    <div class="pi-drawer-section-title">By location</div>
+    <div id="pi-drawer-log"></div>
+  </div>
+  <div class="pi-drawer-footer">
+    <button class="pi-drawer-cta" id="pi-drawer-close-btn">Close panel</button>
+  </div>
+</aside>
+
+<script>
+var DATA_VERSION = (function() {
+  var d = new Date();
+  return d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+})();
+var locations = [];
+var searchState = { text: '', suburb: '', categories: {} };
+var mapInstance = null;
+var mapInitiated = false;
+var autocompleteReady = false;
+var CAT_ARRAY_KEYS = { condition: 'conditionArr', typology: 'typologyArr', architecture: 'architectureArr', urban: 'urbanArr', year: 'yearArr' };
+var MAP_STATE_KEY = 'pi_map_state';
+var piUpdateRecords = [];
+var piUpdateIndex = -1;
+
+function saveMapState(partial) {
+  var existing = {};
+  try {
+    var raw = sessionStorage.getItem(MAP_STATE_KEY);
+    if (raw) existing = JSON.parse(raw);
+  } catch (e) {}
+  for (var k in partial) { existing[k] = partial[k]; }
+  try { sessionStorage.setItem(MAP_STATE_KEY, JSON.stringify(existing)); } catch (e) {}
+}
+
+function loadMapState() {
+  try {
+    var raw = sessionStorage.getItem(MAP_STATE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+
+function getStateFromUrlParam() {
+  try {
+    var raw = new URLSearchParams(window.location.search).get('state');
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+
+function broadcastFilterState(state) {
+  try {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ type: 'pi-filters', suburb: state.suburb || '', categories: state.categories || {} }, 'https://www.photoindex.au');
+    }
+  } catch (e) {}
+}
+
+function openUpdateRecordAt(index) {
+  if (!piUpdateRecords.length || index < 0 || index >= piUpdateRecords.length) return;
+  piUpdateIndex = index;
+  var rec = piUpdateRecords[index];
+  document.querySelectorAll('.pi-log-link').forEach(function(el) {
+    el.classList.toggle('active', !!rec.ref && el.getAttribute('data-ref') === rec.ref);
+  });
+  if (window.innerWidth <= 720) {
+    if (window.piToggleLogDetail) window.piToggleLogDetail(index, rec);
+  } else {
+    if (window.piCloseDrawer) window.piCloseDrawer();
+    if (mapInstance) mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2 });
+    if (window.piOpenPopupForLocation) window.piOpenPopupForLocation(rec, true);
+  }
+}
+
+function injectUpdateNav(overlay) {
+  var existing = overlay.querySelector('.pi-overlay-update-nav');
+  if (existing) existing.remove();
+  var nav = document.createElement('div');
+  nav.className = 'pi-overlay-update-nav';
+  nav.innerHTML =
+    '<button type="button" class="pi-overlay-nav-btn" id="pi-overlay-nav-prev" aria-label="Previous new record"' + (piUpdateIndex <= 0 ? ' disabled' : '') + '>' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
+    '</button>' +
+    '<span class="pi-overlay-nav-count">' + (piUpdateIndex + 1) + ' / ' + piUpdateRecords.length + '</span>' +
+    '<button type="button" class="pi-overlay-nav-btn" id="pi-overlay-nav-next" aria-label="Next new record"' + (piUpdateIndex >= piUpdateRecords.length - 1 ? ' disabled' : '') + '>' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
+    '</button>';
+  overlay.appendChild(nav);
+  var prevBtn = nav.querySelector('#pi-overlay-nav-prev');
+  var nextBtn = nav.querySelector('#pi-overlay-nav-next');
+  if (prevBtn) prevBtn.addEventListener('click', function(ev) { ev.stopPropagation(); openUpdateRecordAt(piUpdateIndex - 1); });
+  if (nextBtn) nextBtn.addEventListener('click', function(ev) { ev.stopPropagation(); openUpdateRecordAt(piUpdateIndex + 1); });
+}
+
+function normalizeKey(s) { return (s || '').toLowerCase().trim(); }
+
+function escapeRegExp(s) {
+  return (s || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function findPhotosByDescription(street, allPhotos) {
+  var trimmed = (street || '').trim();
+  if (!trimmed) return [];
+  var pattern;
+  try {
+    pattern = new RegExp('\\b' + escapeRegExp(trimmed) + '\\b', 'i');
+  } catch (e) {
+    return [];
+  }
+  return allPhotos.filter(function(p) { return p.description && pattern.test(p.description); });
+}
+
+function slugify(s) {
+  return (s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-+|-+$)/g, '');
+}
+
+function refFromUrl(url) {
+  if (!url) return '';
+  var m = url.match(/\/([^\/]+?)(?:_medthumb|_wqxga)?\.[a-zA-Z0-9]+(?:\?.*)?$/);
+  return m ? m[1] : '';
+}
+
+function splitCatValue(v) {
+  return v ? v.split(';').map(function(s) { return s.trim(); }).filter(Boolean) : [];
+}
+
+function splitCsvLine(line, delimiter) {
+  var cols = [], cur = '', inQ = false;
+  for (var i = 0; i < line.length; i++) {
+    var c = line[i];
+    if (c === '"') inQ = !inQ;
+    else if (c === delimiter && !inQ) { cols.push(cur); cur = ''; }
+    else cur += c;
+  }
+  cols.push(cur);
+  return cols;
+}
+
+var SEARCHABLE_CATEGORIES = ['condition', 'typology', 'architecture', 'urban', 'year'];
+
+function quoteIfMultiword(v) { return v; }
+
+function buildPhotoDeckQueryParts() {
+  var parts = [];
+  if (searchState.suburb) parts.push(quoteIfMultiword(searchState.suburb));
+  SEARCHABLE_CATEGORIES.forEach(function(cat) {
+    (searchState.categories[cat] || []).forEach(function(val) { parts.push(quoteIfMultiword(val)); });
+  });
+  if (searchState.text) parts.push(searchState.text);
+  return parts;
+}
+
+function updatePhotoDeckLink() {
+  var queryStr = buildPhotoDeckQueryParts().join(' ');
+  var btnDesktop = document.getElementById('search-archive-btn');
+  var txtDesktop = document.getElementById('search-archive-text');
+  var targetUrl = queryStr ? 'https://www.photoindex.au/?search=' + encodeURIComponent(queryStr) : 'https://www.photoindex.au/';
+  var textValue = queryStr ? 'VIEW SELECTION' : 'SEARCH';
+  if (btnDesktop) { btnDesktop.href = targetUrl; if (txtDesktop) txtDesktop.textContent = textValue; }
+}
+
+function removeFilterTag(type, val) {
+  if (type === 'suburb') {
+    searchState.suburb = '';
+    var defRadio = document.querySelector('.suburb-check[value=""]');
+    if (defRadio) defRadio.checked = true;
+  } else {
+    if (searchState.categories[type]) {
+      searchState.categories[type] = searchState.categories[type].filter(function(v) { return v !== val; });
+    }
+    var cb = document.querySelector('.filter-check[data-cat="' + type + '"][value="' + val + '"]');
+    if (cb) cb.checked = false;
+  }
+  applySearchState();
+}
+
+function renderActiveTags() {
+  var container = document.getElementById('pi-active-tags');
+  var searchInput = document.getElementById('pi-search-input');
+  var clearBtn = document.getElementById('pi-search-clear');
+  
+  if (container) {
+    container.innerHTML = '';
+    var tags = [];
+    if (searchState.suburb) {
+      tags.push({ type: 'suburb', label: searchState.suburb, val: searchState.suburb });
+    }
+    SEARCHABLE_CATEGORIES.forEach(function(cat) {
+      (searchState.categories[cat] || []).forEach(function(val) {
+        tags.push({ type: cat, label: val, val: val });
       });
-      if (upstream.ok) {
-        const text = await upstream.text();
-        if (text && text.toLowerCase().includes("<html")) return text;
-      }
-    } catch (e) {}
-    if (attempt === 1) await new Promise((r) => setTimeout(r, 300));
-  }
-  return null;
-}
+    });
 
-async function handleMap(request) {
-  const html = await fetchMapSource();
-  if (!html) {
-    return new Response(MAP_FALLBACK_HTML, { status: 200, headers: { "content-type": "text/html; charset=UTF-8", "cache-control": "no-store" } });
-  }
-  return new Response(html, { headers: { "content-type": "text/html; charset=UTF-8", "cache-control": "public, max-age=300" } });
-}
-
-const LOGIN_BG_URL = "https://raw.githubusercontent.com/sproutssorbets/bne-urban/main/LOGIN%20BCG/BCG.jpg";
-
-async function handleLoginBackground() {
-  const upstream = await fetch(LOGIN_BG_URL, { cf: { cacheTtl: 3600, cacheEverything: true } });
-  if (!upstream.ok) return new Response("Not found", { status: 404 });
-  const headers = new Headers(upstream.headers);
-  headers.set("cache-control", "public, max-age=3600");
-  headers.delete("content-security-policy");
-  return new Response(upstream.body, { status: 200, headers });
-}
-
-const BACK_OVERRIDE_LOGIC = `
-  (function() {
-    if (window.__piBackOverrideInstalled) return;
-    window.__piBackOverrideInstalled = true;
-    document.addEventListener('click', function(e) {
-      var backLink = e.target.closest('a.back');
-      if (backLink) {
-        e.preventDefault();
+    tags.forEach(function(t) {
+      var tagEl = document.createElement('span');
+      tagEl.className = 'pi-tag';
+      tagEl.innerHTML = t.label + '<button type="button" aria-label="Remove filter">&times;</button>';
+      tagEl.querySelector('button').addEventListener('click', function(e) {
         e.stopPropagation();
-        if (window.history.length > 1) { window.history.back(); }
-        else { window.location.href = backLink.href; }
+        removeFilterTag(t.type, t.val);
+      });
+      container.appendChild(tagEl);
+    });
+  }
+
+  if (clearBtn) {
+    var hasActiveContent = (searchInput && searchInput.value.length > 0) || !!searchState.suburb || countActiveFilters() > 0;
+    clearBtn.style.display = hasActiveContent ? 'block' : 'none';
+  }
+}
+
+function countActiveFilters() {
+  var n = searchState.suburb ? 1 : 0;
+  for (var cat in searchState.categories) { n += (searchState.categories[cat] || []).length; }
+  return n;
+}
+
+function locationMatchesState(loc, textLc, suburbLc, excludeCat) {
+  var matchesText = !textLc || loc.streetLc.indexOf(textLc) !== -1 || loc.suburbLc.indexOf(textLc) !== -1;
+  var matchesSuburb = !suburbLc || loc.suburbLc === suburbLc;
+  if (!matchesText || !matchesSuburb) return false;
+  for (var cat in searchState.categories) {
+    if (cat === excludeCat) continue;
+    var allowed = searchState.categories[cat];
+    if (allowed && allowed.length > 0) {
+      var values = loc[CAT_ARRAY_KEYS[cat]] || [];
+      var found = false;
+      for (var i = 0; i < values.length; i++) {
+        if (allowed.indexOf(values[i]) !== -1) { found = true; break; }
       }
-    }, true);
-  })();
-`;
-
-const GLOBAL_STYLE_CSS = `
-:root { --pi-panel-width: 480px; }
-html body #block_main, html body .block_inner, html body #component_mainc, html body .component_main_content, html body #main_content, html body.page-media main#block_main .main_content { margin-top: 0 !important; margin-bottom: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; border-top: none !important; }
-#main_content > .elem[data-type="spacer"], #main_content .col-2:has(.elem[data-type="spacer"]), #main_content > .row-12:not(:has(.media_detail_wrapper)) { display: none !important; }
-.arrows_overlay, .arrows_overlay *, .media_detail_media .arrows_overlay, .media_slide .arrows_overlay, .arrow_prev, .arrow_next { display: none !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }
-#main_content:has(.media_detail_wrapper) { max-width: 100vw !important; width: 100vw !important; margin: 0 !important; padding: 0 !important; overflow-x: hidden !important; }
-#main_content > .row-12:has(.media_detail_wrapper) { display: flex !important; flex-direction: row !important; width: 100vw !important; max-width: 100vw !important; min-height: calc(100vh - 44px) !important; margin: 0 !important; padding: 0 !important; align-items: stretch !important; }
-#main_content .row-12 > .first.col-6:has(.media_detail_wrapper) { flex: 1 1 auto !important; width: auto !important; max-width: calc(100vw - var(--pi-panel-width)) !important; display: flex !important; align-items: center !important; justify-content: center !important; padding: 12px !important; box-sizing: border-box !important; height: calc(100vh - 44px) !important; overflow: hidden !important; position: relative !important; }
-.media_detail_wrapper { max-height: 100% !important; max-width: 100% !important; display: flex !important; align-items: center !important; justify-content: center !important; position: relative !important; }
-.media_detail_wrapper img { max-height: calc(100vh - 60px) !important; max-width: 100% !important; width: auto !important; height: auto !important; object-fit: contain !important; }
-#main_content .row-12 > .col-4:has(.media_detail_meta_wrapper) { flex: 0 0 var(--pi-panel-width) !important; width: var(--pi-panel-width) !important; max-width: var(--pi-panel-width) !important; border-left: 1px solid #000000 !important; height: calc(100vh - 44px) !important; overflow-y: auto !important; position: sticky !important; top: 0 !important; right: 0 !important; padding: 24px 28px 48px 28px !important; box-sizing: border-box !important; background: #FFFFFF !important; }
-#photoindex-nav-controls { position: fixed !important; top: 0 !important; right: calc(var(--pi-panel-width) + 32px) !important; height: 44px !important; display: flex !important; align-items: center !important; gap: 16px !important; background: transparent !important; border: none !important; z-index: 10000 !important; }
-#photoindex-nav-controls a { display: inline-flex !important; align-items: center !important; gap: 6px !important; height: 44px !important; text-decoration: none !important; color: #000000 !important; font-family: Inter, sans-serif !important; font-size: 11px !important; font-weight: 500 !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; background: transparent !important; border: none !important; cursor: pointer !important; transition: opacity 0.15s ease !important; }
-#photoindex-nav-controls a:hover { opacity: 0.45 !important; }
-#photoindex-nav-controls .pi-nav-divider { width: 1px !important; height: 12px !important; background-color: #CCCCCC !important; }
-@media (max-width: 900px) {
-  #photoindex-nav-controls { display: none !important; }
-  #main_content > .row-12:has(.media_detail_wrapper) { flex-direction: column !important; height: auto !important; min-height: auto !important; width: 100% !important; }
-  #main_content .row-12 > .first.col-6:has(.media_detail_wrapper) { max-width: 100% !important; width: 100% !important; height: auto !important; padding: 16px 16px 20px 16px !important; }
-  .media_detail_wrapper img { max-height: 65vh !important; width: 100% !important; height: auto !important; }
-  #main_content .row-12 > .col-4:has(.media_detail_meta_wrapper) { flex: 1 1 auto !important; width: 100% !important; max-width: 100% !important; border-left: none !important; border-top: 1px solid #000000 !important; height: auto !important; position: static !important; padding: 24px 18px 60px 18px !important; box-sizing: border-box !important; }
-}
-`;
-
-const GLOBAL_STYLE_LOGIC = `
-  (function ensureGlobalStyle() {
-    if (document.getElementById('photoindex-global-style')) return;
-    var styleEl = document.createElement('style');
-    styleEl.id = 'photoindex-global-style';
-    styleEl.textContent = ${JSON.stringify(GLOBAL_STYLE_CSS)};
-    document.head.appendChild(styleEl);
-  })();
-`;
-
-const EDITORIAL_DETAIL_CSS = `
-.pi-record-meta-top { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #000000; padding-bottom: 8px; margin-bottom: 16px; font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
-.pi-record-meta-top .pi-ref-label { color: #000000; font-weight: 600; }
-.pi-record-meta-top .pi-loc-label { color: #666666; font-weight: 400; letter-spacing: 0.06em; }
-.pi-record-title { font-size: 14px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; line-height: 1.35; margin: 0 0 12px 0; color: #000000; }
-.pi-record-caption { font-size: 12px; line-height: 1.6; color: #444444; margin-bottom: 24px; }
-.pi-cta-block { margin-bottom: 28px; display: flex; flex-direction: column; gap: 8px; }
-.pi-cta-block form.button_to { margin: 0; width: 100%; }
-.pi-cta-block input.lightbox_toggle { width: 100%; height: 44px; background: #000000; color: #FFFFFF; border: 1px solid #000000; font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; transition: all 0.15s ease; }
-.pi-cta-block input.lightbox_toggle:hover { background: #333333; }
-.pi-btn-copy-ref { width: 100%; height: 38px; background: #FFFFFF; color: #000000; border: 1px solid #DADADA; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: border-color 0.15s ease; }
-.pi-btn-copy-ref:hover { border-color: #000000; }
-.pi-btn-copy-ref svg { width: 14px; height: 14px; stroke: #000000; }
-.pi-spec-acc-group { border-top: 1px solid #000000; }
-.pi-spec-acc-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #000000; cursor: pointer; user-select: none; }
-.pi-spec-acc-title { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #000000; }
-.pi-spec-acc-body { display: none; padding: 14px 0 20px 0; border-bottom: 1px solid #000000; font-size: 11px; }
-.pi-spec-acc-body.open { display: block; }
-.pi-data-grid { display: flex; flex-direction: column; gap: 9px; }
-.pi-data-row { display: grid; grid-template-columns: 140px 1fr; align-items: baseline; column-gap: 12px; font-size: 11px; line-height: 1.5; }
-.pi-data-key { color: #666666; text-transform: uppercase; letter-spacing: 0.05em; font-size: 10px; }
-.pi-data-val { color: #000000; font-weight: 500; text-align: right; word-break: break-word; }
-.pi-tags-flex { display: flex; flex-wrap: wrap; gap: 4px; }
-.pi-tags-flex a { border: 1px solid #DADADA; padding: 3px 6px; font-size: 9px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; color: #000000; }
-.pi-tags-flex a:hover { border-color: #000000; background: #000000; color: #FFFFFF; }
-`;
-
-const EDITORIAL_DETAIL_LOGIC = `
-  (function ensureEditorialCSS() {
-    if (document.getElementById('photoindex-editorial-style')) return;
-    var s = document.createElement('style');
-    s.id = 'photoindex-editorial-style';
-    s.textContent = ${JSON.stringify(EDITORIAL_DETAIL_CSS)};
-    document.head.appendChild(s);
-  })();
-`;
-
-const ZOOM_CSS = `
-.pi-zoom-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255, 255, 255, 0.98); z-index: 2147483647; display: grid; place-items: center; overflow: auto; cursor: zoom-out; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
-.pi-zoom-overlay.visible { opacity: 1; pointer-events: auto; }
-.pi-zoom-overlay img { max-width: none; max-height: none; margin: 40px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); transition: transform 0.2s ease; transform: scale(0.95); pointer-events: none; }
-.pi-zoom-overlay.visible img { transform: scale(1); }
-.media_detail_wrapper img, .pi-fp-card img, #pi-hover-preview img { cursor: zoom-in; }
-`;
-
-const ZOOM_LOGIC = `
-  (function ensureZoomLogic() {
-    if (window.__piZoomInstalled) return;
-    window.__piZoomInstalled = true;
-    var styleEl = document.createElement('style');
-    styleEl.id = 'photoindex-zoom-style';
-    styleEl.textContent = ${JSON.stringify(ZOOM_CSS)};
-    document.head.appendChild(styleEl);
-    var overlay = document.createElement('div');
-    overlay.className = 'pi-zoom-overlay';
-    var overlayImg = document.createElement('img');
-    overlay.appendChild(overlayImg);
-    document.body.appendChild(overlay);
-    overlay.addEventListener('click', function() { overlay.classList.remove('visible'); });
-    document.addEventListener('click', function(e) {
-      var target = e.target;
-      if (!target || target.tagName !== 'IMG') return;
-      var isZoomableImg = target.closest('.media_detail_wrapper') || target.closest('.pi-fp-card');
-      if (isZoomableImg) {
-        e.preventDefault(); e.stopPropagation();
-        overlayImg.src = target.src.replace('_medthumb.jpg', '.jpg');
-        overlay.classList.add('visible');
-      }
-    }, true);
-  })();
-`;
-
-const LOGIN_FULL_CSS = `
-html, body {
-  margin: 0 !important;
-  padding: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  background: #FFFFFF !important;
-  overflow: hidden !important;
-  font-family: 'Inter', -apple-system, sans-serif !important;
-}
-#ws_page {
-  display: flex !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: #FFFFFF !important;
-  overflow: hidden !important;
-  position: relative !important;
-}
-#block_navib, #block_footer, #cookies_acceptance_bar, #component_commt {
-  display: none !important;
-}
-#block_main {
-  flex: 0 0 44% !important;
-  width: 44% !important;
-  height: 100vh !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  background: #FFFFFF !important;
-  box-sizing: border-box !important;
-  padding: 60px !important;
-  margin: 0 !important;
-  position: relative !important;
-  z-index: 2 !important;
-}
-#block_main .block_inner, #component_mainc, .main_content {
-  width: 100% !important;
-  height: auto !important;
-  display: block !important;
-}
-.text_block {
-  max-width: 380px !important;
-  width: 100% !important;
-  margin: 0 auto !important;
-  padding: 0 !important;
-  border: none !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  font-size: 0 !important;
-}
-.text_block::before {
-  content: 'PHOTOINDEX\\A SIGN IN TO THE ARCHIVE\\A A systematic photographic archive of Brisbane in transformation, ahead of the 2032 Olympics. Sign in to search, select and license images.' !important;
-  white-space: pre-line !important;
-  font-size: 14px !important;
-  font-weight: 300 !important;
-  line-height: 1.6 !important;
-  color: #666666 !important;
-  display: block !important;
-  margin-bottom: 40px !important;
-}
-.text_block form {
-  font-size: 14px !important;
-}
-form#login label {
-  display: block !important;
-  font-size: 10px !important;
-  font-weight: 500 !important;
-  letter-spacing: 0.1em !important;
-  text-transform: uppercase !important;
-  color: #111111 !important;
-  margin-bottom: 8px !important;
-}
-form#login input[type="email"],
-form#login input[type="text"],
-form#login input[type="password"] {
-  width: 100% !important;
-  height: 38px !important;
-  border: none !important;
-  border-bottom: 1px solid #111111 !important;
-  padding: 0 0 8px 0 !important;
-  font-family: 'Inter', sans-serif !important;
-  font-size: 15px !important;
-  background: transparent !important;
-  outline: none !important;
-  border-radius: 0 !important;
-  margin-bottom: 28px !important;
-  transition: border-bottom-color 0.15s ease !important;
-}
-form#login input[type="email"]:focus,
-form#login input[type="text"]:focus,
-form#login input[type="password"]:focus {
-  border-bottom: 2px solid #111111 !important;
-}
-form#login input[type="submit"] {
-  width: 100% !important;
-  height: 48px !important;
-  background: #111111 !important;
-  color: #FFFFFF !important;
-  border: 1px solid #111111 !important;
-  font-family: 'Inter', sans-serif !important;
-  font-size: 10px !important;
-  font-weight: 500 !important;
-  letter-spacing: 0.14em !important;
-  text-transform: uppercase !important;
-  cursor: pointer !important;
-  margin-top: 8px !important;
-  transition: background 0.15s ease, color 0.15s ease !important;
-  appearance: none !important;
-}
-form#login input[type="submit"]:hover {
-  background: #FFFFFF !important;
-  color: #111111 !important;
-}
-.pi-login-side-image {
-  flex: 0 0 56% !important;
-  width: 56% !important;
-  height: 100vh !important;
-  background-color: #1A1A1A !important;
-  background-image: url('/assets/login-bg.jpg') !important;
-  background-size: cover !important;
-  background-position: center bottom !important;
-  position: relative !important;
-  display: flex !important;
-  align-items: flex-end !important;
-  padding: 64px !important;
-  box-sizing: border-box !important;
-  z-index: 2 !important;
-}
-.pi-login-side-image::before {
-  content: '' !important;
-  position: absolute !important;
-  bottom: 0 !important; left: 0 !important; width: 100% !important; height: 25% !important;
-  background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%) !important;
-  z-index: 1 !important;
-}
-.pi-login-quote {
-  position: relative !important;
-  z-index: 2 !important;
-  max-width: 460px !important;
-}
-.pi-login-quote h2 {
-  font-size: 26px !important;
-  font-weight: 400 !important;
-  line-height: 1.3 !important;
-  color: #FFFFFF !important;
-  margin: 0 0 14px 0 !important;
-}
-.pi-login-quote p {
-  font-size: 13px !important;
-  font-weight: 300 !important;
-  line-height: 1.65 !important;
-  color: #FFFFFF !important;
-  opacity: 0.85 !important;
-  margin: 0 !important;
-}
-.pi-login-close {
-  position: absolute !important;
-  top: 24px !important;
-  right: 32px !important;
-  z-index: 3 !important;
-  width: 32px !important;
-  height: 32px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  background: transparent !important;
-  border: none !important;
-  color: #FFFFFF !important;
-  cursor: pointer !important;
-}
-.pi-login-close svg {
-  width: 18px !important;
-  height: 18px !important;
-  stroke: currentColor !important;
-  stroke-width: 1.5 !important;
-}
-@media (max-width: 900px) {
-  #ws_page { flex-direction: column !important; overflow: auto !important; height: auto !important; }
-  #block_main { flex: 1 1 auto !important; width: 100% !important; height: auto !important; padding: 48px 28px !important; }
-  .pi-login-side-image { display: none !important; }
-}
-`;
-
-const LOGIN_INJECTION_SCRIPT = `
-  (function() {
-    if (document.getElementById('pi-login-full-style')) return;
-    var styleEl = document.createElement('style');
-    styleEl.id = 'pi-login-full-style';
-    styleEl.textContent = ${JSON.stringify(LOGIN_FULL_CSS)};
-    document.head.appendChild(styleEl);
-
-    function buildLoginLayout() {
-      var wsPage = document.getElementById('ws_page');
-      if (!wsPage) return;
-      if (!document.querySelector('.pi-login-side-image')) {
-        var sideImage = document.createElement('div');
-        sideImage.className = 'pi-login-side-image';
-        sideImage.innerHTML = '<div class="pi-login-quote"><h2>A working archive of the city</h2><p>Urban and architectural photography across Brisbane, for people working with the changing city today, and the record it leaves for later generations.</p></div>';
-        var closeBtn = document.createElement('button');
-        closeBtn.type = 'button';
-        closeBtn.className = 'pi-login-close';
-        closeBtn.setAttribute('aria-label', 'Close');
-        closeBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-linecap="square" stroke-linejoin="miter"/></svg>';
-        closeBtn.addEventListener('click', function(e) {
-          e.preventDefault();
-          window.location.href = '/';
-        });
-        sideImage.appendChild(closeBtn);
-        wsPage.appendChild(sideImage);
-      }
+      if (!found) return false;
     }
+  }
+  return true;
+}
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', buildLoginLayout);
-    } else {
-      buildLoginLayout();
+function applySearchState() {
+  var textLc = searchState.text;
+  var suburbLc = searchState.suburb ? searchState.suburb.toLowerCase() : '';
+  var visibleLocs = locations.filter(function(loc) {
+    return locationMatchesState(loc, textLc, suburbLc, null);
+  });
+  
+  var totalVisible = visibleLocs.reduce(function(sum, loc) { return sum + (loc.count || 1); }, 0);
+  var statusEl = document.querySelector('.pi-mh-status');
+  if (statusEl) {
+    statusEl.textContent = 'SHOWING ' + totalVisible + ' RECORDS';
+  }
+
+  if (window.renderMarkers) window.renderMarkers(visibleLocs);
+  updatePhotoDeckLink();
+  renderActiveTags();
+  annotateFilterCoverage(textLc, suburbLc);
+  var badge = document.getElementById('mobile-filter-count');
+  if (badge) {
+    var n = countActiveFilters();
+    badge.textContent = n;
+    badge.style.display = n > 0 ? 'inline-flex' : 'none';
+  }
+  saveMapState({ suburb: searchState.suburb, categories: searchState.categories });
+  broadcastFilterState({ suburb: searchState.suburb, categories: searchState.categories });
+}
+
+function annotateFilterCoverage(textLc, suburbLc) {
+  textLc = textLc || '';
+  suburbLc = suburbLc || '';
+  var contextCache = {};
+  document.querySelectorAll('.filter-check').forEach(function(cb) {
+    var cat = cb.getAttribute('data-cat');
+    var val = cb.value;
+    var key = CAT_ARRAY_KEYS[cat];
+    if (!contextCache[cat]) {
+      contextCache[cat] = locations.filter(function(loc) {
+        return locationMatchesState(loc, textLc, suburbLc, cat);
+      });
     }
-  })();
-`;
-
-const UNIVERSAL_BACK_BUTTON_LOGIC = `
-  ${BACK_OVERRIDE_LOGIC}
-  ${GLOBAL_STYLE_LOGIC}
-  ${EDITORIAL_DETAIL_LOGIC}
-  ${ZOOM_LOGIC}
-  (function ensureNavControls() {
-    if (document.getElementById('photoindex-nav-controls')) return;
-    var wrap = document.createElement('div');
-    wrap.id = 'photoindex-nav-controls';
-    var backBtn = document.createElement('a');
-    backBtn.href = '#'; backBtn.innerHTML = '&lsaquo; PREV';
-    backBtn.addEventListener('click', function(e) { e.preventDefault(); window.history.back(); });
-    var divider = document.createElement('span'); divider.className = 'pi-nav-divider';
-    var fwdBtn = document.createElement('a');
-    fwdBtn.href = '#'; fwdBtn.innerHTML = 'NEXT &rsaquo;';
-    fwdBtn.addEventListener('click', function(e) { e.preventDefault(); window.history.forward(); });
-    wrap.appendChild(backBtn); wrap.appendChild(divider); wrap.appendChild(fwdBtn);
-    document.body.appendChild(wrap);
-  })();
-`;
-
-async function handleIndexInjection(request) {
-  const headers = new Headers(request.headers);
-  headers.delete("if-modified-since");
-  headers.delete("if-none-match");
-  const response = await fetch(new Request(request, { headers }));
-  const contentType = (response.headers.get("content-type") || "").toLowerCase();
-
-  if (contentType.includes("html")) {
-    const rewritten = new HTMLRewriter()
-      .on("head", {
-        element(el) {
-          el.append(CLARITY_HEAD_SNIPPET, { html: true });
-          el.append(BLINKING_FAVICON_HEAD_SNIPPET, { html: true });
-        },
-      })
-      .on("#main_content", {
-        element(el) {
-          el.setAttribute("style", "margin-top:0!important;padding-top:0!important;");
-          const safeHtml = `<div id="photoindex-injected-wrapper" style="position:relative;z-index:2147483647;background-color:#FFFFFF;">${FILTER_PANEL_HTML}</div><script>(function(){${UNIVERSAL_BACK_BUTTON_LOGIC}})();</script>`;
-          el.prepend(safeHtml, { html: true });
-        },
-      })
-      .transform(response);
-
-    const htmlHeaders = new Headers(rewritten.headers);
-    htmlHeaders.set("cache-control", "no-store");
-    return new Response(rewritten.body, { status: rewritten.status, headers: htmlHeaders });
-  }
-  return response;
-}
-
-async function handleLoginInjection(request) {
-  const headers = new Headers(request.headers);
-  headers.delete("if-modified-since");
-  headers.delete("if-none-match");
-  const response = await fetch(new Request(request, { headers }));
-  const contentType = (response.headers.get("content-type") || "").toLowerCase();
-
-  if (contentType.includes("html")) {
-    const rewritten = new HTMLRewriter()
-      .on("head", {
-        element(el) {
-          el.append(CLARITY_HEAD_SNIPPET, { html: true });
-          el.append(BLINKING_FAVICON_HEAD_SNIPPET, { html: true });
-          el.append(`<script>${LOGIN_INJECTION_SCRIPT}</script>`, { html: true });
-        },
-      })
-      .on("body", {
-        element(el) {
-          el.setAttribute("class", (el.getAttribute("class") || "") + " page-login");
-        },
-      })
-      .transform(response);
-
-    const htmlHeaders = new Headers(rewritten.headers);
-    htmlHeaders.set("cache-control", "no-store");
-    return new Response(rewritten.body, { status: rewritten.status, headers: htmlHeaders });
-  }
-  return response;
-}
-
-async function handleDefault(request) {
-  const headers = new Headers(request.headers);
-  headers.delete("if-modified-since");
-  headers.delete("if-none-match");
-  const response = await fetch(new Request(request, { headers }));
-  const contentType = (response.headers.get("content-type") || "").toLowerCase();
-
-  if (contentType.includes("html")) {
-    const rewritten = new HTMLRewriter()
-      .on("head", {
-        element(el) {
-          el.append(CLARITY_HEAD_SNIPPET, { html: true });
-          el.append(BLINKING_FAVICON_HEAD_SNIPPET, { html: true });
-        },
-      })
-      .on("body", {
-        element(el) {
-          el.append(`<script>(function(){${UNIVERSAL_BACK_BUTTON_LOGIC}})();</script>`, { html: true });
-        },
-      })
-      .transform(response);
-
-    const htmlHeaders = new Headers(rewritten.headers);
-    htmlHeaders.set("cache-control", "no-store");
-    return new Response(rewritten.body, { status: rewritten.status, headers: htmlHeaders });
-  }
-  return response;
-}
-
-const STREET_CSV_URL = "https://raw.githubusercontent.com/sproutssorbets/bne-urban/main/street-names-with-suburbs.csv";
-const KNOWN_SUBURBS = ["ALBION", "BOWEN HILLS", "BRISBANE CITY", "FORTITUDE VALLEY", "HERSTON", "KANGAROO POINT", "KELVIN GROVE", "MILTON", "NEW FARM", "NEWSTEAD", "PADDINGTON", "RED HILL", "SOUTH BRISBANE", "SPRING HILL", "TENERIFFE", "WEST END", "WOOLLOONGABBA"];
-const NAMED_PLACES = ["Big W", "Deloitte", "Dexus", "Hilton Brisbane", "Hotel Embassy", "JLL", "John Holland", "MacArthur Central", "Montblanc", "TAG Heuer", "Woolworths", "Stock Exchange Hotel", "Victory Hotel", "The Hour Glass", "The Grosvenor Apartments", "Spencer Chambers", "Naldham House", "Watson Brothers Building", "Central Plaza 1", "Coronation Drive Office Park", "Eagle Street Pier", "Waterfront Brisbane", "Saint Stephen's Cathedral", "Felix Tower", "Henry Box & Son Coachbuilders Building", "Edward House", "Mary Lane", "Brisbane Skytower", "Riparian Plaza", "Port Office Hotel", "Hermès"].sort((a, b) => b.length - a.length);
-const CONDITION_TERMS = ["existing condition", "fenced development site", "demolition & site works", "active construction site", "completed development"];
-const CATEGORY_TERMS = {
-  typology: ["residential", "apartment", "residential tower", "social housing", "student housing", "commercial", "office", "retail", "hospitality", "shopfront", "showroom", "market", "supermarket", "shopping centre", "cafe", "restaurant", "bar", "pub", "hotel", "public", "civic", "education", "university", "school", "health", "hospital", "clinic", "government", "place of worship", "community centre", "library", "museum", "gallery", "theatre", "performance venue", "stadium", "arena", "heritage", "heritage architecture", "queenslander", "highset house", "lowset house", "workers cottage", "post war house", "terrace house", "duplex", "adaptive reuse", "industrial", "warehouse", "parking structure", "industrial architecture"],
-  architecture: ["high rise", "mid rise", "low rise", "tower", "podium", "corner building", "corner tower", "curved facade", "modern architecture", "contemporary architecture", "postwar architecture", "glass", "brick", "face brick", "painted brick", "concrete", "timber", "metal", "stone", "rendered finish", "corrugated iron", "screen", "grid"],
-  urban: ["urban renewal", "urban development", "urban intensification", "urban consolidation", "high density", "riverfront", "transport corridor", "construction impact", "flood resilience", "pedestrian zone", "shared zone", "arcade", "passage", "public art", "mural", "outdoor dining", "streetscape", "street level", "laneway", "street activation", "olympic venue", "olympic precinct", "olympic infrastructure", "transport upgrade", "athlete village", "temporary structure", "legacy project"]
-};
-
-function phase1ExtractTag(block, tag) {
-  const m = block.match(new RegExp("<" + tag + ">([\\s\\S]*?)</" + tag + ">"));
-  if (!m) return "";
-  return m[1].replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'").trim();
-}
-function phase1ParseMediasXml(xmlText) {
-  const blocks = xmlText.match(/<media>[\s\S]*?<\/media>/g) || [];
-  return blocks.map((block) => ({
-    uuid: phase1ExtractTag(block, "uuid"),
-    fileName: phase1ExtractTag(block, "file-name"),
-    title: phase1ExtractTag(block, "title"),
-    description: phase1ExtractTag(block, "description"),
-    location: phase1ExtractTag(block, "location"),
-    width: parseInt(phase1ExtractTag(block, "width"), 10) || 0,
-    height: parseInt(phase1ExtractTag(block, "height"), 10) || 0,
-    keywords: phase1ExtractTag(block, "keywords"),
-    thumbnailUrl: phase1ExtractTag(block, "thumbnail-url"),
-    imageUrl: phase1ExtractTag(block, "image-url"),
-    pageUrl: phase1ExtractTag(block, "url"),
-  }));
-}
-function phase1ParseStreetCsv(csvText) {
-  const lines = csvText.split(/\r?\n/);
-  const header = lines[0].replace(/^\uFEFF/, "").split(",");
-  const nameIdx = header.indexOf("STREET NAME");
-  const typeIdx = header.indexOf("STREET TYPE");
-  const suburbIdx = header.indexOf("SUBURB");
-  const streetToSuburbs = {};
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i];
-    if (!line) continue;
-    const cols = line.split(",");
-    const name = (cols[nameIdx] || "").trim().toUpperCase();
-    const stype = (cols[typeIdx] || "").trim();
-    const suburb = (cols[suburbIdx] || "").trim();
-    if (!name || !suburb) continue;
-    const key = name + "|" + stype;
-    if (!streetToSuburbs[key]) streetToSuburbs[key] = [];
-    if (streetToSuburbs[key].indexOf(suburb) === -1) streetToSuburbs[key].push(suburb);
-  }
-  return streetToSuburbs;
-}
-function phase1ToTitleCase(s) { return s.split(" ").map((w) => w.charAt(0) + w.slice(1).toLowerCase()).join(" "); }
-function phase1StripHouseNumber(s) { return s.trim().replace(/^\d+\s+/, ""); }
-function phase1SplitNameType(s) {
-  const parts = s.trim().split(/\s+/);
-  if (parts.length < 2) return null;
-  return { name: parts.slice(0, -1).join(" ").toUpperCase(), stype: parts[parts.length - 1] };
-}
-function phase1SuburbForStreetName(locationName, streetTable) {
-  const parts = locationName.split("/").map((p) => phase1StripHouseNumber(p));
-  const matches = [];
-  for (const part of parts) {
-    const nt = phase1SplitNameType(part);
-    if (!nt) continue;
-    const key = nt.name + "|" + nt.stype;
-    if (streetTable[key]) matches.push(new Set(streetTable[key]));
-  }
-  if (matches.length >= 2) {
-    let common = matches[0];
-    for (let i = 1; i < matches.length; i++) common = new Set([...common].filter((x) => matches[i].has(x)));
-    if (common.size === 1) return phase1ToTitleCase([...common][0]);
-  }
-  if (matches.length === 1 && matches[0].size === 1) return phase1ToTitleCase([...matches[0]][0]);
-  return null;
-}
-function phase1ApplyOverride(name) {
-  if (name.indexOf("Eagle Street") !== -1 || name.indexOf("Charlotte Street") !== -1) return "Brisbane City";
-  return null;
-}
-function phase1Orientation(w, h) {
-  if (w === 0 || h === 0) return "unknown";
-  if (Math.abs(w - h) / Math.max(w, h) < 0.05) return "square";
-  return h > w ? "vertical" : "horizontal";
-}
-function phase1ExtractFacets(text) {
-  const desc = text.toLowerCase();
-  let condition = null;
-  for (const c of CONDITION_TERMS) { if (desc.indexOf(c) !== -1) { condition = c; break; } }
-  const facets = { condition, typology: [], architecture: [], urban: [] };
-  for (const cat in CATEGORY_TERMS) {
-    CATEGORY_TERMS[cat].forEach((term) => { if (desc.indexOf(term) !== -1) facets[cat].push(term); });
-  }
-  return facets;
-}
-async function phase1LoadStreetTable(env) {
-  const cached = await env.MEDIAS_CACHE.get("street_table");
-  if (cached) { try { return JSON.parse(cached); } catch (e) {} }
-  const response = await fetch(STREET_CSV_URL);
-  if (!response.ok) return {};
-  const table = phase1ParseStreetCsv(await response.text());
-  await env.MEDIAS_CACHE.put("street_table", JSON.stringify(table));
-  return table;
-}
-async function phase1BuildPhotosJson(env, xmlText) {
-  const photos = phase1ParseMediasXml(xmlText);
-  const streetTable = await phase1LoadStreetTable(env);
-  const entries = {};
-  function ensure(name, kind) {
-    if (!entries[name]) entries[name] = { uuids: new Set(), kind, xmlLocations: [] };
-    entries[name].kind = kind;
-    return entries[name];
-  }
-  for (const p of photos) {
-    const title = p.title.split(",").slice(0, -1).join(",").trim() || p.title;
-    const titleOverride = phase1ApplyOverride(title);
-    let foundAny = false;
-    let m;
-    const addrPat = /\b(\d+\s+[A-Z][a-zA-Z']*\s+(?:Street|Road|Drive|Avenue|Lane|Place|Terrace|Parade|Way))\b/g;
-    while ((m = addrPat.exec(p.description)) !== null) {
-      const e = ensure(m[1], "address"); e.uuids.add(p.uuid);
-      if (p.location) e.xmlLocations.push(p.location);
-      if (titleOverride) e.xmlLocations.push(titleOverride);
-      foundAny = true;
-    }
-    for (const name of NAMED_PLACES) {
-      if (p.description.indexOf(name) !== -1) {
-        const e = ensure(name, "named_place"); e.uuids.add(p.uuid);
-        if (p.location) e.xmlLocations.push(p.location);
-        if (titleOverride) e.xmlLocations.push(titleOverride);
-        foundAny = true;
-      }
-    }
-    if (title.indexOf("/") !== -1) {
-      const e = ensure(title, "intersection"); e.uuids.add(p.uuid);
-      if (p.location) e.xmlLocations.push(p.location);
-      if (titleOverride) e.xmlLocations.push(titleOverride);
-      foundAny = true;
-    }
-    if (!foundAny) { ensure(title, "fallback_title").uuids.add(p.uuid); }
-  }
-  const rows = [];
-  for (const name in entries) {
-    const data = entries[name];
-    let suburb = phase1SuburbForStreetName(name, streetTable) || data.xmlLocations.find((l) => l) || phase1ApplyOverride(name);
-    rows.push({ name, count: data.uuids.size, suburb, kind: data.kind, uuids: [...data.uuids] });
-  }
-  await env.MEDIAS_CACHE.put("locations_json", JSON.stringify(rows));
-  const uuidToSuburbs = {};
-  rows.forEach((r) => { if (r.suburb) r.uuids.forEach((u) => { if (!uuidToSuburbs[u]) uuidToSuburbs[u] = []; uuidToSuburbs[u].push(r.suburb); }); });
-  return photos.map((p) => {
-    const facets = phase1ExtractFacets(p.keywords + " " + p.description);
-    const title = p.title.split(",").slice(0, -1).join(",").trim() || p.title;
-    const suburb = (uuidToSuburbs[p.uuid] || [])[0] || phase1ApplyOverride(title) || "";
-    return {
-      title, uuid: p.uuid, date: p.title.split(",").pop().trim(),
-      thumb: p.imageUrl || `https://d38zjy0x98992m.cloudfront.net/${p.uuid}/${p.fileName.replace(/\.[^.]+$/, "")}_medthumb.jpg`,
-      pageUrl: p.pageUrl || "", description: p.description || "",
-      orientation: phase1Orientation(p.width, p.height), suburb,
-      photoId: p.fileName.replace(/\.[^.]+$/, ""),
-      isFeatured: (p.keywords || "").toLowerCase().indexOf('featured') !== -1,
-      condition: facets.condition, typology: facets.typology, architecture: facets.architecture, urban: facets.urban
-    };
+    var count = contextCache[cat].filter(function(loc) {
+      return (loc[key] || []).indexOf(val) !== -1;
+    }).reduce(function(sum, loc) { return sum + (loc.count || 1); }, 0);
+    var label = cb.closest('label');
+    if (!label) return;
+    var existing = label.querySelector('.filter-count');
+    if (existing) existing.remove();
+    var countSpan = document.createElement('span');
+    countSpan.className = 'filter-count';
+    countSpan.textContent = count;
+    label.appendChild(countSpan);
+    if (count === 0 && !cb.checked) { cb.disabled = true; label.classList.add('no-data'); }
+    else { cb.disabled = false; label.classList.remove('no-data'); }
   });
 }
 
-async function handlePhotosJson(env) {
-  const cached = await env.MEDIAS_CACHE.get("photos_json");
-  if (!cached) return new Response(JSON.stringify({ error: "not_ready" }), { status: 503, headers: { "content-type": "application/json", "access-control-allow-origin": "*" } });
-  return new Response(cached, { headers: { "content-type": "application/json", "cache-control": "public, max-age=1800", "access-control-allow-origin": "*" } });
+function filterSuburbOptions() {
+  var container = document.getElementById('acc-location');
+  if (!container) return;
+  var suburbsWithData = {};
+  locations.forEach(function(loc) {
+    if (loc.suburb) suburbsWithData[loc.suburb] = true;
+  });
+  var children = Array.prototype.slice.call(container.children);
+  var currentGroupDivider = null;
+  var groupHasVisible = false;
+  children.forEach(function(el) {
+    if (el.classList.contains('sub-category-title')) {
+      if (currentGroupDivider) currentGroupDivider.style.display = groupHasVisible ? '' : 'none';
+      currentGroupDivider = el;
+      groupHasVisible = false;
+    } else if (el.tagName === 'LABEL') {
+      var input = el.querySelector('.suburb-check');
+      if (!input) return;
+      if (input.value === '') return;
+      var visible = !!suburbsWithData[input.value];
+      el.style.display = visible ? '' : 'none';
+      if (visible) groupHasVisible = true;
+    }
+  });
+  if (currentGroupDivider) currentGroupDivider.style.display = groupHasVisible ? '' : 'none';
 }
 
-export default {
-  async fetch(request, env, ctx) {
-    const url = new URL(request.url);
+function restoreSavedFilters() {
+  var saved = getStateFromUrlParam() || loadMapState();
+  if (!saved) return;
+  var hasFilters = false;
+  if (saved.suburb) {
+    hasFilters = true;
+    searchState.suburb = saved.suburb;
+    var radio = document.querySelector('.suburb-check[value="' + saved.suburb + '"]');
+    if (radio) radio.checked = true;
+  }
+  if (saved.categories && Object.keys(saved.categories).some(function(cat) { return (saved.categories[cat] || []).length > 0; })) {
+    hasFilters = true;
+    searchState.categories = saved.categories;
+    for (var cat in saved.categories) {
+      var values = saved.categories[cat] || [];
+      values.forEach(function(val) {
+        var cb = document.querySelector('.filter-check[data-cat="' + cat + '"][value="' + val + '"]');
+        if (cb) cb.checked = true;
+      });
+      if (values.length > 0) {
+        var head = document.querySelector('.acc-head[data-target="acc-' + cat + '"]');
+        var body = document.getElementById('acc-' + cat);
+        if (head) head.classList.add('open');
+        if (body) body.classList.add('open');
+      }
+    }
+  }
+  if (hasFilters) applySearchState();
+}
 
-    if (url.pathname === "/api/medias-cache-status") {
-      return new Response(await env.MEDIAS_CACHE.get("medias_cache_meta") || "{}", { headers: { "content-type": "application/json" } });
+function loadInitialData() {
+  Promise.all([
+    fetch('https://raw.githubusercontent.com/sproutssorbets/bne-urban/main/locations.csv?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.text() : ''; }),
+    fetch('https://www.photoindex.au/api/photos.json?v=' + DATA_VERSION).then(function(r) { return r.ok ? r.json() : []; }).catch(function() { return []; })
+  ])
+  .then(function(results) {
+    var csvText = results[0];
+    var allPhotos = Array.isArray(results[1]) ? results[1] : [];
+    if (!csvText || !csvText.trim()) return;
+
+    var photosByTitle = {};
+    allPhotos.forEach(function(p) {
+      var key = normalizeKey(p.title);
+      if (!key) return;
+      if (!photosByTitle[key]) photosByTitle[key] = [];
+      photosByTitle[key].push(p);
+    });
+
+    var lines = csvText.trim().split('\n');
+    var headers = lines[0].split(',').map(function(h) { return h.trim(); });
+    locations = [];
+    var totalArchiveRecords = 0;
+    var batchesMap = {};
+    for (var i = 1; i < lines.length; i++) {
+      var line = lines[i];
+      if (!line) continue;
+      var cols = splitCsvLine(line, ',');
+      var row = {};
+      headers.forEach(function(h, idx) { row[h] = (cols[idx] || '').trim(); });
+
+      var street = row.address || row.street || 'Unnamed location';
+      var matchedPhotos = photosByTitle[normalizeKey(street)] || [];
+      if (!matchedPhotos.length) {
+        matchedPhotos = findPhotosByDescription(street, allPhotos);
+      }
+
+      var thumbsFallback = row.thumbs ? row.thumbs.split(';').filter(Boolean) : [];
+      var imagesFallback = row.images ? row.images.split(';').filter(Boolean) : [];
+      var fallbackDate = row.shoot_dates ? row.shoot_dates.split(';').pop().trim() : (row.date || '');
+
+      var photosArr;
+      if (matchedPhotos.length) {
+        photosArr = matchedPhotos.map(function(p) {
+          return { ref: p.photoId || '', thumb: p.thumb || '', pageUrl: p.pageUrl || '', date: p.date || '', description: p.description || '' };
+        });
+      } else if (thumbsFallback.length) {
+        photosArr = thumbsFallback.map(function(url, idx) {
+          return { ref: refFromUrl(url) || row.ref || '', thumb: imagesFallback[idx] || url, pageUrl: row.archiveUrl || '#', date: fallbackDate, description: row.description || '' };
+        });
+      } else {
+        photosArr = [{ ref: row.ref || '', thumb: '', pageUrl: row.archiveUrl || '#', date: fallbackDate, description: row.description || '' }];
+      }
+
+      var count = matchedPhotos.length || parseInt(row.count, 10) || 1;
+      totalArchiveRecords += count;
+
+      var locData = {
+        ref: row.ref || 'PX.26.000',
+        street: street,
+        suburb: row.suburb || 'Brisbane City',
+        description: photosArr[0].description || '',
+        count: count,
+        dates: row.shoot_dates || row.date || '',
+        coords: [parseFloat(row.lng), parseFloat(row.lat)],
+        archiveUrl: row.archiveUrl || '#',
+        photos: photosArr
+      };
+
+      if (matchedPhotos.length) {
+        var condSet = {}, typSet = {}, archSet = {}, urbSet = {};
+        matchedPhotos.forEach(function(p) {
+          if (p.condition) condSet[p.condition] = true;
+          (p.typology || []).forEach(function(v) { typSet[v] = true; });
+          (p.architecture || []).forEach(function(v) { archSet[v] = true; });
+          (p.urban || []).forEach(function(v) { urbSet[v] = true; });
+        });
+        locData.conditionArr = Object.keys(condSet);
+        locData.typologyArr = Object.keys(typSet);
+        locData.architectureArr = Object.keys(archSet);
+        locData.urbanArr = Object.keys(urbSet);
+      } else {
+        locData.conditionArr = splitCatValue(row.condition || '');
+        locData.typologyArr = splitCatValue(row.typology || '');
+        locData.architectureArr = splitCatValue(row.architecture || '');
+        locData.urbanArr = splitCatValue(row.urban || '');
+      }
+
+      locData.streetLc = locData.street.toLowerCase();
+      locData.suburbLc = locData.suburb.toLowerCase();
+      locData.yearArr = splitCatValue(row.year || (row.date ? row.date.slice(-4) : ''));
+
+      if (!isNaN(locData.coords[0]) && !isNaN(locData.coords[1])) {
+        locations.push(locData);
+      }
+      var batchId = row.update_batch || 'UNKNOWN';
+      if (!batchesMap[batchId]) batchesMap[batchId] = [];
+      batchesMap[batchId].push(locData);
     }
-    if (url.pathname === "/api/photos.json") {
-      return handlePhotosJson(env);
+    var sortedBatches = Object.keys(batchesMap).filter(function(b) { return b !== 'UNKNOWN'; }).sort(function(a, b) {
+      var timeA = new Date(a).getTime();
+      var timeB = new Date(b).getTime();
+      if (!isNaN(timeA) && !isNaN(timeB)) return timeB - timeA;
+      return b.localeCompare(a);
+    });
+    var latestBatchId = sortedBatches[0];
+    if (latestBatchId) {
+      var latestRecords = batchesMap[latestBatchId];
+      piUpdateRecords = latestRecords;
+      var latestTotalCount = latestRecords.reduce(function(acc, r) { return acc + r.count; }, 0);
+      var elDrawerIdx = document.getElementById('pi-drawer-index');
+      if (elDrawerIdx) elDrawerIdx.innerHTML = 'UPDATE &middot; ' + latestBatchId.toUpperCase();
+      var elDrawerTitle = document.getElementById('pi-drawer-title');
+      if (elDrawerTitle) elDrawerTitle.textContent = latestTotalCount + ' new records documented';
+      var elDrawerSub = document.getElementById('pi-drawer-sub');
+      if (elDrawerSub) elDrawerSub.textContent = 'Archive total: ' + totalArchiveRecords + ' records';
+      var logContainer = document.getElementById('pi-drawer-log');
+      if (logContainer) {
+        logContainer.innerHTML = latestRecords.map(function(rec, idx) {
+          var padCount = rec.count.toString().padStart(2, '0');
+          return '<a href="#" class="pi-log-link" data-idx="' + idx + '" data-ref="' + (rec.ref || '') + '">' +
+                 '<span class="loc">' + rec.street + '</span>' +
+                 '<span class="stats"><span class="count">' + padCount + '</span></span>' +
+                 '</a>' +
+                 '<div class="pi-log-detail" id="pi-log-detail-' + idx + '"></div>';
+        }).join('');
+        logContainer.querySelectorAll('.pi-log-link').forEach(function(link) {
+          var idx = parseInt(link.getAttribute('data-idx'), 10);
+          var rec = latestRecords[idx];
+          link.addEventListener('click', function(ev) {
+            ev.preventDefault();
+            piUpdateRecords = latestRecords;
+            piUpdateIndex = idx;
+            if (window.innerWidth <= 720) {
+              window.piToggleLogDetail(idx, rec);
+            } else if (mapInstance) {
+              if (window.piCloseDrawer) window.piCloseDrawer();
+              mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2 });
+              window.piOpenPopupForLocation(rec, true);
+            }
+          });
+        });
+      }
+      var dot = document.getElementById('pi-drawer-dot');
+      if (dot) {
+        try {
+          var storageKey = 'pi_archive_seen_time_' + latestBatchId;
+          var firstSeenTime = localStorage.getItem(storageKey);
+          var now = Date.now();
+          if (!firstSeenTime) {
+            localStorage.setItem(storageKey, now);
+            dot.classList.remove('hidden');
+          } else if (now - parseInt(firstSeenTime, 10) < 86400000) {
+            dot.classList.remove('hidden');
+          } else {
+            dot.classList.add('hidden');
+          }
+        } catch (e) {
+          dot.classList.add('hidden');
+        }
+      }
     }
-    if (url.pathname === "/debug-filter-panel") {
-      return new Response(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Debug</title></head><body style="margin:0;padding:24px;">${FILTER_PANEL_HTML}</body></html>`, { headers: { "content-type": "text/html; charset=UTF-8" } });
+    annotateFilterCoverage('', '');
+    filterSuburbOptions();
+    restoreSavedFilters();
+  })
+  .catch(function(e) { console.error('PhotoIndex map: loadInitialData failed', e); });
+}
+
+function initAddressAutocomplete() {
+  if (autocompleteReady) return;
+  autocompleteReady = true;
+  var suggestBox = document.getElementById('pi-suggest');
+  var searchInput = document.getElementById('pi-search-input');
+  if (!suggestBox || !searchInput) return;
+  var acTimeout = null;
+  var activeIndex = -1;
+  var currentItems = [];
+
+  function closeSuggest() {
+    suggestBox.classList.remove('open');
+    suggestBox.innerHTML = '';
+    currentItems = [];
+    activeIndex = -1;
+  }
+
+  function searchLocalArchive(q) {
+    var qLc = q.toLowerCase();
+    return locations.filter(function(loc) {
+      return loc.streetLc.indexOf(qLc) !== -1 || loc.suburbLc.indexOf(qLc) !== -1;
+    }).slice(0, 5).map(function(loc) {
+      return { source: 'archive', label: loc.street + ', ' + loc.suburb, loc: loc };
+    });
+  }
+
+  function renderSuggestions(items) {
+    currentItems = items;
+    activeIndex = -1;
+    if (!items.length) { closeSuggest(); return; }
+    suggestBox.innerHTML = items.map(function(item, i) {
+      var tag = item.source === 'archive' ? '<span class="pi-suggest-mark" aria-hidden="true"></span><span class="pi-sr-only">Already photographed: </span>' : '';
+      return '<div class="pi-suggest-item" data-idx="' + i + '">' + tag + item.label.toUpperCase() + '</div>';
+    }).join('');
+    suggestBox.classList.add('open');
+    suggestBox.querySelectorAll('.pi-suggest-item').forEach(function(el) {
+      el.addEventListener('click', function() {
+        selectItem(currentItems[parseInt(this.getAttribute('data-idx'), 10)]);
+      });
+    });
+  }
+
+  function selectItem(item) {
+    if (!item || !mapInstance) return;
+    closeSuggest();
+    searchInput.value = item.label;
+    searchState.text = item.label.toLowerCase();
+    applySearchState();
+    if (item.source === 'archive') {
+      mapInstance.flyTo({ center: item.loc.coords, zoom: 15.5, speed: 1.2 });
+      if (window.piOpenPopupForLocation) window.piOpenPopupForLocation(item.loc);
+    } else if (item.feature.bbox) {
+      mapInstance.fitBounds(item.feature.bbox, { padding: 60, duration: 600, maxZoom: 15.5 });
+    } else if (item.feature.center) {
+      mapInstance.flyTo({ center: item.feature.center, zoom: 15.5, speed: 1.2 });
     }
-    if (url.pathname === "/map" || url.pathname.startsWith("/map/")) {
-      return handleMap(request);
+  }
+
+  searchInput.addEventListener('input', function() {
+    var q = this.value.trim();
+    clearTimeout(acTimeout);
+    if (q.length < 3) { closeSuggest(); return; }
+    var localMatches = searchLocalArchive(q);
+    renderSuggestions(localMatches);
+    acTimeout = setTimeout(function() {
+      fetch('https://api.mapbox.com/geocoding/v5/mapbox.places/' + encodeURIComponent(q) + '.json?access_token=' + mapboxgl.accessToken + '&country=au&proximity=153.0307,-27.4598&bbox=152.66,-27.85,153.4,-26.9&limit=5')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          var external = (data.features || []).map(function(f) {
+            return { source: 'mapbox', label: f.place_name, feature: f };
+          });
+          renderSuggestions(localMatches.concat(external).slice(0, 8));
+        })
+        .catch(function() {});
+    }, 300);
+  });
+
+  searchInput.addEventListener('keydown', function(ev) {
+    if (!suggestBox.classList.contains('open')) return;
+    var items = suggestBox.querySelectorAll('.pi-suggest-item');
+    if (ev.key === 'ArrowDown') {
+      ev.preventDefault();
+      activeIndex = Math.min(activeIndex + 1, items.length - 1);
+      items.forEach(function(el, i) { el.classList.toggle('active', i === activeIndex); });
+    } else if (ev.key === 'ArrowUp') {
+      ev.preventDefault();
+      activeIndex = Math.max(activeIndex - 1, 0);
+      items.forEach(function(el, i) { el.classList.toggle('active', i === activeIndex); });
+    } else if (ev.key === 'Enter' && activeIndex >= 0 && currentItems[activeIndex]) {
+      ev.preventDefault();
+      selectItem(currentItems[activeIndex]);
+    } else if (ev.key === 'Escape') {
+      closeSuggest();
     }
-    if (url.pathname === "/assets/login-bg.jpg") {
-      return handleLoginBackground();
-    }
-    if (url.pathname === "/full-index") {
-      return handleFullIndexPage(env);
-    }
-    if (url.pathname === GRID_PAGE_PATH) {
-      return handleIndexInjection(request);
-    }
-    if (url.pathname.startsWith("/login") || url.pathname.startsWith("/session") || url.pathname.startsWith("/client")) {
-      return handleLoginInjection(request);
+  });
+
+  document.addEventListener('click', function(ev) {
+    if (!suggestBox.contains(ev.target) && ev.target !== searchInput) closeSuggest();
+  });
+
+  document.addEventListener('keydown', function(ev) {
+    if (ev.key !== 'Enter') return;
+    if (suggestBox.classList.contains('open')) return;
+    var btn = document.getElementById('search-archive-btn');
+    if (btn && btn.href) { ev.preventDefault(); window.top.location.href = btn.href; }
+  });
+}
+
+function initMapLazy() {
+  if (mapInitiated) return;
+  mapInitiated = true;
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = 'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css';
+  document.head.appendChild(css);
+  var js = document.createElement('script');
+  js.src = 'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js';
+  js.onload = function() {
+    mapboxgl.accessToken = 'pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ';
+    var savedMapState = loadMapState();
+    var startCenter = (savedMapState && typeof savedMapState.lng === 'number' && typeof savedMapState.lat === 'number')
+      ? [savedMapState.lng, savedMapState.lat] : [153.0307, -27.4598];
+    var startZoom = (savedMapState && typeof savedMapState.zoom === 'number') ? savedMapState.zoom : 13;
+    mapInstance = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/light-v11',
+      center: startCenter,
+      zoom: startZoom,
+      fadeDuration: 0,
+      attributionControl: false,
+      maxTileCacheSize: 50,
+      collectResourceTiming: false
+    });
+    mapInstance.on('moveend', function() {
+      var c = mapInstance.getCenter();
+      saveMapState({ lng: c.lng, lat: c.lat, zoom: mapInstance.getZoom() });
+    });
+    mapInstance.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
+
+    mapInstance.on('load', function() {
+      mapInstance.addSource('landmarks', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: [
+            { type: 'Feature', properties: { name: 'Infinity Tower' }, geometry: { type: 'Point', coordinates: [153.0194754, -27.4678006] } },
+            { type: 'Feature', properties: { name: '1 William Street' }, geometry: { type: 'Point', coordinates: [153.025835, -27.4748377] } },
+            { type: 'Feature', properties: { name: 'Riverside Centre' }, geometry: { type: 'Point', coordinates: [153.0302001, -27.467152] } },
+            { type: 'Feature', properties: { name: 'Riparian Plaza' }, geometry: { type: 'Point', coordinates: [153.0303029, -27.4682608] } },
+            { type: 'Feature', properties: { name: 'One One One Eagle Street' }, geometry: { type: 'Point', coordinates: [153.0301996, -27.4676829] } },
+            { type: 'Feature', properties: { name: "Queen's Wharf" }, geometry: { type: 'Point', coordinates: [153.0245387, -27.4741509] } },
+            { type: 'Feature', properties: { name: '480 Queen Street' }, geometry: { type: 'Point', coordinates: [153.0308165, -27.4640791] } },
+            { type: 'Feature', properties: { name: 'Bris Quarter' }, geometry: { type: 'Point', coordinates: [153.0224282, -27.4701207] } },
+            { type: 'Feature', properties: { name: 'Story Bridge' }, geometry: { type: 'Point', coordinates: [153.0358644, -27.4636326] } },
+            { type: 'Feature', properties: { name: 'Victoria Park / Barrambin' }, geometry: { type: 'Point', coordinates: [153.0212178, -27.4529175] } }
+          ]
+        }
+      });
+      mapInstance.addLayer({
+        id: 'landmark-marks',
+        type: 'circle',
+        source: 'landmarks',
+        maxzoom: 16,
+        paint: { 'circle-radius': 3, 'circle-color': '#000000' }
+      });
+      mapInstance.addLayer({
+        id: 'landmark-labels',
+        type: 'symbol',
+        source: 'landmarks',
+        maxzoom: 16,
+        layout: {
+          'text-field': ['upcase', ['get', 'name']],
+          'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
+          'text-size': 10,
+          'text-letter-spacing': 0.08,
+          'text-offset': [0, 0.9],
+          'text-anchor': 'top'
+        },
+        paint: {
+          'text-color': '#666666',
+          'text-halo-color': '#FFFFFF',
+          'text-halo-width': 1.4
+        }
+      });
+    });
+
+    function getCardPhotos(loc) {
+      return (loc.photos && loc.photos.length) ? loc.photos : [{ ref: loc.ref || '', thumb: '', pageUrl: loc.archiveUrl || '#', date: '', description: loc.description || '' }];
     }
 
-    return handleDefault(request);
-  },
+    function buildLocationCardHtml(loc, showClose) {
+      var allPhotos = getCardPhotos(loc);
+      var displayPhotos = allPhotos.filter(function(p) { return p.thumb; });
+      var initial = displayPhotos.length ? displayPhotos[0] : allPhotos[0];
 
-  async scheduled(event, env, ctx) {
-    ctx.waitUntil(refreshMediasCache(env));
-  },
-};
+      var closeBtnHtml = showClose === false ? '' : '<button type="button" class="pi-map-overlay-close-btn" aria-label="Close">&times;</button>';
+
+      var sliderHtml = '';
+      if (displayPhotos.length > 0) {
+        var slidesHtml = displayPhotos.map(function(p, i) {
+          var slideHref = p.pageUrl || loc.archiveUrl || '#';
+          return '<a href="' + slideHref + '" target="_top" class="pi-popup-slide-link" style="display:' + (i === 0 ? 'block' : 'none') + ';width:100%;height:100%;" data-pi-slide="' + i + '"><img src="' + p.thumb + '" loading="lazy" style="width:100%;height:100%;object-fit:contain;object-position:center;display:block;" alt=""></a>';
+        }).join('');
+
+        var navHtml = displayPhotos.length > 1
+          ? '<button type="button" class="pi-popup-slider-prev" style="position:absolute;top:50%;left:0;transform:translateY(-50%);background:var(--bg);border:1px solid var(--text);border-left:none;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg></button>' +
+            '<button type="button" class="pi-popup-slider-next" style="position:absolute;top:50%;right:0;transform:translateY(-50%);background:var(--bg);border:1px solid var(--text);border-right:none;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg></button>'
+          : '';
+
+        sliderHtml = '<div class="pi-overlay-slider-wrap"><div class="pi-popup-slider" style="position:relative;width:100%;height:100%;">' + slidesHtml + navHtml + '</div></div>';
+      }
+
+      var allTags = [].concat(loc.typologyArr || [], loc.architectureArr || [], loc.urbanArr || [], loc.conditionArr || []).filter(Boolean);
+      var tagsHtml = allTags.map(function(t) {
+          return '<span style="border: 1px solid #DADADA; padding: 3px 6px; font-size: 9px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: #000;">' + t + '</span>';
+      }).join('');
+
+      var initialDate = initial.date || 'Unknown';
+      var initialDesc = initial.description || 'Close street view documented in morning daylight. High-density urban architecture and development recording.';
+
+      var bodyContent = '<div class="pi-overlay-body-wrap"><div style="padding: 24px;">' +
+        '<div class="pi-record-meta-top">' +
+          '<span class="pi-ref-label">REF. <span class="pi-card-ref-value">' + (initial.ref || loc.ref || '') + '</span></span>' +
+          '<span class="pi-loc-label">' + (loc.suburb || '').toUpperCase() + ', QLD, AUSTRALIA</span>' +
+        '</div>' +
+        '<h2 class="pi-record-title">' + loc.street + ', <span class="pi-card-date-value">' + initialDate + '</span></h2>' +
+        '<p class="pi-record-caption"><span class="pi-card-desc-value">' + initialDesc + '</span></p>' +
+
+        '<div class="pi-cta-block">' +
+          '<div class="pi-cta-combined">' +
+            '<button type="button" class="pi-btn-add">ADD TO SELECTION</button>' +
+            '<a href="' + (initial.pageUrl || loc.archiveUrl) + '" target="_top" class="pi-btn-open">OPEN RECORD</a>' +
+            '<button type="button" class="pi-btn-copy-icon pi-popup-copy-link" aria-label="Copy archive reference link" title="Copy archive reference link">' +
+              '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>' +
+            '</button>' +
+          '</div>' +
+        '</div>' +
+
+        '<div class="pi-spec-acc-group">' +
+          '<div class="pi-spec-acc-head"><span class="pi-spec-acc-title">1. Archival &amp; Technical Data</span><span class="pi-spec-acc-icon">+</span></div>' +
+          '<div class="pi-spec-acc-body">' +
+            '<div class="pi-data-grid">' +
+              '<div class="pi-data-row"><span class="pi-data-key">Date</span><span class="pi-data-val pi-card-date-value">' + initialDate + '</span></div>' +
+              '<div class="pi-data-row"><span class="pi-data-key">Author</span><span class="pi-data-val">Anka Boychev</span></div>' +
+              '<div class="pi-data-row"><span class="pi-data-key">Copyright</span><span class="pi-data-val">© 2026 All rights reserved.</span></div>' +
+            '</div>' +
+          '</div>' +
+
+          '<div class="pi-spec-acc-head"><span class="pi-spec-acc-title">2. Processing Protocol</span><span class="pi-spec-acc-icon">+</span></div>' +
+          '<div class="pi-spec-acc-body">' +
+            '<p style="margin:0 0 12px 0;font-weight:500;color:#111111;"> Processing protocol </p>' +
+            '<p style="margin:0 0 8px 0;"> <span style="color:#6B6B6B;">AI tools:</span> None used at any stage </p>' +
+            '<p style="margin:0 0 8px 0;"> <span style="color:#6B6B6B;">Adjustments:</span> Exposure, white balance, perspective, slight cropping </p>' +
+            '<p style="margin:0 0 8px 0;"> <span style="color:#6B6B6B;">Elements added, removed, composited:</span> None </p>' +
+            '<p style="margin:0;"> <span style="color:#6B6B6B;">Provenance:</span> Embedded and verifiable via Content Credentials (C2PA) from initial processing onward </p>' +
+          '</div>' +
+
+          '<div class="pi-spec-acc-head"><span class="pi-spec-acc-title">3. Taxonomy &amp; Keywords</span><span class="pi-spec-acc-icon">+</span></div>' +
+          '<div class="pi-spec-acc-body">' +
+             '<div class="pi-tags-flex" style="display:flex; flex-wrap:wrap; gap:4px;">' + tagsHtml + '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div></div>';
+
+      return closeBtnHtml + sliderHtml + bodyContent;
+    }
+
+    function wireLocationCard(root, loc) {
+      if (!root) return;
+      var allPhotos = getCardPhotos(loc);
+      var displayPhotos = allPhotos.filter(function(p) { return p.thumb; });
+
+      root.querySelectorAll('.pi-spec-acc-head').forEach(function(head) {
+        head.addEventListener('click', function() {
+          var body = this.nextElementSibling;
+          var icon = this.querySelector('.pi-spec-acc-icon');
+          var isOpen = body.classList.contains('open');
+          body.classList.toggle('open', !isOpen);
+          icon.innerHTML = isOpen ? '+' : '&minus;';
+        });
+      });
+
+      var copyBtn = root.querySelector('.pi-popup-copy-link');
+      if (copyBtn) {
+        var defaultCopyIcon = copyBtn.innerHTML;
+        var checkIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+        copyBtn.addEventListener('click', function(ev) {
+          ev.stopPropagation();
+          var z = Math.round(mapInstance.getZoom() * 10) / 10;
+          var link = window.location.origin + window.location.pathname + '#' + z + '/' + loc.coords[1] + '/' + loc.coords[0] + '/' + slugify(loc.street);
+          navigator.clipboard.writeText(link).then(function() {
+            copyBtn.classList.add('copied');
+            copyBtn.innerHTML = checkIcon;
+            copyBtn.setAttribute('title', 'Link copied');
+            setTimeout(function() {
+              copyBtn.classList.remove('copied');
+              copyBtn.innerHTML = defaultCopyIcon;
+              copyBtn.setAttribute('title', 'Copy archive reference link');
+            }, 1500);
+          });
+        });
+      }
+
+      var openBtn = root.querySelector('.pi-btn-open');
+
+      if (displayPhotos.length > 1) {
+        var imgs = root.querySelectorAll('[data-pi-slide]');
+        var refEls = root.querySelectorAll('.pi-card-ref-value');
+        var dateEls = root.querySelectorAll('.pi-card-date-value');
+        var descEls = root.querySelectorAll('.pi-card-desc-value');
+        var idx = 0;
+        var showSlide = function(next) {
+          imgs[idx].style.display = 'none';
+          idx = (next + imgs.length) % imgs.length;
+          imgs[idx].style.display = 'block';
+          var p = displayPhotos[idx];
+          refEls.forEach(function(el) { el.textContent = p.ref || loc.ref || ''; });
+          dateEls.forEach(function(el) { el.textContent = p.date || 'Unknown'; });
+          descEls.forEach(function(el) { el.textContent = p.description || 'Close street view documented in morning daylight. High-density urban architecture and development recording.'; });
+          if (openBtn && p.pageUrl) openBtn.setAttribute('href', p.pageUrl);
+        };
+
+        var prevBtn = root.querySelector('.pi-popup-slider-prev');
+        var nextBtn = root.querySelector('.pi-popup-slider-next');
+
+        if (prevBtn) prevBtn.addEventListener('click', function(ev) { ev.stopPropagation(); showSlide(idx - 1); });
+        if (nextBtn) nextBtn.addEventListener('click', function(ev) { ev.stopPropagation(); showSlide(idx + 1); });
+      }
+    }
+
+    window.piOpenPopupForLocation = function(loc, fromUpdates) {
+      if (!fromUpdates) { piUpdateIndex = -1; }
+      document.querySelectorAll('.pi-log-link').forEach(function(el) {
+        el.classList.toggle('active', !!loc.ref && el.getAttribute('data-ref') === loc.ref);
+      });
+      var overlay = document.getElementById('pi-map-overlay');
+      if (!overlay) return;
+      overlay.innerHTML = buildLocationCardHtml(loc, true);
+      overlay.classList.add('visible');
+      
+      if (mapInstance) setTimeout(function() { mapInstance.resize(); }, 150);
+
+      var closeBtn = overlay.querySelector('.pi-map-overlay-close-btn');
+      if (closeBtn) closeBtn.addEventListener('click', function(ev) { 
+        ev.stopPropagation(); 
+        overlay.classList.remove('visible'); 
+        piUpdateIndex = -1;
+        if (mapInstance) setTimeout(function() { mapInstance.resize(); }, 150);
+      });
+      wireLocationCard(overlay, loc);
+
+      if (piUpdateIndex !== -1 && piUpdateRecords.length > 1) {
+        injectUpdateNav(overlay);
+      }
+    };
+    
+    window.piToggleLogDetail = function(idx, rec) {
+      var detail = document.getElementById('pi-log-detail-' + idx);
+      if (!detail) return;
+      var wasOpen = detail.classList.contains('open');
+      document.querySelectorAll('.pi-log-detail.open').forEach(function(d) { d.classList.remove('open'); });
+      if (wasOpen) return;
+      detail.innerHTML = buildLocationCardHtml(rec, false);
+      detail.classList.add('open');
+      wireLocationCard(detail, rec);
+    };
+
+    var markerTemplate = document.createElement('div');
+    markerTemplate.className = 'custom-marker-hitbox';
+    markerTemplate.innerHTML = '<div class="pi-pin"><div class="pi-pin-body"></div><div class="pi-pin-point"></div></div>';
+
+    var CLUSTER_PIXEL_RADIUS = 40;
+
+    function clusterByScreenDistance(map, locs, radius) {
+      var pts = locs.map(function(loc) {
+        var p = map.project(loc.coords);
+        return { loc: loc, x: p.x, y: p.y };
+      });
+      var used = new Array(pts.length).fill(false);
+      var groups = [];
+      for (var i = 0; i < pts.length; i++) {
+        if (used[i]) continue;
+        var group = [pts[i]];
+        used[i] = true;
+        for (var j = i + 1; j < pts.length; j++) {
+          if (used[j]) continue;
+          var dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
+          if (Math.sqrt(dx * dx + dy * dy) <= radius) {
+            group.push(pts[j]);
+            used[j] = true;
+          }
+        }
+        groups.push(group);
+      }
+      return groups;
+    }
+
+    var currentVisibleLocs = [];
+    var mountedMarkers = [];
+
+    window.renderMarkers = function(visibleLocs) {
+      currentVisibleLocs = visibleLocs;
+      mountedMarkers.forEach(function(m) { m.remove(); });
+      mountedMarkers = [];
+
+      var groups = clusterByScreenDistance(mapInstance, visibleLocs, CLUSTER_PIXEL_RADIUS);
+
+      groups.forEach(function(group) {
+        var el = markerTemplate.cloneNode(true);
+
+        if (group.length === 1) {
+          var loc = group[0].loc;
+          el.querySelector('.pi-pin-body').textContent = loc.count;
+          el.addEventListener('click', function(ev) {
+            ev.stopPropagation();
+            window.piOpenPopupForLocation(loc);
+          });
+          mountedMarkers.push(
+            new mapboxgl.Marker({ element: el, anchor: 'bottom' }).setLngLat(loc.coords).addTo(mapInstance)
+          );
+        } else {
+          el.classList.add('pi-pin-cluster');
+          var totalPhotos = group.reduce(function(sum, p) { return sum + (p.loc.count || 0); }, 0);
+          el.querySelector('.pi-pin-body').textContent = totalPhotos;
+          var lngSum = 0, latSum = 0;
+          group.forEach(function(p) { lngSum += p.loc.coords[0]; latSum += p.loc.coords[1]; });
+          var centroid = [lngSum / group.length, latSum / group.length];
+          el.addEventListener('click', function(ev) {
+            ev.stopPropagation();
+            var bounds = new mapboxgl.LngLatBounds();
+            group.forEach(function(p) { bounds.extend(p.loc.coords); });
+            var currentZoom = mapInstance.getZoom();
+            var camera = mapInstance.cameraForBounds(bounds, { padding: 80, maxZoom: 18 });
+            var targetZoom = camera ? Math.max(camera.zoom, Math.min(currentZoom + 3, 18)) : Math.min(currentZoom + 3, 18);
+            var targetCenter = camera ? camera.center : bounds.getCenter();
+            mapInstance.easeTo({ center: targetCenter, zoom: targetZoom, duration: 500 });
+          });
+          mountedMarkers.push(
+            new mapboxgl.Marker({ element: el, anchor: 'bottom' }).setLngLat(centroid).addTo(mapInstance)
+          );
+        }
+      });
+    };
+
+    mapInstance.on('moveend', function() { window.renderMarkers(currentVisibleLocs); });
+
+    function tryOpenFromHash() {
+      var hash = window.location.hash.replace(/^#/, '');
+      if (!hash) return;
+      var parts = hash.split('/');
+      if (parts.length < 3) return;
+      var z = parseFloat(parts[0]);
+      var lat = parseFloat(parts[1]);
+      var lng = parseFloat(parts[2]);
+      if (isNaN(z) || isNaN(lat) || isNaN(lng)) return;
+
+      var best = null;
+      locations.forEach(function(loc) {
+        var d = Math.sqrt(Math.pow(loc.coords[0] - lng, 2) + Math.pow(loc.coords[1] - lat, 2));
+        if (!best || d < best.d) best = { loc: loc, d: d };
+      });
+
+      mapInstance.flyTo({ center: [lng, lat], zoom: z, speed: 1.4 });
+      if (best && best.d < 0.001) {
+        setTimeout(function() { window.piOpenPopupForLocation(best.loc); }, 600);
+      }
+    }
+
+    function waitForLocationsThenRender() {
+      if (!locations || locations.length === 0) {
+        setTimeout(waitForLocationsThenRender, 50);
+        return;
+      }
+      window.renderMarkers(locations);
+      document.getElementById('map').classList.add('loaded');
+      applySearchState();
+      tryOpenFromHash();
+      initAddressAutocomplete();
+    }
+    waitForLocationsThenRender();
+  };
+  document.head.appendChild(js);
+}
+
+loadInitialData();
+
+var existingSavedState = loadMapState();
+if (existingSavedState && typeof existingSavedState.lng === 'number') {
+  initMapLazy();
+} else {
+  ['mousemove', 'scroll', 'touchstart', 'keydown', 'click'].forEach(function(evt) {
+    window.addEventListener(evt, initMapLazy, { once: true, passive: true });
+  });
+  window.addEventListener('load', function() {
+    if (window.requestIdleCallback) {
+      requestIdleCallback(function() { setTimeout(initMapLazy, 2500); });
+    } else {
+      setTimeout(initMapLazy, 3000);
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var searchInput = document.getElementById('pi-search-input');
+  var clearBtn = document.getElementById('pi-search-clear');
+  var searchTimeout = null;
+
+  function resetAllFilters() {
+    if (searchInput) searchInput.value = '';
+    if (clearBtn) clearBtn.style.display = 'none';
+    var defRadio = document.querySelector('.suburb-check[value=""]');
+    if (defRadio) defRadio.checked = true;
+    searchState.suburb = '';
+    searchState.text = '';
+    searchState.categories = {};
+    document.querySelectorAll('.filter-check:checked').forEach(function(cb) { cb.checked = false; });
+    sessionStorage.removeItem(MAP_STATE_KEY);
+    applySearchState();
+    if (mapInstance) mapInstance.flyTo({ center: [153.0307, -27.4598], zoom: 13, duration: 800 });
+  }
+
+  if (searchInput && clearBtn) {
+    clearBtn.addEventListener('click', resetAllFilters);
+    searchInput.addEventListener('input', function() {
+      var val = this.value.trim().toLowerCase();
+      clearBtn.style.display = (this.value.length > 0 || countActiveFilters() > 0) ? 'block' : 'none';
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(function() {
+        searchState.text = val;
+        if (val && typeof clarity === 'function') {
+          clarity('set', 'search_query', val);
+        }
+        applySearchState();
+      }, 120);
+    });
+  }
+
+  document.querySelectorAll('.acc-head').forEach(function(h) {
+    h.addEventListener('click', function() {
+      this.classList.toggle('open');
+      var body = document.getElementById(this.getAttribute('data-target'));
+      if (body) body.classList.toggle('open');
+    });
+  });
+
+  document.querySelectorAll('.suburb-check').forEach(function(cb) {
+    cb.addEventListener('click', function() {
+      if (this.value && this.value === searchState.suburb) {
+        this.checked = false;
+        var defRadio = document.querySelector('.suburb-check[value=""]');
+        if (defRadio) defRadio.checked = true;
+        document.getElementById('pi-map-overlay').classList.remove('visible');
+        if (mapInstance) setTimeout(function() { mapInstance.resize(); }, 150);
+        searchState.suburb = '';
+        applySearchState();
+      }
+    });
+    cb.addEventListener('change', function() {
+      document.getElementById('pi-map-overlay').classList.remove('visible');
+      if (mapInstance) setTimeout(function() { mapInstance.resize(); }, 150);
+      searchState.suburb = this.value;
+      applySearchState();
+      if (this.value && typeof clarity === 'function') {
+        clarity('set', 'suburb_filter', this.value);
+      }
+      if (this.value && mapInstance) {
+        fetch('https://api.mapbox.com/geocoding/v5/mapbox.places/' + encodeURIComponent(this.value + ', Brisbane, Australia') + '.json?access_token=' + mapboxgl.accessToken + '&country=au&types=place,locality,neighborhood&limit=1')
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            if (data.features && data.features[0] && mapInstance) {
+              mapInstance.fitBounds(data.features[0].bbox, { padding: 60, duration: 600, maxZoom: 14.5 });
+            }
+          });
+      }
+    });
+  });
+
+  document.querySelectorAll('.filter-check').forEach(function(cb) {
+    cb.addEventListener('change', function() {
+      var cat = this.getAttribute('data-cat');
+      if (!searchState.categories[cat]) searchState.categories[cat] = [];
+      if (this.checked) searchState.categories[cat].push(this.value);
+      else searchState.categories[cat] = searchState.categories[cat].filter(function(v) { return v !== cb.value; });
+      applySearchState();
+      if (this.checked && typeof clarity === 'function') {
+        clarity('set', cat + '_filter', this.value);
+      }
+    });
+  });
+
+  var mobileToggleBtn = document.getElementById('mobile-toggle-filters');
+  var indexPanel = document.getElementById('index-panel');
+  var mobileCloseBtn = document.getElementById('mobile-panel-close');
+  var mobileApplyBtn = document.getElementById('mobile-panel-apply');
+  
+  if (mobileToggleBtn && indexPanel) {
+    mobileToggleBtn.addEventListener('click', function() {
+      indexPanel.classList.add('mobile-active');
+      document.body.classList.add('pi-drawer-lock');
+      indexPanel.scrollTop = 0;
+    });
+  }
+  
+  function closeMobilePanel() {
+    if (indexPanel) {
+      indexPanel.classList.remove('mobile-active');
+      document.body.classList.remove('pi-drawer-lock');
+    }
+  }
+  
+  if (mobileCloseBtn) mobileCloseBtn.addEventListener('click', closeMobilePanel);
+  if (mobileApplyBtn) mobileApplyBtn.addEventListener('click', closeMobilePanel);
+
+  if (indexPanel) {
+    var touchStartY = null;
+    indexPanel.addEventListener('touchstart', function(ev) {
+      if (window.innerWidth > 720 || !indexPanel.classList.contains('mobile-active')) return;
+      if (indexPanel.scrollTop > 0) return;
+      touchStartY = ev.touches[0].clientY;
+    }, { passive: true });
+    indexPanel.addEventListener('touchmove', function(ev) {
+      if (touchStartY === null) return;
+      var delta = ev.touches[0].clientY - touchStartY;
+      if (delta > 80) {
+        closeMobilePanel();
+        touchStartY = null;
+      }
+    }, { passive: true });
+    indexPanel.addEventListener('touchend', function() { touchStartY = null; }, { passive: true });
+  }
+
+  var tab = document.getElementById('pi-drawer-tab');
+  var panel = document.getElementById('pi-drawer-panel');
+  var closeBtn = document.getElementById('pi-drawer-close');
+  var closeBtnAlt = document.getElementById('pi-drawer-close-btn');
+  var backdrop = document.getElementById('pi-drawer-backdrop');
+
+  function openDrawer() {
+    panel.classList.add('open');
+    backdrop.classList.add('active');
+    panel.setAttribute('aria-hidden', 'false');
+    tab.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeDrawer() {
+    panel.classList.remove('open');
+    backdrop.classList.remove('active');
+    panel.setAttribute('aria-hidden', 'true');
+    tab.setAttribute('aria-expanded', 'false');
+  }
+
+  tab.addEventListener('click', function() {
+    panel.classList.contains('open') ? closeDrawer() : openDrawer();
+  });
+  closeBtn.addEventListener('click', closeDrawer);
+  if (closeBtnAlt) closeBtnAlt.addEventListener('click', closeDrawer);
+  backdrop.addEventListener('click', closeDrawer);
+  window.piCloseDrawer = closeDrawer;
+
+  document.addEventListener('keydown', function(ev) {
+    var overlay = document.getElementById('pi-map-overlay');
+    if (overlay && overlay.classList.contains('visible')) {
+      if (ev.key === 'ArrowLeft') {
+        var prevBtn = overlay.querySelector('.pi-popup-slider-prev');
+        if (prevBtn) { prevBtn.click(); return; }
+        var navPrev = overlay.querySelector('#pi-overlay-nav-prev');
+        if (navPrev && !navPrev.disabled) navPrev.click();
+      } else if (ev.key === 'ArrowRight') {
+        var nextBtn = overlay.querySelector('.pi-popup-slider-next');
+        if (nextBtn) { nextBtn.click(); return; }
+        var navNext = overlay.querySelector('#pi-overlay-nav-next');
+        if (navNext && !navNext.disabled) navNext.click();
+      }
+    }
+  });
+});
+
+(function () {
+  var isInIframe = window.self !== window.top;
+  var toggleBtn = document.getElementById('pi-fullscreen-toggle');
+  if (!isInIframe || !toggleBtn) return;
+
+  var isFullscreen = false;
+  var parentDoc = null;
+  try { parentDoc = window.parent.document; } catch (e) {}
+  if (!parentDoc) return;
+
+  var EXPAND_SVG = toggleBtn.innerHTML;
+  var COMPRESS_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" style="width:16px;height:16px;"><path d="M9 3v5H4M15 3v5h5M9 21v-5H4M15 21v-5h5"/></svg>';
+
+  toggleBtn.style.display = 'flex';
+
+  function getIframeEl() {
+    var iframes = parentDoc.getElementsByTagName('iframe');
+    for (var i = 0; i < iframes.length; i++) {
+      if (iframes[i].contentWindow === window) return iframes[i];
+    }
+    return null;
+  }
+
+  function getHeaderHeight() {
+    var header = parentDoc.querySelector('#component_menu') || parentDoc.querySelector('#block_navib') || parentDoc.querySelector('header');
+    return header ? Math.ceil(header.getBoundingClientRect().height) : 44;
+  }
+
+  function expandMap() {
+    var iframe = getIframeEl();
+    if (!iframe) return;
+    iframe.dataset.piOrigStyle = iframe.getAttribute('style') || '';
+    var h = getHeaderHeight();
+    iframe.setAttribute('style',
+      'position:fixed !important; top:' + h + 'px !important; left:0 !important; right:0 !important; ' +
+      'width:100vw !important; height:calc(100vh - ' + h + 'px) !important; ' +
+      'z-index:100000 !important; border:none !important;'
+    );
+    parentDoc.body.style.overflow = 'hidden';
+    isFullscreen = true;
+    toggleBtn.innerHTML = COMPRESS_SVG;
+    toggleBtn.setAttribute('aria-label', 'Exit full screen map');
+    toggleBtn.setAttribute('title', 'Exit full screen map');
+    setTimeout(function () { if (mapInstance) mapInstance.resize(); }, 260);
+  }
+
+  function collapseMap() {
+    var iframe = getIframeEl();
+    if (!iframe) return;
+    iframe.setAttribute('style', iframe.dataset.piOrigStyle || '');
+    parentDoc.body.style.overflow = '';
+    isFullscreen = false;
+    toggleBtn.innerHTML = EXPAND_SVG;
+    toggleBtn.setAttribute('aria-label', 'Expand map to full screen');
+    toggleBtn.setAttribute('title', 'Expand map to full screen');
+    setTimeout(function () { if (mapInstance) mapInstance.resize(); }, 260);
+  }
+
+  toggleBtn.addEventListener('click', function () {
+    isFullscreen ? collapseMap() : expandMap();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && isFullscreen) collapseMap();
+  });
+})();
+</script>
+</body>
+</html>
