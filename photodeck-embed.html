@@ -16,7 +16,7 @@
   --line: #000000;
   --text: #000000;
   --muted: #666666;
-  --accent-new: #A92B2B; /* Stonowana, zgaszona "ceglana" czerwień */
+  --accent-new: #A92B2B;
 }
 
   *, *::before, *::after {
@@ -90,7 +90,7 @@
   #search-archive-btn:hover { background: var(--text); color: var(--bg); }
   .pi-search-action-icon { display: none; width: 18px; height: 18px; }
 
-  /* LAYOUT MATRIX */
+  /* LAYOUT MATRIX: STAŁY TRÓJKOLUMNOWY UKŁAD */
   #layout { width: 100%; flex: 1 1 auto; min-height: 0; background: var(--bg); position: relative; display: flex; overflow: hidden; margin: 0; padding: 0; }
   
   #index-panel { width: 340px; flex-shrink: 0; position: relative; height: 100%; border-right: 1px solid var(--text); display: flex; flex-direction: column; background: var(--bg); z-index: 3; overflow-y: auto; }
@@ -124,13 +124,13 @@
 
   #filters-group { flex-shrink: 0; }
 
-  /* MAP VIEWPORT & INSTRUCTIONS */
+  /* MAP VIEWPORT */
   #map-wrap { flex: 1; position: relative; height: 100%; background: var(--bg); margin: 0; padding: 0; }
   
   #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s ease-in-out; }
   #map.loaded { opacity: 1; }
   #map .mapboxgl-canvas { filter: grayscale(100%); }
-  
+
   .pi-map-instructions {
     position: absolute;
     bottom: 24px;
@@ -148,7 +148,7 @@
     z-index: 10;
     white-space: nowrap;
   }
-
+  
   #map-error {
     position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
     background: var(--bg); text-align: center; padding: 40px; z-index: 5;
@@ -186,24 +186,22 @@
   .pi-pin-cluster .pi-pin-body { min-width: 26px; height: 26px; font-size: 11px; border-width: 2px; }
   .pi-pin-cluster .pi-pin-point { border-left-width: 4px; border-right-width: 4px; border-top-width: 5px; }
 
-  /* Pins belonging to the most recent upload batch */
+  /* Pins belonging to the most recent upload batch — for QA / verifying placement */
   .pi-pin-new .pi-pin-body { background: var(--accent-new); border-color: var(--text); color: var(--bg); }
   .pi-pin-new .pi-pin-point { border-top-color: var(--text); }
   .pi-pin-cluster-new .pi-pin-body { background: var(--accent-new); border-color: var(--text); color: var(--bg); }
   .pi-pin-cluster-new .pi-pin-point { border-top-color: var(--text); }
 
-  /* PRAWY STAŁY PANEL SZCZEGÓŁÓW - Stały na desktopie */
+  /* PRAWY WYSUWANY PANEL SZCZEGÓŁÓW ZDJĘCIA (DRAWER) */
   .pi-map-overlay {
-    position: relative; width: 638px; flex-shrink: 0; height: 100%;
+    position: absolute; top: 0; right: 0; width: 638px; max-width: 100%; height: 100%;
     background: var(--bg); border-left: 1px solid var(--text);
-    display: none; flex-direction: column; overflow: hidden; z-index: 800;
+    display: flex; flex-direction: column; overflow: hidden; z-index: 800;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  @media (min-width: 721px) {
-    .pi-map-overlay { display: flex !important; }
-  }
-  .pi-map-overlay.visible { display: flex; } /* Mobilny trigger */
+  .pi-map-overlay.visible { transform: translateX(0); }
 
-  /* Dodatkowe przyciski nawigacji pionowej (Góra/Dół) w panelu */
   .pi-record-nav-btn {
     width: 32px; height: 32px; border: 1px solid var(--text); background: var(--bg); color: var(--text);
     cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.1s, color 0.1s;
@@ -288,15 +286,12 @@
 
   .pi-tags-flex { display: flex; flex-wrap: wrap; gap: 4px; }
 
-  /* UPDATE DRAWER - Skorygowane Z-INDEX i pozycjonowanie na Desktopie */
+  /* UPDATE DRAWER */
   #pi-drawer-tab {
     position: fixed; top: 50%; right: 0; transform: translateY(-50%);
     width: 28px; height: 144px; background: var(--text); color: var(--bg);
     border: 1px solid var(--text); border-right: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
-    z-index: 900; transition: background 0.1s, color 0.1s;
-  }
-  @media (min-width: 721px) {
-    #pi-drawer-tab { right: 638px; border-right: none; } /* Przysysa tab do krawędzi prawego panelu overlay */
+    z-index: 500; transition: background 0.1s, color 0.1s;
   }
   #pi-drawer-tab:hover { background: var(--bg); color: var(--text); }
   #pi-drawer-tab-inner {
@@ -314,13 +309,13 @@
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.5; transform: scale(1.35); }
   }
-  #pi-drawer-backdrop { position: fixed; inset: 0; z-index: 850; pointer-events: none; }
+  #pi-drawer-backdrop { position: fixed; inset: 0; z-index: 600; pointer-events: none; }
   #pi-drawer-backdrop.active { pointer-events: auto; }
   
   #pi-drawer-panel {
     position: fixed; top: 0; right: 0; height: 100%; height: 100dvh; width: 638px; max-width: calc(100vw - 40px);
     background: var(--bg); border-left: 1px solid var(--text); transform: translateX(100%);
-    transition: transform 0.25s cubic-bezier(0.16,1,0.3,1); z-index: 910; display: flex; flex-direction: column;
+    transition: transform 0.25s cubic-bezier(0.16,1,0.3,1); z-index: 700; display: flex; flex-direction: column;
   }
   #pi-drawer-panel.open { transform: translateX(0); }
   .pi-drawer-header {
@@ -387,14 +382,13 @@
       z-index: 900; pointer-events: auto; animation: pi-fade-in 0.3s ease;
     }
     #map-wrap { height: calc(100dvh - 52px - 44px); }
-    #pi-drawer-tab { height: 120px; width: 32px; padding-left: 4px; right: 0; }
+    #pi-drawer-tab { height: 120px; width: 32px; padding-left: 4px; }
     
     .pi-map-overlay {
       position: fixed !important; inset: 0 !important; width: 100% !important; max-width: 100% !important;
       height: 100% !important; z-index: 9999 !important; transform: translateX(100%);
       transition: transform 0.3s ease;
     }
-    .pi-map-overlay.visible { transform: translateX(0) !important; display: flex !important; }
     .pi-map-instructions { display: none; } /* Hide instructions on mobile */
   }
   @keyframes pi-fade-in { from { opacity: 0; } to { opacity: 1; } }
@@ -654,7 +648,6 @@
 
 <script>
 var currentOpenLoc = null;
-var emptyOverlayHtml = '<div class="pi-empty-state" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:40px;color:var(--muted);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" style="margin-bottom:16px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg><span style="font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;">Select a location on the map<br>to view archive records</span></div>';
 
 var DATA_VERSION = (function() {
   var d = new Date();
@@ -672,26 +665,6 @@ var piUpdateRecords = [];
 var piUpdateIndex = -1;
 var is3DMode = false;
 var isLndmrkMode = false;
-
-if (window.innerWidth > 720) {
-  var initialOverlay = document.getElementById('pi-map-overlay');
-  if (initialOverlay) initialOverlay.innerHTML = emptyOverlayHtml;
-}
-
-function closeRecordPreview() {
-  currentOpenLoc = null;
-  piUpdateIndex = -1;
-  var overlay = document.getElementById('pi-map-overlay');
-  if (!overlay) return;
-  
-  if (window.innerWidth > 720) {
-      overlay.innerHTML = emptyOverlayHtml;
-  } else {
-      overlay.classList.remove('visible');
-      setTimeout(function() { if (mapInstance) mapInstance.resize(); }, 150);
-  }
-  document.querySelectorAll('.pi-log-link.active').forEach(function(el) { el.classList.remove('active'); });
-}
 
 function setMap3DMode(enabled) {
   is3DMode = enabled;
@@ -1402,7 +1375,13 @@ function initMapLazy() {
     
     // Zamknięcie podglądu, gdy kliknięto puste pole mapy
     mapInstance.on('click', function(e) {
-      if (currentOpenLoc) closeRecordPreview();
+      var overlay = document.getElementById('pi-map-overlay');
+      if (overlay && overlay.classList.contains('visible')) {
+        overlay.classList.remove('visible');
+        currentOpenLoc = null;
+        piUpdateIndex = -1;
+        setTimeout(function() { mapInstance.resize(); }, 150);
+      }
     });
 
     mapInstance.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
@@ -1474,7 +1453,7 @@ function initMapLazy() {
 
       var closeBtnHtml = showClose === false ? '' : '<button type="button" class="pi-map-overlay-close-btn" aria-label="Close">&times;</button>';
       
-      // Dodane strzałki Góra/Dół do następnego/poprzedniego rekordu
+      // Strzałki nawigacji
       var recordNavHtml = showClose === false ? '' : 
         '<div class="pi-record-nav-arrows" style="position:absolute; top:12px; right:54px; display:flex; z-index:5;">' +
             '<button type="button" class="pi-record-nav-btn pi-record-nav-up" title="Previous record (Up Arrow)" style="border-right:none;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"></polyline></svg></button>' +
@@ -1618,7 +1597,7 @@ function initMapLazy() {
         if (nextBtn) nextBtn.addEventListener('click', function(ev) { ev.stopPropagation(); showSlide(idx + 1); });
       }
       
-      // Obsługa strzałek nawigacyjnych następny/poprzedni rekord
+      // Nawigacja między rekordami (Up/Down)
       var btnUp = root.querySelector('.pi-record-nav-up');
       var btnDown = root.querySelector('.pi-record-nav-down');
       if (btnUp || btnDown) {
@@ -1654,7 +1633,10 @@ function initMapLazy() {
       var closeBtn = overlay.querySelector('.pi-map-overlay-close-btn');
       if (closeBtn) closeBtn.addEventListener('click', function(ev) { 
         ev.stopPropagation(); 
-        closeRecordPreview();
+        overlay.classList.remove('visible'); 
+        currentOpenLoc = null;
+        piUpdateIndex = -1;
+        if (mapInstance) setTimeout(function() { mapInstance.resize(); }, 150);
       });
       wireLocationCard(overlay, loc);
 
@@ -1704,7 +1686,6 @@ function initMapLazy() {
       return groups;
     }
 
-    var currentVisibleLocs = [];
     var mountedMarkers = [];
 
     window.renderMarkers = function(visibleLocs) {
@@ -1870,13 +1851,24 @@ document.addEventListener('DOMContentLoaded', function() {
         this.checked = false;
         var defRadio = document.querySelector('.suburb-check[value=""]');
         if (defRadio) defRadio.checked = true;
-        closeRecordPreview();
+        
+        var overlay = document.getElementById('pi-map-overlay');
+        if (overlay) overlay.classList.remove('visible');
+        currentOpenLoc = null;
+        piUpdateIndex = -1;
+        if (mapInstance) setTimeout(function() { mapInstance.resize(); }, 150);
+
         searchState.suburb = '';
         applySearchState();
       }
     });
     cb.addEventListener('change', function() {
-      closeRecordPreview();
+      var overlay = document.getElementById('pi-map-overlay');
+      if (overlay) overlay.classList.remove('visible');
+      currentOpenLoc = null;
+      piUpdateIndex = -1;
+      if (mapInstance) setTimeout(function() { mapInstance.resize(); }, 150);
+
       searchState.suburb = this.value;
       applySearchState();
       if (this.value && typeof clarity === 'function') {
@@ -1980,7 +1972,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (ev.target.tagName === 'INPUT' || ev.target.tagName === 'TEXTAREA') return;
 
     var overlay = document.getElementById('pi-map-overlay');
-    var isOverlayActive = overlay && (window.innerWidth > 720 ? currentOpenLoc !== null : overlay.classList.contains('visible'));
+    var isOverlayActive = overlay && overlay.classList.contains('visible');
 
     if (isOverlayActive) {
       if (ev.key === 'ArrowLeft') {
