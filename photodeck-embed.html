@@ -16,7 +16,7 @@
   --line: #000000;
   --text: #000000;
   --muted: #666666;
-  --accent-new: #A92B2B;
+  --accent-new: #A92B2B; /* Stonowana, zgaszona "ceglana" czerwień */
 }
 
   *, *::before, *::after {
@@ -90,7 +90,7 @@
   #search-archive-btn:hover { background: var(--text); color: var(--bg); }
   .pi-search-action-icon { display: none; width: 18px; height: 18px; }
 
-  /* LAYOUT MATRIX: STAŁY TRÓJKOLUMNOWY UKŁAD */
+  /* LAYOUT MATRIX */
   #layout { width: 100%; flex: 1 1 auto; min-height: 0; background: var(--bg); position: relative; display: flex; overflow: hidden; margin: 0; padding: 0; }
   
   #index-panel { width: 340px; flex-shrink: 0; position: relative; height: 100%; border-right: 1px solid var(--text); display: flex; flex-direction: column; background: var(--bg); z-index: 3; overflow-y: auto; }
@@ -124,13 +124,13 @@
 
   #filters-group { flex-shrink: 0; }
 
-  /* MAP VIEWPORT */
+  /* MAP VIEWPORT & INSTRUCTIONS */
   #map-wrap { flex: 1; position: relative; height: 100%; background: var(--bg); margin: 0; padding: 0; }
   
   #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s ease-in-out; }
   #map.loaded { opacity: 1; }
   #map .mapboxgl-canvas { filter: grayscale(100%); }
-
+  
   .pi-map-instructions {
     position: absolute;
     bottom: 24px;
@@ -148,7 +148,7 @@
     z-index: 10;
     white-space: nowrap;
   }
-  
+
   #map-error {
     position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
     background: var(--bg); text-align: center; padding: 40px; z-index: 5;
@@ -186,27 +186,31 @@
   .pi-pin-cluster .pi-pin-body { min-width: 26px; height: 26px; font-size: 11px; border-width: 2px; }
   .pi-pin-cluster .pi-pin-point { border-left-width: 4px; border-right-width: 4px; border-top-width: 5px; }
 
-  /* Pins belonging to the most recent upload batch — for QA / verifying placement */
   .pi-pin-new .pi-pin-body { background: var(--accent-new); border-color: var(--text); color: var(--bg); }
   .pi-pin-new .pi-pin-point { border-top-color: var(--text); }
   .pi-pin-cluster-new .pi-pin-body { background: var(--accent-new); border-color: var(--text); color: var(--bg); }
   .pi-pin-cluster-new .pi-pin-point { border-top-color: var(--text); }
 
-  /* PRAWY WYSUWANY PANEL SZCZEGÓŁÓW ZDJĘCIA (DRAWER) */
+  /* PRAWY STAŁY PANEL SZCZEGÓŁÓW ZDJĘCIA */
   .pi-map-overlay {
-    position: absolute; top: 0; right: 0; width: 638px; max-width: 100%; height: 100%;
+    position: relative; width: 638px; flex-shrink: 0; height: 100%;
     background: var(--bg); border-left: 1px solid var(--text);
-    display: flex; flex-direction: column; overflow: hidden; z-index: 800;
-    transform: translateX(100%);
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: none; flex-direction: column; overflow: hidden; z-index: 800;
   }
-  .pi-map-overlay.visible { transform: translateX(0); }
+  @media (min-width: 721px) {
+    .pi-map-overlay { display: flex !important; }
+  }
+  .pi-map-overlay.visible { display: flex; } /* Mobilny trigger */
 
-  .pi-record-nav-btn {
-    width: 32px; height: 32px; border: 1px solid var(--text); background: var(--bg); color: var(--text);
-    cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.1s, color 0.1s;
-  }
+  /* NOWA ZINTEGROWANA NAWIGACJA REKORDÓW (Prawy Górny Róg) */
+  .pi-map-overlay-close-btn { width: 32px; height: 32px; border: 1px solid var(--text); background: var(--bg); cursor: pointer; color: var(--text); display: flex; align-items: center; justify-content: center; transition: background 0.1s, color 0.1s; }
+  .pi-map-overlay-close-btn:hover { background: var(--text); color: var(--bg); }
+  
+  .pi-record-nav-btn { width: 32px; height: 32px; border: 1px solid var(--text); background: var(--bg); color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.1s, color 0.1s; }
   .pi-record-nav-btn:hover { background: var(--text); color: var(--bg); }
+
+  /* STRZAŁKI SLIDERA ZDJĘĆ */
+  .pi-popup-slider-prev:hover, .pi-popup-slider-next:hover { background: var(--text) !important; color: var(--bg) !important; }
 
   /* ARCHITEKTURA WNĘTRZA PANELA SZCZEGÓŁÓW */
   .pi-record-meta-top {
@@ -254,26 +258,6 @@
   .pi-spec-acc-icon { font-size: 14px; font-weight: 400; line-height: 1; }
   .pi-spec-acc-body { display: none; padding: 14px 0 20px 0; border-bottom: 1px solid #000000; font-size: 11px; }
   .pi-spec-acc-body.open { display: block; }
-  .pi-map-overlay-close-btn { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border: 1px solid #000000; background: #FFFFFF; cursor: pointer; font-size: 16px; color: #000000; display: flex; align-items: center; justify-content: center; z-index: 5; transition: background 0.1s, color 0.1s; }
-  .pi-map-overlay-close-btn:hover { background: #000000; color: #FFFFFF; }
-
-  .pi-overlay-update-nav {
-    position: absolute; top: 12px; left: 12px; z-index: 6;
-    display: flex; align-items: center; border: 1px solid #000000; background: #FFFFFF;
-  }
-  .pi-overlay-nav-btn {
-    width: 32px; height: 32px; border: none; background: transparent; color: #000000;
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-    transition: background 0.1s, color 0.1s;
-  }
-  .pi-overlay-nav-btn:hover:not(:disabled) { background: #000000; color: #FFFFFF; }
-  .pi-overlay-nav-btn:disabled { opacity: 0.25; cursor: default; }
-  .pi-overlay-nav-btn svg { width: 14px; height: 14px; }
-  .pi-overlay-nav-count {
-    font-size: 9px; font-weight: 500; letter-spacing: 0.06em; padding: 0 10px;
-    border-left: 1px solid #DADADA; border-right: 1px solid #DADADA; color: #000000;
-    white-space: nowrap; user-select: none;
-  }
 
   .pi-overlay-slider-wrap { flex-shrink: 0; height: 58vh; background: #FAFAFA; border-bottom: 1px solid #000000; overflow: hidden; }
   .pi-overlay-body-wrap { flex: 1; overflow-y: auto; }
@@ -283,15 +267,17 @@
   .pi-data-row { display: grid; grid-template-columns: 140px 1fr; align-items: baseline; column-gap: 12px; font-size: 11px; line-height: 1.5; }
   .pi-data-key { color: #666666; text-transform: uppercase; letter-spacing: 0.05em; font-size: 10px; }
   .pi-data-val { color: #000000; font-weight: 500; text-align: right; word-break: break-word; }
-
   .pi-tags-flex { display: flex; flex-wrap: wrap; gap: 4px; }
 
-  /* UPDATE DRAWER */
+  /* UPDATE DRAWER - Przylepiony do panelu bocznego */
   #pi-drawer-tab {
     position: fixed; top: 50%; right: 0; transform: translateY(-50%);
     width: 28px; height: 144px; background: var(--text); color: var(--bg);
     border: 1px solid var(--text); border-right: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
-    z-index: 500; transition: background 0.1s, color 0.1s;
+    z-index: 900; transition: background 0.1s, color 0.1s;
+  }
+  @media (min-width: 721px) {
+    #pi-drawer-tab { right: 638px; border-right: none; }
   }
   #pi-drawer-tab:hover { background: var(--bg); color: var(--text); }
   #pi-drawer-tab-inner {
@@ -309,13 +295,13 @@
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.5; transform: scale(1.35); }
   }
-  #pi-drawer-backdrop { position: fixed; inset: 0; z-index: 600; pointer-events: none; }
+  #pi-drawer-backdrop { position: fixed; inset: 0; z-index: 850; pointer-events: none; }
   #pi-drawer-backdrop.active { pointer-events: auto; }
   
   #pi-drawer-panel {
     position: fixed; top: 0; right: 0; height: 100%; height: 100dvh; width: 638px; max-width: calc(100vw - 40px);
     background: var(--bg); border-left: 1px solid var(--text); transform: translateX(100%);
-    transition: transform 0.25s cubic-bezier(0.16,1,0.3,1); z-index: 700; display: flex; flex-direction: column;
+    transition: transform 0.25s cubic-bezier(0.16,1,0.3,1); z-index: 910; display: flex; flex-direction: column;
   }
   #pi-drawer-panel.open { transform: translateX(0); }
   .pi-drawer-header {
@@ -382,14 +368,15 @@
       z-index: 900; pointer-events: auto; animation: pi-fade-in 0.3s ease;
     }
     #map-wrap { height: calc(100dvh - 52px - 44px); }
-    #pi-drawer-tab { height: 120px; width: 32px; padding-left: 4px; }
+    #pi-drawer-tab { height: 120px; width: 32px; padding-left: 4px; right: 0; }
     
     .pi-map-overlay {
       position: fixed !important; inset: 0 !important; width: 100% !important; max-width: 100% !important;
       height: 100% !important; z-index: 9999 !important; transform: translateX(100%);
       transition: transform 0.3s ease;
     }
-    .pi-map-instructions { display: none; } /* Hide instructions on mobile */
+    .pi-map-overlay.visible { transform: translateX(0) !important; display: flex !important; }
+    .pi-map-instructions { display: none; }
   }
   @keyframes pi-fade-in { from { opacity: 0; } to { opacity: 1; } }
 </style>
@@ -648,6 +635,7 @@
 
 <script>
 var currentOpenLoc = null;
+var emptyOverlayHtml = '<div class="pi-empty-state" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:40px;color:var(--muted);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" style="margin-bottom:16px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg><span style="font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;">Select a location on the map<br>to view archive records</span></div>';
 
 var DATA_VERSION = (function() {
   var d = new Date();
@@ -665,6 +653,26 @@ var piUpdateRecords = [];
 var piUpdateIndex = -1;
 var is3DMode = false;
 var isLndmrkMode = false;
+
+// Układ okna początkowy
+if (window.innerWidth > 720) {
+  var initialOverlay = document.getElementById('pi-map-overlay');
+  if (initialOverlay) initialOverlay.innerHTML = emptyOverlayHtml;
+}
+
+function closeRecordPreview() {
+  currentOpenLoc = null;
+  var overlay = document.getElementById('pi-map-overlay');
+  if (!overlay) return;
+  
+  if (window.innerWidth > 720) {
+      overlay.innerHTML = emptyOverlayHtml;
+  } else {
+      overlay.classList.remove('visible');
+      setTimeout(function() { if (mapInstance) mapInstance.resize(); }, 150);
+  }
+  document.querySelectorAll('.pi-log-link.active').forEach(function(el) { el.classList.remove('active'); });
+}
 
 function setMap3DMode(enabled) {
   is3DMode = enabled;
@@ -778,26 +786,6 @@ function openUpdateRecordAt(index) {
     if (mapInstance) mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2 });
     if (window.piOpenPopupForLocation) window.piOpenPopupForLocation(rec, true);
   }
-}
-
-function injectUpdateNav(overlay) {
-  var existing = overlay.querySelector('.pi-overlay-update-nav');
-  if (existing) existing.remove();
-  var nav = document.createElement('div');
-  nav.className = 'pi-overlay-update-nav';
-  nav.innerHTML =
-    '<button type="button" class="pi-overlay-nav-btn" id="pi-overlay-nav-prev" aria-label="Previous new record"' + (piUpdateIndex <= 0 ? ' disabled' : '') + '>' +
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
-    '</button>' +
-    '<span class="pi-overlay-nav-count">' + (piUpdateIndex + 1) + ' / ' + piUpdateRecords.length + '</span>' +
-    '<button type="button" class="pi-overlay-nav-btn" id="pi-overlay-nav-next" aria-label="Next new record"' + (piUpdateIndex >= piUpdateRecords.length - 1 ? ' disabled' : '') + '>' +
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
-    '</button>';
-  overlay.appendChild(nav);
-  var prevBtn = nav.querySelector('#pi-overlay-nav-prev');
-  var nextBtn = nav.querySelector('#pi-overlay-nav-next');
-  if (prevBtn) prevBtn.addEventListener('click', function(ev) { ev.stopPropagation(); openUpdateRecordAt(piUpdateIndex - 1); });
-  if (nextBtn) nextBtn.addEventListener('click', function(ev) { ev.stopPropagation(); openUpdateRecordAt(piUpdateIndex + 1); });
 }
 
 function normalizeKey(s) { return (s || '').toLowerCase().trim(); }
@@ -1375,13 +1363,7 @@ function initMapLazy() {
     
     // Zamknięcie podglądu, gdy kliknięto puste pole mapy
     mapInstance.on('click', function(e) {
-      var overlay = document.getElementById('pi-map-overlay');
-      if (overlay && overlay.classList.contains('visible')) {
-        overlay.classList.remove('visible');
-        currentOpenLoc = null;
-        piUpdateIndex = -1;
-        setTimeout(function() { mapInstance.resize(); }, 150);
-      }
+      if (currentOpenLoc) closeRecordPreview();
     });
 
     mapInstance.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
@@ -1451,13 +1433,24 @@ function initMapLazy() {
       var displayPhotos = allPhotos.filter(function(p) { return p.thumb; });
       var initial = displayPhotos.length ? displayPhotos[0] : allPhotos[0];
 
-      var closeBtnHtml = showClose === false ? '' : '<button type="button" class="pi-map-overlay-close-btn" aria-label="Close">&times;</button>';
-      
-      // Strzałki nawigacji
-      var recordNavHtml = showClose === false ? '' : 
-        '<div class="pi-record-nav-arrows" style="position:absolute; top:12px; right:54px; display:flex; z-index:5;">' +
+      // LICZNIK REKORDÓW ZINTEGROWANY Z GÓRNYMI PRZYCISKAMI
+      var locCountText = '';
+      if (showClose !== false) {
+          if (piUpdateIndex !== -1 && piUpdateRecords && piUpdateRecords.length > 0) {
+              locCountText = (piUpdateIndex + 1) + ' / ' + piUpdateRecords.length;
+          } else if (currentVisibleLocs && currentVisibleLocs.length > 0) {
+              var cIdx = currentVisibleLocs.indexOf(loc);
+              if (cIdx !== -1) locCountText = (cIdx + 1) + ' / ' + currentVisibleLocs.length;
+          }
+      }
+      var counterBadgeHtml = locCountText ? '<div class="pi-nav-counter" style="display:flex;align-items:center;padding:0 12px;font-size:9px;font-weight:600;letter-spacing:0.1em;border:1px solid var(--text);border-right:none;background:var(--bg);color:var(--text);user-select:none;">' + locCountText + '</div>' : '';
+
+      var panelControlsHtml = showClose === false ? '' : 
+        '<div class="pi-panel-top-controls" style="position:absolute; top:12px; right:12px; display:flex; z-index:10;">' +
+            counterBadgeHtml +
             '<button type="button" class="pi-record-nav-btn pi-record-nav-up" title="Previous record (Up Arrow)" style="border-right:none;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"></polyline></svg></button>' +
-            '<button type="button" class="pi-record-nav-btn pi-record-nav-down" title="Next record (Down Arrow)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></button>' +
+            '<button type="button" class="pi-record-nav-btn pi-record-nav-down" title="Next record (Down Arrow)" style="border-right:none;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></button>' +
+            '<button type="button" class="pi-map-overlay-close-btn" aria-label="Close" style="position:static;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>' +
         '</div>';
 
       var sliderHtml = '';
@@ -1470,8 +1463,8 @@ function initMapLazy() {
         var navHtml = '';
         if (displayPhotos.length > 1) {
           navHtml = 
-            '<button type="button" class="pi-popup-slider-prev" style="position:absolute;top:50%;left:0;transform:translateY(-50%);background:var(--bg);border:1px solid var(--text);border-left:none;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg></button>' +
-            '<button type="button" class="pi-popup-slider-next" style="position:absolute;top:50%;right:0;transform:translateY(-50%);background:var(--bg);border:1px solid var(--text);border-right:none;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg></button>' +
+            '<button type="button" class="pi-popup-slider-prev" title="Previous photo" style="position:absolute;top:50%;left:12px;transform:translateY(-50%);background:var(--bg);color:var(--text);border:1px solid var(--text);width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;transition:background 0.1s,color 0.1s;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg></button>' +
+            '<button type="button" class="pi-popup-slider-next" title="Next photo" style="position:absolute;top:50%;right:12px;transform:translateY(-50%);background:var(--bg);color:var(--text);border:1px solid var(--text);width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;transition:background 0.1s,color 0.1s;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></button>' +
             '<div class="pi-slider-counter" style="position:absolute;bottom:12px;right:12px;background:var(--bg);color:var(--text);border:1px solid var(--text);padding:4px 8px;font-size:9px;font-weight:600;letter-spacing:0.1em;z-index:2;user-select:none;">1 / ' + displayPhotos.length + '</div>';
         }
 
@@ -1530,7 +1523,7 @@ function initMapLazy() {
         '</div>' +
       '</div></div>';
 
-      return closeBtnHtml + recordNavHtml + sliderHtml + bodyContent;
+      return panelControlsHtml + sliderHtml + bodyContent;
     }
 
     function wireLocationCard(root, loc) {
@@ -1597,20 +1590,26 @@ function initMapLazy() {
         if (nextBtn) nextBtn.addEventListener('click', function(ev) { ev.stopPropagation(); showSlide(idx + 1); });
       }
       
-      // Nawigacja między rekordami (Up/Down)
+      // Obsługa nawigacji między rekordami (Up/Down)
       var btnUp = root.querySelector('.pi-record-nav-up');
       var btnDown = root.querySelector('.pi-record-nav-down');
       if (btnUp || btnDown) {
           var goNextRecord = function(direction) {
-              if (!currentVisibleLocs || currentVisibleLocs.length === 0) return;
-              var currentIndex = currentVisibleLocs.indexOf(loc);
+              var list = (piUpdateIndex !== -1 && piUpdateRecords && piUpdateRecords.length > 0) ? piUpdateRecords : currentVisibleLocs;
+              if (!list || list.length === 0) return;
+              
+              var currentIndex = list.indexOf(loc);
               if (currentIndex === -1) currentIndex = 0;
+              
               var nextIndex = direction === 1 
-                  ? (currentIndex + 1) % currentVisibleLocs.length 
-                  : (currentIndex - 1 + currentVisibleLocs.length) % currentVisibleLocs.length;
-              var nextLoc = currentVisibleLocs[nextIndex];
+                  ? (currentIndex + 1) % list.length 
+                  : (currentIndex - 1 + list.length) % list.length;
+                  
+              var nextLoc = list[nextIndex];
+              if (piUpdateIndex !== -1) { piUpdateIndex = nextIndex; }
+              
               if (mapInstance) mapInstance.flyTo({ center: nextLoc.coords, zoom: Math.max(mapInstance.getZoom(), 15), speed: 1.2 });
-              window.piOpenPopupForLocation(nextLoc);
+              window.piOpenPopupForLocation(nextLoc, piUpdateIndex !== -1);
           };
           if (btnUp) btnUp.addEventListener('click', function(e) { e.stopPropagation(); goNextRecord(-1); });
           if (btnDown) btnDown.addEventListener('click', function(e) { e.stopPropagation(); goNextRecord(1); });
@@ -1633,16 +1632,9 @@ function initMapLazy() {
       var closeBtn = overlay.querySelector('.pi-map-overlay-close-btn');
       if (closeBtn) closeBtn.addEventListener('click', function(ev) { 
         ev.stopPropagation(); 
-        overlay.classList.remove('visible'); 
-        currentOpenLoc = null;
-        piUpdateIndex = -1;
-        if (mapInstance) setTimeout(function() { mapInstance.resize(); }, 150);
+        closeRecordPreview();
       });
       wireLocationCard(overlay, loc);
-
-      if (piUpdateIndex !== -1 && piUpdateRecords.length > 1) {
-        injectUpdateNav(overlay);
-      }
     };
     
     window.piToggleLogDetail = function(idx, rec) {
@@ -1851,24 +1843,13 @@ document.addEventListener('DOMContentLoaded', function() {
         this.checked = false;
         var defRadio = document.querySelector('.suburb-check[value=""]');
         if (defRadio) defRadio.checked = true;
-        
-        var overlay = document.getElementById('pi-map-overlay');
-        if (overlay) overlay.classList.remove('visible');
-        currentOpenLoc = null;
-        piUpdateIndex = -1;
-        if (mapInstance) setTimeout(function() { mapInstance.resize(); }, 150);
-
+        closeRecordPreview();
         searchState.suburb = '';
         applySearchState();
       }
     });
     cb.addEventListener('change', function() {
-      var overlay = document.getElementById('pi-map-overlay');
-      if (overlay) overlay.classList.remove('visible');
-      currentOpenLoc = null;
-      piUpdateIndex = -1;
-      if (mapInstance) setTimeout(function() { mapInstance.resize(); }, 150);
-
+      closeRecordPreview();
       searchState.suburb = this.value;
       applySearchState();
       if (this.value && typeof clarity === 'function') {
@@ -1975,35 +1956,20 @@ document.addEventListener('DOMContentLoaded', function() {
     var isOverlayActive = overlay && overlay.classList.contains('visible');
 
     if (isOverlayActive) {
+      // Slajdy (Lewo/Prawo)
       if (ev.key === 'ArrowLeft') {
         var prevBtn = overlay.querySelector('.pi-popup-slider-prev');
         if (prevBtn) { prevBtn.click(); return; }
-        var navPrev = overlay.querySelector('#pi-overlay-nav-prev');
-        if (navPrev && !navPrev.disabled) navPrev.click();
       } else if (ev.key === 'ArrowRight') {
         var nextBtn = overlay.querySelector('.pi-popup-slider-next');
         if (nextBtn) { nextBtn.click(); return; }
-        var navNext = overlay.querySelector('#pi-overlay-nav-next');
-        if (navNext && !navNext.disabled) navNext.click();
       }
       
+      // Rekordy (Góra/Dół)
       if (ev.key === 'ArrowUp' || ev.key === 'ArrowDown') {
           ev.preventDefault();
-          if (currentOpenLoc && currentVisibleLocs && currentVisibleLocs.length > 0) {
-              var currentIndex = currentVisibleLocs.indexOf(currentOpenLoc);
-              if (currentIndex === -1) currentIndex = 0;
-              
-              var nextIndex;
-              if (ev.key === 'ArrowDown') {
-                  nextIndex = (currentIndex + 1) % currentVisibleLocs.length;
-              } else {
-                  nextIndex = (currentIndex - 1 + currentVisibleLocs.length) % currentVisibleLocs.length;
-              }
-              var nextLoc = currentVisibleLocs[nextIndex];
-              
-              if (mapInstance) mapInstance.flyTo({ center: nextLoc.coords, zoom: Math.max(mapInstance.getZoom(), 15), speed: 1.2 });
-              window.piOpenPopupForLocation(nextLoc);
-          }
+          var navBtn = ev.key === 'ArrowUp' ? overlay.querySelector('.pi-record-nav-up') : overlay.querySelector('.pi-record-nav-down');
+          if (navBtn) navBtn.click();
       }
     }
   });
