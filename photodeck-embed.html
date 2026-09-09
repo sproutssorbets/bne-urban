@@ -288,12 +288,15 @@
 
   .pi-tags-flex { display: flex; flex-wrap: wrap; gap: 4px; }
 
-  /* UPDATE DRAWER */
+  /* UPDATE DRAWER - Skorygowane Z-INDEX i pozycjonowanie na Desktopie */
   #pi-drawer-tab {
     position: fixed; top: 50%; right: 0; transform: translateY(-50%);
     width: 28px; height: 144px; background: var(--text); color: var(--bg);
     border: 1px solid var(--text); border-right: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
-    z-index: 500; transition: background 0.1s, color 0.1s;
+    z-index: 900; transition: background 0.1s, color 0.1s;
+  }
+  @media (min-width: 721px) {
+    #pi-drawer-tab { right: 638px; border-right: none; } /* Przysysa tab do krawędzi prawego panelu overlay */
   }
   #pi-drawer-tab:hover { background: var(--bg); color: var(--text); }
   #pi-drawer-tab-inner {
@@ -311,13 +314,13 @@
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.5; transform: scale(1.35); }
   }
-  #pi-drawer-backdrop { position: fixed; inset: 0; z-index: 600; pointer-events: none; }
+  #pi-drawer-backdrop { position: fixed; inset: 0; z-index: 850; pointer-events: none; }
   #pi-drawer-backdrop.active { pointer-events: auto; }
   
   #pi-drawer-panel {
     position: fixed; top: 0; right: 0; height: 100%; height: 100dvh; width: 638px; max-width: calc(100vw - 40px);
     background: var(--bg); border-left: 1px solid var(--text); transform: translateX(100%);
-    transition: transform 0.25s cubic-bezier(0.16,1,0.3,1); z-index: 700; display: flex; flex-direction: column;
+    transition: transform 0.25s cubic-bezier(0.16,1,0.3,1); z-index: 910; display: flex; flex-direction: column;
   }
   #pi-drawer-panel.open { transform: translateX(0); }
   .pi-drawer-header {
@@ -384,7 +387,7 @@
       z-index: 900; pointer-events: auto; animation: pi-fade-in 0.3s ease;
     }
     #map-wrap { height: calc(100dvh - 52px - 44px); }
-    #pi-drawer-tab { height: 120px; width: 32px; padding-left: 4px; }
+    #pi-drawer-tab { height: 120px; width: 32px; padding-left: 4px; right: 0; }
     
     .pi-map-overlay {
       position: fixed !important; inset: 0 !important; width: 100% !important; max-width: 100% !important;
@@ -670,7 +673,6 @@ var piUpdateIndex = -1;
 var is3DMode = false;
 var isLndmrkMode = false;
 
-// Initialize empty state on desktop load
 if (window.innerWidth > 720) {
   var initialOverlay = document.getElementById('pi-map-overlay');
   if (initialOverlay) initialOverlay.innerHTML = emptyOverlayHtml;
@@ -1228,7 +1230,7 @@ function loadInitialData() {
               window.piToggleLogDetail(idx, rec);
             } else {
               if (window.piCloseDrawer) window.piCloseDrawer();
-              if (mapInstance) mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2 });
+              mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2 });
               window.piOpenPopupForLocation(rec, true);
             }
           });
@@ -1981,7 +1983,6 @@ document.addEventListener('DOMContentLoaded', function() {
     var isOverlayActive = overlay && (window.innerWidth > 720 ? currentOpenLoc !== null : overlay.classList.contains('visible'));
 
     if (isOverlayActive) {
-      // Slajdy w danym rekordzie
       if (ev.key === 'ArrowLeft') {
         var prevBtn = overlay.querySelector('.pi-popup-slider-prev');
         if (prevBtn) { prevBtn.click(); return; }
@@ -1994,7 +1995,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (navNext && !navNext.disabled) navNext.click();
       }
       
-      // Następny / Poprzedni rekord
       if (ev.key === 'ArrowUp' || ev.key === 'ArrowDown') {
           ev.preventDefault();
           if (currentOpenLoc && currentVisibleLocs && currentVisibleLocs.length > 0) {
