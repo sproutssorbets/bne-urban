@@ -192,13 +192,23 @@
   .pi-pin-cluster-new .pi-pin-body { background: var(--accent-new); border-color: var(--text); color: var(--bg); }
   .pi-pin-cluster-new .pi-pin-point { border-top-color: var(--text); }
 
-  /* PRAWY STAŁY PANEL SZCZEGÓŁÓW */
+  /* PRAWY STAŁY PANEL SZCZEGÓŁÓW - Stały na desktopie */
   .pi-map-overlay {
     position: relative; width: 638px; flex-shrink: 0; height: 100%;
     background: var(--bg); border-left: 1px solid var(--text);
     display: none; flex-direction: column; overflow: hidden; z-index: 800;
   }
-  .pi-map-overlay.visible { display: flex; }
+  @media (min-width: 721px) {
+    .pi-map-overlay { display: flex !important; }
+  }
+  .pi-map-overlay.visible { display: flex; } /* Mobilny trigger */
+
+  /* Dodatkowe przyciski nawigacji pionowej (Góra/Dół) w panelu */
+  .pi-record-nav-btn {
+    width: 32px; height: 32px; border: 1px solid var(--text); background: var(--bg); color: var(--text);
+    cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.1s, color 0.1s;
+  }
+  .pi-record-nav-btn:hover { background: var(--text); color: var(--bg); }
 
   /* ARCHITEKTURA WNĘTRZA PANELA SZCZEGÓŁÓW */
   .pi-record-meta-top {
@@ -640,6 +650,9 @@
 </aside>
 
 <script>
+var currentOpenLoc = null;
+var emptyOverlayHtml = '<div class="pi-empty-state" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:40px;color:var(--muted);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" style="margin-bottom:16px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg><span style="font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;">Select a location on the map<br>to view archive records</span></div>';
+
 var DATA_VERSION = (function() {
   var d = new Date();
   return d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
@@ -656,6 +669,27 @@ var piUpdateRecords = [];
 var piUpdateIndex = -1;
 var is3DMode = false;
 var isLndmrkMode = false;
+
+// Initialize empty state on desktop load
+if (window.innerWidth > 720) {
+  var initialOverlay = document.getElementById('pi-map-overlay');
+  if (initialOverlay) initialOverlay.innerHTML = emptyOverlayHtml;
+}
+
+function closeRecordPreview() {
+  currentOpenLoc = null;
+  piUpdateIndex = -1;
+  var overlay = document.getElementById('pi-map-overlay');
+  if (!overlay) return;
+  
+  if (window.innerWidth > 720) {
+      overlay.innerHTML = emptyOverlayHtml;
+  } else {
+      overlay.classList.remove('visible');
+      setTimeout(function() { if (mapInstance) mapInstance.resize(); }, 150);
+  }
+  document.querySelectorAll('.pi-log-link.active').forEach(function(el) { el.classList.remove('active'); });
+}
 
 function setMap3DMode(enabled) {
   is3DMode = enabled;
@@ -711,7 +745,6 @@ ToggleLndmrkControl.prototype.onAdd = function(map) {
   this._button = document.createElement('button');
   this._button.type = 'button';
   this._button.className = 'pi-3d-toggle-btn pi-lndmrk-toggle-btn';
-  // Ikona architektoniczna z kolumnami
   this._button.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><polygon points="12 2 2 9 22 9"></polygon><line x1="6" y1="22" x2="6" y2="9"></line><line x1="12" y1="22" x2="12" y2="9"></line><line x1="18" y1="22" x2="18" y2="9"></line><line x1="2" y1="22" x2="22" y2="22"></line></svg>';
   this._button.setAttribute('aria-pressed', 'false');
   this._button.setAttribute('title', 'Toggle architectural landmarks');
@@ -1193,9 +1226,9 @@ function loadInitialData() {
             piUpdateIndex = idx;
             if (window.innerWidth <= 720) {
               window.piToggleLogDetail(idx, rec);
-            } else if (mapInstance) {
+            } else {
               if (window.piCloseDrawer) window.piCloseDrawer();
-              mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2 });
+              if (mapInstance) mapInstance.flyTo({ center: rec.coords, zoom: 15, speed: 1.2 });
               window.piOpenPopupForLocation(rec, true);
             }
           });
@@ -1365,14 +1398,9 @@ function initMapLazy() {
       saveMapState({ lng: c.lng, lat: c.lat, zoom: mapInstance.getZoom() });
     });
     
-    // Zamykanie panelu bocznego po kliknięciu na pustą mapę
+    // Zamknięcie podglądu, gdy kliknięto puste pole mapy
     mapInstance.on('click', function(e) {
-      var overlay = document.getElementById('pi-map-overlay');
-      if (overlay && overlay.classList.contains('visible')) {
-        overlay.classList.remove('visible');
-        piUpdateIndex = -1;
-        setTimeout(function() { mapInstance.resize(); }, 150);
-      }
+      if (currentOpenLoc) closeRecordPreview();
     });
 
     mapInstance.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
@@ -1443,6 +1471,13 @@ function initMapLazy() {
       var initial = displayPhotos.length ? displayPhotos[0] : allPhotos[0];
 
       var closeBtnHtml = showClose === false ? '' : '<button type="button" class="pi-map-overlay-close-btn" aria-label="Close">&times;</button>';
+      
+      // Dodane strzałki Góra/Dół do następnego/poprzedniego rekordu
+      var recordNavHtml = showClose === false ? '' : 
+        '<div class="pi-record-nav-arrows" style="position:absolute; top:12px; right:54px; display:flex; z-index:5;">' +
+            '<button type="button" class="pi-record-nav-btn pi-record-nav-up" title="Previous record (Up Arrow)" style="border-right:none;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"></polyline></svg></button>' +
+            '<button type="button" class="pi-record-nav-btn pi-record-nav-down" title="Next record (Down Arrow)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></button>' +
+        '</div>';
 
       var sliderHtml = '';
       if (displayPhotos.length > 0) {
@@ -1451,12 +1486,15 @@ function initMapLazy() {
           return '<a href="' + slideHref + '" target="_top" class="pi-popup-slide-link" style="display:' + (i === 0 ? 'block' : 'none') + ';width:100%;height:100%;" data-pi-slide="' + i + '"><img src="' + p.thumb + '" loading="lazy" style="width:100%;height:100%;object-fit:contain;object-position:center;display:block;" alt=""></a>';
         }).join('');
 
-        var navHtml = displayPhotos.length > 1
-          ? '<button type="button" class="pi-popup-slider-prev" style="position:absolute;top:50%;left:0;transform:translateY(-50%);background:var(--bg);border:1px solid var(--text);border-left:none;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg></button>' +
-            '<button type="button" class="pi-popup-slider-next" style="position:absolute;top:50%;right:0;transform:translateY(-50%);background:var(--bg);border:1px solid var(--text);border-right:none;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg></button>'
-          : '';
+        var navHtml = '';
+        if (displayPhotos.length > 1) {
+          navHtml = 
+            '<button type="button" class="pi-popup-slider-prev" style="position:absolute;top:50%;left:0;transform:translateY(-50%);background:var(--bg);border:1px solid var(--text);border-left:none;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg></button>' +
+            '<button type="button" class="pi-popup-slider-next" style="position:absolute;top:50%;right:0;transform:translateY(-50%);background:var(--bg);border:1px solid var(--text);border-right:none;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg></button>' +
+            '<div class="pi-slider-counter" style="position:absolute;bottom:12px;right:12px;background:var(--bg);color:var(--text);border:1px solid var(--text);padding:4px 8px;font-size:9px;font-weight:600;letter-spacing:0.1em;z-index:2;user-select:none;">1 / ' + displayPhotos.length + '</div>';
+        }
 
-        sliderHtml = '<div class="pi-overlay-slider-wrap"><div class="pi-popup-slider" style="position:relative;width:100%;height:100%;">' + slidesHtml + navHtml + '</div></div>';
+        sliderHtml = '<div class="pi-overlay-slider-wrap" style="position:relative;"><div class="pi-popup-slider" style="position:relative;width:100%;height:100%;">' + slidesHtml + navHtml + '</div></div>';
       }
 
       var allTags = [].concat(loc.typologyArr || [], loc.architectureArr || [], loc.urbanArr || [], loc.conditionArr || []).filter(Boolean);
@@ -1511,7 +1549,7 @@ function initMapLazy() {
         '</div>' +
       '</div></div>';
 
-      return closeBtnHtml + sliderHtml + bodyContent;
+      return closeBtnHtml + recordNavHtml + sliderHtml + bodyContent;
     }
 
     function wireLocationCard(root, loc) {
@@ -1551,6 +1589,7 @@ function initMapLazy() {
       }
 
       var openBtn = root.querySelector('.pi-btn-open');
+      var counterEl = root.querySelector('.pi-slider-counter');
 
       if (displayPhotos.length > 1) {
         var imgs = root.querySelectorAll('[data-pi-slide]');
@@ -1562,6 +1601,7 @@ function initMapLazy() {
           imgs[idx].style.display = 'none';
           idx = (next + imgs.length) % imgs.length;
           imgs[idx].style.display = 'block';
+          if (counterEl) counterEl.textContent = (idx + 1) + ' / ' + displayPhotos.length;
           var p = displayPhotos[idx];
           refEls.forEach(function(el) { el.textContent = p.ref || loc.ref || ''; });
           dateEls.forEach(function(el) { el.textContent = p.date || 'Unknown'; });
@@ -1575,10 +1615,30 @@ function initMapLazy() {
         if (prevBtn) prevBtn.addEventListener('click', function(ev) { ev.stopPropagation(); showSlide(idx - 1); });
         if (nextBtn) nextBtn.addEventListener('click', function(ev) { ev.stopPropagation(); showSlide(idx + 1); });
       }
+      
+      // Obsługa strzałek nawigacyjnych następny/poprzedni rekord
+      var btnUp = root.querySelector('.pi-record-nav-up');
+      var btnDown = root.querySelector('.pi-record-nav-down');
+      if (btnUp || btnDown) {
+          var goNextRecord = function(direction) {
+              if (!currentVisibleLocs || currentVisibleLocs.length === 0) return;
+              var currentIndex = currentVisibleLocs.indexOf(loc);
+              if (currentIndex === -1) currentIndex = 0;
+              var nextIndex = direction === 1 
+                  ? (currentIndex + 1) % currentVisibleLocs.length 
+                  : (currentIndex - 1 + currentVisibleLocs.length) % currentVisibleLocs.length;
+              var nextLoc = currentVisibleLocs[nextIndex];
+              if (mapInstance) mapInstance.flyTo({ center: nextLoc.coords, zoom: Math.max(mapInstance.getZoom(), 15), speed: 1.2 });
+              window.piOpenPopupForLocation(nextLoc);
+          };
+          if (btnUp) btnUp.addEventListener('click', function(e) { e.stopPropagation(); goNextRecord(-1); });
+          if (btnDown) btnDown.addEventListener('click', function(e) { e.stopPropagation(); goNextRecord(1); });
+      }
     }
 
     window.piOpenPopupForLocation = function(loc, fromUpdates) {
       if (!fromUpdates) { piUpdateIndex = -1; }
+      currentOpenLoc = loc;
       document.querySelectorAll('.pi-log-link').forEach(function(el) {
         el.classList.toggle('active', !!loc.ref && el.getAttribute('data-ref') === loc.ref);
       });
@@ -1592,9 +1652,7 @@ function initMapLazy() {
       var closeBtn = overlay.querySelector('.pi-map-overlay-close-btn');
       if (closeBtn) closeBtn.addEventListener('click', function(ev) { 
         ev.stopPropagation(); 
-        overlay.classList.remove('visible'); 
-        piUpdateIndex = -1;
-        if (mapInstance) setTimeout(function() { mapInstance.resize(); }, 150);
+        closeRecordPreview();
       });
       wireLocationCard(overlay, loc);
 
@@ -1810,15 +1868,13 @@ document.addEventListener('DOMContentLoaded', function() {
         this.checked = false;
         var defRadio = document.querySelector('.suburb-check[value=""]');
         if (defRadio) defRadio.checked = true;
-        document.getElementById('pi-map-overlay').classList.remove('visible');
-        if (mapInstance) setTimeout(function() { mapInstance.resize(); }, 150);
+        closeRecordPreview();
         searchState.suburb = '';
         applySearchState();
       }
     });
     cb.addEventListener('change', function() {
-      document.getElementById('pi-map-overlay').classList.remove('visible');
-      if (mapInstance) setTimeout(function() { mapInstance.resize(); }, 150);
+      closeRecordPreview();
       searchState.suburb = this.value;
       applySearchState();
       if (this.value && typeof clarity === 'function') {
@@ -1919,8 +1975,13 @@ document.addEventListener('DOMContentLoaded', function() {
   window.piCloseDrawer = closeDrawer;
 
   document.addEventListener('keydown', function(ev) {
+    if (ev.target.tagName === 'INPUT' || ev.target.tagName === 'TEXTAREA') return;
+
     var overlay = document.getElementById('pi-map-overlay');
-    if (overlay && overlay.classList.contains('visible')) {
+    var isOverlayActive = overlay && (window.innerWidth > 720 ? currentOpenLoc !== null : overlay.classList.contains('visible'));
+
+    if (isOverlayActive) {
+      // Slajdy w danym rekordzie
       if (ev.key === 'ArrowLeft') {
         var prevBtn = overlay.querySelector('.pi-popup-slider-prev');
         if (prevBtn) { prevBtn.click(); return; }
@@ -1931,6 +1992,26 @@ document.addEventListener('DOMContentLoaded', function() {
         if (nextBtn) { nextBtn.click(); return; }
         var navNext = overlay.querySelector('#pi-overlay-nav-next');
         if (navNext && !navNext.disabled) navNext.click();
+      }
+      
+      // Następny / Poprzedni rekord
+      if (ev.key === 'ArrowUp' || ev.key === 'ArrowDown') {
+          ev.preventDefault();
+          if (currentOpenLoc && currentVisibleLocs && currentVisibleLocs.length > 0) {
+              var currentIndex = currentVisibleLocs.indexOf(currentOpenLoc);
+              if (currentIndex === -1) currentIndex = 0;
+              
+              var nextIndex;
+              if (ev.key === 'ArrowDown') {
+                  nextIndex = (currentIndex + 1) % currentVisibleLocs.length;
+              } else {
+                  nextIndex = (currentIndex - 1 + currentVisibleLocs.length) % currentVisibleLocs.length;
+              }
+              var nextLoc = currentVisibleLocs[nextIndex];
+              
+              if (mapInstance) mapInstance.flyTo({ center: nextLoc.coords, zoom: Math.max(mapInstance.getZoom(), 15), speed: 1.2 });
+              window.piOpenPopupForLocation(nextLoc);
+          }
       }
     }
   });
