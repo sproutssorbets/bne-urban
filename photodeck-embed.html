@@ -622,6 +622,7 @@ var mapInitiated = false;
 var autocompleteReady = false;
 var CAT_ARRAY_KEYS = { condition: 'conditionArr', typology: 'typologyArr', architecture: 'architectureArr', urban: 'urbanArr', year: 'yearArr' };
 var MAP_STATE_KEY = 'pi_map_state';
+var NEW_PIN_WINDOW_MS = 7 * 24 * 60 * 60 * 1000; // batches within this many ms of the latest batch are marked "new" on the map
 var piUpdateRecords = [];
 var piUpdateIndex = -1;
 
@@ -1056,7 +1057,22 @@ function loadInitialData() {
     if (latestBatchId) {
       var latestRecords = batchesMap[latestBatchId];
       piUpdateRecords = latestRecords;
-      latestRecords.forEach(function(rec) { rec.isNew = true; });
+
+      // Pin highlighting: mark every location whose batch date falls within
+      // NEW_PIN_WINDOW_MS of the most recent batch, not just the single
+      // latest batch. The update-log drawer (title/list below) still only
+      // ever shows latestRecords — this window only affects map pin colour.
+      var latestBatchTime = new Date(latestBatchId).getTime();
+      if (!isNaN(latestBatchTime)) {
+        sortedBatches.forEach(function(batchId) {
+          var batchTime = new Date(batchId).getTime();
+          if (!isNaN(batchTime) && (latestBatchTime - batchTime) <= NEW_PIN_WINDOW_MS) {
+            batchesMap[batchId].forEach(function(rec) { rec.isNew = true; });
+          }
+        });
+      } else {
+        latestRecords.forEach(function(rec) { rec.isNew = true; });
+      }
       var latestTotalCount = latestRecords.reduce(function(acc, r) { return acc + r.count; }, 0);
       var elDrawerIdx = document.getElementById('pi-drawer-index');
       if (elDrawerIdx) elDrawerIdx.innerHTML = 'UPDATE &middot; ' + latestBatchId.toUpperCase();
