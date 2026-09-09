@@ -191,18 +191,15 @@
   .pi-pin-cluster-new .pi-pin-body { background: var(--accent-new); border-color: var(--text); color: var(--bg); }
   .pi-pin-cluster-new .pi-pin-point { border-top-color: var(--text); }
 
-  /* PRAWY STAŁY PANEL SZCZEGÓŁÓW ZDJĘCIA */
+  /* PRAWY WYSUWANY PANEL SZCZEGÓŁÓW ZDJĘCIA */
   .pi-map-overlay {
     position: relative; width: 638px; flex-shrink: 0; height: 100%;
     background: var(--bg); border-left: 1px solid var(--text);
     display: none; flex-direction: column; overflow: hidden; z-index: 800;
   }
-  @media (min-width: 721px) {
-    .pi-map-overlay { display: flex !important; }
-  }
-  .pi-map-overlay.visible { display: flex; } /* Mobilny trigger */
+  .pi-map-overlay.visible { display: flex; }
 
-  /* NOWA ZINTEGROWANA NAWIGACJA REKORDÓW (Prawy Górny Róg) */
+  /* ZINTEGROWANA NAWIGACJA REKORDÓW (Prawy Górny Róg w Panelu) */
   .pi-map-overlay-close-btn { width: 32px; height: 32px; border: 1px solid var(--text); background: var(--bg); cursor: pointer; color: var(--text); display: flex; align-items: center; justify-content: center; transition: background 0.1s, color 0.1s; }
   .pi-map-overlay-close-btn:hover { background: var(--text); color: var(--bg); }
   
@@ -269,15 +266,12 @@
   .pi-data-val { color: #000000; font-weight: 500; text-align: right; word-break: break-word; }
   .pi-tags-flex { display: flex; flex-wrap: wrap; gap: 4px; }
 
-  /* UPDATE DRAWER - Przylepiony do panelu bocznego */
+  /* UPDATE DRAWER - Szuflada aktualizacji, przypięta na stałe do brzegu ekranu */
   #pi-drawer-tab {
     position: fixed; top: 50%; right: 0; transform: translateY(-50%);
     width: 28px; height: 144px; background: var(--text); color: var(--bg);
     border: 1px solid var(--text); border-right: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
     z-index: 900; transition: background 0.1s, color 0.1s;
-  }
-  @media (min-width: 721px) {
-    #pi-drawer-tab { right: 638px; border-right: none; }
   }
   #pi-drawer-tab:hover { background: var(--bg); color: var(--text); }
   #pi-drawer-tab-inner {
@@ -635,7 +629,6 @@
 
 <script>
 var currentOpenLoc = null;
-var emptyOverlayHtml = '<div class="pi-empty-state" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:40px;color:var(--muted);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" style="margin-bottom:16px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg><span style="font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;">Select a location on the map<br>to view archive records</span></div>';
 
 var DATA_VERSION = (function() {
   var d = new Date();
@@ -654,23 +647,15 @@ var piUpdateIndex = -1;
 var is3DMode = false;
 var isLndmrkMode = false;
 
-// Układ okna początkowy
-if (window.innerWidth > 720) {
-  var initialOverlay = document.getElementById('pi-map-overlay');
-  if (initialOverlay) initialOverlay.innerHTML = emptyOverlayHtml;
-}
-
 function closeRecordPreview() {
   currentOpenLoc = null;
+  piUpdateIndex = -1;
   var overlay = document.getElementById('pi-map-overlay');
   if (!overlay) return;
   
-  if (window.innerWidth > 720) {
-      overlay.innerHTML = emptyOverlayHtml;
-  } else {
-      overlay.classList.remove('visible');
-      setTimeout(function() { if (mapInstance) mapInstance.resize(); }, 150);
-  }
+  overlay.classList.remove('visible');
+  setTimeout(function() { if (mapInstance) mapInstance.resize(); }, 150);
+  
   document.querySelectorAll('.pi-log-link.active').forEach(function(el) { el.classList.remove('active'); });
 }
 
@@ -1590,7 +1575,6 @@ function initMapLazy() {
         if (nextBtn) nextBtn.addEventListener('click', function(ev) { ev.stopPropagation(); showSlide(idx + 1); });
       }
       
-      // Obsługa nawigacji między rekordami (Up/Down)
       var btnUp = root.querySelector('.pi-record-nav-up');
       var btnDown = root.querySelector('.pi-record-nav-down');
       if (btnUp || btnDown) {
