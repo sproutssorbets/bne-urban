@@ -362,7 +362,7 @@
       z-index: 900; pointer-events: auto; animation: pi-fade-in 0.3s ease;
     }
     #map-wrap { height: calc(100dvh - 52px - 44px); }
-    #pi-drawer-tab { height: 120px; width: 32px; padding-left: 4px; right: 0; }
+    #pi-drawer-tab { height: 120px; width: 32px; padding-left: 4px; }
     
     .pi-map-overlay {
       position: fixed !important; inset: 0 !important; width: 100% !important; max-width: 100% !important;
@@ -1418,17 +1418,8 @@ function initMapLazy() {
       var displayPhotos = allPhotos.filter(function(p) { return p.thumb; });
       var initial = displayPhotos.length ? displayPhotos[0] : allPhotos[0];
 
-      // LICZNIK REKORDÓW ZINTEGROWANY Z GÓRNYMI PRZYCISKAMI
-      var locCountText = '';
-      if (showClose !== false) {
-          if (piUpdateIndex !== -1 && piUpdateRecords && piUpdateRecords.length > 0) {
-              locCountText = (piUpdateIndex + 1) + ' / ' + piUpdateRecords.length;
-          } else if (currentVisibleLocs && currentVisibleLocs.length > 0) {
-              var cIdx = currentVisibleLocs.indexOf(loc);
-              if (cIdx !== -1) locCountText = (cIdx + 1) + ' / ' + currentVisibleLocs.length;
-          }
-      }
-      var counterBadgeHtml = locCountText ? '<div class="pi-nav-counter" style="display:flex;align-items:center;padding:0 12px;font-size:9px;font-weight:600;letter-spacing:0.1em;border:1px solid var(--text);border-right:none;background:var(--bg);color:var(--text);user-select:none;">' + locCountText + '</div>' : '';
+      var photoCountText = displayPhotos.length > 1 ? '1 / ' + displayPhotos.length : '';
+      var counterBadgeHtml = photoCountText ? '<div class="pi-nav-counter pi-top-photo-counter" style="display:flex;align-items:center;padding:0 12px;font-size:9px;font-weight:600;letter-spacing:0.1em;border:1px solid var(--text);border-right:none;background:var(--bg);color:var(--text);user-select:none;">' + photoCountText + '</div>' : '';
 
       var panelControlsHtml = showClose === false ? '' : 
         '<div class="pi-panel-top-controls" style="position:absolute; top:12px; right:12px; display:flex; z-index:10;">' +
@@ -1449,8 +1440,7 @@ function initMapLazy() {
         if (displayPhotos.length > 1) {
           navHtml = 
             '<button type="button" class="pi-popup-slider-prev" title="Previous photo" style="position:absolute;top:50%;left:12px;transform:translateY(-50%);background:var(--bg);color:var(--text);border:1px solid var(--text);width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;transition:background 0.1s,color 0.1s;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg></button>' +
-            '<button type="button" class="pi-popup-slider-next" title="Next photo" style="position:absolute;top:50%;right:12px;transform:translateY(-50%);background:var(--bg);color:var(--text);border:1px solid var(--text);width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;transition:background 0.1s,color 0.1s;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></button>' +
-            '<div class="pi-slider-counter" style="position:absolute;bottom:12px;right:12px;background:var(--bg);color:var(--text);border:1px solid var(--text);padding:4px 8px;font-size:9px;font-weight:600;letter-spacing:0.1em;z-index:2;user-select:none;">1 / ' + displayPhotos.length + '</div>';
+            '<button type="button" class="pi-popup-slider-next" title="Next photo" style="position:absolute;top:50%;right:12px;transform:translateY(-50%);background:var(--bg);color:var(--text);border:1px solid var(--text);width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;transition:background 0.1s,color 0.1s;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></button>';
         }
 
         sliderHtml = '<div class="pi-overlay-slider-wrap" style="position:relative;"><div class="pi-popup-slider" style="position:relative;width:100%;height:100%;">' + slidesHtml + navHtml + '</div></div>';
@@ -1548,7 +1538,7 @@ function initMapLazy() {
       }
 
       var openBtn = root.querySelector('.pi-btn-open');
-      var counterEl = root.querySelector('.pi-slider-counter');
+      var counterEl = root.querySelector('.pi-top-photo-counter');
 
       if (displayPhotos.length > 1) {
         var imgs = root.querySelectorAll('[data-pi-slide]');
