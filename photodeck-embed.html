@@ -138,6 +138,15 @@
   #map-error.visible { display: flex; }
   #map-error-text { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text); max-width: 320px; line-height: 1.6; }
 
+  .pi-3d-toggle-ctrl { background: var(--bg) !important; border: 1px solid var(--text) !important; overflow: hidden; }
+  .pi-3d-toggle-btn {
+    width: 29px; height: 29px; border: none; background: var(--bg); color: var(--text);
+    font-size: 10px; font-weight: 600; letter-spacing: 0.02em; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: background 0.1s, color 0.1s;
+  }
+  .pi-3d-toggle-btn:hover { background: var(--text); color: var(--bg); }
+  .pi-3d-toggle-btn[aria-pressed="true"] { background: var(--text); color: var(--bg); }
+
   .pi-log-detail {
     display: none; padding: 12px 0; border-bottom: 1px solid var(--text);
     font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em;
@@ -625,6 +634,42 @@ var MAP_STATE_KEY = 'pi_map_state';
 var NEW_PIN_WINDOW_MS = 7 * 24 * 60 * 60 * 1000; // batches within this many ms of the latest batch are marked "new" on the map
 var piUpdateRecords = [];
 var piUpdateIndex = -1;
+var is3DMode = false;
+
+function setMap3DMode(enabled) {
+  is3DMode = enabled;
+  if (!mapInstance) return;
+  if (mapInstance.getLayer('3d-buildings')) {
+    mapInstance.setLayoutProperty('3d-buildings', 'visibility', enabled ? 'visible' : 'none');
+  }
+  mapInstance.easeTo({ pitch: enabled ? 50 : 0, duration: 500 });
+  var btn = document.querySelector('.pi-3d-toggle-btn');
+  if (btn) {
+    btn.textContent = enabled ? '2D' : '3D';
+    btn.setAttribute('aria-pressed', String(enabled));
+    btn.setAttribute('title', enabled ? 'Switch to flat 2D view' : 'Switch to 3D buildings view');
+  }
+}
+
+function Toggle3DControl() {}
+Toggle3DControl.prototype.onAdd = function(map) {
+  this._map = map;
+  this._container = document.createElement('div');
+  this._container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group pi-3d-toggle-ctrl';
+  this._button = document.createElement('button');
+  this._button.type = 'button';
+  this._button.className = 'pi-3d-toggle-btn';
+  this._button.textContent = '3D';
+  this._button.setAttribute('aria-pressed', 'false');
+  this._button.setAttribute('title', 'Switch to 3D buildings view');
+  this._button.addEventListener('click', function() { setMap3DMode(!is3DMode); });
+  this._container.appendChild(this._button);
+  return this._container;
+};
+Toggle3DControl.prototype.onRemove = function() {
+  if (this._container && this._container.parentNode) this._container.parentNode.removeChild(this._container);
+  this._map = undefined;
+};
 
 function saveMapState(partial) {
   var existing = {};
@@ -1271,6 +1316,7 @@ function initMapLazy() {
       saveMapState({ lng: c.lng, lat: c.lat, zoom: mapInstance.getZoom() });
     });
     mapInstance.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
+    mapInstance.addControl(new Toggle3DControl(), 'bottom-right');
 
     mapInstance.on('load', function() {
       mapInstance.addSource('landmarks', {
@@ -1316,6 +1362,24 @@ function initMapLazy() {
           'text-halo-color': '#FFFFFF',
           'text-halo-width': 1.4
         }
+      });
+
+      // 3D building extrusions — hidden by default (2D start state), toggled via Toggle3DControl / setMap3DMode.
+      // Uses the 'composite' vector source and 'building' layer already present in the light-v11 style.
+      mapInstance.addLayer({
+        id: '3d-buildings',
+        source: 'composite',
+        'source-layer': 'building',
+        filter: ['==', 'extrude', 'true'],
+        type: 'fill-extrusion',
+        minzoom: 14,
+        paint: {
+          'fill-extrusion-color': '#AFAFAF',
+          'fill-extrusion-height': ['interpolate', ['linear'], ['zoom'], 14, 0, 15.05, ['get', 'height']],
+          'fill-extrusion-base': ['interpolate', ['linear'], ['zoom'], 14, 0, 15.05, ['get', 'min_height']],
+          'fill-extrusion-opacity': 0.85
+        },
+        layout: { visibility: 'none' }
       });
     });
 
