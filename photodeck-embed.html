@@ -16,6 +16,7 @@
   --line: #000000;
   --text: #000000;
   --muted: #666666;
+  --accent-new: #1D4ED8;
 }
 
   *, *::before, *::after {
@@ -157,6 +158,12 @@
 
   .pi-pin-cluster .pi-pin-body { min-width: 26px; height: 26px; font-size: 11px; border-width: 2px; }
   .pi-pin-cluster .pi-pin-point { border-left-width: 4px; border-right-width: 4px; border-top-width: 5px; }
+
+  /* Pins belonging to the most recent upload batch — for QA / verifying placement */
+  .pi-pin-new .pi-pin-body { background: var(--accent-new); border-color: var(--accent-new); }
+  .pi-pin-new .pi-pin-point { border-top-color: var(--accent-new); }
+  .pi-pin-cluster-new .pi-pin-body { background: var(--accent-new); border-color: var(--accent-new); }
+  .pi-pin-cluster-new .pi-pin-point { border-top-color: var(--accent-new); }
 
   /* PRAWY STAŁY PANEL SZCZEGÓŁÓW - identyczna szerokość jak panel pojedynczego zdjęcia (638px) */
   .pi-map-overlay {
@@ -516,7 +523,6 @@
         <div class="sub-category-title">Material</div>
         <label><input type="checkbox" class="filter-check" data-cat="architecture" value="glass"> glass</label>
         <label><input type="checkbox" class="filter-check" data-cat="architecture" value="brick"> brick</label>
-        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="face brick"> face brick</label>
         <label><input type="checkbox" class="filter-check" data-cat="architecture" value="painted brick"> painted brick</label>
         <label><input type="checkbox" class="filter-check" data-cat="architecture" value="concrete"> concrete</label>
         <label><input type="checkbox" class="filter-check" data-cat="architecture" value="timber"> timber</label>
@@ -1050,6 +1056,7 @@ function loadInitialData() {
     if (latestBatchId) {
       var latestRecords = batchesMap[latestBatchId];
       piUpdateRecords = latestRecords;
+      latestRecords.forEach(function(rec) { rec.isNew = true; });
       var latestTotalCount = latestRecords.reduce(function(acc, r) { return acc + r.count; }, 0);
       var elDrawerIdx = document.getElementById('pi-drawer-index');
       if (elDrawerIdx) elDrawerIdx.innerHTML = 'UPDATE &middot; ' + latestBatchId.toUpperCase();
@@ -1523,6 +1530,7 @@ function initMapLazy() {
         if (group.length === 1) {
           var loc = group[0].loc;
           el.querySelector('.pi-pin-body').textContent = loc.count;
+          if (loc.isNew) el.classList.add('pi-pin-new');
           el.addEventListener('click', function(ev) {
             ev.stopPropagation();
             window.piOpenPopupForLocation(loc);
@@ -1534,6 +1542,8 @@ function initMapLazy() {
           el.classList.add('pi-pin-cluster');
           var totalPhotos = group.reduce(function(sum, p) { return sum + (p.loc.count || 0); }, 0);
           el.querySelector('.pi-pin-body').textContent = totalPhotos;
+          var hasNew = group.some(function(p) { return p.loc.isNew; });
+          if (hasNew) el.classList.add('pi-pin-cluster-new');
           var lngSum = 0, latSum = 0;
           group.forEach(function(p) { lngSum += p.loc.coords[0]; latSum += p.loc.coords[1]; });
           var centroid = [lngSum / group.length, latSum / group.length];
