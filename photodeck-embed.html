@@ -16,7 +16,7 @@
   --line: #000000;
   --text: #000000;
   --muted: #666666;
-  --accent-new: #1D4ED8;
+  --accent-new: #A92B2B; /* Stonowana, zgaszona "ceglana" czerwień */
 }
 
   *, *::before, *::after {
@@ -90,7 +90,7 @@
   #search-archive-btn:hover { background: var(--text); color: var(--bg); }
   .pi-search-action-icon { display: none; width: 18px; height: 18px; }
 
-  /* LAYOUT MATRIX: STAŁY TRÓJKOLUMNOWY UKŁAD */
+  /* LAYOUT MATRIX */
   #layout { width: 100%; flex: 1 1 auto; min-height: 0; background: var(--bg); position: relative; display: flex; overflow: hidden; margin: 0; padding: 0; }
   
   #index-panel { width: 340px; flex-shrink: 0; position: relative; height: 100%; border-right: 1px solid var(--text); display: flex; flex-direction: column; background: var(--bg); z-index: 3; overflow-y: auto; }
@@ -124,13 +124,31 @@
 
   #filters-group { flex-shrink: 0; }
 
-  /* MAP VIEWPORT */
+  /* MAP VIEWPORT & INSTRUCTIONS */
   #map-wrap { flex: 1; position: relative; height: 100%; background: var(--bg); margin: 0; padding: 0; }
   
   #map { position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s ease-in-out; }
   #map.loaded { opacity: 1; }
   #map .mapboxgl-canvas { filter: grayscale(100%); }
   
+  .pi-map-instructions {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--text);
+    padding: 6px 12px;
+    text-transform: uppercase;
+    pointer-events: none;
+    z-index: 10;
+    white-space: nowrap;
+  }
+
   #map-error {
     position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
     background: var(--bg); text-align: center; padding: 40px; z-index: 5;
@@ -138,9 +156,9 @@
   #map-error.visible { display: flex; }
   #map-error-text { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text); max-width: 320px; line-height: 1.6; }
 
-  .pi-3d-toggle-ctrl { background: var(--bg) !important; border: 1px solid var(--text) !important; overflow: hidden; }
+  .pi-3d-toggle-ctrl { background: var(--bg) !important; border: 1px solid var(--text) !important; overflow: hidden; margin-bottom: 8px !important; }
   .pi-3d-toggle-btn {
-    width: 29px; height: 29px; border: none; background: var(--bg); color: var(--text);
+    min-width: 29px; height: 29px; padding: 0 6px; border: none; background: var(--bg); color: var(--text);
     font-size: 10px; font-weight: 600; letter-spacing: 0.02em; cursor: pointer;
     display: flex; align-items: center; justify-content: center; transition: background 0.1s, color 0.1s;
   }
@@ -168,17 +186,17 @@
   .pi-pin-cluster .pi-pin-body { min-width: 26px; height: 26px; font-size: 11px; border-width: 2px; }
   .pi-pin-cluster .pi-pin-point { border-left-width: 4px; border-right-width: 4px; border-top-width: 5px; }
 
-  /* Pins belonging to the most recent upload batch — for QA / verifying placement */
-  .pi-pin-new .pi-pin-body { background: var(--accent-new); border-color: var(--accent-new); }
-  .pi-pin-new .pi-pin-point { border-top-color: var(--accent-new); }
-  .pi-pin-cluster-new .pi-pin-body { background: var(--accent-new); border-color: var(--accent-new); }
-  .pi-pin-cluster-new .pi-pin-point { border-top-color: var(--accent-new); }
+  /* Pins belonging to the most recent upload batch */
+  .pi-pin-new .pi-pin-body { background: var(--accent-new); border-color: var(--text); color: var(--bg); }
+  .pi-pin-new .pi-pin-point { border-top-color: var(--text); }
+  .pi-pin-cluster-new .pi-pin-body { background: var(--accent-new); border-color: var(--text); color: var(--bg); }
+  .pi-pin-cluster-new .pi-pin-point { border-top-color: var(--text); }
 
-  /* PRAWY STAŁY PANEL SZCZEGÓŁÓW - identyczna szerokość jak panel pojedynczego zdjęcia (638px) */
+  /* PRAWY STAŁY PANEL SZCZEGÓŁÓW */
   .pi-map-overlay {
     position: relative; width: 638px; flex-shrink: 0; height: 100%;
     background: var(--bg); border-left: 1px solid var(--text);
-    display: none; flex-direction: column; overflow: hidden; z-index: 800; /* Większe niż drawer (700) */
+    display: none; flex-direction: column; overflow: hidden; z-index: 800;
   }
   .pi-map-overlay.visible { display: flex; }
 
@@ -198,7 +216,7 @@
     font-size: 12px; line-height: 1.6; color: #444444; margin-bottom: 24px;
   }
   
-  /* GŁÓWNE PRZYCISKI AKCJI W PANELU — jeden rząd: ADD TO SELECTION + OPEN RECORD + COPY LINK */
+  /* GŁÓWNE PRZYCISKI AKCJI W PANELU */
   .pi-cta-block { margin-bottom: 28px; }
   .pi-cta-combined { display: flex; border: 1px solid #000000; }
   .pi-btn-add, .pi-btn-open {
@@ -364,6 +382,7 @@
       transition: transform 0.3s ease;
     }
     .pi-map-overlay.visible { transform: translateX(0) !important; display: flex !important; }
+    .pi-map-instructions { display: none; } /* Hide instructions on mobile */
   }
   @keyframes pi-fade-in { from { opacity: 0; } to { opacity: 1; } }
 </style>
@@ -588,6 +607,7 @@
 
   <main id="map-wrap">
     <div id="map"></div>
+    <div class="pi-map-instructions">CLICK &amp; DRAG: PAN &nbsp;|&nbsp; SCROLL: ZOOM &nbsp;|&nbsp; RIGHT-CLICK &amp; DRAG: ROTATE 3D</div>
     <div id="map-error">
       <div id="map-error-text">Archive data could not be loaded right now. Please refresh, or open the full archive directly.</div>
     </div>
@@ -631,10 +651,11 @@ var mapInitiated = false;
 var autocompleteReady = false;
 var CAT_ARRAY_KEYS = { condition: 'conditionArr', typology: 'typologyArr', architecture: 'architectureArr', urban: 'urbanArr', year: 'yearArr' };
 var MAP_STATE_KEY = 'pi_map_state';
-var NEW_PIN_WINDOW_MS = 7 * 24 * 60 * 60 * 1000; // batches within this many ms of the latest batch are marked "new" on the map
+var NEW_PIN_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
 var piUpdateRecords = [];
 var piUpdateIndex = -1;
 var is3DMode = false;
+var isLndmrkMode = false;
 
 function setMap3DMode(enabled) {
   is3DMode = enabled;
@@ -643,7 +664,7 @@ function setMap3DMode(enabled) {
     mapInstance.setLayoutProperty('3d-buildings', 'visibility', enabled ? 'visible' : 'none');
   }
   mapInstance.easeTo({ pitch: enabled ? 50 : 0, duration: 500 });
-  var btn = document.querySelector('.pi-3d-toggle-btn');
+  var btn = document.querySelector('.pi-3d-toggle-btn:not(.pi-lndmrk-toggle-btn)');
   if (btn) {
     btn.textContent = enabled ? '2D' : '3D';
     btn.setAttribute('aria-pressed', String(enabled));
@@ -667,6 +688,38 @@ Toggle3DControl.prototype.onAdd = function(map) {
   return this._container;
 };
 Toggle3DControl.prototype.onRemove = function() {
+  if (this._container && this._container.parentNode) this._container.parentNode.removeChild(this._container);
+  this._map = undefined;
+};
+
+function setMapLndmrkMode(enabled) {
+  isLndmrkMode = enabled;
+  if (!mapInstance) return;
+  var vis = enabled ? 'visible' : 'none';
+  if (mapInstance.getLayer('landmark-marks')) mapInstance.setLayoutProperty('landmark-marks', 'visibility', vis);
+  if (mapInstance.getLayer('landmark-labels')) mapInstance.setLayoutProperty('landmark-labels', 'visibility', vis);
+  
+  var btn = document.querySelector('.pi-lndmrk-toggle-btn');
+  if (btn) btn.setAttribute('aria-pressed', String(enabled));
+}
+
+function ToggleLndmrkControl() {}
+ToggleLndmrkControl.prototype.onAdd = function(map) {
+  this._map = map;
+  this._container = document.createElement('div');
+  this._container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group pi-3d-toggle-ctrl';
+  this._button = document.createElement('button');
+  this._button.type = 'button';
+  this._button.className = 'pi-3d-toggle-btn pi-lndmrk-toggle-btn';
+  // Ikona architektoniczna z kolumnami
+  this._button.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><polygon points="12 2 2 9 22 9"></polygon><line x1="6" y1="22" x2="6" y2="9"></line><line x1="12" y1="22" x2="12" y2="9"></line><line x1="18" y1="22" x2="18" y2="9"></line><line x1="2" y1="22" x2="22" y2="22"></line></svg>';
+  this._button.setAttribute('aria-pressed', 'false');
+  this._button.setAttribute('title', 'Toggle architectural landmarks');
+  this._button.addEventListener('click', function() { setMapLndmrkMode(!isLndmrkMode); });
+  this._container.appendChild(this._button);
+  return this._container;
+};
+ToggleLndmrkControl.prototype.onRemove = function() {
   if (this._container && this._container.parentNode) this._container.parentNode.removeChild(this._container);
   this._map = undefined;
 };
@@ -1103,10 +1156,6 @@ function loadInitialData() {
       var latestRecords = batchesMap[latestBatchId];
       piUpdateRecords = latestRecords;
 
-      // Pin highlighting: mark every location whose batch date falls within
-      // NEW_PIN_WINDOW_MS of the most recent batch, not just the single
-      // latest batch. The update-log drawer (title/list below) still only
-      // ever shows latestRecords — this window only affects map pin colour.
       var latestBatchTime = new Date(latestBatchId).getTime();
       if (!isNaN(latestBatchTime)) {
         sortedBatches.forEach(function(batchId) {
@@ -1315,7 +1364,19 @@ function initMapLazy() {
       var c = mapInstance.getCenter();
       saveMapState({ lng: c.lng, lat: c.lat, zoom: mapInstance.getZoom() });
     });
+    
+    // Zamykanie panelu bocznego po kliknięciu na pustą mapę
+    mapInstance.on('click', function(e) {
+      var overlay = document.getElementById('pi-map-overlay');
+      if (overlay && overlay.classList.contains('visible')) {
+        overlay.classList.remove('visible');
+        piUpdateIndex = -1;
+        setTimeout(function() { mapInstance.resize(); }, 150);
+      }
+    });
+
     mapInstance.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
+    mapInstance.addControl(new ToggleLndmrkControl(), 'bottom-right');
     mapInstance.addControl(new Toggle3DControl(), 'bottom-right');
 
     mapInstance.on('load', function() {
@@ -1323,18 +1384,7 @@ function initMapLazy() {
         type: 'geojson',
         data: {
           type: 'FeatureCollection',
-          features: [
-            { type: 'Feature', properties: { name: 'Infinity Tower' }, geometry: { type: 'Point', coordinates: [153.0194754, -27.4678006] } },
-            { type: 'Feature', properties: { name: '1 William Street' }, geometry: { type: 'Point', coordinates: [153.025835, -27.4748377] } },
-            { type: 'Feature', properties: { name: 'Riverside Centre' }, geometry: { type: 'Point', coordinates: [153.0302001, -27.467152] } },
-            { type: 'Feature', properties: { name: 'Riparian Plaza' }, geometry: { type: 'Point', coordinates: [153.0303029, -27.4682608] } },
-            { type: 'Feature', properties: { name: 'One One One Eagle Street' }, geometry: { type: 'Point', coordinates: [153.0301996, -27.4676829] } },
-            { type: 'Feature', properties: { name: "Queen's Wharf" }, geometry: { type: 'Point', coordinates: [153.0245387, -27.4741509] } },
-            { type: 'Feature', properties: { name: '480 Queen Street' }, geometry: { type: 'Point', coordinates: [153.0308165, -27.4640791] } },
-            { type: 'Feature', properties: { name: 'Bris Quarter' }, geometry: { type: 'Point', coordinates: [153.0224282, -27.4701207] } },
-            { type: 'Feature', properties: { name: 'Story Bridge' }, geometry: { type: 'Point', coordinates: [153.0358644, -27.4636326] } },
-            { type: 'Feature', properties: { name: 'Victoria Park / Barrambin' }, geometry: { type: 'Point', coordinates: [153.0212178, -27.4529175] } }
-          ]
+          features: [{"type":"Feature","properties":{"name":"Brisbane City Hall & King George Square"},"geometry":{"type":"Point","coordinates":[153.0235,-27.4687]}},{"type":"Feature","properties":{"name":"Queen Street Mall"},"geometry":{"type":"Point","coordinates":[153.026,-27.4691]}},{"type":"Feature","properties":{"name":"Museum of Brisbane (MoB)"},"geometry":{"type":"Point","coordinates":[153.0235,-27.4687]}},{"type":"Feature","properties":{"name":"Anzac Square & Memorial Galleries"},"geometry":{"type":"Point","coordinates":[153.0271,-27.4664]}},{"type":"Feature","properties":{"name":"Queens Gardens"},"geometry":{"type":"Point","coordinates":[153.0255,-27.4712]}},{"type":"Feature","properties":{"name":"Macarthur Chambers"},"geometry":{"type":"Point","coordinates":[153.0285,-27.467]}},{"type":"Feature","properties":{"name":"Customs House"},"geometry":{"type":"Point","coordinates":[153.0305,-27.4645]}},{"type":"Feature","properties":{"name":"The Old Windmill (Tower Mill)"},"geometry":{"type":"Point","coordinates":[153.0222,-27.4633]}},{"type":"Feature","properties":{"name":"Spring Hill Baths"},"geometry":{"type":"Point","coordinates":[153.0205,-27.4611]}},{"type":"Feature","properties":{"name":"St Paul's Presbyterian Church"},"geometry":{"type":"Point","coordinates":[153.024,-27.4628]}},{"type":"Feature","properties":{"name":"Lissner House & Early Residential Cottages"},"geometry":{"type":"Point","coordinates":[153.023,-27.462]}},{"type":"Feature","properties":{"name":"The Tivoli Theatre"},"geometry":{"type":"Point","coordinates":[153.0335,-27.4568]}},{"type":"Feature","properties":{"name":"Chinatown Mall"},"geometry":{"type":"Point","coordinates":[153.0342,-27.4589]}},{"type":"Feature","properties":{"name":"Valley Music Hall / Brunswick Street Mall"},"geometry":{"type":"Point","coordinates":[153.0328,-27.4595]}},{"type":"Feature","properties":{"name":"Holy Trinity Church Complex"},"geometry":{"type":"Point","coordinates":[153.035,-27.4555]}},{"type":"Feature","properties":{"name":"Newstead House"},"geometry":{"type":"Point","coordinates":[153.041,-27.4502]}},{"type":"Feature","properties":{"name":"Gasworks Plaza"},"geometry":{"type":"Point","coordinates":[153.0445,-27.4532]}},{"type":"Feature","properties":{"name":"Newstead Riverpark"},"geometry":{"type":"Point","coordinates":[153.045,-27.452]}},{"type":"Feature","properties":{"name":"Teneriffe Woolstores"},"geometry":{"type":"Point","coordinates":[153.0475,-27.456]}},{"type":"Feature","properties":{"name":"Teneriffe Riverwalk"},"geometry":{"type":"Point","coordinates":[153.049,-27.455]}},{"type":"Feature","properties":{"name":"Commercial Hotel Teneriffe"},"geometry":{"type":"Point","coordinates":[153.046,-27.4565]}},{"type":"Feature","properties":{"name":"Brisbane Powerhouse"},"geometry":{"type":"Point","coordinates":[153.0535,-27.4682]}},{"type":"Feature","properties":{"name":"New Farm Park"},"geometry":{"type":"Point","coordinates":[153.051,-27.471]}},{"type":"Feature","properties":{"name":"Merthyr Village"},"geometry":{"type":"Point","coordinates":[153.0495,-27.465]}},{"type":"Feature","properties":{"name":"RNA Showgrounds (Ekka)"},"geometry":{"type":"Point","coordinates":[153.036,-27.4475]}},{"type":"Feature","properties":{"name":"25 King Street"},"geometry":{"type":"Point","coordinates":[153.0336,-27.4526]}},{"type":"Feature","properties":{"name":"Old Bowen Hills Post Office"},"geometry":{"type":"Point","coordinates":[153.033,-27.451]}},{"type":"Feature","properties":{"name":"Royal Brisbane and Women's Hospital (RBWH)"},"geometry":{"type":"Point","coordinates":[153.027,-27.446]}},{"type":"Feature","properties":{"name":"Herston Heritage Park"},"geometry":{"type":"Point","coordinates":[153.0255,-27.445]}},{"type":"Feature","properties":{"name":"Albion Flour Mill Silos"},"geometry":{"type":"Point","coordinates":[153.0415,-27.432]}},{"type":"Feature","properties":{"name":"Albion Park Pacers (Albion Park Raceway)"},"geometry":{"type":"Point","coordinates":[153.043,-27.43]}},{"type":"Feature","properties":{"name":"Albion Fiveways Historic Precinct"},"geometry":{"type":"Point","coordinates":[153.041,-27.4335]}},{"type":"Feature","properties":{"name":"Suncorp Stadium (Lang Park)"},"geometry":{"type":"Point","coordinates":[153.0078,-27.4648]}},{"type":"Feature","properties":{"name":"Former XXXX Brewery Site"},"geometry":{"type":"Point","coordinates":[153.006,-27.468]}},{"type":"Feature","properties":{"name":"Milton Ferry Terminal & Riverwalk"},"geometry":{"type":"Point","coordinates":[153.005,-27.469]}},{"type":"Feature","properties":{"name":"Paddington Antiques Centre (Old Ithaca Fire Station)"},"geometry":{"type":"Point","coordinates":[153.0055,-27.4582]}},{"type":"Feature","properties":{"name":"Queenslander Streetscapes (Latrobe & Given Terrace)"},"geometry":{"type":"Point","coordinates":[153.004,-27.459]}},{"type":"Feature","properties":{"name":"Ithaca Embankment & Reservoir Sites"},"geometry":{"type":"Point","coordinates":[153.003,-27.457]}},{"type":"Feature","properties":{"name":"St Brigid's Church"},"geometry":{"type":"Point","coordinates":[153.008,-27.453]}},{"type":"Feature","properties":{"name":"Red Hill Skate Arena (Historic)"},"geometry":{"type":"Point","coordinates":[153.009,-27.452]}},{"type":"Feature","properties":{"name":"Red Hill Paddington Community Markets Hub"},"geometry":{"type":"Point","coordinates":[153.01,-27.4515]}},{"type":"Feature","properties":{"name":"QUT Kelvin Grove Campus (Urban Village)"},"geometry":{"type":"Point","coordinates":[153.015,-27.449]}},{"type":"Feature","properties":{"name":"La Boite Theatre (Roundhouse Theatre)"},"geometry":{"type":"Point","coordinates":[153.016,-27.4478]}},{"type":"Feature","properties":{"name":"Queensland Cultural Centre (QPAC, QAGOMA, State Library)"},"geometry":{"type":"Point","coordinates":[153.018,-27.4725]}},{"type":"Feature","properties":{"name":"South Bank Parklands & Streets Beach"},"geometry":{"type":"Point","coordinates":[153.021,-27.475]}},{"type":"Feature","properties":{"name":"Queensland Children's Hospital"},"geometry":{"type":"Point","coordinates":[153.025,-27.481]}},{"type":"Feature","properties":{"name":"Brisbane Convention & Exhibition Centre (BCEC)"},"geometry":{"type":"Point","coordinates":[153.0165,-27.476]}},{"type":"Feature","properties":{"name":"Davies Park"},"geometry":{"type":"Point","coordinates":[153.008,-27.483]}},{"type":"Feature","properties":{"name":"Orleigh Park"},"geometry":{"type":"Point","coordinates":[153.004,-27.4865]}},{"type":"Feature","properties":{"name":"Boundary Street Commercial Precinct"},"geometry":{"type":"Point","coordinates":[153.0105,-27.479]}},{"type":"Feature","properties":{"name":"Kangaroo Point Cliffs"},"geometry":{"type":"Point","coordinates":[153.032,-27.475]}},{"type":"Feature","properties":{"name":"Story Bridge"},"geometry":{"type":"Point","coordinates":[153.036,-27.462]}},{"type":"Feature","properties":{"name":"St Mary's Anglican Church"},"geometry":{"type":"Point","coordinates":[153.035,-27.471]}},{"type":"Feature","properties":{"name":"The Gabba (Brisbane Cricket Ground)"},"geometry":{"type":"Point","coordinates":[153.038,-27.4862]}},{"type":"Feature","properties":{"name":"Woolloongabba Antique Precinct (Logan Road)"},"geometry":{"type":"Point","coordinates":[153.0345,-27.4875]}},{"type":"Feature","properties":{"name":"South City Square"},"geometry":{"type":"Point","coordinates":[153.0335,-27.485]}}]
         }
       });
       mapInstance.addLayer({
@@ -1342,6 +1392,7 @@ function initMapLazy() {
         type: 'circle',
         source: 'landmarks',
         maxzoom: 16,
+        layout: { visibility: 'none' },
         paint: { 'circle-radius': 3, 'circle-color': '#000000' }
       });
       mapInstance.addLayer({
@@ -1350,6 +1401,7 @@ function initMapLazy() {
         source: 'landmarks',
         maxzoom: 16,
         layout: {
+          visibility: 'none',
           'text-field': ['upcase', ['get', 'name']],
           'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
           'text-size': 10,
@@ -1364,8 +1416,6 @@ function initMapLazy() {
         }
       });
 
-      // 3D building extrusions — hidden by default (2D start state), toggled via Toggle3DControl / setMap3DMode.
-      // Uses the 'composite' vector source and 'building' layer already present in the light-v11 style.
       mapInstance.addLayer({
         id: '3d-buildings',
         source: 'composite',
@@ -1374,10 +1424,10 @@ function initMapLazy() {
         type: 'fill-extrusion',
         minzoom: 14,
         paint: {
-          'fill-extrusion-color': '#AFAFAF',
+          'fill-extrusion-color': '#F4F5F7', 
           'fill-extrusion-height': ['interpolate', ['linear'], ['zoom'], 14, 0, 15.05, ['get', 'height']],
           'fill-extrusion-base': ['interpolate', ['linear'], ['zoom'], 14, 0, 15.05, ['get', 'min_height']],
-          'fill-extrusion-opacity': 0.85
+          'fill-extrusion-opacity': 0.95 
         },
         layout: { visibility: 'none' }
       });
@@ -1611,8 +1661,9 @@ function initMapLazy() {
           var loc = group[0].loc;
           el.querySelector('.pi-pin-body').textContent = loc.count;
           if (loc.isNew) el.classList.add('pi-pin-new');
+          
           el.addEventListener('click', function(ev) {
-            ev.stopPropagation();
+            ev.stopPropagation(); 
             window.piOpenPopupForLocation(loc);
           });
           mountedMarkers.push(
@@ -1627,13 +1678,21 @@ function initMapLazy() {
           var lngSum = 0, latSum = 0;
           group.forEach(function(p) { lngSum += p.loc.coords[0]; latSum += p.loc.coords[1]; });
           var centroid = [lngSum / group.length, latSum / group.length];
+          
           el.addEventListener('click', function(ev) {
-            ev.stopPropagation();
+            ev.stopPropagation(); 
             var bounds = new mapboxgl.LngLatBounds();
             group.forEach(function(p) { bounds.extend(p.loc.coords); });
             var currentZoom = mapInstance.getZoom();
-            var camera = mapInstance.cameraForBounds(bounds, { padding: 80, maxZoom: 18 });
-            var targetZoom = camera ? Math.max(camera.zoom, Math.min(currentZoom + 3, 18)) : Math.min(currentZoom + 3, 18);
+            
+            var maxAllowedZoom = 22;
+            var camera = mapInstance.cameraForBounds(bounds, { padding: 80, maxZoom: maxAllowedZoom });
+            var targetZoom = camera ? Math.max(camera.zoom, Math.min(currentZoom + 2.5, maxAllowedZoom)) : Math.min(currentZoom + 2.5, maxAllowedZoom);
+            
+            if (targetZoom <= currentZoom + 0.1 && currentZoom < maxAllowedZoom) {
+                targetZoom = Math.min(currentZoom + 2, maxAllowedZoom);
+            }
+            
             var targetCenter = camera ? camera.center : bounds.getCenter();
             mapInstance.easeTo({ center: targetCenter, zoom: targetZoom, duration: 500 });
           });
