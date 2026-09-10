@@ -1688,11 +1688,17 @@ function initMapLazy() {
           
           el.addEventListener('click', function(ev) {
             ev.stopPropagation(); 
+            var currentZoom = mapInstance.getZoom();
+            var maxAllowedZoom = 22;
+
+            if (currentZoom >= maxAllowedZoom - 1) {
+              window.piOpenPopupForLocation(group[0].loc);
+              return;
+            }
+
             var bounds = new mapboxgl.LngLatBounds();
             group.forEach(function(p) { bounds.extend(p.loc.coords); });
-            var currentZoom = mapInstance.getZoom();
             
-            var maxAllowedZoom = 22;
             var camera = mapInstance.cameraForBounds(bounds, { padding: 80, maxZoom: maxAllowedZoom });
             var targetZoom = camera ? Math.max(camera.zoom, Math.min(currentZoom + 2.5, maxAllowedZoom)) : Math.min(currentZoom + 2.5, maxAllowedZoom);
             
