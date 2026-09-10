@@ -779,18 +779,6 @@ function escapeRegExp(s) {
   return (s || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function findPhotosByDescription(street, allPhotos) {
-  var trimmed = (street || '').trim();
-  if (!trimmed) return [];
-  var pattern;
-  try {
-    pattern = new RegExp('\\b' + escapeRegExp(trimmed) + '\\b', 'i');
-  } catch (e) {
-    return [];
-  }
-  return allPhotos.filter(function(p) { return p.description && pattern.test(p.description); });
-}
-
 function slugify(s) {
   return (s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-+|-+$)/g, '');
 }
@@ -1059,10 +1047,12 @@ function loadInitialData() {
       headers.forEach(function(h, idx) { row[h] = (cols[idx] || '').trim(); });
 
       var street = row.address || row.street || 'Unnamed location';
+      /* NAPRAWIONE: usunięty fallback findPhotosByDescription().
+         Dopasowanie wyłącznie po dokładnym tytule z PhotoDecka. Dopasowanie po
+         opisie łapało zdjęcia, które tylko WSPOMINAŁY tę nazwę w opisie
+         (np. sąsiedni budynek jako punkt orientacyjny), co zawyżało licznik
+         na pinezce i psuło slajder (patrz: przypadek "25 King Street", 15/8/2026). */
       var matchedPhotos = photosByTitle[normalizeKey(street)] || [];
-      if (!matchedPhotos.length) {
-        matchedPhotos = findPhotosByDescription(street, allPhotos);
-      }
 
       var thumbsFallback = row.thumbs ? row.thumbs.split(';').filter(Boolean) : [];
       var imagesFallback = row.images ? row.images.split(';').filter(Boolean) : [];
