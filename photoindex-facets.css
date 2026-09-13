@@ -185,12 +185,16 @@
   break-inside: avoid;
 }
 
+/* display:block on purpose, not grid or flex. Chromium (Chrome, Brave)
+   does not reliably honour break-inside:avoid on grid/flex children
+   inside a column-count layout — a wrapped two-line term gets split
+   across columns and overlaps the neighbouring column's content.
+   Block-level children with an absolutely positioned checkbox are the
+   layout that actually stays put across columns. */
 #pi-facets .pi-term {
-  display: grid;
-  grid-template-columns: 14px 1fr auto;
-  align-items: baseline;
-  gap: 8px;
-  padding: 3px 0;
+  display: block;
+  position: relative;
+  padding: 3px 0 3px 22px;
   cursor: pointer;
   break-inside: avoid;
 }
@@ -208,8 +212,9 @@
   background: transparent;
   margin: 0;
   cursor: pointer;
-  position: relative;
-  top: 1px;
+  position: absolute;
+  left: 0;
+  top: 4px;
 }
 
 #pi-facets .pi-box:checked { background: var(--pi-text); }
