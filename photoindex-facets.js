@@ -409,6 +409,19 @@
       tiles[i].el.classList.toggle('pi-hidden', !keep);
       if (keep) shown++;
     }
+
+    /* PhotoDeck's thumbs_wall computes each tile's position once, as an
+       inline transform: translate(x,y), in a masonry layout. Hiding a
+       tile with display:none does not make it recompute — the gap just
+       sits there. Dispatching resize is a cheap first experiment: many
+       masonry engines relayout on it. If PhotoDeck's does too, this is
+       enough; if not, we need to find its actual relayout hook. */
+    if (window.dispatchEvent) {
+      setTimeout(function () {
+        window.dispatchEvent(new Event('resize'));
+      }, 0);
+    }
+
     return { shown: shown, onPage: tiles.length };
   }
 
