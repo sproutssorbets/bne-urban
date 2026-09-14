@@ -112,15 +112,11 @@
   .sub-category-title:first-child { margin-top: 0; }
   
   .acc-body label { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 10px 0; font-size: 12px; font-weight: 500; letter-spacing: normal; color: var(--text); transition: opacity 0.1s;}
-  .acc-body label.no-data { opacity: 0.3; cursor: default; text-decoration: none !important; }
-  .filter-count { margin-left: auto; font-size: 10px; font-weight: 500; color: var(--text); }
   
   /* STRICT FORM INPUTS */
-  .acc-body input[type="checkbox"], .acc-body input[type="radio"] { -webkit-appearance: none; appearance: none; margin: 0; width: 14px; height: 14px; border: 1px solid var(--text); background: var(--bg); display: grid; place-content: center; flex-shrink: 0; cursor: pointer;}
+  .acc-body input[type="radio"] { -webkit-appearance: none; appearance: none; margin: 0; width: 14px; height: 14px; border: 1px solid var(--text); background: var(--bg); display: grid; place-content: center; flex-shrink: 0; cursor: pointer;}
   .acc-body input[type="radio"]:checked::before { content: ""; width: 6px; height: 6px; background: var(--bg); }
   .acc-body input[type="radio"]:checked { background: var(--text); border-color: var(--text); }
-  .acc-body input[type="checkbox"]:checked::before { content: ""; width: 5px; height: 8px; border: solid var(--bg); border-width: 0 1.5px 1.5px 0; transform: rotate(45deg) translate(-1px, -1px); }
-  .acc-body input[type="checkbox"]:checked { background: var(--text); border-color: var(--text); }
 
   #filters-group { flex-shrink: 0; }
 
@@ -423,11 +419,11 @@
     </div>
     <div class="panel-section-container" id="filters-group">
       <div class="acc-head open" data-target="acc-location">
-        <span class="acc-title">1. Location</span><span class="acc-icon">+</span>
+        <span class="acc-title">Location</span><span class="acc-icon">+</span>
       </div>
       <div class="acc-body open" id="acc-location">
         <label><input type="radio" name="suburb-group" class="suburb-check" value="" checked> All Locations</label>
-        <div class="sub-category-title">Inner North & CBD</div>
+        <div class="sub-category-title">Inner North &amp; CBD</div>
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Brisbane City"> Brisbane City</label>
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Spring Hill"> Spring Hill</label>
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Fortitude Valley"> Fortitude Valley</label>
@@ -447,148 +443,6 @@
         <label><input type="radio" name="suburb-group" class="suburb-check" value="West End"> West End</label>
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Kangaroo Point"> Kangaroo Point</label>
         <label><input type="radio" name="suburb-group" class="suburb-check" value="Woolloongabba"> Woolloongabba</label>
-      </div>
-      <div class="acc-head" data-target="acc-condition">
-        <span class="acc-title">2. Physical Condition</span><span class="acc-icon">+</span>
-      </div>
-      <div class="acc-body" id="acc-condition">
-        <label><input type="checkbox" class="filter-check" data-cat="condition" value="existing condition"> Existing Condition</label>
-        <label><input type="checkbox" class="filter-check" data-cat="condition" value="fenced development site"> Fenced Development Site</label>
-        <label><input type="checkbox" class="filter-check" data-cat="condition" value="demolition & site works"> Demolition & Site Works</label>
-        <label><input type="checkbox" class="filter-check" data-cat="condition" value="active construction site"> Active Construction Site</label>
-        <label><input type="checkbox" class="filter-check" data-cat="condition" value="completed development"> Completed Development</label>
-      </div>
-      <div class="acc-head" data-target="acc-typology">
-        <span class="acc-title">3. Typology & Use</span><span class="acc-icon">+</span>
-      </div>
-      <div class="acc-body" id="acc-typology">
-        <div class="sub-category-title">Residential</div>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="residential"> residential</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="apartment"> apartment</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="residential tower"> residential tower</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="social housing"> social housing</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="student housing"> student housing</label>
-        <div class="sub-category-title">Commercial & Retail</div>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="commercial"> commercial</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="office"> office</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="retail"> retail</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="hospitality"> hospitality</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="shopfront"> shopfront</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="showroom"> showroom</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="market"> market</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="supermarket"> supermarket</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="shopping centre"> shopping centre</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="cafe"> cafe</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="restaurant"> restaurant</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="bar"> bar</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="pub"> pub</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="hotel"> hotel</label>
-        <div class="sub-category-title">Public & Civic</div>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="public"> public</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="civic"> civic</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="education"> education</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="university"> university</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="school"> school</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="health"> health</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="hospital"> hospital</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="clinic"> clinic</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="government"> government</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="place of worship"> place of worship</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="community centre"> community centre</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="library"> library</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="museum"> museum</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="gallery"> gallery</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="theatre"> theatre</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="performance venue"> performance venue</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="stadium"> stadium</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="arena"> arena</label>
-        <div class="sub-category-title">Heritage & Traditional</div>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="heritage"> heritage</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="heritage architecture"> heritage architecture</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="queenslander"> queenslander</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="highset house"> highset house</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="lowset house"> lowset house</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="workers cottage"> workers cottage</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="post war house"> post war house</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="terrace house"> terrace house</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="duplex"> duplex</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="adaptive reuse"> adaptive reuse</label>
-        <div class="sub-category-title">Industrial</div>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="industrial"> industrial</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="warehouse"> warehouse</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="parking structure"> parking structure</label>
-        <label><input type="checkbox" class="filter-check" data-cat="typology" value="industrial architecture"> industrial architecture</label>
-      </div>
-      <div class="acc-head" data-target="acc-architecture">
-        <span class="acc-title">4. Architecture & Material</span><span class="acc-icon">+</span>
-      </div>
-      <div class="acc-body" id="acc-architecture">
-        <div class="sub-category-title">Form & Style</div>
-        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="high rise"> high rise</label>
-        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="mid rise"> mid rise</label>
-        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="low rise"> low rise</label>
-        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="tower"> tower</label>
-        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="podium"> podium</label>
-        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="corner building"> corner building</label>
-        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="corner tower"> corner tower</label>
-        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="curved facade"> curved facade</label>
-        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="modern architecture"> modern architecture</label>
-        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="contemporary architecture"> contemporary architecture</label>
-        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="heritage architecture"> heritage architecture</label>
-        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="postwar architecture"> postwar architecture</label>
-        <div class="sub-category-title">Material</div>
-        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="glass"> glass</label>
-        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="brick"> brick</label>
-        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="painted brick"> painted brick</label>
-        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="concrete"> concrete</label>
-        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="timber"> timber</label>
-        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="metal"> metal</label>
-        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="stone"> stone</label>
-        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="rendered finish"> rendered finish</label>
-        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="corrugated iron"> corrugated iron</label>
-        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="screen"> screen</label>
-        <label><input type="checkbox" class="filter-check" data-cat="architecture" value="grid"> grid</label>
-      </div>
-      <div class="acc-head" data-target="acc-urban">
-        <span class="acc-title">5. Urban Context</span><span class="acc-icon">+</span>
-      </div>
-      <div class="acc-body" id="acc-urban">
-        <div class="sub-category-title">Process & Transformation</div>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="urban renewal"> urban renewal</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="urban development"> urban development</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="urban intensification"> urban intensification</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="urban consolidation"> urban consolidation</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="high density"> high density</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="riverfront"> riverfront</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="transport corridor"> transport corridor</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="construction impact"> construction impact</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="flood resilience"> flood resilience</label>
-        <div class="sub-category-title">Public Realm & Streetscape</div>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="pedestrian zone"> pedestrian zone</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="shared zone"> shared zone</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="arcade"> arcade</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="passage"> passage</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="public art"> public art</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="mural"> mural</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="outdoor dining"> outdoor dining</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="streetscape"> streetscape</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="street level"> street level</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="laneway"> laneway</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="street activation"> street activation</label>
-        <div class="sub-category-title">Brisbane 2032</div>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="olympic venue"> olympic venue</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="olympic precinct"> olympic precinct</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="olympic infrastructure"> olympic infrastructure</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="transport upgrade"> transport upgrade</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="athlete village"> athlete village</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="temporary structure"> temporary structure</label>
-        <label><input type="checkbox" class="filter-check" data-cat="urban" value="legacy project"> legacy project</label>
-      </div>
-      <div class="acc-head" data-target="acc-year">
-        <span class="acc-title">6. Time</span><span class="acc-icon">+</span>
-      </div>
-      <div class="acc-body" id="acc-year">
-        <label><input type="checkbox" class="filter-check" data-cat="year" value="2026"> 2026</label>
       </div>
     </div>
   </aside>
@@ -629,17 +483,26 @@
 
 <script>
 var currentOpenLoc = null;
+var currentVisibleLocs = [];
 
 var DATA_VERSION = (function() {
   var d = new Date();
   return d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
 })();
 var locations = [];
-var searchState = { text: '', suburb: '', categories: {} };
+
+/* ZAKRES FILTROWANIA NA MAPIE
+   Mapa odpowiada wyłącznie na pytanie "gdzie": dzielnica + wyszukiwarka adresowa.
+   Filtry słownikowe (condition / typology / architecture / urban / year) zostały
+   przeniesione do indeksu zdjęć, ponieważ opisują pojedyncze kadry, a pin
+   reprezentuje adres z wieloma zdjęciami o różnych tagach.
+   Tablice tagów nadal są budowane, ale służą już tylko do wyświetlania
+   w sekcji "Taxonomy & Keywords" w panelu szczegółów. */
+var searchState = { text: '', suburb: '' };
+
 var mapInstance = null;
 var mapInitiated = false;
 var autocompleteReady = false;
-var CAT_ARRAY_KEYS = { condition: 'conditionArr', typology: 'typologyArr', architecture: 'architectureArr', urban: 'urbanArr', year: 'yearArr' };
 var MAP_STATE_KEY = 'pi_map_state';
 var NEW_PIN_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
 var piUpdateRecords = [];
@@ -744,7 +607,10 @@ function loadMapState() {
 
 function getStateFromUrlParam() {
   try {
-    var raw = new URLSearchParams(window.location.search).get('state');
+    var params = new URLSearchParams(window.location.search);
+    var suburbParam = params.get('suburb');
+    if (suburbParam) return { suburb: suburbParam };
+    var raw = params.get('state');
     return raw ? JSON.parse(raw) : null;
   } catch (e) { return null; }
 }
@@ -752,7 +618,7 @@ function getStateFromUrlParam() {
 function broadcastFilterState(state) {
   try {
     if (window.parent && window.parent !== window) {
-      window.parent.postMessage({ type: 'pi-filters', suburb: state.suburb || '', categories: state.categories || {} }, 'https://www.photoindex.au');
+      window.parent.postMessage({ type: 'pi-filters', suburb: state.suburb || '' }, 'https://www.photoindex.au');
     }
   } catch (e) {}
 }
@@ -805,16 +671,9 @@ function splitCsvLine(line, delimiter) {
   return cols;
 }
 
-var SEARCHABLE_CATEGORIES = ['condition', 'typology', 'architecture', 'urban', 'year'];
-
-function quoteIfMultiword(v) { return v; }
-
 function buildPhotoDeckQueryParts() {
   var parts = [];
-  if (searchState.suburb) parts.push(quoteIfMultiword(searchState.suburb));
-  SEARCHABLE_CATEGORIES.forEach(function(cat) {
-    (searchState.categories[cat] || []).forEach(function(val) { parts.push(quoteIfMultiword(val)); });
-  });
+  if (searchState.suburb) parts.push(searchState.suburb);
   if (searchState.text) parts.push(searchState.text);
   return parts;
 }
@@ -828,18 +687,10 @@ function updatePhotoDeckLink() {
   if (btnDesktop) { btnDesktop.href = targetUrl; if (txtDesktop) txtDesktop.textContent = textValue; }
 }
 
-function removeFilterTag(type, val) {
-  if (type === 'suburb') {
-    searchState.suburb = '';
-    var defRadio = document.querySelector('.suburb-check[value=""]');
-    if (defRadio) defRadio.checked = true;
-  } else {
-    if (searchState.categories[type]) {
-      searchState.categories[type] = searchState.categories[type].filter(function(v) { return v !== val; });
-    }
-    var cb = document.querySelector('.filter-check[data-cat="' + type + '"][value="' + val + '"]');
-    if (cb) cb.checked = false;
-  }
+function removeSuburbFilter() {
+  searchState.suburb = '';
+  var defRadio = document.querySelector('.suburb-check[value=""]');
+  if (defRadio) defRadio.checked = true;
   applySearchState();
 }
 
@@ -850,64 +701,39 @@ function renderActiveTags() {
   
   if (container) {
     container.innerHTML = '';
-    var tags = [];
     if (searchState.suburb) {
-      tags.push({ type: 'suburb', label: searchState.suburb, val: searchState.suburb });
-    }
-    SEARCHABLE_CATEGORIES.forEach(function(cat) {
-      (searchState.categories[cat] || []).forEach(function(val) {
-        tags.push({ type: cat, label: val, val: val });
-      });
-    });
-
-    tags.forEach(function(t) {
       var tagEl = document.createElement('span');
       tagEl.className = 'pi-tag';
-      tagEl.innerHTML = t.label + '<button type="button" aria-label="Remove filter">&times;</button>';
+      tagEl.innerHTML = searchState.suburb + '<button type="button" aria-label="Remove filter">&times;</button>';
       tagEl.querySelector('button').addEventListener('click', function(e) {
         e.stopPropagation();
-        removeFilterTag(t.type, t.val);
+        removeSuburbFilter();
       });
       container.appendChild(tagEl);
-    });
+    }
   }
 
   if (clearBtn) {
-    var hasActiveContent = (searchInput && searchInput.value.length > 0) || !!searchState.suburb || countActiveFilters() > 0;
+    var hasActiveContent = (searchInput && searchInput.value.length > 0) || !!searchState.suburb;
     clearBtn.style.display = hasActiveContent ? 'block' : 'none';
   }
 }
 
 function countActiveFilters() {
-  var n = searchState.suburb ? 1 : 0;
-  for (var cat in searchState.categories) { n += (searchState.categories[cat] || []).length; }
-  return n;
+  return searchState.suburb ? 1 : 0;
 }
 
-function locationMatchesState(loc, textLc, suburbLc, excludeCat) {
+function locationMatchesState(loc, textLc, suburbLc) {
   var matchesText = !textLc || loc.streetLc.indexOf(textLc) !== -1 || loc.suburbLc.indexOf(textLc) !== -1;
   var matchesSuburb = !suburbLc || loc.suburbLc === suburbLc;
-  if (!matchesText || !matchesSuburb) return false;
-  for (var cat in searchState.categories) {
-    if (cat === excludeCat) continue;
-    var allowed = searchState.categories[cat];
-    if (allowed && allowed.length > 0) {
-      var values = loc[CAT_ARRAY_KEYS[cat]] || [];
-      var found = false;
-      for (var i = 0; i < values.length; i++) {
-        if (allowed.indexOf(values[i]) !== -1) { found = true; break; }
-      }
-      if (!found) return false;
-    }
-  }
-  return true;
+  return matchesText && matchesSuburb;
 }
 
 function applySearchState() {
   var textLc = searchState.text;
   var suburbLc = searchState.suburb ? searchState.suburb.toLowerCase() : '';
   var visibleLocs = locations.filter(function(loc) {
-    return locationMatchesState(loc, textLc, suburbLc, null);
+    return locationMatchesState(loc, textLc, suburbLc);
   });
   
   var totalVisible = visibleLocs.reduce(function(sum, loc) { return sum + (loc.count || 1); }, 0);
@@ -919,44 +745,14 @@ function applySearchState() {
   if (window.renderMarkers) window.renderMarkers(visibleLocs);
   updatePhotoDeckLink();
   renderActiveTags();
-  annotateFilterCoverage(textLc, suburbLc);
   var badge = document.getElementById('mobile-filter-count');
   if (badge) {
     var n = countActiveFilters();
     badge.textContent = n;
     badge.style.display = n > 0 ? 'inline-flex' : 'none';
   }
-  saveMapState({ suburb: searchState.suburb, categories: searchState.categories });
-  broadcastFilterState({ suburb: searchState.suburb, categories: searchState.categories });
-}
-
-function annotateFilterCoverage(textLc, suburbLc) {
-  textLc = textLc || '';
-  suburbLc = suburbLc || '';
-  var contextCache = {};
-  document.querySelectorAll('.filter-check').forEach(function(cb) {
-    var cat = cb.getAttribute('data-cat');
-    var val = cb.value;
-    var key = CAT_ARRAY_KEYS[cat];
-    if (!contextCache[cat]) {
-      contextCache[cat] = locations.filter(function(loc) {
-        return locationMatchesState(loc, textLc, suburbLc, cat);
-      });
-    }
-    var count = contextCache[cat].filter(function(loc) {
-      return (loc[key] || []).indexOf(val) !== -1;
-    }).reduce(function(sum, loc) { return sum + (loc.count || 1); }, 0);
-    var label = cb.closest('label');
-    if (!label) return;
-    var existing = label.querySelector('.filter-count');
-    if (existing) existing.remove();
-    var countSpan = document.createElement('span');
-    countSpan.className = 'filter-count';
-    countSpan.textContent = count;
-    label.appendChild(countSpan);
-    if (count === 0 && !cb.checked) { cb.disabled = true; label.classList.add('no-data'); }
-    else { cb.disabled = false; label.classList.remove('no-data'); }
-  });
+  saveMapState({ suburb: searchState.suburb });
+  broadcastFilterState({ suburb: searchState.suburb });
 }
 
 function filterSuburbOptions() {
@@ -988,32 +784,11 @@ function filterSuburbOptions() {
 
 function restoreSavedFilters() {
   var saved = getStateFromUrlParam() || loadMapState();
-  if (!saved) return;
-  var hasFilters = false;
-  if (saved.suburb) {
-    hasFilters = true;
-    searchState.suburb = saved.suburb;
-    var radio = document.querySelector('.suburb-check[value="' + saved.suburb + '"]');
-    if (radio) radio.checked = true;
-  }
-  if (saved.categories && Object.keys(saved.categories).some(function(cat) { return (saved.categories[cat] || []).length > 0; })) {
-    hasFilters = true;
-    searchState.categories = saved.categories;
-    for (var cat in saved.categories) {
-      var values = saved.categories[cat] || [];
-      values.forEach(function(val) {
-        var cb = document.querySelector('.filter-check[data-cat="' + cat + '"][value="' + val + '"]');
-        if (cb) cb.checked = true;
-      });
-      if (values.length > 0) {
-        var head = document.querySelector('.acc-head[data-target="acc-' + cat + '"]');
-        var body = document.getElementById('acc-' + cat);
-        if (head) head.classList.add('open');
-        if (body) body.classList.add('open');
-      }
-    }
-  }
-  if (hasFilters) applySearchState();
+  if (!saved || !saved.suburb) return;
+  searchState.suburb = saved.suburb;
+  var radio = document.querySelector('.suburb-check[value="' + saved.suburb + '"]');
+  if (radio) radio.checked = true;
+  applySearchState();
 }
 
 function loadInitialData() {
@@ -1086,6 +861,8 @@ function loadInitialData() {
         photos: photosArr
       };
 
+      /* Tablice tagów służą już wyłącznie do wyświetlenia w panelu szczegółów
+         (sekcja "Taxonomy & Keywords"). Nie biorą udziału w filtrowaniu mapy. */
       if (matchedPhotos.length) {
         var condSet = {}, typSet = {}, archSet = {}, urbSet = {};
         matchedPhotos.forEach(function(p) {
@@ -1107,7 +884,6 @@ function loadInitialData() {
 
       locData.streetLc = locData.street.toLowerCase();
       locData.suburbLc = locData.suburb.toLowerCase();
-      locData.yearArr = splitCatValue(row.year || (row.date ? row.date.slice(-4) : ''));
 
       if (!isNaN(locData.coords[0]) && !isNaN(locData.coords[1])) {
         locations.push(locData);
@@ -1191,7 +967,6 @@ function loadInitialData() {
         }
       }
     }
-    annotateFilterCoverage('', '');
     filterSuburbOptions();
     restoreSavedFilters();
   })
@@ -1645,11 +1420,11 @@ function initMapLazy() {
     var mountedMarkers = [];
 
     window.renderMarkers = function(visibleLocs) {
-      currentVisibleLocs = visibleLocs;
+      currentVisibleLocs = visibleLocs || [];
       mountedMarkers.forEach(function(m) { m.remove(); });
       mountedMarkers = [];
 
-      var groups = clusterByScreenDistance(mapInstance, visibleLocs, CLUSTER_PIXEL_RADIUS);
+      var groups = clusterByScreenDistance(mapInstance, currentVisibleLocs, CLUSTER_PIXEL_RADIUS);
 
       groups.forEach(function(group) {
         var el = markerTemplate.cloneNode(true);
@@ -1776,8 +1551,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (defRadio) defRadio.checked = true;
     searchState.suburb = '';
     searchState.text = '';
-    searchState.categories = {};
-    document.querySelectorAll('.filter-check:checked').forEach(function(cb) { cb.checked = false; });
     sessionStorage.removeItem(MAP_STATE_KEY);
     applySearchState();
     if (mapInstance) mapInstance.flyTo({ center: [153.0307, -27.4598], zoom: 13, duration: 800 });
@@ -1833,19 +1606,6 @@ document.addEventListener('DOMContentLoaded', function() {
               mapInstance.fitBounds(data.features[0].bbox, { padding: 60, duration: 600, maxZoom: 14.5 });
             }
           });
-      }
-    });
-  });
-
-  document.querySelectorAll('.filter-check').forEach(function(cb) {
-    cb.addEventListener('change', function() {
-      var cat = this.getAttribute('data-cat');
-      if (!searchState.categories[cat]) searchState.categories[cat] = [];
-      if (this.checked) searchState.categories[cat].push(this.value);
-      else searchState.categories[cat] = searchState.categories[cat].filter(function(v) { return v !== cb.value; });
-      applySearchState();
-      if (this.checked && typeof clarity === 'function') {
-        clarity('set', cat + '_filter', this.value);
       }
     });
   });
