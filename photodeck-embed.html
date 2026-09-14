@@ -671,20 +671,21 @@ function splitCsvLine(line, delimiter) {
   return cols;
 }
 
-function buildPhotoDeckQueryParts() {
-  var parts = [];
-  if (searchState.suburb) parts.push(searchState.suburb);
-  if (searchState.text) parts.push(searchState.text);
-  return parts;
-}
-
 function updatePhotoDeckLink() {
-  var queryStr = buildPhotoDeckQueryParts().join(' ');
+  /* Mapa odpowiada na pytanie "gdzie", index na "co". Przycisk przekazuje
+     stan mapy do indeksu przez parametry URL, ktore panel filtrow czyta
+     w readStateFromUrl(). Link da sie skopiowac i wyslac klientowi. */
   var btnDesktop = document.getElementById('search-archive-btn');
   var txtDesktop = document.getElementById('search-archive-text');
-  var targetUrl = queryStr ? 'https://www.photoindex.au/?search=' + encodeURIComponent(queryStr) : 'https://www.photoindex.au/';
-  var textValue = queryStr ? 'VIEW SELECTION' : 'SEARCH';
-  if (btnDesktop) { btnDesktop.href = targetUrl; if (txtDesktop) txtDesktop.textContent = textValue; }
+  var params = new URLSearchParams();
+  if (searchState.suburb) params.set('suburb', searchState.suburb);
+  if (searchState.text) params.set('q', searchState.text);
+  var qs = params.toString();
+  var targetUrl = 'https://www.photoindex.au/index' + (qs ? '?' + qs : '');
+  if (btnDesktop) {
+    btnDesktop.href = targetUrl;
+    if (txtDesktop) txtDesktop.textContent = qs ? 'VIEW SELECTION' : 'SEARCH';
+  }
 }
 
 function removeSuburbFilter() {
