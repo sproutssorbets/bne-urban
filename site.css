@@ -64,7 +64,7 @@ html body #component_menu ul.component_menu_content li.menu_lightbox_item a span
 html body #component_menu span[class*="minicart" i] { padding-left: 8px !important; padding-right: 9px !important; align-items: center !important; }
 
 /* ==========================================================================
-   2. STRONA ZDJĘCIA (MEDIA PAGE) - DEFINITYWNY RESET I NADPISANIE CUSTOM/THEME
+   2. STRONA ZDJĘCIA (MEDIA PAGE) - DEFINITYWNY CSS GRID (OMINIĘCIE THEME/CUSTOM)
    ========================================================================== */
 
 #ws_page.page-media #block_main,
@@ -76,132 +76,263 @@ html body #component_menu span[class*="minicart" i] { padding-left: 8px !importa
   margin-top: 0 !important; margin-bottom: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; border-top: none !important;
 }
 
-#ws_page.page-media #main_content > .elem[data-type="spacer"],
-#ws_page.page-media #main_content .col-2:has(.elem[data-type="spacer"]) {
-  display: none !important;
+/* Ukryj sztuczne odstępy generowane przez PhotoDeck */
+#ws_page.page-media #main_content > .elem[data-type="spacer"] { display: none !important; }
+
+/* 1. TWORZYMY GŁÓWNĄ SIATKĘ STRONY (GRID) */
+#ws_page.page-media #main_content {
+  display: grid !important;
+  grid-template-columns: 1fr var(--pi-panel-width) !important;
+  grid-auto-rows: min-content !important;
+  min-height: calc(100vh - 44px) !important;
+  position: relative !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
 }
 
-#ws_page.page-media #main_content:has(.media_detail_wrapper) {
-  max-width: 100vw !important; width: 100vw !important; margin: 0 !important; padding: 0 !important; overflow-x: hidden !important;
+/* Tło i obramowanie panelu bocznego jest rysowane przez sztuczny element pod spodem */
+#ws_page.page-media #main_content::after {
+  content: "" !important;
+  grid-column: 2 !important;
+  grid-row: 1 / 30 !important; /* Sięga do samego dołu */
+  background: #FFFFFF !important;
+  border-left: 1px solid #E5E5E5 !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
 }
 
-#ws_page.page-media #main_content > .row-12:has(.media_detail_wrapper) {
-  display: flex !important; flex-direction: row !important; width: 100vw !important; max-width: 100vw !important;
-  min-height: calc(100vh - 44px) !important; margin: 0 !important; padding: 0 !important; align-items: stretch !important;
+/* Spłaszczenie przeszkadzających zagnieżdżeń HTML PhotoDecka */
+#ws_page.page-media #main_content > .row-12:last-child,
+#ws_page.page-media .col-4,
+#ws_page.page-media .col-4 > .elem[data-type="media_metadata"],
+#ws_page.page-media .col-4 > .elem[data-type="media_metadata"] > .media_detail_meta_wrapper {
+  display: contents !important;
 }
 
-/* Lewa kolumna: Zdjęcie */
-#ws_page.page-media #main_content .row-12 > .first.col-6:has(.media_detail_wrapper) {
-  flex: 1 1 auto !important; width: auto !important; max-width: calc(100vw - var(--pi-panel-width)) !important;
-  display: flex !important; align-items: center !important; justify-content: center !important;
-  padding: 12px !important; box-sizing: border-box !important; height: calc(100vh - 44px) !important;
-  overflow: hidden !important; position: relative !important;
+/* ==================== LEWA KOLUMNA (ZDJĘCIE W STICKY VIEWPORT) ==================== */
+#ws_page.page-media #main_content > .row-12:last-child > .first.col-6 {
+  grid-column: 1 !important;
+  grid-row: 1 / 30 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 16px !important;
+  height: calc(100vh - 44px) !important;
+  position: sticky !important;
+  top: 44px !important; /* Zdjęcie zablokowane podczas przewijania panelu bocznego! */
+  box-sizing: border-box !important;
+  z-index: 1 !important;
 }
-
-.media_detail_wrapper { max-height: 100% !important; max-width: 100% !important; display: flex !important; align-items: center !important; justify-content: center !important; position: relative !important; }
-.media_detail_wrapper img { max-height: calc(100vh - 60px) !important; max-width: 100% !important; width: auto !important; height: auto !important; object-fit: contain !important; }
+.media_detail_wrapper { display: flex !important; align-items: center !important; justify-content: center !important; position: relative !important; width: 100% !important; height: 100% !important; }
+.media_detail_wrapper img { max-height: calc(100vh - 80px) !important; max-width: 100% !important; width: auto !important; height: auto !important; object-fit: contain !important; border-radius: 0 !important; }
 #main_content .media_detail_wrapper .media_wrap { background: transparent !important; border-radius: 0 !important; }
 
-/* Ukrycie nakładek */
+/* Czyste zdjęcie - usuwamy domyślne ikony na obrazku */
 #ws_page.page-media .media_detail_media .media_content_overlay,
-#ws_page.page-media .media_detail_media .media_detail_actions {
-  display: none !important;
+#ws_page.page-media .media_detail_media .media_detail_actions { display: none !important; }
+
+/* ==================== PRAWA KOLUMNA (PANEL BOCZNY) ==================== */
+
+/* Ustawiamy globalny lewy/prawy margines dla zawartości panelu oraz wyciągamy ponad tło */
+#ws_page.page-media .media_friendly_id,
+#ws_page.page-media .col-4 h1,
+#ws_page.page-media .media_description,
+#ws_page.page-media #main_content > .row-12:first-child,
+#ws_page.page-media .media_creation_date,
+#ws_page.page-media .media_author,
+#ws_page.page-media .media_copyright,
+#ws_page.page-media .media_size,
+#ws_page.page-media .col-4 .elem[data-type="raw"],
+#ws_page.page-media .media_detail_keywords {
+  grid-column: 2 !important;
+  padding-left: 28px !important;
+  padding-right: 28px !important;
+  box-sizing: border-box !important;
+  z-index: 1 !important;
 }
 
-/* Prawa kolumna: Panel boczny */
-#ws_page.page-media #main_content .row-12 > .col-4:has(.media_detail_meta_wrapper) {
-  flex: 0 0 var(--pi-panel-width) !important; width: var(--pi-panel-width) !important; max-width: var(--pi-panel-width) !important;
-  border-left: 1px solid #E5E5E5 !important; height: calc(100vh - 44px) !important; overflow-y: auto !important;
-  position: sticky !important; top: 0 !important; right: 0 !important;
-  padding: 24px 28px 64px 28px !important; box-sizing: border-box !important; background: #FFFFFF !important;
-  display: flex !important; flex-direction: column !important;
-}
-
-/* Wypłaszczenie kontenerów w flexie */
-#ws_page.page-media .col-4 .elem[data-type="media_metadata"] {
-  display: contents !important;
-}
-#ws_page.page-media .col-4 .media_detail_meta_wrapper {
-  display: contents !important;
-}
-
-/* 1. Górny pasek: REF ID + Lokalizacja */
+/* --- ROW 1: REF ID i Lokalizacja --- */
 #ws_page.page-media .media_detail_meta_wrapper > div.media_friendly_id {
-  order: 1 !important; display: flex !important; justify-content: space-between !important; align-items: baseline !important;
-  width: 100% !important; margin: 0 0 14px 0 !important;
+  grid-row: 1 !important;
+  padding-top: 24px !important;
+  display: flex !important; justify-content: space-between !important; align-items: baseline !important;
+  margin: 0 0 16px 0 !important;
   font-size: 0 !important; line-height: 0 !important; color: transparent !important;
 }
 #ws_page.page-media .media_detail_meta_wrapper > div.media_friendly_id b {
-  font: 500 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important;
+  font: 500 10px/1.4 'JetBrains Mono', 'SF Mono', Menlo, monospace, Inter, sans-serif !important; 
+  letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important;
 }
-#ws_page.page-media .media_detail_meta_wrapper > div.media_friendly_id b::before {
-  content: "REF. ";
-}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_friendly_id b::before { content: "REF. "; }
 #ws_page.page-media .media_detail_meta_wrapper > div.media_friendly_id::after {
   content: "BRISBANE, QLD, AUSTRALIA";
-  font: 400 10px/1.4 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important;
+  font: 400 10px/1.4 'JetBrains Mono', 'SF Mono', Menlo, monospace, Inter, sans-serif !important; 
+  color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important;
 }
 #ws_page.page-media .media_location { display: none !important; }
 
-/* 2. Tytuł */
+/* --- ROW 2: Tytuł Zdjęcia --- */
 #ws_page.page-media .col-4 h1,
 #ws_page.page-media .media_detail_meta_wrapper h1 {
-  order: 2 !important; margin: 0 0 10px 0 !important;
+  grid-row: 2 !important; margin: 0 0 10px 0 !important;
   font: 500 11px/1.45 Inter, sans-serif !important; letter-spacing: 0.06em !important; text-transform: uppercase !important; color: #111111 !important;
 }
 
-/* 3. Opis */
+/* --- ROW 3: Field Notes / Opis --- */
 #ws_page.page-media .col-4 .media_description,
 #ws_page.page-media .media_detail_meta_wrapper .media_description {
-  order: 3 !important; margin: 0 0 16px 0 !important;
+  grid-row: 3 !important; margin: 0 0 24px 0 !important;
 }
 #ws_page.page-media .col-4 .media_description p {
   font: 400 12px/1.55 Inter, sans-serif !important; color: #333333 !important; margin: 0 !important;
 }
 
-/* 4. Przycisk ADD TO SELECTION - nadpisanie stylu z CUSTOM CSS */
-#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) {
-  display: block !important; position: static !important; width: 100% !important; height: auto !important; margin: 0 !important; padding: 0 !important;
+/* --- ROW 4: Przycisk ADD TO SELECTION --- */
+/* Integrujemy blok pierwszego wiersza PhotoDecka prosto w nasz strumień metadanych! */
+#ws_page.page-media #main_content > .row-12:first-child {
+  grid-row: 4 !important;
+  display: block !important; width: 100% !important; margin-bottom: 32px !important;
 }
-#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .first.col-5,
-#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .first.col-6,
-#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .elem[data-type="spacer"] {
-  display: none !important;
+#ws_page.page-media #main_content > .row-12:first-child .col-5,
+#ws_page.page-media #main_content > .row-12:first-child .first.col-6 { display: none !important; }
+#ws_page.page-media #main_content > .row-12:first-child .col-7,
+#ws_page.page-media #main_content > .row-12:first-child .col-6,
+#ws_page.page-media #main_content > .row-12:first-child .elem,
+#ws_page.page-media #main_content > .row-12:first-child .page_meta,
+#ws_page.page-media #main_content > .row-12:first-child .page_actions,
+#ws_page.page-media #main_content > .row-12:first-child form {
+  display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important;
 }
-#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .col-7,
-#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .col-6,
-#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .page_meta,
-#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .media_detail_actions {
-  display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; float: none !important;
-}
-#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) form.button_to {
-  display: block !important; width: 100% !important; margin: 0 !important;
-}
-
-#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) {
-  position: absolute !important; top: 160px !important; right: 0 !important; width: var(--pi-panel-width) !important;
-  padding: 0 28px !important; box-sizing: border-box !important; z-index: 50 !important; pointer-events: none !important;
-}
-#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .media_detail_actions {
-  pointer-events: auto !important;
-}
-
-/* Wymuszenie zaokrąglonego kształtu wbrew CUSTOM CSS */
-#ws_page.page-media input.submit_small.lightbox_toggle,
-#ws_page.page-media #main_content input.lightbox_toggle {
+#ws_page.page-media input.submit_small.lightbox_toggle {
   display: block !important; width: 100% !important; height: 38px !important; margin: 0 !important; padding: 0 20px !important;
   background: #000000 !important; color: #FFFFFF !important; border: 1px solid #000000 !important;
-  border-radius: 9999px !important;
+  border-radius: 9999px !important; /* Niszczy sztywny border z THEME CSS */
   font: 500 11px/36px Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important;
   cursor: pointer !important; text-align: center !important; box-sizing: border-box !important; transition: opacity 0.15s ease !important;
 }
-#ws_page.page-media input.submit_small.lightbox_toggle:hover {
-  opacity: 0.88 !important;
+#ws_page.page-media input.submit_small.lightbox_toggle:hover { opacity: 0.88 !important; }
+
+/* --- ROW 5: 1. ARCHIVAL & TECHNICAL DATA (Nagłówek i data) --- */
+#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date {
+  grid-row: 5 !important;
+  border-top: 1px solid #E5E5E5 !important; padding-top: 20px !important; margin-top: 0 !important;
+  font-size: 0 !important; line-height: 0 !important; color: transparent !important;
+  display: flex !important; flex-direction: column !important;
 }
-#ws_page.page-media .col-4 .media_description {
-  margin-bottom: 58px !important;
+#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date::before {
+  content: "1. ARCHIVAL & TECHNICAL DATA"; display: block !important; width: 100% !important;
+  font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important;
+  margin: 0 0 16px 0 !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date b {
+  display: flex !important; justify-content: space-between !important; align-items: baseline !important; width: 100% !important;
+  font-size: 0 !important; line-height: 1.5 !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date b::before {
+  content: "DATE"; font: 400 10px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date time {
+  font: 400 11px/1.5 Inter, sans-serif !important; color: #111111 !important; text-align: right !important;
 }
 
+/* --- ROW 6, 7, 8: Autoryzacja i Parametry Techniczne --- */
+#ws_page.page-media .media_detail_meta_wrapper > div.media_author { grid-row: 6 !important; }
+#ws_page.page-media .media_detail_meta_wrapper > div.media_copyright { grid-row: 7 !important; }
+#ws_page.page-media .media_detail_meta_wrapper > div.media_size { grid-row: 8 !important; border-bottom: 1px solid #E5E5E5 !important; padding-bottom: 20px !important; }
+
+#ws_page.page-media .media_detail_meta_wrapper > div.media_author,
+#ws_page.page-media .media_detail_meta_wrapper > div.media_copyright,
+#ws_page.page-media .media_detail_meta_wrapper > div.media_size {
+  font-size: 0 !important; line-height: 0 !important; color: transparent !important;
+  display: flex !important; justify-content: space-between !important; align-items: baseline !important;
+  padding-top: 6px !important; padding-bottom: 6px !important; margin: 0 !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_author::before { content: "AUTHOR"; font: 400 10px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important; }
+#ws_page.page-media .media_detail_meta_wrapper > div.media_copyright::before { content: "RIGHTS"; font: 400 10px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important; }
+#ws_page.page-media .media_detail_meta_wrapper > div.media_size::before { content: "DIMENSIONS"; font: 400 10px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important; }
+
+#ws_page.page-media .media_detail_meta_wrapper > div.media_author b,
+#ws_page.page-media .media_detail_meta_wrapper > div.media_size b {
+  font: 400 11px/1.5 Inter, sans-serif !important; color: #111111 !important; text-align: right !important; font-weight: 400 !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_copyright::after {
+  content: "© 2026 All rights reserved."; font: 400 11px/1.5 Inter, sans-serif !important; color: #111111 !important; text-align: right !important;
+}
+
+/* --- ROW 9: 2. PROCESSING PROTOCOL --- */
+#ws_page.page-media .col-4 .elem[data-type="raw"] { grid-row: 9 !important; margin: 0 !important; }
+#ws_page.page-media .col-4 .elem[data-type="raw"] > div {
+  border-top: none !important; border-bottom: 1px solid #E5E5E5 !important;
+  padding: 20px 0 !important; margin: 0 !important;
+}
+#ws_page.page-media .col-4 .elem[data-type="raw"] p:first-child {
+  font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important; margin: 0 0 16px 0 !important;
+}
+#ws_page.page-media .col-4 .elem[data-type="raw"] p:first-child::before { content: "2. "; }
+#ws_page.page-media .col-4 .elem[data-type="raw"] p:not(:first-child) {
+  font: 400 11px/1.5 Inter, sans-serif !important; color: #333333 !important; margin: 0 0 8px 0 !important;
+}
+#ws_page.page-media .col-4 .elem[data-type="raw"] span { color: #767676 !important; font-size: 10.5px !important; }
+
+/* --- ROW 10: 3. TAXONOMY & KEYWORDS --- */
+#ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords {
+  grid-row: 10 !important;
+  padding-top: 20px !important; padding-bottom: 64px !important; margin: 0 !important;
+  border-top: none !important; border-bottom: none !important;
+  font-size: 0 !important; line-height: 0 !important; color: transparent !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords::before {
+  content: "3. TAXONOMY & KEYWORDS"; display: block !important;
+  font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important; margin: 0 0 12px 0 !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords b {
+  font-size: 0 !important; line-height: 0 !important; letter-spacing: 0 !important; color: transparent !important;
+  display: block !important; font-weight: 400 !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords b a {
+  display: inline-block !important;
+  font: 400 9.5px/1.2 Inter, sans-serif !important;
+  letter-spacing: 0.04em !important; text-transform: uppercase !important;
+  color: #222222 !important; background: #FFFFFF !important; border: 1px solid #E5E5E5 !important;
+  padding: 4px 6px !important; margin: 0 5px 6px 0 !important; border-radius: 4px !important;
+  text-decoration: none !important; vertical-align: middle !important;
+  transition: border-color 0.15s ease, background 0.15s ease !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords b a:hover {
+  border-color: #999999 !important; background: #F9F9F9 !important; color: #000000 !important;
+}
+
+/* ==================== RESPONSYWNOŚĆ ==================== */
+@media (max-width: 900px) {
+  #ws_page.page-media #main_content { display: flex !important; flex-direction: column !important; }
+  #ws_page.page-media #main_content::after { display: none !important; }
+  #ws_page.page-media #main_content > .row-12:last-child > .first.col-6 { position: static !important; height: auto !important; width: 100% !important; padding: 16px !important; }
+  
+  /* Flex order replikuje grid layout */
+  #ws_page.page-media .media_friendly_id { order: 1 !important; }
+  #ws_page.page-media .col-4 h1 { order: 2 !important; }
+  #ws_page.page-media .media_description { order: 3 !important; }
+  #ws_page.page-media #main_content > .row-12:first-child { order: 4 !important; padding: 0 16px !important; margin-bottom: 24px !important;}
+  #ws_page.page-media .media_creation_date { order: 5 !important; }
+  #ws_page.page-media .media_author { order: 6 !important; }
+  #ws_page.page-media .media_copyright { order: 7 !important; }
+  #ws_page.page-media .media_size { order: 8 !important; }
+  #ws_page.page-media .col-4 .elem[data-type="raw"] { order: 9 !important; }
+  #ws_page.page-media .media_detail_keywords { order: 10 !important; }
+  
+  #ws_page.page-media .media_friendly_id,
+  #ws_page.page-media .col-4 h1,
+  #ws_page.page-media .media_description,
+  #ws_page.page-media .media_creation_date,
+  #ws_page.page-media .media_author,
+  #ws_page.page-media .media_copyright,
+  #ws_page.page-media .media_size,
+  #ws_page.page-media .col-4 .elem[data-type="raw"],
+  #ws_page.page-media .media_detail_keywords {
+      padding-left: 16px !important; padding-right: 16px !important;
+  }
+}
 /* ==========================================================================
    5. SEKCJA 1: ARCHIVAL & TECHNICAL DATA
    ========================================================================== */
