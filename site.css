@@ -57,7 +57,7 @@ html body #component_menu span[class*="minicart" i] { padding-left: 8px !importa
 
 /* Layout Główny (Flexbox) */
 html body.page-media #block_main, html body.page-media .block_inner, html body.page-media #component_mainc, html body.page-media .component_main_content, html body.page-media #main_content, html body.page-media main#block_main .main_content { margin-top: 0 !important; margin-bottom: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; border-top: none !important; }
-#main_content > .elem[data-type="spacer"], #main_content .col-2:has(.elem[data-type="spacer"]), #main_content > .row-12:not(:has(.media_detail_wrapper)) { display: none !important; }
+#main_content > .elem[data-type="spacer"], #main_content .col-2:has(.elem[data-type="spacer"]), body.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) { display: none !important; }
 #main_content:has(.media_detail_wrapper) { max-width: 100vw !important; width: 100vw !important; margin: 0 !important; padding: 0 !important; overflow-x: hidden !important; }
 #main_content > .row-12:has(.media_detail_wrapper) { display: flex !important; flex-direction: row !important; width: 100vw !important; max-width: 100vw !important; min-height: calc(100vh - 44px) !important; margin: 0 !important; padding: 0 !important; align-items: stretch !important; }
 
