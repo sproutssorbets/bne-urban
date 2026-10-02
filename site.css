@@ -17,6 +17,18 @@
 /* ==========================================================================
    1. GLOBALNE REGUŁY, STRONA GŁÓWNA, RESET
    ========================================================================== */
+/* Wymuszenie pełnej szerokości i widoczności dla osadzonego iframe */
+#ws_page.front-page #component_mainc,
+#ws_page.front-page #main_content,
+#ws_page.front-page iframe,
+#ws_page:not(.page-media) #component_mainc {
+  display: block !important;
+  width: 100% !important;
+  min-height: calc(100vh - 44px) !important;
+}
+#ws_page.front-page iframe {
+  border: none !important;
+}
 
 .arrows_overlay, .arrows_overlay *, .media_detail_media .arrows_overlay, .media_slide .arrows_overlay, .arrow_prev, .arrow_next { display: none !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }
 .media_detail_wrapper img { border-radius: 0 !important; }
