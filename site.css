@@ -1105,3 +1105,10 @@ body.pi-acct .pi-acct-root form:has(input[type="text"], input[type="email"], inp
   grid-column: 1 / -1 !important;
   margin: 16px 0 !important;
 }
+/* ===== KOREKTA: USUNIĘCIE CZARNEGO TŁA POD ZDJĘCIAMI (STRONA GŁÓWNA) ===== */
+
+.thumbs_wall .media .thumb,
+.thumbs_wall .media .media_wrap {
+  background: transparent !important;
+  border-radius: var(--pi-r-md, 16px) !important;
+}
