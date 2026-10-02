@@ -64,7 +64,7 @@ html body #component_menu ul.component_menu_content li.menu_lightbox_item a span
 html body #component_menu span[class*="minicart" i] { padding-left: 8px !important; padding-right: 9px !important; align-items: center !important; }
 
 /* ==========================================================================
-   2. STRONA ZDJĘCIA (MEDIA PAGE) - UKŁAD ZDJĘCIE + ARCHIWALNY PANEL BOCZNY
+   2. STRONA ZDJĘCIA (MEDIA PAGE) - POPRAWIONA WERSJA PIXEL-PERFECT
    ========================================================================== */
 
 #ws_page.page-media #block_main,
@@ -114,14 +114,12 @@ html body #component_menu span[class*="minicart" i] { padding-left: 8px !importa
   border-left: 1px solid #E5E5E5 !important; height: calc(100vh - 44px) !important; overflow-y: auto !important;
   position: sticky !important; top: 0 !important; right: 0 !important;
   padding: 24px 28px 64px 28px !important; box-sizing: border-box !important; background: #FFFFFF !important;
-}
-
-/* Panel Boczny: Jednolita hierarchia pionowa */
-#ws_page.page-media .col-4:has(.media_detail_meta_wrapper) {
   display: flex !important; flex-direction: column !important;
 }
+
+/* Układ wewnętrzny panelu */
 #ws_page.page-media .col-4 .elem[data-type="media_metadata"] {
-  order: 1 !important; display: block !important; width: 100% !important;
+  display: block !important; width: 100% !important;
 }
 #ws_page.page-media .col-4 .media_detail_meta_wrapper {
   display: flex !important; flex-direction: column !important; position: static !important; padding: 0 !important;
@@ -138,19 +136,17 @@ html body #component_menu span[class*="minicart" i] { padding-left: 8px !importa
   content: "BRISBANE, QLD, AUSTRALIA";
   color: #767676 !important; font-weight: 400 !important; letter-spacing: 0.05em !important;
 }
-#ws_page.page-media .media_location {
-  display: none !important;
-}
+#ws_page.page-media .media_location { display: none !important; }
 
-/* 2. Tytuł obiektu (minimalistyczny uppercase) */
+/* 2. Tytuł obiektu */
 #ws_page.page-media .col-4 .media_detail_meta_wrapper h1 {
-  order: 2 !important; margin: 0 0 10px 0 !important;
+  order: 2 !important; margin: 0 0 12px 0 !important;
   font: 500 11px/1.45 Inter, sans-serif !important; letter-spacing: 0.06em !important; text-transform: uppercase !important; color: #111111 !important;
 }
 
 /* 3. Opis / Field Notes */
 #ws_page.page-media .col-4 .media_description {
-  order: 3 !important; margin: 0 0 20px 0 !important;
+  order: 3 !important; margin: 0 0 16px 0 !important;
 }
 #ws_page.page-media .col-4 .media_description p {
   font: 400 12px/1.55 Inter, sans-serif !important; color: #333333 !important; margin: 0 !important;
@@ -175,7 +171,6 @@ html body #component_menu span[class*="minicart" i] { padding-left: 8px !importa
   display: block !important; width: 100% !important; margin: 0 !important;
 }
 
-/* Dokładne umiejscowienie przycisku pod opisem */
 #ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) {
   position: absolute !important; top: 160px !important; right: 0 !important; width: var(--pi-panel-width) !important;
   padding: 0 28px !important; box-sizing: border-box !important; z-index: 50 !important; pointer-events: none !important;
@@ -197,30 +192,63 @@ html body #component_menu span[class*="minicart" i] { padding-left: 8px !importa
   margin-bottom: 58px !important; /* Rezerwacja miejsca na przycisk */
 }
 
-/* 5. Sekcja 1: ARCHIVAL & TECHNICAL DATA */
+/* ==========================================================================
+   5. SEKCJA 1: ARCHIVAL & TECHNICAL DATA (ROZBICIE NA CZYSTY UKŁAD 2-KOLUMN)
+   ========================================================================== */
+
+/* Nagłówek Sekcji 1 jako osobny blok */
 #ws_page.page-media .media_creation_date {
-  order: 5 !important; border-top: 1px solid #E5E5E5 !important; padding-top: 14px !important; margin-top: 0 !important;
+  order: 5 !important;
+  border-top: 1px solid #E5E5E5 !important;
+  padding-top: 14px !important;
+  margin-top: 0 !important;
+  display: flex !important;
+  flex-direction: column !important; /* Przełamujemy flex na 2 wiersze: nagłówek na górze, data na dole */
 }
+
 #ws_page.page-media .media_creation_date::before {
-  content: "1. ARCHIVAL & TECHNICAL DATA"; display: block !important;
+  content: "1. ARCHIVAL & TECHNICAL DATA";
+  display: block !important; width: 100% !important;
   font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important;
   margin: 0 0 10px 0 !important;
 }
+
+/* Wiersz z datą pod nagłówkiem */
+#ws_page.page-media .media_creation_date time {
+  display: flex !important; justify-content: space-between !important; align-items: baseline !important;
+  width: 100% !important; font: 400 11px/1.5 Inter, sans-serif !important; color: #111111 !important;
+}
+#ws_page.page-media .media_creation_date b {
+  display: flex !important; justify-content: space-between !important; width: 100% !important; font-weight: 400 !important;
+}
+#ws_page.page-media .media_creation_date b::before {
+  content: "DATE"; font: 400 10px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important;
+}
+
+/* Wiersze: Author, Copyright, Dimensions */
 #ws_page.page-media .media_author { order: 6 !important; }
 #ws_page.page-media .media_copyright { order: 7 !important; }
 #ws_page.page-media .media_size {
-  order: 8 !important; border-bottom: 1px solid #E5E5E5 !important; padding-bottom: 14px !important; margin-bottom: 0 !important;
+  order: 8 !important;
+  border-bottom: 1px solid #E5E5E5 !important;
+  padding-bottom: 14px !important;
+  margin-bottom: 0 !important;
 }
 
-#ws_page.page-media .media_detail_meta_wrapper > div:is(.media_creation_date, .media_author, .media_copyright, .media_size) {
+#ws_page.page-media .media_detail_meta_wrapper > div:is(.media_author, .media_copyright, .media_size) {
   display: flex !important; justify-content: space-between !important; align-items: baseline !important;
   padding: 4px 0 !important; font: 400 10px/1.5 Inter, sans-serif !important; color: #767676 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important;
 }
-#ws_page.page-media .media_detail_meta_wrapper > div b {
+
+#ws_page.page-media .media_detail_meta_wrapper > div:is(.media_author, .media_copyright, .media_size) b {
   font: 400 11px/1.5 Inter, sans-serif !important; color: #111111 !important; text-align: right !important; text-transform: none !important; letter-spacing: 0 !important;
 }
 
-/* 6. Sekcja 2: PROCESSING PROTOCOL */
+/* ==========================================================================
+   6. SEKCJA 2: PROCESSING PROTOCOL (WYPEŁNIONA MIĘDZY SEKCJA 1 A 3)
+   ========================================================================== */
+
+/* Wyciągamy div raw i pozycjonujemy go pod sekcją 1 */
 #ws_page.page-media .col-4 .elem[data-type="raw"] {
   order: 2 !important; width: 100% !important; margin: 0 !important;
 }
@@ -242,7 +270,11 @@ html body #component_menu span[class*="minicart" i] { padding-left: 8px !importa
   color: #767676 !important; font-size: 11px !important;
 }
 
-/* 7. Sekcja 3: TAXONOMY & KEYWORDS (Minimalistyczne prostokątne tagi) */
+/* ==========================================================================
+   7. SEKCJA 3: TAXONOMY & KEYWORDS (UKRYCIE PRZECINKÓW + RAMKI TAGÓW)
+   ========================================================================== */
+
+/* Przenosimy sekcję słów kluczowych pod Processing Protocol */
 #ws_page.page-media .media_detail_keywords {
   order: 9 !important; font-size: 0 !important; border-top: none !important; border-bottom: none !important;
   padding: 14px 0 0 0 !important; margin: 0 !important;
@@ -252,36 +284,36 @@ html body #component_menu span[class*="minicart" i] { padding-left: 8px !importa
   font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important;
   margin: 0 0 10px 0 !important;
 }
+
+/* Ukrywamy surowe przecinki PhotoDecka przez font-size: 0 */
 #ws_page.page-media .media_detail_keywords b {
-  display: flex !important; flex-wrap: wrap !important; gap: 5px !important; font-weight: 400 !important;
+  display: block !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  font-weight: 400 !important;
 }
+
+/* Styl pojedynczego tagu */
 #ws_page.page-media .media_detail_keywords b a {
-  font: 400 9.5px/1 Inter, sans-serif !important; letter-spacing: 0.04em !important; text-transform: uppercase !important;
-  color: #222222 !important; background: #FFFFFF !important; border: 1px solid #E5E5E5 !important;
-  padding: 4px 6px !important; border-radius: var(--pi-r-xs, 4px) !important; text-decoration: none !important;
-  display: inline-block !important; transition: border-color 0.15s ease, background 0.15s ease !important;
+  display: inline-block !important;
+  font: 400 9.5px/1.2 Inter, sans-serif !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  color: #222222 !important;
+  background: #FFFFFF !important;
+  border: 1px solid #E5E5E5 !important;
+  padding: 4px 6px !important;
+  margin: 0 4px 5px 0 !important; /* Odstępy zamiast flex gap usuwają problem przecinków */
+  border-radius: var(--pi-r-xs, 4px) !important;
+  text-decoration: none !important;
+  vertical-align: middle !important;
+  transition: border-color 0.15s ease, background 0.15s ease !important;
 }
+
 #ws_page.page-media .media_detail_keywords b a:hover {
-  border-color: #999999 !important; background: #F9F9F9 !important;
+  border-color: #999999 !important;
+  background: #F9F9F9 !important;
 }
-
-/* Przycisk zamknięcia panelu */
-html body #main_content .pi-detail-close { position: absolute !important; top: 16px !important; right: 16px !important; z-index: 20 !important; }
-html body #main_content .pi-detail-x { position: absolute !important; top: 24px !important; right: 14px !important; width: 36px !important; height: 36px !important; border: 1px solid #111 !important; border-radius: 50% !important; background: #fff !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; z-index: 30 !important; }
-html body #main_content .pi-detail-x svg { width: 14px !important; height: 14px !important; fill: none !important; stroke: #111 !important; stroke-width: 1.6 !important; }
-html body #main_content .pi-detail-x:hover { background: #111 !important; }
-html body #main_content .pi-detail-x:hover svg { stroke: #fff !important; }
-
-/* Responsywność */
-@media (max-width: 900px) {
-  #ws_page.page-media #main_content > .row-12:has(.media_detail_wrapper) { flex-direction: column !important; height: auto !important; min-height: auto !important; width: 100% !important; }
-  #ws_page.page-media #main_content .row-12 > .first.col-6:has(.media_detail_wrapper) { max-width: 100% !important; width: 100% !important; height: auto !important; padding: 16px 16px 20px 16px !important; }
-  .media_detail_wrapper img { max-height: 65vh !important; width: 100% !important; height: auto !important; }
-  #ws_page.page-media #main_content .row-12 > .col-4:has(.media_detail_meta_wrapper) { flex: 1 1 auto !important; width: 100% !important; max-width: 100% !important; border-left: none !important; border-top: 1px solid #000000 !important; height: auto !important; position: static !important; padding: 24px 18px 60px 18px !important; box-sizing: border-box !important; }
-  #ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) { position: static !important; width: 100% !important; padding: 0 18px 24px 18px !important; }
-  #ws_page.page-media .col-4 .media_description { margin-bottom: 20px !important; }
-}
-
 /* ==========================================================================
    3. KONTO, SELEKCJA, ZAKUPY (ODPORNE NA NAWIGACJĘ AJAX)
    ========================================================================== */
