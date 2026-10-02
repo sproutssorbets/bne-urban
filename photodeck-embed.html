@@ -124,6 +124,27 @@ body.panel #mapcol{display:none}
  #chips{order:4;flex-basis:100%}
 }
 @media (prefers-reduced-motion:reduce){.card img,.card::after,.ovt,.eye{transition:none;animation:none}}
+.mm{display:flex;align-items:center;gap:10px;margin:0 0 6px;font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.mm .seg{display:inline-flex;border:1px solid var(--line);border-radius:var(--r-pill);overflow:hidden}
+.mm button{border:none;background:transparent;padding:5px 12px;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--mute);cursor:pointer}
+.mm button[aria-pressed=true]{background:var(--ink);color:#fff}
+#subr{display:flex;align-items:center;gap:24px}
+#sortw{position:relative;display:flex;align-items:center;gap:8px;height:44px;font-size:11px;letter-spacing:.06em;color:var(--mute)}
+#sortw .l{text-transform:uppercase;letter-spacing:.12em}
+#sortbtn{display:inline-flex;align-items:center;gap:8px;padding:6px 0;border:none;border-bottom:1px solid transparent;background:transparent;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink)}
+#sortbtn:hover,#sortbtn[aria-expanded=true]{border-bottom-color:var(--ink)}
+#sortbtn svg,#sortlist svg{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+#sortbtn .cv svg{width:12px;height:12px}
+#sortbtn .cv{display:inline-flex;margin-left:-2px}
+#sortlist{display:none;position:absolute;top:calc(100% - 2px);right:0;z-index:700;min-width:190px;background:#fff;border:1px solid var(--ink);border-radius:var(--r-md);padding:6px}
+#sortlist.open{display:block}
+.so{display:flex;align-items:center;gap:12px;padding:10px 12px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);border-radius:var(--r-sm);cursor:pointer}
+.so .sl{flex:1}
+.so .ck{display:inline-flex;visibility:hidden}
+.so[aria-selected=true] .ck{visibility:visible}
+.so:hover,.so.act{background:var(--ink);color:#fff}
+@media (max-width:900px){#sortlist{right:auto;left:0}}
+.cj{flex:none;font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
 </style>
 </head>
 <body class="map">
@@ -137,7 +158,7 @@ body.panel #mapcol{display:none}
   </div>
   <div id="sub">
     <div id="tabs" role="tablist"></div>
-    <div id="dens"><span class="l">Columns</span><button id="dm" type="button" aria-label="Fewer columns">&minus;</button><b id="dn">3</b><button id="dp" type="button" aria-label="More columns">+</button></div>
+    <div id="subr"><div id="sortw"><span class="l">Sort</span><button id="sortbtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="sortlist" aria-label="Sort photographs"></button><div id="sortlist" role="listbox" aria-label="Sort photographs"></div></div><div id="dens"><span class="l">Columns</span><button id="dm" type="button" aria-label="Fewer columns">&minus;</button><b id="dn">3</b><button id="dp" type="button" aria-label="More columns">+</button></div></div>
   </div>
   <div id="split">
     <aside id="panel" aria-label="Filters">
@@ -197,7 +218,7 @@ var FACETS=[
 ];
 var FBY={};FACETS.forEach(function(f){FBY[f.key]=f});
 
-var S={tab:"photo",q:"",loc:"",f:{},cols:0,map:true,panel:false,open:{suburb:true}};
+var S={tab:"photo",q:"",loc:"",f:{},mode:{},sort:"featured",cols:0,map:true,panel:false,open:{suburb:true}};
 var DATA=[],PLACES=[],PLACEBYNAME={},LIST=[],MAP=null,MAPREADY=false,MAPLOAD=false,FITTED=false,TQ=null;
 var $=function(id){return document.getElementById(id)};
 var lc=function(s){return String(s==null?"":s).toLowerCase().trim()};
@@ -246,19 +267,78 @@ function prep(){
     p._v={};
     FACETS.forEach(function(F){var v=p[F.key];p._v[F.key]=(Array.isArray(v)?v:v?[v]:[]).map(lc)});
     p._hay=[p.title,p._loc,p.description,p.suburb,p.photoId,p.date,p.tokens].concat(FACETS.map(function(F){return p._v[F.key].join(" ")})).join(" ").toLowerCase()});
+  FACETS.forEach(function(F){MULTI[F.key]=!F.radio&&DATA.some(function(p){return p._v[F.key].length>1})});
   /* featured first, keep feed order otherwise */
   var f=[],o=[];DATA.forEach(function(p){(p.isFeatured?f:o).push(p)});
-  if(f.length&&o.length)DATA=f.concat(o)}
+  if(f.length&&o.length)DATA=f.concat(o);
+  DATA.forEach(function(p,i){p._i=i})}
+
+/* ---------- sorting ---------- */
+/* Newest / Oldest follow the order of adding to PhotoDeck. Ids are UUIDv7, the first 48 bits are
+   the creation time, so plain string order is order of adding. */
+var SORTS=["featured","newest","oldest","name"];
+var SLABEL={featured:"Featured",newest:"Newest",oldest:"Oldest",name:"A to Z"};
+/* Icons: Lucide (lucide.dev), ISC License, Copyright (c) 2026 Lucide Icons and Contributors */
+var SICON={
+  featured:'<path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/>',
+  newest:'<path d="M12 6v6l2 1"/><path d="M12.337 21.994a10 10 0 1 1 9.588-8.767"/><path d="m14 18 4 4 4-4"/><path d="M18 14v8"/>',
+  oldest:'<path d="M12 6v6l1.56.78"/><path d="M13.227 21.925a10 10 0 1 1 8.767-9.588"/><path d="m14 18 4-4 4 4"/><path d="M18 22v-8"/>',
+  name:'<path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="M20 8h-5"/><path d="M15 10V6.5a2.5 2.5 0 0 1 5 0V10"/><path d="M15 14h5l-5 6h5"/>',
+  chev:'<path d="m6 9 6 6 6-6"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>'
+};
+function sicon(k){return '<svg viewBox="0 0 24 24" aria-hidden="true">'+SICON[k]+'</svg>'}
+function cmpText(a,b){return String(a).localeCompare(String(b),undefined,{numeric:true,sensitivity:"base"})}
+/* Address order: by street name first, house number only breaks ties.
+   Handles "25 King Street", "3/25 King Street", "25-27 King Street", "25A King Street". "5th Avenue" is left alone. */
+var ADDR=/^(?:\d+[a-z]?\s*\/\s*)?(\d+)[a-z]?(?:\s*[-\u2013]\s*\d+[a-z]?)?[,\s]+(?=\D)/i;
+function addrKey(n){var s=String(n||"").trim(),m=ADDR.exec(s);return m?s.slice(m[0].length):s}
+function addrNum(n){var m=ADDR.exec(String(n||"").trim());return m?parseInt(m[1],10):0}
+function cmpAddr(a,b){return cmpText(addrKey(a),addrKey(b))||addrNum(a)-addrNum(b)||cmpText(a,b)}
+function cmpUuid(a,b){a=String(a||"");b=String(b||"");return a<b?-1:a>b?1:0}
+function newer(a,b){return cmpUuid(b.uuid,a.uuid)||a._i-b._i}
+function sortList(list){
+  var by={
+    featured:function(a,b){return (b.isFeatured?1:0)-(a.isFeatured?1:0)||newer(a,b)},
+    newest:newer,
+    oldest:function(a,b){return cmpUuid(a.uuid,b.uuid)||a._i-b._i},
+    name:function(a,b){return cmpAddr(a._name,b._name)||newer(a,b)}
+  }[S.sort]||newer;
+  return list.slice().sort(by)}
+/* custom menu, a native select cannot show icons */
+var SORTI=0;
+function buildSortMenu(){
+  var m=$("sortlist");m.innerHTML="";
+  SORTS.forEach(function(k,i){
+    var o=el("div","so");o.id="so-"+k;o.setAttribute("role","option");o.setAttribute("data-val",k);
+    o.innerHTML=sicon(k)+'<span class="sl">'+SLABEL[k]+'</span><span class="ck">'+sicon("check")+'</span>';
+    m.appendChild(o)});
+  $("sortbtn").innerHTML=sicon(S.sort)+'<span id="sortlabel">'+SLABEL[S.sort]+'</span><span class="cv">'+sicon("chev")+'</span>'}
+function syncSort(){
+  var b=$("sortbtn");
+  b.innerHTML=sicon(S.sort)+'<span id="sortlabel">'+SLABEL[S.sort]+'</span><span class="cv">'+sicon("chev")+'</span>';
+  [].forEach.call($("sortlist").children,function(o){o.setAttribute("aria-selected",String(o.getAttribute("data-val")===S.sort))})}
+function sortOpen(v){
+  $("sortlist").classList.toggle("open",v);$("sortbtn").setAttribute("aria-expanded",String(v));
+  if(v){SORTI=Math.max(0,SORTS.indexOf(S.sort));sortAct()}else $("sortbtn").removeAttribute("aria-activedescendant")}
+function sortAct(){
+  [].forEach.call($("sortlist").children,function(o,i){o.classList.toggle("act",i===SORTI)});
+  $("sortbtn").setAttribute("aria-activedescendant","so-"+SORTS[SORTI])}
+function pickSort(k){S.sort=k;sortOpen(false);render();$("main").scrollTop=0}
 
 /* ---------- filtering ---------- */
 function selOf(key){return S.f[key]||[]}
+/* Match mode per facet. Default comes from FACETS[].all, the visitor can override it in the panel.
+   MULTI marks facets where one photo can carry several values; only for those the choice makes sense. */
+var MULTI={};
+function isAll(F){return S.mode[F.key]!==undefined?S.mode[F.key]==="all":!!F.all}
 function pass(p,except){
   if(except!=="loc"&&S.loc&&p._loc!==S.loc)return false;
   for(var i=0;i<FACETS.length;i++){
     var F=FACETS[i];if(F.key===except)continue;
     var sel=selOf(F.key);if(!sel.length)continue;
     var arr=p._v[F.key],j;
-    if(F.all){for(j=0;j<sel.length;j++)if(arr.indexOf(sel[j])<0)return false}
+    if(isAll(F)){for(j=0;j<sel.length;j++)if(arr.indexOf(sel[j])<0)return false}
     else{var ok=false;for(j=0;j<sel.length;j++)if(arr.indexOf(sel[j])>-1)ok=true;if(!ok)return false}}
   if(S.q){var t=S.q.toLowerCase().split(/\s+/).filter(Boolean);for(var k=0;k<t.length;k++)if(p._hay.indexOf(t[k])<0)return false}
   return true}
@@ -285,9 +365,16 @@ function renderPanel(){
     if(sel.length)h.appendChild(el("span","badge",String(sel.length)));
     h.appendChild(el("span","ic",isOpen?"\u2212":"+"));sec.appendChild(h);
     if(isOpen){
-      var body=el("div","sb"),shown=0,last="";
+      var body=el("div","sb"),shown=0,last="",allm=isAll(F);
+      if(MULTI[F.key]){
+        var mm=el("div","mm"),seg=el("span","seg");
+        mm.appendChild(el("span",null,"Match"));
+        seg.title="Any: photos with at least one selected term. All: photos with every selected term.";
+        [["any","Any"],["all","All"]].forEach(function(m){var b=el("button",null,m[1]);b.type="button";b.setAttribute("data-mkey",F.key);b.setAttribute("data-mval",m[0]);b.setAttribute("aria-pressed",String((m[0]==="all")===allm));seg.appendChild(b)});
+        mm.appendChild(seg);body.appendChild(mm)}
       opts.forEach(function(v){
-        var n=0;for(var i=0;i<DATA.length;i++){var p=DATA[i];if(pass(p,F.key)&&p._v[F.key].indexOf(v)>-1)n++}
+        /* All: count what selecting v would leave. Any: count what v adds on top of the other facets. */
+        var n=0;for(var i=0;i<DATA.length;i++){var p=DATA[i];if((allm?pass(p,null):pass(p,F.key))&&p._v[F.key].indexOf(v)>-1)n++}
         var on=sel.indexOf(v)>-1;if(!n&&!on)return;
         if(F.key==="typology"&&TG[v]&&TG[v]!==last){last=TG[v];body.appendChild(el("div","grp",last))}
         var lab=el("label","opt"),inp=document.createElement("input");
@@ -304,12 +391,12 @@ function renderChips(){
   var host=$("chips");host.innerHTML="";
   function chip(key,val,text){var c=el("span","chip");c.appendChild(document.createTextNode(text));var b=el("button",null,"\u00D7");b.type="button";b.setAttribute("data-key",key);b.setAttribute("data-val",val);b.setAttribute("aria-label","Remove filter");c.appendChild(b);host.appendChild(c)}
   if(S.loc)chip("loc",S.loc,S.loc);
-  FACETS.forEach(function(F){selOf(F.key).forEach(function(v){chip(F.key,v,canon(F.key,v))})});
+  FACETS.forEach(function(F){selOf(F.key).forEach(function(v,i){if(i>0&&MULTI[F.key])host.appendChild(el("span","cj",isAll(F)?"and":"or"));chip(F.key,v,canon(F.key,v))})});
   var n=activeCount(),b=$("badge");b.hidden=!n;b.textContent=n;
   $("clear").style.display=n?"inline":"none"}
 
 /* ---------- tabs ---------- */
-function groupBy(list,fn){var m={},o=[];list.forEach(function(p){var k=fn(p);if(!k)return;if(!m[k]){m[k]={name:k,photos:[]};o.push(k)}m[k].photos.push(p)});o.sort(function(a,b){return a.localeCompare(b)});return o.map(function(k){return m[k]})}
+function groupBy(list,fn){var m={},o=[];list.forEach(function(p){var k=fn(p);if(!k)return;if(!m[k]){m[k]={name:k,photos:[]};o.push(k)}m[k].photos.push(p)});o.sort(cmpAddr);return o.map(function(k){return m[k]})}
 function renderTabs(counts){
   var host=$("tabs");host.innerHTML="";
   [["photo","Photographs"],["location","Locations"],["suburb","Suburbs"]].forEach(function(t){
@@ -378,7 +465,7 @@ function mapHot(id){if(MAP&&MAPREADY)MAP.setFilter("hot",["==",["get","id"],id||
 
 /* ---------- render ---------- */
 function render(){
-  LIST=DATA.filter(function(p){return pass(p,null)});
+  LIST=sortList(DATA.filter(function(p){return pass(p,null)}));
   var locs=groupBy(LIST,function(p){return p._loc}),subs=groupBy(LIST,function(p){return p.suburb});
   renderTabs({photo:LIST.length,location:locs.length,suburb:subs.length});
   renderChips();
@@ -403,6 +490,7 @@ function render(){
   $("ftoggle").setAttribute("aria-expanded",String(S.panel));
   $("mtoggle").textContent=S.map?"Grid":"Map";$("mtoggle").setAttribute("aria-pressed",String(S.map));
   $("dens").style.display=isGrid?"":"none";
+  $("sortw").style.display=isGrid?"":"none";syncSort();
   document.body.classList.toggle("map",S.map);document.body.classList.toggle("panel",S.panel);
   $("panel").classList.toggle("open",S.panel);
   layout();mapUpdate(true);save()}
@@ -430,10 +518,10 @@ function pickSug(s){SG=[];SGI=-1;showSug();$("q").value="";S.q="";s.apply();if(s
 function closeSug(){SG=[];SGI=-1;showSug()}
 
 /* ---------- state ---------- */
-function save(){try{window.sessionStorage.setItem("pi_browse",JSON.stringify({tab:S.tab,q:S.q,loc:S.loc,f:S.f,cols:S.cols,map:S.map,y:$("main").scrollTop}))}catch(e){}}
+function save(){try{window.sessionStorage.setItem("pi_browse",JSON.stringify({tab:S.tab,q:S.q,loc:S.loc,f:S.f,mode:S.mode,sort:S.sort,cols:S.cols,map:S.map,y:$("main").scrollTop}))}catch(e){}}
 function restore(){
   try{var r=JSON.parse(window.sessionStorage.getItem("pi_browse")||"null");if(!r)return 0;
-    S.tab=r.tab||"photo";S.q=r.q||"";S.loc=r.loc||"";S.f=r.f||{};S.cols=r.cols||0;if(typeof r.map==="boolean")S.map=r.map;
+    S.tab=r.tab||"photo";S.q=r.q||"";S.loc=r.loc||"";S.f=r.f||{};S.mode=r.mode||{};S.sort=SORTS.indexOf(r.sort)>-1?r.sort:"featured";S.cols=r.cols||0;if(typeof r.map==="boolean")S.map=r.map;
     $("q").value=S.q;return r.y||0}catch(e){return 0}}
 (function readParams(){
   try{var p=new URLSearchParams(window.location.search);
@@ -450,11 +538,22 @@ function wire(){
   on("mtoggle","click",function(){S.map=!S.map;if(S.map){S.panel=false;ensureMap()}render();if(MAP)setTimeout(function(){MAP.resize()},60)});
   on("clear","click",function(){S.f={};S.loc="";render()});
   on("noteok","click",function(){try{window.localStorage.setItem("pi_map_note","1")}catch(e){}$("note").classList.remove("show")});
+  buildSortMenu();
+  on("sortbtn","click",function(){sortOpen(!$("sortlist").classList.contains("open"))});
+  on("sortbtn","keydown",function(e){
+    var open=$("sortlist").classList.contains("open"),k=e.key;
+    if(k==="Escape"&&open){e.preventDefault();e.stopPropagation();sortOpen(false)}
+    else if(k==="ArrowDown"||k==="ArrowUp"){e.preventDefault();if(!open)sortOpen(true);else{SORTI=(SORTI+(k==="ArrowDown"?1:-1)+SORTS.length)%SORTS.length;sortAct()}}
+    else if(open&&(k==="Enter"||k===" ")){e.preventDefault();pickSort(SORTS[SORTI])}
+    else if(open&&k==="Tab")sortOpen(false)});
+  on("sortlist","mousedown",function(e){e.preventDefault()});
+  on("sortlist","click",function(e){var o=e.target.closest&&e.target.closest(".so");if(o)pickSort(o.getAttribute("data-val"))});
+  document.addEventListener("click",function(e){if(!e.target.closest||!e.target.closest("#sortw"))sortOpen(false)});
   on("dm","click",function(){var n=parseInt($("wall").getAttribute("data-n")||"3",10);S.cols=Math.max(1,n-1);layout();save()});
   on("dp","click",function(){var n=parseInt($("wall").getAttribute("data-n")||"3",10);S.cols=Math.min(6,n+1);layout();save()});
   on("chips","click",function(e){var b=e.target.closest&&e.target.closest("button");if(!b)return;var k=b.getAttribute("data-key"),v=b.getAttribute("data-val");if(k==="loc")S.loc="";else{S.f[k]=(S.f[k]||[]).filter(function(x){return x!==v})}render()});
   on("tabs","click",function(e){var b=e.target.closest&&e.target.closest("button");if(!b)return;S.tab=b.getAttribute("data-tab");render()});
-  on("fgrid","click",function(e){var h=e.target.closest&&e.target.closest(".sh");if(!h)return;var k=h.getAttribute("data-sec"),cur=S.open[k]!==undefined?S.open[k]:selOf(k).length>0;S.open[k]=!cur;renderPanel()});
+  on("fgrid","click",function(e){var m=e.target.closest&&e.target.closest("[data-mkey]");if(m){S.mode[m.getAttribute("data-mkey")]=m.getAttribute("data-mval");render();return}var h=e.target.closest&&e.target.closest(".sh");if(!h)return;var k=h.getAttribute("data-sec"),cur=S.open[k]!==undefined?S.open[k]:selOf(k).length>0;S.open[k]=!cur;renderPanel()});
   on("fgrid","change",function(e){var i=e.target;if(i.getAttribute("data-key"))toggle(i.getAttribute("data-key"),i.getAttribute("data-val"))});
   on("locgrid","click",function(e){var b=e.target.closest&&e.target.closest(".lc");if(!b)return;var kind=b.getAttribute("data-kind"),name=b.getAttribute("data-name");
     if(kind==="location")S.loc=S.loc===name?"":name;else S.f.suburb=[lc(name)];S.tab="photo";render();$("main").scrollTop=0});
