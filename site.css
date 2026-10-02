@@ -621,3 +621,88 @@ body.pi-acct .pi-acct-root form:has(input[type="text"], input[type="email"], inp
 #ws_page.page-website_page-contact form :is(input[type="checkbox"] + label, label:has(input[type="checkbox"])) { display: inline !important; font: 400 12px/1.5 Inter, sans-serif !important; letter-spacing: 0 !important; text-transform: none !important; margin: 0 !important; cursor: pointer !important; }
 #ws_page.page-website_page-contact form :is(input[type="submit"], button[type="submit"]) { display: block !important; width: 100% !important; height: 48px !important; margin: 8px 0 16px 0 !important; padding: 0 !important; background: #111111 !important; color: #FFFFFF !important; border: 1px solid #111111 !important; border-radius: 999px !important; box-shadow: none !important; font: 500 11px/46px Inter, sans-serif !important; letter-spacing: 0.14em !important; text-transform: uppercase !important; text-align: center !important; cursor: pointer !important; -webkit-appearance: none !important; }
 #ws_page.page-website_page-contact form :is(input[type="submit"], button[type="submit"]):hover { background: #FFFFFF !important; color: #111111 !important; }
+
+/* ===== STRONA ZDJĘCIA: METADANE (CSS-ONLY) ===== */
+
+/* 1. Układ wierszy etykieta/wartość (anonimowe węzły tekstowe jako flex items) */
+#main_content .media_detail_meta_wrapper > div:is(.media_location, .media_friendly_id, .media_creation_date, .media_author, .media_copyright, .media_size) {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: space-between !important;
+  align-items: baseline !important;
+  padding: 12px 0 !important;
+  border-bottom: 1px solid #DADADA !important;
+  font: 400 12px/1.6 Inter, sans-serif !important;
+  color: #6F6F6F !important;
+}
+#main_content .media_detail_meta_wrapper > div b {
+  color: #111111 !important;
+  font-weight: 500 !important;
+  text-align: right !important;
+}
+
+/* 2. Nagłówki sekcji wprowadzane przez ::before */
+#main_content .media_location::before {
+  content: "Details";
+  flex: 0 0 100% !important;
+  font: 500 11px/1.4 Inter, sans-serif !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: #111111 !important;
+  margin: 24px 0 12px 0 !important;
+}
+#main_content .media_detail_keywords::before {
+  content: "Keywords";
+  display: block !important;
+  font: 500 11px/1.4 Inter, sans-serif !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: #111111 !important;
+  margin: 32px 0 16px 0 !important;
+}
+
+/* 3. Pigułki słów kluczowych (ukrycie "Photo keywords: ") */
+#main_content .media_detail_keywords {
+  font-size: 0 !important; 
+  border: none !important;
+}
+#main_content .media_detail_keywords b {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  font-weight: 400 !important;
+}
+#main_content .media_detail_keywords b a {
+  font: 500 11px/1 Inter, sans-serif !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  color: #111111 !important;
+  background: #F1F1EF !important;
+  padding: 8px 14px !important;
+  border-radius: var(--pi-r-pill, 999px) !important;
+  text-decoration: none !important;
+  transition: opacity 0.15s ease !important;
+}
+#main_content .media_detail_keywords b a:hover {
+  opacity: 0.8 !important;
+}
+
+/* 4. Natywny przycisk SHARE jako Outlined Pill */
+#main_content .media_detail_actions a.share_icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 44px !important;
+  background: transparent !important;
+  color: #111111 !important;
+  border: 1px solid #111111 !important;
+  border-radius: var(--pi-r-pill, 999px) !important;
+  font: 500 10px/1 Inter, sans-serif !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  text-decoration: none !important;
+}
+#main_content .media_detail_actions a.share_icon::after {
+  content: "SHARE" !important;
+}
