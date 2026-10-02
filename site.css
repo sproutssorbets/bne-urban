@@ -11,16 +11,17 @@
   --pi-r-lg: 28px;
   --pi-r-pill: 999px;
   --pi-thumb: 176px;
-  --pi-shop-w: 640px;
+  --pi-shop-w: 860px;
 }
 
 /* ==========================================================================
-   1. GLOBALNE REGUŁY I KOMPONENTY
+   1. GLOBALNE REGUŁY, STRONA GŁÓWNA, RESET
    ========================================================================== */
 
 .arrows_overlay, .arrows_overlay *, .media_detail_media .arrows_overlay, .media_slide .arrows_overlay, .arrow_prev, .arrow_next { display: none !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }
 .media_detail_wrapper img { border-radius: 0 !important; }
 .thumbs_wall .media .thumb, .thumbs_wall .media .media_wrap, .thumbs_wall .media img { background: transparent !important; border-radius: var(--pi-r-md, 16px) !important; }
+html body .media_wrap::after { background: none !important; background-image: none !important; opacity: 0 !important; }
 
 /* Status logowania i komunikaty */
 .user-bar-greeting { margin: 0 !important; padding: 14px 20px 0 !important; text-align: right !important; }
@@ -52,367 +53,182 @@ html body #component_menu ul.component_menu_content li.menu_lightbox_item a span
 html body #component_menu span[class*="minicart" i] { padding-left: 8px !important; padding-right: 9px !important; align-items: center !important; }
 
 /* ==========================================================================
-   2. STRONA ZDJĘCIA (MEDIA PAGE)
+   2. STRONA ZDJĘCIA (MEDIA PAGE) - UKŁAD WORKERA
    ========================================================================== */
 
-/* ===== 1. STRONA ZDJĘCIA (MEDIA PAGE) ===== */
+#ws_page.page-media #block_main,
+#ws_page.page-media .block_inner,
+#ws_page.page-media #component_mainc,
+#ws_page.page-media .component_main_content,
+#ws_page.page-media #main_content,
+#ws_page.page-media main#block_main .main_content {
+  margin-top: 0 !important; margin-bottom: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; border-top: none !important;
+}
 
-/* Ukrywamy górny pasek. Przyciski wyciągniemy z nakładki na zdjęciu */
+#ws_page.page-media #main_content > .elem[data-type="spacer"],
+#ws_page.page-media #main_content .col-2:has(.elem[data-type="spacer"]) {
+  display: none !important;
+}
+
+#ws_page.page-media #main_content:has(.media_detail_wrapper) {
+  max-width: 100vw !important; width: 100vw !important; margin: 0 !important; padding: 0 !important; overflow-x: hidden !important;
+}
+
+#ws_page.page-media #main_content > .row-12:has(.media_detail_wrapper) {
+  display: flex !important; flex-direction: row !important; width: 100vw !important; max-width: 100vw !important;
+  min-height: calc(100vh - 44px) !important; margin: 0 !important; padding: 0 !important; align-items: stretch !important;
+}
+
+/* Kolumna Lewa (Zdjęcie) */
+#ws_page.page-media #main_content .row-12 > .first.col-6:has(.media_detail_wrapper) {
+  flex: 1 1 auto !important; width: auto !important; max-width: calc(100vw - var(--pi-panel-width)) !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+  padding: 12px !important; box-sizing: border-box !important; height: calc(100vh - 44px) !important;
+  overflow: hidden !important; position: relative !important;
+}
+
+.media_detail_wrapper { max-height: 100% !important; max-width: 100% !important; display: flex !important; align-items: center !important; justify-content: center !important; position: relative !important; }
+.media_detail_wrapper img { max-height: calc(100vh - 60px) !important; max-width: 100% !important; width: auto !important; height: auto !important; object-fit: contain !important; }
+#main_content .media_detail_wrapper .media_wrap { background: transparent !important; border-radius: 0 !important; }
+
+/* Ukrywamy zbędne nakładki na zdjęciu */
+#ws_page.page-media .media_detail_media .media_content_overlay,
+#ws_page.page-media .media_detail_media .media_detail_actions {
+  display: none !important;
+}
+
+/* Kolumna Prawa (Panel Boczny) */
+#ws_page.page-media #main_content .row-12 > .col-4:has(.media_detail_meta_wrapper) {
+  flex: 0 0 var(--pi-panel-width) !important; width: var(--pi-panel-width) !important; max-width: var(--pi-panel-width) !important;
+  border-left: 1px solid #000000 !important; height: calc(100vh - 44px) !important; overflow-y: auto !important;
+  position: sticky !important; top: 0 !important; right: 0 !important;
+  padding: 24px 28px 48px 28px !important; box-sizing: border-box !important; background: #FFFFFF !important;
+}
+
+/* Panel Boczny: Pionowy Flexbox */
+#ws_page.page-media .col-4 .media_detail_meta_wrapper {
+  display: flex !important; flex-direction: column !important;
+}
+
+/* Górny wiersz REF (ID z lewej, Lokalizacja z prawej) */
+#ws_page.page-media .col-4 .media_detail_meta_wrapper { position: relative !important; padding-top: 24px !important; }
+#ws_page.page-media .media_friendly_id {
+  position: absolute !important; top: 0 !important; left: 0 !important; margin: 0 !important;
+  font: 500 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important;
+}
+#ws_page.page-media .media_location {
+  position: absolute !important; top: 0 !important; right: 0 !important; margin: 0 !important; text-align: right !important;
+  font: 500 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important;
+}
+
+/* Tytuł i opis */
+#ws_page.page-media .col-4 .media_detail_meta_wrapper h1 {
+  order: 2 !important; margin: 0 0 12px 0 !important;
+  font: 600 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important;
+}
+#ws_page.page-media .col-4 .media_description {
+  order: 3 !important; margin: 0 0 24px 0 !important;
+  font: 400 12px/1.6 Inter, sans-serif !important; color: #111111 !important;
+}
+
+/* Przycisk ADD TO SELECTION umieszczony pod opisem */
+#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) {
+  display: block !important; position: static !important; width: 100% !important; height: auto !important; margin: 0 !important; padding: 0 !important;
+}
+#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .first.col-5,
+#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .first.col-6 {
+  display: none !important;
+}
+#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .col-7,
+#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .col-6,
+#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .page_meta,
+#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .page_actions {
+  display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; float: none !important;
+}
+#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) {
+  position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; z-index: 100 !important; pointer-events: none !important;
+}
+#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .page_actions {
+  pointer-events: auto !important; position: absolute !important; top: calc(100vh - 44px) !important;
+}
 #ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) { display: none !important; }
 
-/* Pływający dolny panel z przyciskami (Sticky Footer w prawym panelu) */
-#main_content .media_content_overlay .media_detail_actions {
-  position: fixed !important; bottom: 0 !important; right: 0 !important; width: var(--pi-panel-width) !important;
-  background: #FFFFFF !important; padding: 20px 28px 24px 28px !important; border-top: 1px solid #E5E5E5 !important;
-  display: flex !important; flex-direction: column !important; gap: 12px !important;
-  z-index: 9999 !important; pointer-events: auto !important; box-sizing: border-box !important;
+/* Natywny przycisk w panelu bocznym */
+#ws_page.page-media .col-4 .media_detail_actions {
+  order: 4 !important; display: block !important; width: 100% !important; margin: 0 0 32px 0 !important; padding: 0 !important;
 }
-#main_content .media_content_overlay .media_detail_actions form { margin: 0 !important; display: block !important; }
-
-/* Główny przycisk (ADD TO SELECTION) */
-#main_content .media_content_overlay .media_detail_actions input.submit_small {
-  width: 100% !important; height: 44px !important; padding: 0 24px !important; margin: 0 !important;
-  border-radius: var(--pi-r-pill, 999px) !important; background: #111111 !important; color: #FFFFFF !important;
+#ws_page.page-media .col-4 .media_detail_actions form { width: 100% !important; margin: 0 !important; }
+#ws_page.page-media .col-4 .media_detail_actions input.submit_small {
+  width: 100% !important; height: 44px !important; margin: 0 !important;
+  background: #111111 !important; color: #FFFFFF !important; border: 1px solid #111111 !important;
+  border-radius: var(--pi-r-pill, 999px) !important;
   font: 500 10px/44px Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important;
-  border: none !important; cursor: pointer !important; transition: background 0.15s ease !important;
+  cursor: pointer !important; text-align: center !important; transition: background 0.15s ease !important;
 }
-#main_content .media_content_overlay .media_detail_actions input.submit_small:hover { background: #333333 !important; }
+#ws_page.page-media .col-4 .media_detail_actions input.submit_small:hover { background: #333333 !important; }
+#ws_page.page-media .col-4 .media_detail_actions input.share_icon { display: none !important; }
 
-/* Przycisk Share (jako minimalistyczna ikona pod głównym) */
-#main_content .media_content_overlay .media_detail_actions input.share_icon {
-  background: transparent !important; color: #111111 !important; border: none !important;
-  width: 100% !important; height: 20px !important; padding: 0 !important; box-shadow: none !important;
-  background-position: center !important; background-repeat: no-repeat !important;
-}
-
-/* Margines dla panelu bocznego (by listwa nie ucięła tekstu) */
-#main_content .row-12 > .col-4:has(.media_detail_meta_wrapper) { padding-bottom: 120px !important; }
-
-/* --- METADANE (Wyrównanie do projektu) --- */
-#main_content .media_detail_meta_wrapper { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 0 !important; align-items: baseline !important; }
-#main_content .media_detail_meta_wrapper > * { grid-column: 1 / -1 !important; }
-
-/* REF i Location */
-#main_content .media_friendly_id { grid-column: 1 / 2 !important; grid-row: 1 !important; font: 500 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; }
-#main_content .media_location { grid-column: 2 / 3 !important; grid-row: 1 !important; text-align: right !important; font: 500 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; }
-
-/* Tytuł i Opis */
-#main_content .media_detail_meta_wrapper h1 { grid-row: 2 !important; margin: 24px 0 12px 0 !important; font: 600 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; }
-#main_content .media_description { grid-row: 3 !important; margin: 0 0 32px 0 !important; font: 400 12px/1.6 Inter, sans-serif !important; color: #111111 !important; }
-
-/* Wiersze danych tabelarycznych (brak ramek między wierszami) */
-#main_content .media_detail_meta_wrapper > div:is(.media_creation_date, .media_author, .media_copyright, .media_size) {
-  display: flex !important; flex-wrap: wrap !important; justify-content: space-between !important;
-  padding: 6px 0 !important; font: 400 11px/1.5 Inter, sans-serif !important; color: #6F6F6F !important; border: none !important;
-}
-#main_content .media_detail_meta_wrapper > div b { font-weight: 400 !important; color: #111111 !important; text-align: right !important; }
-
-/* Sekcja 1: Header */
-#main_content .media_creation_date { border-top: 1px solid #E5E5E5 !important; padding-top: 16px !important; margin-top: 0 !important; }
-#main_content .media_creation_date::before {
-  content: "1. ARCHIVAL & TECHNICAL DATA"; flex: 0 0 100% !important;
+/* Sekcja 1: Dane techniczne */
+#ws_page.page-media .media_creation_date { order: 5 !important; border-top: 1px solid #E5E5E5 !important; padding-top: 16px !important; margin-top: 0 !important; }
+#ws_page.page-media .media_creation_date::before {
+  content: "1. ARCHIVAL & TECHNICAL DATA"; display: block !important;
   font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important;
   margin: 0 0 16px 0 !important;
 }
+#ws_page.page-media .media_author { order: 6 !important; }
+#ws_page.page-media .media_copyright { order: 7 !important; }
+#ws_page.page-media .media_size { order: 8 !important; border-bottom: 1px solid #E5E5E5 !important; padding-bottom: 16px !important; margin-bottom: 0 !important; }
+
+#ws_page.page-media .media_detail_meta_wrapper > div:is(.media_creation_date, .media_author, .media_copyright, .media_size) {
+  display: flex !important; justify-content: space-between !important; align-items: baseline !important;
+  padding: 6px 0 !important; font: 400 11px/1.5 Inter, sans-serif !important; color: #6F6F6F !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div b { font-weight: 400 !important; color: #111111 !important; text-align: right !important; }
 
 /* Sekcja 3: Słowa kluczowe */
-#main_content .media_detail_keywords { font-size: 0 !important; border-top: 1px solid #E5E5E5 !important; padding-top: 16px !important; margin-top: 24px !important; }
-#main_content .media_detail_keywords::before {
+#ws_page.page-media .media_detail_keywords {
+  order: 9 !important; font-size: 0 !important; border-top: none !important; border-bottom: 1px solid #E5E5E5 !important;
+  padding: 24px 0 24px 0 !important; margin: 0 !important;
+}
+#ws_page.page-media .media_detail_keywords::before {
   content: "3. TAXONOMY & KEYWORDS"; display: block !important;
   font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important;
   margin: 0 0 16px 0 !important;
 }
-#main_content .media_detail_keywords b { display: flex !important; flex-wrap: wrap !important; gap: 6px !important; font-weight: 400 !important; }
-#main_content .media_detail_keywords b a {
+#ws_page.page-media .media_detail_keywords b { display: flex !important; flex-wrap: wrap !important; gap: 6px !important; font-weight: 400 !important; }
+#ws_page.page-media .media_detail_keywords b a {
   font: 500 9px/1 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important;
   background: #F4F4F4 !important; padding: 6px 12px !important; border-radius: var(--pi-r-pill, 999px) !important; text-decoration: none !important;
   transition: background 0.15s ease !important;
 }
-#main_content .media_detail_keywords b a:hover { background: #E5E5E5 !important; }
+#ws_page.page-media .media_detail_keywords b a:hover { background: #E5E5E5 !important; }
 
 /* Processing Protocol */
-#main_content .col-4 .elem[data-type="raw"] > div { border-top: 1px solid #E5E5E5 !important; padding-top: 16px !important; margin-top: 32px !important; }
-#main_content .col-4 .elem[data-type="raw"] p:first-child { font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; margin-bottom: 16px !important; }
-#main_content .col-4 .elem[data-type="raw"] p { font: 400 11px/1.6 Inter, sans-serif !important; color: #6F6F6F !important; margin-bottom: 8px !important; }
-#main_content .col-4 .elem[data-type="raw"] span { color: #111111 !important; }
-
-/* RWD: Pasek na dole ekranu w widoku mobilnym */
-@media (max-width: 900px) {
-  #main_content .media_content_overlay .media_detail_actions { bottom: 0 !important; right: 0 !important; left: 0 !important; width: 100% !important; border-top: 1px solid #111111 !important; padding: 16px !important; }
-  #main_content .row-12 > .col-4:has(.media_detail_meta_wrapper) { padding-bottom: 120px !important; }
-}
-
-/* ==========================================================================
-   3. KONTO, FORMULARZE, STRONA GŁÓWNA KLIENTA
-   ========================================================================== */
-
-body.pi-acct .pi-acct-hidden { display: none !important; }
-body.pi-acct .pi-acct-root { padding-left: 24px !important; padding-right: 24px !important; font-family: 'Inter', sans-serif; color: #111111; }
-body.pi-acct .pi-acct-root::after { content: ''; display: block; height: 72px; }
-body.pi-acct[data-pi-acct="selections"] .pi-acct-root, body.pi-acct[data-pi-acct="profile"] .pi-acct-root, body.pi-acct[data-pi-acct="form"] .pi-acct-root, body.pi-acct[data-pi-acct="selection"] .pi-acct-root { width: 100% !important; max-width: 640px !important; margin-left: auto !important; margin-right: auto !important; float: none !important; box-sizing: border-box; }
-body.pi-acct .pi-acct-fluid { width: 100% !important; max-width: none !important; float: none !important; margin-left: 0 !important; margin-right: 0 !important; padding-left: 0 !important; padding-right: 0 !important; box-sizing: border-box; }
-body.pi-acct .pi-acct-root .pi-acct-center { width: 100% !important; max-width: 640px !important; margin-left: auto !important; margin-right: auto !important; box-sizing: border-box; }
-.pi-acct-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; min-height: 72px; margin: 0 0 24px 0; }
-.pi-acct-tabs { display: flex; gap: 28px; }
-.pi-acct-tab { height: 44px; display: inline-flex; align-items: center; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #9A9A96 !important; text-decoration: none !important; border-bottom: 1px solid transparent; }
-.pi-acct-tab:hover { color: #111111 !important; }
-.pi-acct-tab.on { color: #111111 !important; border-bottom-color: #111111; }
-.pi-acct-who { display: flex; align-items: center; gap: 20px; height: 44px; font-family: 'Inter', sans-serif; font-size: 12px; color: #6B6B6B; }
-.pi-acct-name { color: #111111; font-weight: 500; }
-.pi-acct-name::before { content: "You are logged in as "; color: #6B6B6B; font-weight: 400; }
-.pi-acct-who a { font-size: 12px !important; font-weight: 400 !important; letter-spacing: 0.02em !important; text-transform: none !important; color: #6B6B6B !important; text-decoration: underline !important; text-underline-offset: 3px !important; }
-.pi-acct-who a:hover { color: #111111 !important; }
-.pi-acct-title { font-family: 'Inter', sans-serif; font-size: 26px; font-weight: 500; letter-spacing: -0.015em; line-height: 1.2; margin: 8px 0 6px 0; color: #111111; }
-.pi-acct-sub { font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6; color: #6B6B6B; margin: 0 0 32px 0; }
-body.pi-acct .pi-acct-root :is(.block_inner, #component_mainc, .main_content, .text_block, [class^="col-"], [class*=" col-"], [class^="row-"], [class*=" row-"]):not(:has(.thumbs_wall)):not(.thumbs_wall):not(.thumbs_wall *):not(.pi-acct-contents) { display: block !important; float: none !important; width: 100% !important; max-width: none !important; margin-left: 0 !important; margin-right: 0 !important; padding-left: 0 !important; padding-right: 0 !important; }
-body.pi-acct .pi-acct-root .pi-acct-contents { display: contents !important; }
-body.pi-acct .pi-acct-root .pi-acct-headrow { display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 16px; margin: 32px 0 24px 0 !important; padding: 0 0 12px 0 !important; }
-body.pi-acct .pi-acct-root .pi-acct-headrow > :is(h1, h2, h3, h4) { margin: 0 !important; }
-body.pi-acct .pi-acct-root .pi-acct-headrow .pi-acct-qbtn { margin: 0 !important; }
-body.pi-acct .pi-acct-root :is(h1, h2, h3, h4):not(.pi-acct-title):not(.thumbs_wall *) { font-family: 'Inter', sans-serif !important; font-size: 11px !important; font-weight: 500 !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; margin: 32px 0 16px 0 !important; }
-
-/* Pola Formularzy */
-body.pi-acct .pi-acct-root :is(input[type="text"], input[type="email"], input[type="password"], input[type="tel"], input[type="search"]):not(.thumbs_wall *) { width: 100% !important; height: 52px !important; box-sizing: border-box !important; border: 1px solid #D9D9D6 !important; padding: 0 18px !important; margin: 0 0 20px 0 !important; background: #FFFFFF !important; outline: none !important; box-shadow: none !important; border-radius: var(--pi-r-md, 16px) !important; font-family: 'Inter', sans-serif !important; font-size: 15px !important; font-weight: 400 !important; color: #111111 !important; transition: border-color 0.15s ease !important; }
-body.pi-acct .pi-acct-root :is(input[type="text"], input[type="email"], input[type="password"], input[type="tel"], input[type="search"]):focus { border-color: #111111 !important; }
-body.pi-acct .pi-acct-root select, html body.pi-acct main#block_main.pi-acct-root form.saved_lightboxes select#lightbox_id { -webkit-appearance: none !important; appearance: none !important; width: 100% !important; height: 52px !important; box-sizing: border-box !important; border: 1px solid #D9D9D6 !important; border-radius: var(--pi-r-md, 16px) !important; padding: 0 44px 0 18px !important; margin: 0 0 20px 0 !important; box-shadow: none !important; outline: none !important; font-family: 'Inter', sans-serif !important; font-size: 15px !important; color: #111111 !important; background: #FFFFFF url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23111' stroke-width='1.3'/%3E%3C/svg%3E") right 18px center / 12px 8px no-repeat !important; }
-body.pi-acct .pi-acct-root select:focus, html body.pi-acct main#block_main.pi-acct-root form.saved_lightboxes select#lightbox_id:focus { border-color: #111111 !important; }
-body.pi-acct .pi-acct-root textarea { width: 100% !important; box-sizing: border-box !important; min-height: 96px; resize: vertical; border: 1px solid #D9D9D6 !important; border-radius: var(--pi-r-md, 16px) !important; padding: 14px 18px !important; margin: 0 0 20px 0 !important; background: #FFFFFF !important; outline: none !important; box-shadow: none !important; font-family: 'Inter', sans-serif !important; font-size: 14px !important; line-height: 1.5 !important; color: #111111 !important; }
-body.pi-acct .pi-acct-root textarea:focus { border-color: #111111 !important; }
-body.pi-acct .pi-acct-root label:not(.thumbs_wall *) { display: block !important; font-family: 'Inter', sans-serif !important; font-size: 11px !important; font-weight: 500 !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; margin: 0 0 4px 0 !important; padding: 0 !important; border: none !important; }
-body.pi-acct .pi-acct-root :is(small, [class*="hint"], [class*="help"]):not(.thumbs_wall *) { display: block; font-size: 12px !important; line-height: 1.5 !important; color: #6B6B6B !important; text-transform: none !important; letter-spacing: 0 !important; margin: 0 0 6px 0 !important; }
-body.pi-acct .pi-acct-root .pi-acct-note { font-size: 12px !important; color: #6B6B6B !important; }
-body.pi-acct .pi-acct-root :has(> input[type="checkbox"]):not(.thumbs_wall *) { display: flex !important; align-items: flex-start !important; gap: 10px !important; margin: 0 0 20px 0 !important; }
-body.pi-acct .pi-acct-root input[type="checkbox"]:not(.thumbs_wall *) { -webkit-appearance: none !important; appearance: none !important; display: inline-block !important; flex-shrink: 0 !important; width: 16px !important; height: 16px !important; margin: 2px 0 0 0 !important; padding: 0 !important; border: 1px solid #111111 !important; border-radius: var(--pi-r-xs, 5px) !important; background: #FFFFFF center / 12px no-repeat !important; cursor: pointer !important; opacity: 1 !important; visibility: visible !important; position: static !important; clip: auto !important; float: none !important; }
-body.pi-acct .pi-acct-root :is(input[type="checkbox"] + label, label:has(input[type="checkbox"]))::before, body.pi-acct .pi-acct-root :is(input[type="checkbox"] + label, label:has(input[type="checkbox"]))::after { content: none !important; display: none !important; }
-body.pi-acct .pi-acct-root input[type="checkbox"]:not(.thumbs_wall *):checked { background-color: #111111 !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E") !important; }
-body.pi-acct .pi-acct-root :is(input[type="checkbox"] + label, label:has(input[type="checkbox"])):not(.thumbs_wall *) { font-size: 12px !important; font-weight: 400 !important; letter-spacing: 0 !important; text-transform: none !important; line-height: 1.5 !important; margin: 0 !important; cursor: pointer !important; text-indent: 0 !important; }
-body.pi-acct .pi-acct-root input:-webkit-autofill { transition: background-color 600000s ease-in-out 0s !important; -webkit-text-fill-color: #111111 !important; caret-color: #111111; }
-html body.pi-acct main#block_main.pi-acct-root input#lightbox_title { width: 100% !important; height: 52px !important; box-sizing: border-box !important; border: 1px solid #D9D9D6 !important; border-radius: var(--pi-r-md, 16px) !important; padding: 0 18px !important; margin: 0 0 20px 0 !important; background: #FFFFFF !important; box-shadow: none !important; outline: none !important; font-family: 'Inter', sans-serif !important; font-size: 15px !important; color: #111111 !important; }
-html body.pi-acct main#block_main.pi-acct-root input#lightbox_title:focus { border-color: #111111 !important; }
-html body.pi-acct .pi-acct-root .item_presentation .item_description { flex: 1 1 0 !important; min-width: 0 !important; }
-html body.pi-acct .pi-acct-root .item_description textarea { min-height: 72px !important; height: 72px !important; }
-
-/* Przyciski */
-body.pi-acct .pi-acct-root .pi-acct-btn, body.pi-acct .pi-acct-root form:has(input[type="text"], input[type="email"], input[type="password"], input[type="tel"], select, textarea) :is(input[type="submit"], button[type="submit"]):not(.icon):not(.pi-acct-qbtn) { display: block !important; width: 100% !important; height: 48px !important; margin: 8px 0 16px 0 !important; padding: 0 !important; background: #111111 !important; color: #FFFFFF !important; border: 1px solid #111111 !important; border-radius: var(--pi-r-pill, 999px) !important; box-shadow: none !important; font-family: 'Inter', sans-serif !important; font-size: 11px !important; font-weight: 500 !important; letter-spacing: 0.14em !important; text-transform: uppercase !important; text-align: center !important; text-decoration: none !important; line-height: 46px !important; cursor: pointer !important; -webkit-appearance: none !important; transition: background 0.15s ease, color 0.15s ease !important; }
-body.pi-acct .pi-acct-root .pi-acct-btn:hover, body.pi-acct .pi-acct-root form:has(input[type="text"], input[type="email"], input[type="password"], input[type="tel"], select, textarea) :is(input[type="submit"], button[type="submit"]):not(.icon):not(.pi-acct-qbtn):hover { background: #FFFFFF !important; color: #111111 !important; }
-body.pi-acct .pi-acct-root .pi-acct-qbtn { display: inline-flex !important; align-items: center !important; width: auto !important; height: 32px !important; margin: 0 20px 0 0 !important; padding: 0 !important; background: transparent !important; color: #111111 !important; border: none !important; border-bottom: 1px solid transparent !important; border-radius: 0 !important; box-shadow: none !important; font-family: 'Inter', sans-serif !important; font-size: 11px !important; font-weight: 500 !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; text-decoration: none !important; cursor: pointer !important; -webkit-appearance: none !important; }
-body.pi-acct .pi-acct-root .pi-acct-qbtn:hover { border-bottom-color: #111111 !important; background: transparent !important; color: #111111 !important; }
-body.pi-acct .pi-acct-root form.button_to { display: inline-block; margin: 0; }
-body.pi-acct .pi-acct-root form:not(.button_to) a:not(.pi-acct-btn):not(.pi-acct-qbtn) { font-size: 12px !important; font-weight: 400 !important; letter-spacing: 0.02em !important; text-transform: none !important; color: #6B6B6B !important; text-decoration: underline !important; text-underline-offset: 3px !important; }
-body.pi-acct .pi-acct-root form:not(.button_to) a:not(.pi-acct-btn):not(.pi-acct-qbtn):hover { color: #111111 !important; }
-html body.pi-acct main#block_main.pi-acct-root h2 form.button_to input.submit_small.pi-acct-qbtn { border-radius: var(--pi-r-pill, 999px) !important; padding-left: 18px !important; padding-right: 18px !important; }
-html body.pi-acct main#block_main.pi-acct-root #main_content :is(.pi-acct-qbtn, a[href*="share" i], [id*="share" i]:is(a, input, button), [class*="share" i]:is(a, input, button)), html body.pi-acct main#block_main.pi-acct-root #main_content :is(.pi-acct-qbtn, a[href*="share" i], [id*="share" i]:is(a, input, button), [class*="share" i]:is(a, input, button)):is(:hover, :focus, :active, :focus-visible) { display: inline-flex !important; align-items: center !important; width: auto !important; height: 32px !important; margin: 0 20px 0 0 !important; padding: 0 !important; background: transparent !important; color: #111111 !important; -webkit-text-fill-color: #111111 !important; border: none !important; border-bottom: 1px solid transparent !important; border-radius: 0 !important; box-shadow: none !important; outline: none !important; font: 500 11px/1 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; text-decoration: none !important; cursor: pointer !important; -webkit-appearance: none !important; }
-html body.pi-acct main#block_main.pi-acct-root #main_content :is(.pi-acct-qbtn, a[href*="share" i], [id*="share" i]:is(a, input, button), [class*="share" i]:is(a, input, button)):is(:hover, :focus-visible) { border-bottom-color: #111111 !important; }
-
-/* Grid Konto */
-body.pi-acct .pi-acct-root .pi-acct-grid { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(176px, 200px)); justify-content: start; gap: 32px 16px; align-items: start; }
-body.pi-acct .pi-acct-root .pi-acct-grid > .pi-acct-span { grid-column: 1 / -1; margin: 0 !important; }
-body.pi-acct .pi-acct-root .pi-acct-item { display: block !important; width: auto !important; margin: 0 !important; padding: 0 !important; text-align: left !important; }
-body.pi-acct .pi-acct-root .pi-acct-item img, body.pi-acct .pi-acct-root img.pi-acct-cover { display: block !important; width: 100% !important; height: auto !important; aspect-ratio: auto !important; object-fit: contain !important; margin: 0 0 10px 0 !important; max-width: none !important; background: #ECECEA; border-radius: var(--pi-r-md, 16px) !important; }
-body.pi-acct .pi-acct-root .pi-acct-item a { display: block !important; text-align: left !important; }
-body.pi-acct .pi-acct-root .pi-acct-item a:not(:has(img)) { font-family: 'Inter', sans-serif !important; font-size: 12px !important; font-weight: 500 !important; line-height: 1.3 !important; letter-spacing: 0 !important; text-transform: none !important; color: #111111 !important; text-decoration: none !important; padding: 0 !important; }
-body.pi-acct .pi-acct-root .pi-acct-item a:not(:has(img)):hover { text-decoration: underline !important; text-underline-offset: 3px; }
-body.pi-acct .pi-acct-root .pi-acct-fields { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; align-items: start; max-width: none; margin-top: 32px !important; margin-bottom: 32px !important; }
-body.pi-acct .pi-acct-root .pi-acct-fields > * { min-width: 0; margin-left: 0 !important; }
-body.pi-acct .pi-acct-root .pi-acct-fields > .pi-acct-span { grid-column: 1 / -1; }
-body.pi-acct .pi-acct-root .pi-acct-fieldgroup { max-width: 520px; }
-
-/* Miniatury w selekcji */
-html body.pi-acct main#block_main.pi-acct-root #lightboxes .thumb, html body.pi-acct main#block_main.pi-acct-root #lightboxes_shared .thumb { display: block !important; width: fit-content !important; height: auto !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; border: 0 !important; background: none !important; border-radius: var(--pi-r-sm, 10px) !important; overflow: hidden !important; }
-html body.pi-acct main#block_main.pi-acct-root #lightboxes .media_wrap, html body.pi-acct main#block_main.pi-acct-root #lightboxes_shared .media_wrap { position: static !important; display: block !important; width: auto !important; height: auto !important; padding: 0 !important; background: transparent !important; border-radius: var(--pi-r-sm, 10px) !important; overflow: hidden !important; }
-html body.pi-acct main#block_main.pi-acct-root #lightboxes img.pi-acct-cover, html body.pi-acct main#block_main.pi-acct-root #lightboxes_shared img.pi-acct-cover { position: static !important; display: block !important; width: auto !important; height: auto !important; min-width: 0 !important; min-height: 0 !important; max-width: var(--pi-thumb, 176px) !important; max-height: var(--pi-thumb, 176px) !important; object-fit: contain !important; border-radius: var(--pi-r-sm, 10px) !important; margin: 0 !important; background: none !important; }
-html body.pi-acct main#block_main.pi-acct-root #lightboxes .gallery, html body.pi-acct main#block_main.pi-acct-root #lightboxes_shared .gallery { text-align: left !important; }
-html body.pi-acct main#block_main.pi-acct-root #lightboxes .gallery_meta, html body.pi-acct main#block_main.pi-acct-root #lightboxes_shared .gallery_meta { text-align: left !important; margin: 10px 0 0 !important; padding: 0 !important; }
-html body.pi-acct main#block_main.pi-acct-root #lightboxes h2.gallery_title, html body.pi-acct main#block_main.pi-acct-root #lightboxes_shared h2.gallery_title { text-align: left !important; margin: 0 !important; padding: 0 !important; }
-html body.pi-acct[data-pi-acct="selection"] main#block_main.pi-acct-root #main_content .thumbs_wall { display: grid !important; grid-template-columns: repeat(auto-fill, var(--pi-thumb, 176px)) !important; justify-content: start !important; gap: 28px 20px !important; align-items: start !important; height: auto !important; position: static !important; }
-html body.pi-acct[data-pi-acct="selection"] main#block_main.pi-acct-root #main_content .thumbs_wall > .media { position: static !important; transform: none !important; width: auto !important; height: auto !important; margin: 0 !important; padding: 0 !important; float: none !important; }
-html body.pi-acct[data-pi-acct="selection"] main#block_main.pi-acct-root #main_content .thumbs_wall > .media .thumb { position: relative !important; display: block !important; width: fit-content !important; height: auto !important; padding: 0 !important; margin: 0 !important; border-radius: var(--pi-r-sm, 10px) !important; overflow: hidden !important; background: none !important; }
-html body.pi-acct[data-pi-acct="selection"] main#block_main.pi-acct-root #main_content .thumbs_wall > .media .thumb img { display: block !important; width: auto !important; height: auto !important; max-width: var(--pi-thumb, 176px) !important; max-height: var(--pi-thumb, 176px) !important; object-fit: contain !important; border-radius: var(--pi-r-sm, 10px) !important; margin: 0 !important; }
-html body.pi-acct[data-pi-acct="selection"] main#block_main.pi-acct-root #main_content .thumbs_wall > .media .thumb_meta { width: var(--pi-thumb, 176px) !important; height: auto !important; padding: 10px 0 0 !important; margin: 0 !important; text-align: left !important; border: 0 !important; }
-html body.pi-acct[data-pi-acct="selection"] main#block_main.pi-acct-root .thumbs_wall .thumb_links input.icon { width: 28px !important; height: 28px !important; min-width: 0 !important; padding: 0 !important; margin: 0 !important; border: 0 !important; border-radius: 50% !important; box-shadow: none !important; opacity: 1 !important; background-color: rgba(17, 17, 17, 0.6) !important; background-position: center !important; background-repeat: no-repeat !important; background-size: 14px 14px !important; }
-html body.pi-acct[data-pi-acct="selection"] main#block_main.pi-acct-root .thumbs_wall .thumb_links input.icon.lightbox_icon { background-color: #FFFFFF !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='1.8' stroke-linecap='round'%3E%3Cpath d='M12 5v14M5 12h14'/%3E%3C/svg%3E") !important; }
-html body.pi-acct[data-pi-acct="selection"] main#block_main.pi-acct-root .thumbs_wall .thumb_links input.icon.lightbox_inv_icon { background-color: #111111 !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12l5 5L20 6'/%3E%3C/svg%3E") !important; }
-html body.pi-acct[data-pi-acct="selection"] main#block_main.pi-acct-root #main_content .thumbs_wall .media_wrap { background: transparent !important; border-radius: var(--pi-r-sm, 10px) !important; }
-
-/* Mobile (Konto) */
-@media (max-width: 720px) {
-  body.pi-acct .pi-acct-root { padding-left: 16px !important; padding-right: 16px !important; }
-  .pi-acct-head { flex-wrap: wrap; align-items: flex-start; gap: 0 16px; min-height: 0; margin-top: 8px; }
-  .pi-acct-tabs { gap: 20px; }
-  body.pi-acct .pi-acct-root .pi-acct-fields { grid-template-columns: 1fr; }
-  body.pi-acct .pi-acct-root .pi-acct-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 10px; }
-  body.pi-acct .pi-acct-root :is(input[type="text"], input[type="email"], input[type="password"], input[type="tel"], select) { font-size: 16px !important; }
-}
-@media (max-width: 560px) {
-  html body.pi-acct[data-pi-acct="selection"] main#block_main.pi-acct-root #main_content .thumbs_wall { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 24px 12px !important; }
-  html body.pi-acct[data-pi-acct="selection"] main#block_main.pi-acct-root #main_content .thumbs_wall > .media .thumb img { max-width: 100% !important; }
-  html body.pi-acct[data-pi-acct="selection"] main#block_main.pi-acct-root #main_content .thumbs_wall > .media .thumb_meta { width: auto !important; }
-  body.pi-acct .pi-acct-root .pi-acct-qbtn { margin-right: 12px !important; }
-}
-
-/* ==========================================================================
-   4. SKLEP, KOSZYK, KASA, ZAMÓWIENIA
-   ========================================================================== */
-
-html body[data-pi-shop] #main_content { font-family: Inter, sans-serif !important; font-size: 13px !important; line-height: 1.6 !important; color: #111111 !important; width: 100% !important; max-width: var(--pi-shop-w) !important; margin-left: auto !important; margin-right: auto !important; float: none !important; padding-left: 24px !important; padding-right: 24px !important; box-sizing: border-box !important; }
-html body[data-pi-shop] #main_content :is(p, .text_block, .elem) { text-align: left !important; text-align-last: left !important; hyphens: none !important; }
-html body[data-pi-shop] #main_content :is(h1, h2, h3, h4) { font-family: Inter, sans-serif !important; font-weight: 500 !important; letter-spacing: 0.02em !important; color: #111111 !important; }
-html body[data-pi-shop] #main_content *:not(input):not(select):not(textarea):not(button):not(.button):not(.btn) { border-color: #DADADA !important; }
-html body[data-pi-shop] #main_content a:not(.button):not(.btn) { color: #111111 !important; text-decoration: underline !important; text-underline-offset: 3px !important; }
-html body[data-pi-shop] #main_content a:not(.button):not(.btn):hover { color: #6B6B6B !important; }
-html body[data-pi-shop] #main_content img { border-radius: var(--pi-r-sm, 10px) !important; }
-html body[data-pi-shop] #main_content :is(input[type="text"], input[type="email"], input[type="tel"], input[type="password"], input[type="number"], select, textarea) { height: 52px !important; box-sizing: border-box !important; padding: 0 18px !important; background: #FFFFFF !important; border: 1px solid #D9D9D6 !important; border-radius: var(--pi-r-md, 16px) !important; box-shadow: none !important; outline: none !important; font: 400 14px/1.4 Inter, sans-serif !important; color: #111111 !important; }
-html body[data-pi-shop] #main_content textarea { height: auto !important; min-height: 96px !important; padding: 14px 18px !important; }
-html body[data-pi-shop] #main_content :is(input[type="text"], input[type="email"], input[type="tel"], input[type="password"], input[type="number"], select, textarea):focus { border-color: #111111 !important; }
-html body[data-pi-shop] #main_content input[type="checkbox"] { accent-color: #111111; border-radius: var(--pi-r-xs, 5px); }
-html body[data-pi-shop] #main_content label { font: 500 12px/1.5 Inter, sans-serif !important; color: #111111 !important; }
-html body[data-pi-shop] #main_content > [class*="row-"] { display: block !important; }
-html body[data-pi-shop] #main_content > :is([class^="col-"], [class*=" col-"], [class^="row-"], [class*=" row-"], .block_inner, .text_block, .elem), html body[data-pi-shop] #main_content > * > :is([class^="col-"], [class*=" col-"], [class^="row-"], [class*=" row-"], .block_inner, .text_block, .elem), html body[data-pi-shop] #main_content > * > * > :is(.text_block, .elem) { float: none !important; width: 100% !important; max-width: none !important; margin-left: 0 !important; margin-right: 0 !important; padding-left: 0 !important; padding-right: 0 !important; box-sizing: border-box !important; }
-html body[data-pi-shop] #main_content img.pi-cart-thumb { display: block !important; width: auto !important; height: auto !important; max-width: 200px !important; max-height: 200px !important; object-fit: contain !important; border-radius: var(--pi-r-sm, 10px) !important; }
-html body:is([data-pi-shop="payment"], [data-pi-shop="notify"]) #main_content :is(div, form, section, article) { width: 100% !important; max-width: none !important; float: none !important; margin-left: 0 !important; margin-right: 0 !important; padding-left: 0 !important; padding-right: 0 !important; box-sizing: border-box !important; }
-html body[data-pi-shop="cart"] #main_content :is(td, th):last-child { padding-right: 0 !important; text-align: right !important; }
-html body[data-pi-shop="cart"] #main_content :has(> input[type="checkbox"]) { margin-left: 0 !important; padding-left: 0 !important; }
-html body[data-pi-shop] .user-bar-greeting { padding-bottom: 20px !important; }
-html body:is([data-pi-shop="payment"], [data-pi-shop="notify"]) #main_content { padding-left: 0 !important; padding-right: 0 !important; }
-html body[data-pi-shop="notify"] #main_content::before { content: ""; display: block; height: 24px; }
-html body[data-pi-shop="cart"] #main_content .pi-amt { display: block !important; text-align: right !important; padding-right: 0 !important; margin-right: 0 !important; }
-html body[data-pi-shop="cart"] #main_content .pi-terms-fix { margin-left: 0 !important; padding-left: 0 !important; }
-.pi-empty-link { display: inline-block; margin-top: 14px; font: 400 12px/1.4 Inter, sans-serif; color: #111111 !important; text-decoration: underline !important; text-underline-offset: 3px; }
-.pi-empty-link:hover { color: #6B6B6B !important; }
-
-/* ==========================================================================
-   5. WSPÓLNE LISTY TRANSAKCYJNE (WYCENA I ZAMÓWIENIA)
-   ========================================================================== */
-
-#ws_page.page-quotation ul.order_or_cart_items, #ws_page.page-order ul.order_or_cart_items, #ws_page.page-cart ul.order_or_cart_items { display: flex !important; flex-direction: column !important; width: 100% !important; list-style: none !important; padding: 0 !important; margin: 32px 0 48px 0 !important; gap: 0 !important; }
-#ws_page.page-quotation li.ooc_item, #ws_page.page-order li.ooc_item, #ws_page.page-cart li.ooc_item { display: flex !important; flex-wrap: wrap !important; justify-content: space-between !important; align-items: flex-start !important; padding: 24px 0 !important; border-top: 1px solid #DADADA !important; gap: 16px !important; width: 100% !important; box-sizing: border-box !important; }
-#ws_page.page-quotation li.ooc_item { border-bottom: 1px solid #DADADA !important; }
-.item_presentation { display: flex !important; gap: 24px !important; flex: 1 1 auto !important; min-width: 240px !important; }
-.item_thumbnail { flex: 0 0 100px !important; width: 100px !important; }
-.item_description { flex: 1 1 auto !important; min-width: 0 !important; font-size: 12px !important; line-height: 1.6 !important; color: #6F6F6F !important; }
-#ws_page.page-order ul.totals li.ooc_item { border-top: none !important; border-bottom: 1px solid #DADADA !important; padding: 16px 0 !important; }
-#ws_page.page-order ul.totals li.ooc_item.grand_total { border-bottom: 2px solid #111111 !important; }
-#ws_page.page-order .item_quantity_and_actions { flex: 0 0 40px !important; text-align: right !important; }
-#ws_page.page-order .item_price_and_taxes { flex: 0 0 100px !important; text-align: right !important; }
-#ws_page.page-order .item_price_and_taxes .currency { font-weight: 500 !important; color: #111111 !important; }
-#ws_page.page-order .text_block > br { display: none !important; }
-#ws_page.page-quotation form.quotation_form > p { margin-bottom: 24px !important; }
-#ws_page.page-quotation form.quotation_form label { display: block !important; margin-bottom: 8px !important; }
-
-/* ==========================================================================
-   6. LIGHTBOX (KARTA SELEKCJI - WIDOK 640px)
-   ========================================================================== */
-
-#ws_page.page-lightbox .main_content, #ws_page.page-quotation .main_content { max-width: 640px !important; margin: 0 auto !important; float: none !important; width: 100% !important; }
-#ws_page.page-lightbox .page_meta { margin-top: 48px !important; justify-content: center !important; flex-wrap: wrap !important; }
-#ws_page.page-lightbox .page_actions { justify-content: center !important; width: 100% !important; gap: 12px !important; }
-#ws_page.page-lightbox .main_content > .elem:has(> .user-bar-greeting) { justify-content: center !important; margin-bottom: 32px !important; }
-#ws_page.page-lightbox .lightbox_meta { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 24px !important; margin-bottom: 32px !important; }
-#ws_page.page-lightbox .lightbox_meta form { flex: auto !important; margin: 0 !important; width: 100% !important; }
-#ws_page.page-lightbox .lightbox_meta form label { display: block !important; margin-bottom: 8px !important; }
-#ws_page.page-lightbox .lightbox_meta:has(.short_message) { display: flex !important; flex-direction: column !important; align-items: center !important; gap: 32px !important; }
-#ws_page.page-lightbox .lightbox_meta:has(.short_message) form { max-width: 320px !important; }
-#ws_page.page-lightbox .lightbox_meta .short_message { grid-column: 1 / -1 !important; margin: 16px 0 !important; }
-#ws_page.page-lightbox .thumbs_wall { justify-content: center !important; gap: 32px 20px !important; }
-
-/* ==========================================================================
-   7. GLOBALNE PRZYCISKI I PIGUŁKI
-   ========================================================================== */
-
-#ws_page.page-client_home .galleries .thumb, #ws_page.page-client_home #inline_subscription { border-radius: var(--pi-r-md, 16px) !important; }
-#ws_page.page-client_home .order_meta .tag, #ws_page.page-client_home .order_actions a.submit_small, #ws_page.page-client_home #inline_subscription input.submit,
-#ws_page.page-lightbox input.submit_small, #ws_page.page-lightbox .lightbox_meta form.save_lightbox input.submit, #ws_page.page-lightbox a.ajaxable.request_quotation_link, #ws_page.page-lightbox .lightbox_meta > p > a.back,
-#ws_page.page-quotation input.submit, #ws_page.page-order a.button.forward,
-html body[data-pi-shop] #main_content :is(input[type="submit"], input[type="button"], button, a.button, a.btn, .button, .btn) { border-radius: var(--pi-r-pill, 999px) !important; }
-
-html body[data-pi-shop] #main_content :is(input[type="submit"], input[type="button"], button, a.button, a.btn, .button, .btn) { height: 44px !important; min-height: 44px !important; padding: 0 24px !important; box-sizing: border-box !important; background: #111111 !important; color: #FFFFFF !important; border: 1px solid #111111 !important; font: 500 11px/1 Inter, sans-serif !important; letter-spacing: 0.14em !important; text-transform: uppercase !important; text-decoration: none !important; cursor: pointer !important; -webkit-appearance: none !important; transition: background 0.15s ease, color 0.15s ease !important; }
-html body[data-pi-shop] #main_content :is(a.button, a.btn, .button, .btn):not(input):not(button) { display: inline-flex !important; align-items: center !important; justify-content: center !important; }
-html body[data-pi-shop] #main_content :is(input[type="submit"], input[type="button"], button, a.button, a.btn, .button, .btn):hover { background: #FFFFFF !important; color: #111111 !important; }
-html body[data-pi-shop] #main_content :is(a, input, button)[class*="button" i], html body[data-pi-shop] #main_content :is(a, input, button)[class*="btn" i] { border-radius: var(--pi-r-pill, 999px) !important; }
-
-/* Pełna szerokość głównych przycisków CTA na listach */
-#ws_page.page-lightbox a.ajaxable.request_quotation_link, #ws_page.page-lightbox .lightbox_meta > p > a.back, #ws_page.page-quotation input.submit, #ws_page.page-order a.button.forward { width: 100% !important; box-sizing: border-box !important; text-align: center !important; display: block !important; margin-bottom: 24px !important; height: 48px !important; line-height: 48px !important; }
-#ws_page.page-quotation a.ajaxable.back, #ws_page.page-order a.ajaxable.back { display: inline-block !important; font: 500 11px/1 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; text-decoration: underline !important; text-underline-offset: 3px !important; margin-top: 16px !important; text-align: center !important; width: 100% !important; }
-#ws_page.page-quotation a.ajaxable.back:hover, #ws_page.page-order a.ajaxable.back:hover { color: #6B6B6B !important; }
-
-/* ==========================================================================
-   8. FORMULARZ KONTAKTOWY (Natywny)
-   ========================================================================== */
-
-#ws_page.page-website_page-contact form label { display: block !important; font: 500 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; margin: 0 0 4px 0 !important; padding: 0 !important; border: none !important; }
-#ws_page.page-website_page-contact form :is(input[type="text"], input[type="email"], input[type="tel"]) { width: 100% !important; height: 52px !important; box-sizing: border-box !important; border: 1px solid #D9D9D6 !important; border-radius: var(--pi-r-md) !important; padding: 0 18px !important; margin: 0 0 20px 0 !important; background: #FFFFFF !important; box-shadow: none !important; outline: none !important; font: 400 15px/1.4 Inter, sans-serif !important; color: #111111 !important; }
-#ws_page.page-website_page-contact form textarea { width: 100% !important; box-sizing: border-box !important; min-height: 96px; resize: vertical; border: 1px solid #D9D9D6 !important; border-radius: var(--pi-r-md) !important; padding: 14px 18px !important; margin: 0 0 20px 0 !important; background: #FFFFFF !important; box-shadow: none !important; outline: none !important; font: 400 14px/1.5 Inter, sans-serif !important; color: #111111 !important; }
-#ws_page.page-website_page-contact form :is(input[type="text"], input[type="email"], input[type="tel"], textarea):focus { border-color: #111111 !important; }
-#ws_page.page-website_page-contact form input[type="checkbox"] { -webkit-appearance: none !important; appearance: none !important; display: inline-block !important; flex-shrink: 0 !important; width: 16px !important; height: 16px !important; margin: 2px 10px 0 0 !important; padding: 0 !important; border: 1px solid #111111 !important; border-radius: var(--pi-r-xs) !important; background: #FFFFFF center / 12px no-repeat !important; cursor: pointer !important; vertical-align: top !important; }
-#ws_page.page-website_page-contact form input[type="checkbox"]:checked { background-color: #111111 !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E") !important; }
-#ws_page.page-website_page-contact form :is(input[type="checkbox"] + label, label:has(input[type="checkbox"])) { display: inline !important; font: 400 12px/1.5 Inter, sans-serif !important; letter-spacing: 0 !important; text-transform: none !important; margin: 0 !important; cursor: pointer !important; }
-#ws_page.page-website_page-contact form :is(input[type="submit"], button[type="submit"]) { display: block !important; width: 100% !important; height: 48px !important; margin: 8px 0 16px 0 !important; padding: 0 !important; background: #111111 !important; color: #FFFFFF !important; border: 1px solid #111111 !important; border-radius: var(--pi-r-pill) !important; box-shadow: none !important; font: 500 11px/46px Inter, sans-serif !important; letter-spacing: 0.14em !important; text-transform: uppercase !important; text-align: center !important; cursor: pointer !important; -webkit-appearance: none !important; }
-#ws_page.page-website_page-contact form :is(input[type="submit"], button[type="submit"]):hover { background: #FFFFFF !important; color: #111111 !important; }
-/* ===== 8. POSZERZENIE GŁÓWNEGO KONTENERA DO 860px ===== */
-html body[data-pi-shop] {
-  --pi-shop-w: 860px !important;
-}
-
-body.pi-acct[data-pi-acct="selections"] .pi-acct-root,
-body.pi-acct[data-pi-acct="profile"] .pi-acct-root,
-body.pi-acct[data-pi-acct="form"] .pi-acct-root,
-body.pi-acct[data-pi-acct="selection"] .pi-acct-root,
-body.pi-acct .pi-acct-root .pi-acct-center,
-#ws_page.page-lightbox .main_content,
-#ws_page.page-quotation .main_content {
-  max-width: 860px !important;
-}
-/* ===== 2. STRONA ZDJĘCIA (MEDIA PAGE) - SZCZEGÓŁY ===== */
-/* Przypięty dolny pasek z akcjami (zamiast ukrytego formularza) */
-#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) {
-  display: block !important; position: fixed !important; bottom: 0 !important; right: 0 !important;
-  width: var(--pi-panel-width) !important; background: #FFFFFF !important;
-  padding: 20px 28px 24px 28px !important; border-top: 1px solid #E5E5E5 !important;
-  display: flex !important; flex-direction: column !important; gap: 12px !important;
-  z-index: 9999 !important; pointer-events: auto !important; box-sizing: border-box !important;
-}
-#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .page_meta { margin: 0 !important; }
-#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) form { margin: 0 !important; display: block !important; }
-#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) input.submit_small {
-  width: 100% !important; height: 44px !important; padding: 0 24px !important; margin: 0 !important;
-  border-radius: var(--pi-r-pill, 999px) !important; background: #111111 !important; color: #FFFFFF !important;
-  font: 500 10px/44px Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important;
-  border: none !important; cursor: pointer !important; transition: background 0.15s ease !important;
-}
-#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) input.submit_small:hover { background: #333333 !important; }
-#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) input.share_icon {
-  background: transparent !important; color: #111111 !important; border: none !important;
-  width: 100% !important; height: 20px !important; padding: 0 !important; box-shadow: none !important;
-  background-position: center !important; background-repeat: no-repeat !important; line-height: 20px !important;
-}
-#ws_page.page-media #main_content .row-12 > .col-4:has(.media_detail_meta_wrapper) { padding-bottom: 120px !important; }
-@media (max-width: 900px) { #ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) { width: 100% !important; border-top: 1px solid #111111 !important; padding: 16px !important; } }
-
-/* Metadane w panelu bocznym */
-#ws_page.page-media .media_detail_meta_wrapper { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 0 !important; align-items: baseline !important; }
-#ws_page.page-media .media_detail_meta_wrapper > * { grid-column: 1 / -1 !important; }
-#ws_page.page-media .media_friendly_id { grid-column: 1 / 2 !important; grid-row: 1 !important; font: 500 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; }
-#ws_page.page-media .media_location { grid-column: 2 / 3 !important; grid-row: 1 !important; text-align: right !important; font: 500 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; }
-#ws_page.page-media .media_detail_meta_wrapper h1 { grid-row: 2 !important; margin: 24px 0 12px 0 !important; font: 600 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; }
-#ws_page.page-media .media_description { grid-row: 3 !important; margin: 0 0 32px 0 !important; font: 400 12px/1.6 Inter, sans-serif !important; color: #111111 !important; }
-#ws_page.page-media .media_detail_meta_wrapper > div:is(.media_creation_date, .media_author, .media_copyright, .media_size) { display: flex !important; flex-wrap: wrap !important; justify-content: space-between !important; padding: 6px 0 !important; font: 400 11px/1.5 Inter, sans-serif !important; color: #6F6F6F !important; border: none !important; }
-#ws_page.page-media .media_detail_meta_wrapper > div b { font-weight: 400 !important; color: #111111 !important; text-align: right !important; }
-#ws_page.page-media .media_creation_date { border-top: 1px solid #E5E5E5 !important; padding-top: 16px !important; margin-top: 0 !important; }
-#ws_page.page-media .media_creation_date::before { content: "1. ARCHIVAL & TECHNICAL DATA"; flex: 0 0 100% !important; font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; margin: 0 0 16px 0 !important; }
-#ws_page.page-media .media_detail_keywords { font-size: 0 !important; border-top: 1px solid #E5E5E5 !important; padding-top: 16px !important; margin-top: 24px !important; border-bottom: none !important; }
-#ws_page.page-media .media_detail_keywords::before { content: "3. TAXONOMY & KEYWORDS"; display: block !important; font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; margin: 0 0 16px 0 !important; }
-#ws_page.page-media .media_detail_keywords b { display: flex !important; flex-wrap: wrap !important; gap: 6px !important; font-weight: 400 !important; }
-#ws_page.page-media .media_detail_keywords b a { font: 500 9px/1 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important; background: #F4F4F4 !important; padding: 6px 12px !important; border-radius: var(--pi-r-pill, 999px) !important; text-decoration: none !important; transition: background 0.15s ease !important; }
-#ws_page.page-media .media_detail_keywords b a:hover { background: #E5E5E5 !important; }
-#ws_page.page-media .col-4 .elem[data-type="raw"] > div { border-top: 1px solid #E5E5E5 !important; padding-top: 16px !important; margin-top: 32px !important; }
+#ws_page.page-media .col-4 .elem[data-type="raw"] { order: 10 !important; }
+#ws_page.page-media .col-4 .elem[data-type="raw"] > div { border-top: none !important; padding-top: 24px !important; margin-top: 0 !important; }
 #ws_page.page-media .col-4 .elem[data-type="raw"] p:first-child { font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; margin-bottom: 16px !important; }
 #ws_page.page-media .col-4 .elem[data-type="raw"] p { font: 400 11px/1.6 Inter, sans-serif !important; color: #6F6F6F !important; margin-bottom: 8px !important; }
 #ws_page.page-media .col-4 .elem[data-type="raw"] span { color: #111111 !important; }
 
-/* ===== 3. KONTO, SELEKCJA, ZAKUPY (ZUNIFIKOWANY UKŁAD ODPORNY NA AJAX) ===== */
-:root { --pi-shop-w: 860px; }
+/* Przycisk zamknięcia panelu */
+html body #main_content .pi-detail-close { position: absolute !important; top: 16px !important; right: 16px !important; z-index: 20 !important; }
+html body #main_content .pi-detail-x { position: absolute !important; top: 24px !important; right: 14px !important; width: 36px !important; height: 36px !important; border: 1px solid #111 !important; border-radius: 50% !important; background: #fff !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; z-index: 30 !important; }
+html body #main_content .pi-detail-x svg { width: 14px !important; height: 14px !important; fill: none !important; stroke: #111 !important; stroke-width: 1.6 !important; }
+html body #main_content .pi-detail-x:hover { background: #111 !important; }
+html body #main_content .pi-detail-x:hover svg { stroke: #fff !important; }
 
-/* Główny kontener 860px */
+/* Mobile (Media Page) */
+@media (max-width: 900px) {
+  #ws_page.page-media #main_content > .row-12:has(.media_detail_wrapper) { flex-direction: column !important; height: auto !important; min-height: auto !important; width: 100% !important; }
+  #ws_page.page-media #main_content .row-12 > .first.col-6:has(.media_detail_wrapper) { max-width: 100% !important; width: 100% !important; height: auto !important; padding: 16px 16px 20px 16px !important; }
+  .media_detail_wrapper img { max-height: 65vh !important; width: 100% !important; height: auto !important; }
+  #ws_page.page-media #main_content .row-12 > .col-4:has(.media_detail_meta_wrapper) { flex: 1 1 auto !important; width: 100% !important; max-width: 100% !important; border-left: none !important; border-top: 1px solid #000000 !important; height: auto !important; position: static !important; padding: 24px 18px 60px 18px !important; box-sizing: border-box !important; }
+}
+
+/* ==========================================================================
+   3. KONTO, SELEKCJA, ZAKUPY (ODPORNE NA NAWIGACJĘ AJAX)
+   ========================================================================== */
+
 :is(#ws_page.page-client_home, #ws_page.page-lightbox, #ws_page.page-quotation, #ws_page.page-cart, #ws_page.page-order, #ws_page.page-payment) .main_content {
   width: 100% !important; max-width: var(--pi-shop-w) !important; margin: 0 auto !important; float: none !important;
   padding: 0 24px !important; box-sizing: border-box !important; font-family: 'Inter', sans-serif !important; color: #111111 !important;
@@ -421,7 +237,7 @@ body.pi-acct .pi-acct-root .pi-acct-center,
   font-weight: 500 !important; color: #111111 !important;
 }
 
-/* Pigułki i zaokrąglenia (wymuszenie) */
+/* Pigułki i zaokrąglenia */
 :is(#ws_page.page-client_home, #ws_page.page-lightbox, #ws_page.page-quotation, #ws_page.page-cart, #ws_page.page-order, #ws_page.page-payment) :is(input[type="submit"], button, a.button, a.btn, .btn) {
   border-radius: var(--pi-r-pill, 999px) !important; text-align: center !important; text-decoration: none !important;
   font: 500 11px/1 Inter, sans-serif !important; letter-spacing: 0.14em !important; text-transform: uppercase !important;
@@ -436,16 +252,19 @@ body.pi-acct .pi-acct-root .pi-acct-center,
   border-radius: var(--pi-r-sm, 10px) !important;
 }
 
-/* Główne przyciski na całą szerokość */
-#ws_page.page-quotation input.submit, #ws_page.page-order a.button.forward, #ws_page.page-lightbox a.ajaxable.request_quotation_link {
-  width: 100% !important; margin: 24px 0 !important;
+/* Przyciski CTA pełnej szerokości */
+#ws_page.page-quotation input.submit,
+#ws_page.page-order a.button.forward,
+#ws_page.page-lightbox a.ajaxable.request_quotation_link {
+  width: 100% !important; margin: 24px 0 !important; height: 48px !important; line-height: 48px !important;
 }
 
 /* Ciche przyciski powrotu */
 :is(#ws_page.page-quotation, #ws_page.page-order, #ws_page.page-lightbox) a.ajaxable.back {
   display: block !important; width: 100% !important; text-align: center !important;
   font: 500 11px/1 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important;
-  color: #111111 !important; text-decoration: underline !important; text-underline-offset: 3px !important; margin-top: 16px !important; background: transparent !important; padding: 0 !important; border: none !important; height: auto !important;
+  color: #111111 !important; text-decoration: underline !important; text-underline-offset: 3px !important; margin-top: 16px !important;
+  background: transparent !important; padding: 0 !important; border: none !important; height: auto !important;
 }
 :is(#ws_page.page-quotation, #ws_page.page-order, #ws_page.page-lightbox) a.ajaxable.back:hover { color: #6B6B6B !important; }
 
@@ -456,11 +275,15 @@ body.pi-acct .pi-acct-root .pi-acct-center,
   font: 400 14px/1.4 Inter, sans-serif !important; color: #111111 !important;
 }
 :is(#ws_page.page-client_home, #ws_page.page-lightbox, #ws_page.page-quotation, #ws_page.page-cart, #ws_page.page-payment) :is(input[type="text"], input[type="email"], input[type="password"], input[type="tel"], select):not([multiple]) { height: 52px !important; }
-:is(#ws_page.page-client_home, #ws_page.page-lightbox, #ws_page.page-quotation, #ws_page.page-cart, #ws_page.page-payment) select { appearance: none !important; padding-right: 44px !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23111' stroke-width='1.3'/%3E%3C/svg%3E") !important; background-position: right 18px center !important; background-repeat: no-repeat !important; background-size: 12px 8px !important; }
+:is(#ws_page.page-client_home, #ws_page.page-lightbox, #ws_page.page-quotation, #ws_page.page-cart, #ws_page.page-payment) select {
+  appearance: none !important; padding-right: 44px !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23111' stroke-width='1.3'/%3E%3C/svg%3E") !important;
+  background-position: right 18px center !important; background-repeat: no-repeat !important; background-size: 12px 8px !important;
+}
 :is(#ws_page.page-client_home, #ws_page.page-lightbox, #ws_page.page-quotation, #ws_page.page-cart, #ws_page.page-payment) textarea { padding: 14px 18px !important; min-height: 96px !important; resize: vertical !important; }
 :is(#ws_page.page-client_home, #ws_page.page-lightbox, #ws_page.page-quotation, #ws_page.page-cart, #ws_page.page-payment) label { display: block !important; font: 500 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; margin: 0 0 8px 0 !important; }
 
-/* Wspólne listy (Koszyk, Wycena, Zamówienia) */
+/* Wspólne listy transakcyjne (Koszyk, Wycena, Zamówienia) */
 :is(#ws_page.page-quotation, #ws_page.page-order, #ws_page.page-cart) ul.order_or_cart_items { display: flex !important; flex-direction: column !important; width: 100% !important; list-style: none !important; padding: 0 !important; margin: 32px 0 48px 0 !important; gap: 0 !important; }
 :is(#ws_page.page-quotation, #ws_page.page-order, #ws_page.page-cart) li.ooc_item { display: flex !important; flex-wrap: wrap !important; justify-content: space-between !important; align-items: flex-start !important; padding: 24px 0 !important; border-top: 1px solid #DADADA !important; gap: 16px !important; width: 100% !important; box-sizing: border-box !important; }
 #ws_page.page-quotation li.ooc_item { border-bottom: 1px solid #DADADA !important; }
@@ -492,12 +315,16 @@ body.pi-acct .pi-acct-root .pi-acct-center,
 #ws_page.page-lightbox .thumbs_wall .thumb_links input.icon.lightbox_inv_icon { background-color: #111111 !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12l5 5L20 6'/%3E%3C/svg%3E") !important; }
 #ws_page.page-lightbox .thumbs_wall .thumb_meta { width: 100% !important; padding: 10px 0 0 !important; text-align: left !important; border: none !important; }
 
-/* Client Home (Siatka miniatur) */
+/* Client Home */
 #ws_page.page-client_home .galleries.thumbs_grid { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)) !important; gap: 32px 20px !important; }
 #ws_page.page-client_home .galleries .thumb img { width: 100% !important; height: auto !important; }
 #ws_page.page-client_home .gallery_meta h2 { font: 500 12px/1.3 Inter, sans-serif !important; letter-spacing: 0 !important; text-transform: none !important; margin-top: 10px !important; text-align: left !important; }
+#ws_page.page-client_home .order_meta .tag { border-radius: var(--pi-r-pill, 999px) !important; padding: 4px 12px !important; }
 
-/* ===== 4. FORMULARZ KONTAKTOWY (Natywny) ===== */
+/* ==========================================================================
+   4. FORMULARZ KONTAKTOWY (Natywny)
+   ========================================================================== */
+
 #ws_page.page-website_page-contact form label { display: block !important; font: 500 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; margin: 0 0 4px 0 !important; padding: 0 !important; border: none !important; }
 #ws_page.page-website_page-contact form :is(input[type="text"], input[type="email"], input[type="tel"]) { width: 100% !important; height: 52px !important; box-sizing: border-box !important; border: 1px solid #D9D9D6 !important; border-radius: var(--pi-r-md) !important; padding: 0 18px !important; margin: 0 0 20px 0 !important; background: #FFFFFF !important; box-shadow: none !important; outline: none !important; font: 400 15px/1.4 Inter, sans-serif !important; color: #111111 !important; }
 #ws_page.page-website_page-contact form textarea { width: 100% !important; box-sizing: border-box !important; min-height: 96px; resize: vertical; border: 1px solid #D9D9D6 !important; border-radius: var(--pi-r-md) !important; padding: 14px 18px !important; margin: 0 0 20px 0 !important; background: #FFFFFF !important; box-shadow: none !important; outline: none !important; font: 400 14px/1.5 Inter, sans-serif !important; color: #111111 !important; }
@@ -507,4 +334,3 @@ body.pi-acct .pi-acct-root .pi-acct-center,
 #ws_page.page-website_page-contact form :is(input[type="checkbox"] + label, label:has(input[type="checkbox"])) { display: inline !important; font: 400 12px/1.5 Inter, sans-serif !important; letter-spacing: 0 !important; text-transform: none !important; margin: 0 !important; cursor: pointer !important; }
 #ws_page.page-website_page-contact form :is(input[type="submit"], button[type="submit"]) { display: block !important; width: 100% !important; height: 48px !important; margin: 8px 0 16px 0 !important; padding: 0 !important; background: #111111 !important; color: #FFFFFF !important; border: 1px solid #111111 !important; border-radius: var(--pi-r-pill) !important; box-shadow: none !important; font: 500 11px/46px Inter, sans-serif !important; letter-spacing: 0.14em !important; text-transform: uppercase !important; text-align: center !important; cursor: pointer !important; -webkit-appearance: none !important; transition: background 0.15s ease, color 0.15s ease !important; }
 #ws_page.page-website_page-contact form :is(input[type="submit"], button[type="submit"]):hover { background: #FFFFFF !important; color: #111111 !important; }
-#ws_page.page-media main#block_main .main_content {
