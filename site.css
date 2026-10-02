@@ -64,7 +64,7 @@ html body #component_menu ul.component_menu_content li.menu_lightbox_item a span
 html body #component_menu span[class*="minicart" i] { padding-left: 8px !important; padding-right: 9px !important; align-items: center !important; }
 
 /* ==========================================================================
-   2. STRONA ZDJĘCIA (MEDIA PAGE) - NAPRAWIONA WERSJA DLA SILNIKA PHOTODECK
+   2. STRONA ZDJĘCIA (MEDIA PAGE) - DEFINITYWNY RESET I NADPISANIE CUSTOM/THEME
    ========================================================================== */
 
 #ws_page.page-media #block_main,
@@ -117,7 +117,7 @@ html body #component_menu span[class*="minicart" i] { padding-left: 8px !importa
   display: flex !important; flex-direction: column !important;
 }
 
-/* Wypłaszczenie kontenerów, aby umożliwić globalne sterowanie kolejnością sekcji 1, 2 i 3 */
+/* Wypłaszczenie kontenerów w flexie */
 #ws_page.page-media .col-4 .elem[data-type="media_metadata"] {
   display: contents !important;
 }
@@ -125,39 +125,41 @@ html body #component_menu span[class*="minicart" i] { padding-left: 8px !importa
   display: contents !important;
 }
 
-/* 1. Nagłówek: REF ID + Lokalizacja */
-#ws_page.page-media .media_friendly_id {
+/* 1. Górny pasek: REF ID + Lokalizacja */
+#ws_page.page-media .media_detail_meta_wrapper > div.media_friendly_id {
   order: 1 !important; display: flex !important; justify-content: space-between !important; align-items: baseline !important;
   width: 100% !important; margin: 0 0 14px 0 !important;
-  font-size: 0 !important; /* Ukrywa surowy tekst Photo ID: */
+  font-size: 0 !important; line-height: 0 !important; color: transparent !important;
 }
-#ws_page.page-media .media_friendly_id b {
+#ws_page.page-media .media_detail_meta_wrapper > div.media_friendly_id b {
   font: 500 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important;
 }
-#ws_page.page-media .media_friendly_id b::before {
+#ws_page.page-media .media_detail_meta_wrapper > div.media_friendly_id b::before {
   content: "REF. ";
 }
-#ws_page.page-media .media_friendly_id::after {
+#ws_page.page-media .media_detail_meta_wrapper > div.media_friendly_id::after {
   content: "BRISBANE, QLD, AUSTRALIA";
   font: 400 10px/1.4 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important;
 }
 #ws_page.page-media .media_location { display: none !important; }
 
-/* 2. Tytuł zdjęcia */
-#ws_page.page-media .col-4 h1 {
+/* 2. Tytuł */
+#ws_page.page-media .col-4 h1,
+#ws_page.page-media .media_detail_meta_wrapper h1 {
   order: 2 !important; margin: 0 0 10px 0 !important;
   font: 500 11px/1.45 Inter, sans-serif !important; letter-spacing: 0.06em !important; text-transform: uppercase !important; color: #111111 !important;
 }
 
 /* 3. Opis */
-#ws_page.page-media .col-4 .media_description {
+#ws_page.page-media .col-4 .media_description,
+#ws_page.page-media .media_detail_meta_wrapper .media_description {
   order: 3 !important; margin: 0 0 16px 0 !important;
 }
 #ws_page.page-media .col-4 .media_description p {
   font: 400 12px/1.55 Inter, sans-serif !important; color: #333333 !important; margin: 0 !important;
 }
 
-/* 4. Przycisk ADD TO SELECTION */
+/* 4. Przycisk ADD TO SELECTION - nadpisanie stylu z CUSTOM CSS */
 #ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) {
   display: block !important; position: static !important; width: 100% !important; height: auto !important; margin: 0 !important; padding: 0 !important;
 }
@@ -183,14 +185,17 @@ html body #component_menu span[class*="minicart" i] { padding-left: 8px !importa
 #ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .media_detail_actions {
   pointer-events: auto !important;
 }
-#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) input.lightbox_toggle {
+
+/* Wymuszenie zaokrąglonego kształtu wbrew CUSTOM CSS */
+#ws_page.page-media input.submit_small.lightbox_toggle,
+#ws_page.page-media #main_content input.lightbox_toggle {
   display: block !important; width: 100% !important; height: 38px !important; margin: 0 !important; padding: 0 20px !important;
   background: #000000 !important; color: #FFFFFF !important; border: 1px solid #000000 !important;
-  border-radius: var(--pi-r-pill, 999px) !important;
+  border-radius: 9999px !important;
   font: 500 11px/36px Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important;
   cursor: pointer !important; text-align: center !important; box-sizing: border-box !important; transition: opacity 0.15s ease !important;
 }
-#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) input.lightbox_toggle:hover {
+#ws_page.page-media input.submit_small.lightbox_toggle:hover {
   opacity: 0.88 !important;
 }
 #ws_page.page-media .col-4 .media_description {
@@ -200,6 +205,146 @@ html body #component_menu span[class*="minicart" i] { padding-left: 8px !importa
 /* ==========================================================================
    5. SEKCJA 1: ARCHIVAL & TECHNICAL DATA
    ========================================================================== */
+
+#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date {
+  order: 5 !important;
+  border-top: 1px solid #E5E5E5 !important;
+  padding-top: 14px !important;
+  margin-top: 0 !important;
+  font-size: 0 !important; line-height: 0 !important; color: transparent !important;
+  display: flex !important; flex-direction: column !important;
+}
+
+#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date::before {
+  content: "1. ARCHIVAL & TECHNICAL DATA";
+  display: block !important; width: 100% !important;
+  font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important;
+  margin: 0 0 10px 0 !important;
+}
+
+#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date b {
+  display: flex !important; justify-content: space-between !important; align-items: baseline !important; width: 100% !important;
+  font-size: 0 !important; line-height: 1.5 !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date b::before {
+  content: "DATE"; font: 400 10px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date time {
+  font: 400 11px/1.5 Inter, sans-serif !important; color: #111111 !important; text-align: right !important;
+}
+
+/* Wiersz AUTHOR */
+#ws_page.page-media .media_detail_meta_wrapper > div.media_author {
+  order: 6 !important; font-size: 0 !important; line-height: 0 !important; color: transparent !important;
+  display: flex !important; justify-content: space-between !important; align-items: baseline !important;
+  padding: 4px 0 !important; margin: 0 !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_author::before {
+  content: "AUTHOR"; font: 400 10px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_author b {
+  font: 400 11px/1.5 Inter, sans-serif !important; color: #111111 !important; text-align: right !important; font-weight: 400 !important;
+}
+
+/* Wiersz COPYRIGHT */
+#ws_page.page-media .media_detail_meta_wrapper > div.media_copyright {
+  order: 7 !important; display: flex !important; justify-content: space-between !important; align-items: baseline !important;
+  padding: 4px 0 !important; margin: 0 !important; font-size: 0 !important; line-height: 0 !important; color: transparent !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_copyright::before {
+  content: "RIGHTS"; font: 400 10px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_copyright::after {
+  content: "© 2026 All rights reserved.";
+  font: 400 11px/1.5 Inter, sans-serif !important; color: #111111 !important; text-align: right !important;
+}
+
+/* Wiersz DIMENSIONS / PHOTO SIZE */
+#ws_page.page-media .media_detail_meta_wrapper > div.media_size {
+  order: 8 !important; font-size: 0 !important; line-height: 0 !important; color: transparent !important;
+  border-bottom: 1px solid #E5E5E5 !important;
+  padding: 4px 0 14px 0 !important; margin: 0 !important;
+  display: flex !important; justify-content: space-between !important; align-items: baseline !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_size::before {
+  content: "DIMENSIONS"; font: 400 10px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_size b {
+  font: 400 11px/1.5 Inter, sans-serif !important; color: #111111 !important; text-align: right !important; font-weight: 400 !important;
+}
+
+/* ==========================================================================
+   6. SEKCJA 2: PROCESSING PROTOCOL
+   ========================================================================== */
+
+#ws_page.page-media .col-4 .elem[data-type="raw"] {
+  order: 9 !important; width: 100% !important; margin: 0 !important;
+}
+#ws_page.page-media .col-4 .elem[data-type="raw"] > div {
+  border-top: none !important; border-bottom: 1px solid #E5E5E5 !important;
+  padding: 14px 0 16px 0 !important; margin: 0 !important;
+}
+#ws_page.page-media .col-4 .elem[data-type="raw"] p:first-child {
+  font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important;
+  margin: 0 0 10px 0 !important;
+}
+#ws_page.page-media .col-4 .elem[data-type="raw"] p:first-child::before {
+  content: "2. ";
+}
+#ws_page.page-media .col-4 .elem[data-type="raw"] p:not(:first-child) {
+  font: 400 11.5px/1.5 Inter, sans-serif !important; color: #333333 !important; margin: 0 0 6px 0 !important;
+}
+#ws_page.page-media .col-4 .elem[data-type="raw"] span {
+  color: #767676 !important; font-size: 11px !important;
+}
+
+/* ==========================================================================
+   7. SEKCJA 3: TAXONOMY & KEYWORDS (UKRYCIE PRZECINKÓW PRZEZ SPECYFICZNOŚĆ)
+   ========================================================================== */
+
+#ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords {
+  order: 10 !important; font-size: 0 !important; line-height: 0 !important; color: transparent !important;
+  border-top: none !important; border-bottom: none !important;
+  padding: 14px 0 0 0 !important; margin: 0 !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords::before {
+  content: "3. TAXONOMY & KEYWORDS"; display: block !important;
+  font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important;
+  margin: 0 0 10px 0 !important;
+}
+
+/* Wycięcie przecinków: ustawiamy font-size: 0 na b oraz resetujemy line-height */
+#ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords b {
+  font-size: 0 !important;
+  line-height: 0 !important;
+  letter-spacing: 0 !important;
+  color: transparent !important;
+  display: block !important;
+  font-weight: 400 !important;
+}
+
+/* Przywrócenie kafelków na linkach <a> wewnątrz <b> */
+#ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords b a {
+  display: inline-block !important;
+  font: 400 9.5px/1.2 Inter, sans-serif !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  color: #222222 !important;
+  background: #FFFFFF !important;
+  border: 1px solid #E5E5E5 !important;
+  padding: 4px 6px !important;
+  margin: 0 4px 5px 0 !important;
+  border-radius: 4px !important;
+  text-decoration: none !important;
+  vertical-align: middle !important;
+  transition: border-color 0.15s ease, background 0.15s ease !important;
+}
+
+#ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords b a:hover {
+  border-color: #999999 !important;
+  background: #F9F9F9 !important;
+  color: #000000 !important;
+}
 
 /* Nagłówek i Wiersz DATE */
 #ws_page.page-media .media_creation_date {
