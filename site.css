@@ -908,3 +908,85 @@ body.pi-acct .pi-acct-root form:has(input[type="text"], input[type="email"], inp
   color: #6B6B6B !important;
 }
 
+/* ===== LIGHTBOX & QUOTATION: UJEDNOLICONY UKŁAD (640px) ===== */
+
+/* 1. Główna kolumna wyśrodkowana na 640px dla obu podstron */
+#ws_page.page-lightbox .main_content,
+#ws_page.page-quotation .main_content {
+  max-width: 640px !important;
+  margin: 0 auto !important;
+  float: none !important;
+  width: 100% !important;
+}
+
+/* 2. Lightbox: Dwa pola wprowadzania obok siebie (rozciągnięte) */
+#ws_page.page-lightbox .lightbox_meta {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 24px !important;
+  margin-bottom: 32px !important;
+}
+#ws_page.page-lightbox .lightbox_meta form {
+  flex: auto !important;
+  margin: 0 !important;
+  width: 100% !important;
+}
+#ws_page.page-lightbox .lightbox_meta form label {
+  display: block !important;
+  margin-bottom: 8px !important;
+}
+
+/* 3. Lightbox: Przyciski górne (New, Clear, Delete) z wyrównaniem do lewej */
+#ws_page.page-lightbox .page_actions {
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  margin-bottom: 32px !important;
+}
+
+/* 4. Lightbox: Wyśrodkowanie siatki zdjęć */
+#ws_page.page-lightbox .thumbs_wall {
+  justify-content: center !important;
+  gap: 32px 20px !important;
+}
+
+/* 5. ZACHOWANIE PIGUŁEK: Wymuszenie okrągłych krawędzi (nadpisanie CUSTOM.css) */
+#ws_page.page-lightbox input.submit_small,
+#ws_page.page-lightbox .lightbox_meta form.save_lightbox input.submit,
+#ws_page.page-lightbox a.ajaxable.request_quotation_link,
+#ws_page.page-lightbox .lightbox_meta > p > a.back,
+#ws_page.page-quotation input.submit {
+  border-radius: var(--pi-r-pill, 999px) !important;
+}
+
+/* 6. Główne dolne przyciski rozciągnięte na 100% szerokości (640px) */
+#ws_page.page-lightbox a.ajaxable.request_quotation_link,
+#ws_page.page-lightbox .lightbox_meta > p > a.back,
+#ws_page.page-quotation input.submit {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  text-align: center !important;
+}
+
+/* 7. Formularz wyceny (Quotation) - siatka */
+#ws_page.page-quotation form.quotation_form > p { margin-bottom: 24px !important; }
+#ws_page.page-quotation form.quotation_form label { display: block !important; margin-bottom: 8px !important; }
+#ws_page.page-quotation ul.order_or_cart_items { list-style: none !important; padding: 0 !important; margin: 32px 0 48px 0 !important; }
+#ws_page.page-quotation li.ooc_item { padding: 24px 0 !important; border-top: 1px solid #DADADA !important; border-bottom: 1px solid #DADADA !important; }
+#ws_page.page-quotation .item_presentation { display: flex !important; gap: 24px !important; align-items: flex-start !important; }
+#ws_page.page-quotation .item_thumbnail { flex: 0 0 100px !important; width: 100px !important; }
+#ws_page.page-quotation .item_description { flex: 1 1 auto !important; min-width: 0 !important; }
+
+/* Cichy link "Back" na samym dole wyceny */
+#ws_page.page-quotation a.ajaxable.back {
+  display: inline-block !important;
+  font: 500 11px/1 Inter, sans-serif !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: #111111 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px !important;
+  margin-top: 16px !important;
+  text-align: center !important;
+  width: 100% !important;
+}
+#ws_page.page-quotation a.ajaxable.back:hover { color: #6B6B6B !important; }
