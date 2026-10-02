@@ -834,3 +834,17 @@ body.pi-acct .pi-acct-root form:has(input[type="text"], input[type="email"], inp
   border-radius: var(--pi-r-pill, 999px) !important;
   text-decoration: none !important;
 }
+/* ===== ZAOKRAGLENIA: STRONA GLOWNA KLIENTA ===== */
+
+/* Ramki miniatur selekcji i boks subskrypcji */
+#ws_page.page-client_home .galleries .thumb,
+#ws_page.page-client_home #inline_subscription {
+  border-radius: var(--pi-r-md, 16px) !important;
+}
+
+/* Etykiety statusu (Pending) i wszystkie przyciski (View, Subscribe) */
+#ws_page.page-client_home .order_meta .tag,
+#ws_page.page-client_home .order_actions a.submit_small,
+#ws_page.page-client_home #inline_subscription input.submit {
+  border-radius: var(--pi-r-pill, 999px) !important;
+}
