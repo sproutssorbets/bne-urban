@@ -622,493 +622,63 @@ body.pi-acct .pi-acct-root form:has(input[type="text"], input[type="email"], inp
 #ws_page.page-website_page-contact form :is(input[type="submit"], button[type="submit"]) { display: block !important; width: 100% !important; height: 48px !important; margin: 8px 0 16px 0 !important; padding: 0 !important; background: #111111 !important; color: #FFFFFF !important; border: 1px solid #111111 !important; border-radius: 999px !important; box-shadow: none !important; font: 500 11px/46px Inter, sans-serif !important; letter-spacing: 0.14em !important; text-transform: uppercase !important; text-align: center !important; cursor: pointer !important; -webkit-appearance: none !important; }
 #ws_page.page-website_page-contact form :is(input[type="submit"], button[type="submit"]):hover { background: #FFFFFF !important; color: #111111 !important; }
 
-/* ===== STRONA ZDJĘCIA: METADANE (CSS-ONLY) ===== */
+/* ===== 4. STRONA ZDJĘCIA (MEDIA PAGE) ===== */
+#main_content .media_detail_meta_wrapper { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 0 !important; }
+#main_content .media_detail_meta_wrapper > * { grid-column: 1 / -1 !important; }
+#main_content .media_friendly_id { grid-column: 1 / 2 !important; grid-row: 1 !important; font: 500 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; }
+#main_content .media_location { grid-column: 2 / 3 !important; grid-row: 1 !important; text-align: right !important; font: 500 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; }
+#main_content .media_detail_meta_wrapper h1 { grid-row: 2 !important; margin-top: 24px !important; }
+#main_content .media_description { grid-row: 3 !important; }
+#main_content .media_detail_actions { grid-row: 4 !important; display: flex !important; flex-direction: column !important; gap: 12px !important; margin: 24px 0 32px 0 !important; }
+#main_content .media_detail_actions form, #main_content .media_detail_actions input.submit_small { width: 100% !important; margin: 0 !important; }
+#main_content .media_detail_actions input.submit_small:not(.share_icon) { height: 48px !important; border-radius: var(--pi-r-pill, 999px) !important; background: #111111 !important; color: #FFFFFF !important; font: 500 11px/48px Inter, sans-serif !important; }
+#main_content .media_detail_actions input.share_icon { height: 48px !important; background-color: transparent !important; border: 1px solid #111111 !important; border-radius: var(--pi-r-pill, 999px) !important; background-position: center !important; }
+#main_content .media_detail_meta_wrapper > div:is(.media_creation_date, .media_author, .media_copyright, .media_size) { display: flex !important; flex-wrap: wrap !important; justify-content: space-between !important; align-items: baseline !important; padding: 12px 0 !important; border-bottom: 1px solid #DADADA !important; font: 400 12px/1.6 Inter, sans-serif !important; color: #6F6F6F !important; }
+#main_content .media_detail_meta_wrapper > div b { font-weight: 500 !important; color: #111111 !important; text-align: right !important; }
+#main_content .media_creation_date::before { content: "1. ARCHIVAL & TECHNICAL DATA"; flex: 0 0 100% !important; font: 500 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; margin: 16px 0 16px 0 !important; }
+#main_content .media_detail_keywords { font-size: 0 !important; border: none !important; margin-top: 16px !important; }
+#main_content .media_detail_keywords::before { content: "3. TAXONOMY & KEYWORDS"; display: block !important; font: 500 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; margin: 32px 0 16px 0 !important; }
+#main_content .media_detail_keywords b { display: flex !important; flex-wrap: wrap !important; gap: 8px !important; font-weight: 400 !important; }
+#main_content .media_detail_keywords b a { font: 500 10px/1 Inter, sans-serif !important; letter-spacing: 0.06em !important; text-transform: uppercase !important; color: #111111 !important; background: #F1F1EF !important; padding: 8px 14px !important; border-radius: var(--pi-r-pill, 999px) !important; text-decoration: none !important; transition: opacity 0.15s ease !important; }
+#main_content .media_detail_keywords b a:hover { opacity: 0.8 !important; }
 
-/* 1. Układ wierszy etykieta/wartość (anonimowe węzły tekstowe jako flex items) */
-#main_content .media_detail_meta_wrapper > div:is(.media_location, .media_friendly_id, .media_creation_date, .media_author, .media_copyright, .media_size) {
-  display: flex !important;
-  flex-wrap: wrap !important;
-  justify-content: space-between !important;
-  align-items: baseline !important;
-  padding: 12px 0 !important;
-  border-bottom: 1px solid #DADADA !important;
-  font: 400 12px/1.6 Inter, sans-serif !important;
-  color: #6F6F6F !important;
-}
-#main_content .media_detail_meta_wrapper > div b {
-  color: #111111 !important;
-  font-weight: 500 !important;
-  text-align: right !important;
-}
+/* ===== 5. ZAOKRĄGLENIA I KOREKTY GLOBALNE ===== */
+.thumbs_wall .media .thumb, .thumbs_wall .media .media_wrap { background: transparent !important; border-radius: var(--pi-r-md, 16px) !important; }
+#ws_page.page-client_home .galleries .thumb, #ws_page.page-client_home #inline_subscription { border-radius: var(--pi-r-md, 16px) !important; }
+#ws_page.page-client_home .order_meta .tag, #ws_page.page-client_home .order_actions a.submit_small, #ws_page.page-client_home #inline_subscription input.submit,
+#ws_page.page-lightbox input.submit_small, #ws_page.page-lightbox .lightbox_meta form.save_lightbox input.submit, #ws_page.page-lightbox a.ajaxable.request_quotation_link, #ws_page.page-lightbox .lightbox_meta > p > a.back,
+#ws_page.page-quotation input.submit, #ws_page.page-order a.button.forward { border-radius: var(--pi-r-pill, 999px) !important; }
 
-/* 2. Nagłówki sekcji wprowadzane przez ::before */
-#main_content .media_location::before {
-  content: "Details";
-  flex: 0 0 100% !important;
-  font: 500 11px/1.4 Inter, sans-serif !important;
-  letter-spacing: 0.12em !important;
-  text-transform: uppercase !important;
-  color: #111111 !important;
-  margin: 24px 0 12px 0 !important;
-}
-#main_content .media_detail_keywords::before {
-  content: "Keywords";
-  display: block !important;
-  font: 500 11px/1.4 Inter, sans-serif !important;
-  letter-spacing: 0.12em !important;
-  text-transform: uppercase !important;
-  color: #111111 !important;
-  margin: 32px 0 16px 0 !important;
-}
-
-/* 3. Pigułki słów kluczowych (ukrycie "Photo keywords: ") */
-#main_content .media_detail_keywords {
-  font-size: 0 !important; 
-  border: none !important;
-}
-#main_content .media_detail_keywords b {
-  display: flex !important;
-  flex-wrap: wrap !important;
-  gap: 8px !important;
-  font-weight: 400 !important;
-}
-#main_content .media_detail_keywords b a {
-  font: 500 11px/1 Inter, sans-serif !important;
-  letter-spacing: 0.06em !important;
-  text-transform: uppercase !important;
-  color: #111111 !important;
-  background: #F1F1EF !important;
-  padding: 8px 14px !important;
-  border-radius: var(--pi-r-pill, 999px) !important;
-  text-decoration: none !important;
-  transition: opacity 0.15s ease !important;
-}
-#main_content .media_detail_keywords b a:hover {
-  opacity: 0.8 !important;
-}
-
-/* 4. Natywny przycisk SHARE jako Outlined Pill */
-#main_content .media_detail_actions a.share_icon {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 100% !important;
-  height: 44px !important;
-  background: transparent !important;
-  color: #111111 !important;
-  border: 1px solid #111111 !important;
-  border-radius: var(--pi-r-pill, 999px) !important;
-  font: 500 10px/1 Inter, sans-serif !important;
-  letter-spacing: 0.14em !important;
-  text-transform: uppercase !important;
-  text-decoration: none !important;
-}
-#main_content .media_detail_actions a.share_icon::after {
-  content: "SHARE" !important;
-}
-
-/* ===== 1. STRONA ZDJĘCIA: REORGANIZACJA PANELU BOCZNEGO (CSS-ONLY) ===== */
-
-/* Siatka panelu: pozwala na swobodne przestawianie kolejności bloków */
-#main_content .media_detail_meta_wrapper {
-  display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
-  gap: 0 !important;
-}
-#main_content .media_detail_meta_wrapper > * {
-  grid-column: 1 / -1 !important;
-}
-
-/* Wiersz REF (ID do lewej, lokacja do prawej) */
-#main_content .media_friendly_id {
-  grid-column: 1 / 2 !important;
-  grid-row: 1 !important;
-  font: 500 11px/1.4 Inter, sans-serif !important;
-  letter-spacing: 0.12em !important;
-  text-transform: uppercase !important;
-  color: #111111 !important;
-}
-#main_content .media_location {
-  grid-column: 2 / 3 !important;
-  grid-row: 1 !important;
-  text-align: right !important;
-  font: 500 11px/1.4 Inter, sans-serif !important;
-  letter-spacing: 0.12em !important;
-  text-transform: uppercase !important;
-  color: #111111 !important;
-}
-
-/* Tytuł i opis */
-#main_content .media_detail_meta_wrapper h1 {
-  grid-row: 2 !important;
-  margin-top: 24px !important;
-}
-#main_content .media_description {
-  grid-row: 3 !important;
-}
-
-/* Akcje główne (Add to selection) umieszczone zaraz pod opisem */
-#main_content .media_detail_actions {
-  grid-row: 4 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 12px !important;
-  margin: 24px 0 32px 0 !important;
-}
-#main_content .media_detail_actions form,
-#main_content .media_detail_actions input.submit_small {
-  width: 100% !important;
-  margin: 0 !important;
-}
-#main_content .media_detail_actions input.submit_small:not(.share_icon) {
-  height: 48px !important;
-  border-radius: var(--pi-r-pill, 999px) !important;
-  background: #111111 !important;
-  color: #FFFFFF !important;
-  font: 500 11px/48px Inter, sans-serif !important;
-}
-
-/* Natywny Share jako Outlined Pill z ikoną */
-#main_content .media_detail_actions input.share_icon {
-  height: 48px !important;
-  background-color: transparent !important;
-  border: 1px solid #111111 !important;
-  border-radius: var(--pi-r-pill, 999px) !important;
-  background-position: center !important;
-}
-
-/* Sekcja 1: Dane techniczne (anonimowe węzły tekstowe jako flex items) */
-#main_content .media_detail_meta_wrapper > div:is(.media_creation_date, .media_author, .media_copyright, .media_size) {
-  display: flex !important;
-  flex-wrap: wrap !important;
-  justify-content: space-between !important;
-  align-items: baseline !important;
-  padding: 12px 0 !important;
-  border-bottom: 1px solid #DADADA !important;
-  font: 400 12px/1.6 Inter, sans-serif !important;
-  color: #6F6F6F !important;
-}
-#main_content .media_detail_meta_wrapper > div b {
-  font-weight: 500 !important;
-  color: #111111 !important;
-  text-align: right !important;
-}
-#main_content .media_creation_date::before {
-  content: "1. ARCHIVAL & TECHNICAL DATA";
-  flex: 0 0 100% !important;
-  font: 500 11px/1.4 Inter, sans-serif !important;
-  letter-spacing: 0.12em !important;
-  text-transform: uppercase !important;
-  color: #111111 !important;
-  margin: 16px 0 16px 0 !important;
-}
-
-/* Sekcja 3: Słowa kluczowe */
-#main_content .media_detail_keywords {
-  font-size: 0 !important;
-  border: none !important;
-  margin-top: 16px !important;
-}
-#main_content .media_detail_keywords::before {
-  content: "3. TAXONOMY & KEYWORDS";
-  display: block !important;
-  font: 500 11px/1.4 Inter, sans-serif !important;
-  letter-spacing: 0.12em !important;
-  text-transform: uppercase !important;
-  color: #111111 !important;
-  margin: 32px 0 16px 0 !important;
-}
-#main_content .media_detail_keywords b {
-  display: flex !important;
-  flex-wrap: wrap !important;
-  gap: 8px !important;
-  font-weight: 400 !important;
-}
-#main_content .media_detail_keywords b a {
-  font: 500 10px/1 Inter, sans-serif !important;
-  letter-spacing: 0.06em !important;
-  text-transform: uppercase !important;
-  color: #111111 !important;
-  background: #F1F1EF !important;
-  padding: 8px 14px !important;
-  border-radius: var(--pi-r-pill, 999px) !important;
-  text-decoration: none !important;
-}
-/* ===== ZAOKRAGLENIA: STRONA GLOWNA KLIENTA ===== */
-
-/* Ramki miniatur selekcji i boks subskrypcji */
-#ws_page.page-client_home .galleries .thumb,
-#ws_page.page-client_home #inline_subscription {
-  border-radius: var(--pi-r-md, 16px) !important;
-}
-
-/* Etykiety statusu (Pending) i wszystkie przyciski (View, Subscribe) */
-#ws_page.page-client_home .order_meta .tag,
-#ws_page.page-client_home .order_actions a.submit_small,
-#ws_page.page-client_home #inline_subscription input.submit {
-  border-radius: var(--pi-r-pill, 999px) !important;
-}/* ===== ZAOKRAGLENIA: KARTA SEKCJI (LIGHTBOX) ===== */
-
-#ws_page.page-lightbox input.submit_small,
-#ws_page.page-lightbox .lightbox_meta form.save_lightbox input.submit,
-#ws_page.page-lightbox a.ajaxable.request_quotation_link,
-#ws_page.page-lightbox a.back {
-  border-radius: var(--pi-r-pill, 999px) !important;
-}
-/* ===== FORMULARZ WYCENY (QUOTATION) ===== */
-
-/* Etykiety i odstępy w głównym formularzu */
-#ws_page.page-quotation form.quotation_form > p {
-  margin-bottom: 24px !important;
-}
-#ws_page.page-quotation form.quotation_form label {
-  display: block !important;
-  margin-bottom: 8px !important;
-}
-
-/* Lista przedmiotów (odwzorowanie siatki koszyka) */
-#ws_page.page-quotation ul.order_or_cart_items {
-  list-style: none !important;
-  padding: 0 !important;
-  margin: 32px 0 48px 0 !important;
-}
-#ws_page.page-quotation li.ooc_item {
-  padding: 24px 0 !important;
-  border-top: 1px solid #DADADA !important;
-  border-bottom: 1px solid #DADADA !important;
-}
-#ws_page.page-quotation .item_presentation {
-  display: flex !important;
-  gap: 24px !important;
-  align-items: flex-start !important;
-}
-#ws_page.page-quotation .item_thumbnail {
-  flex: 0 0 100px !important;
-  width: 100px !important;
-}
-#ws_page.page-quotation .item_description {
-  flex: 1 1 auto !important;
-  min-width: 0 !important;
-}
-
-/* Przycisk powrotu pod formularzem */
-#ws_page.page-quotation a.ajaxable.back {
-  display: inline-block !important;
-  font: 500 11px/1 Inter, sans-serif !important;
-  letter-spacing: 0.12em !important;
-  text-transform: uppercase !important;
-  color: #111111 !important;
-  text-decoration: underline !important;
-  text-underline-offset: 3px !important;
-  margin-top: 16px !important;
-  text-align: center !important;
-  width: 100% !important;
-}
-#ws_page.page-quotation a.ajaxable.back:hover {
-  color: #6B6B6B !important;
-}
-
-/* ===== LIGHTBOX & QUOTATION: UJEDNOLICONY UKŁAD (640px) ===== */
-
-/* 1. Główna kolumna wyśrodkowana na 640px dla obu podstron */
-#ws_page.page-lightbox .main_content,
-#ws_page.page-quotation .main_content {
-  max-width: 640px !important;
-  margin: 0 auto !important;
-  float: none !important;
-  width: 100% !important;
-}
-
-/* 2. Lightbox: Dwa pola wprowadzania obok siebie (rozciągnięte) */
-#ws_page.page-lightbox .lightbox_meta {
-  display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
-  gap: 24px !important;
-  margin-bottom: 32px !important;
-}
-#ws_page.page-lightbox .lightbox_meta form {
-  flex: auto !important;
-  margin: 0 !important;
-  width: 100% !important;
-}
-#ws_page.page-lightbox .lightbox_meta form label {
-  display: block !important;
-  margin-bottom: 8px !important;
-}
-
-/* 3. Lightbox: Przyciski górne (New, Clear, Delete) z wyrównaniem do lewej */
-#ws_page.page-lightbox .page_actions {
-  justify-content: flex-start !important;
-  gap: 12px !important;
-  margin-bottom: 32px !important;
-}
-
-/* 4. Lightbox: Wyśrodkowanie siatki zdjęć */
-#ws_page.page-lightbox .thumbs_wall {
-  justify-content: center !important;
-  gap: 32px 20px !important;
-}
-
-/* 5. ZACHOWANIE PIGUŁEK: Wymuszenie okrągłych krawędzi (nadpisanie CUSTOM.css) */
-#ws_page.page-lightbox input.submit_small,
-#ws_page.page-lightbox .lightbox_meta form.save_lightbox input.submit,
-#ws_page.page-lightbox a.ajaxable.request_quotation_link,
-#ws_page.page-lightbox .lightbox_meta > p > a.back,
-#ws_page.page-quotation input.submit {
-  border-radius: var(--pi-r-pill, 999px) !important;
-}
-
-/* 6. Główne dolne przyciski rozciągnięte na 100% szerokości (640px) */
-#ws_page.page-lightbox a.ajaxable.request_quotation_link,
-#ws_page.page-lightbox .lightbox_meta > p > a.back,
-#ws_page.page-quotation input.submit {
-  width: 100% !important;
-  box-sizing: border-box !important;
-  text-align: center !important;
-}
-
-/* 7. Formularz wyceny (Quotation) - siatka */
+/* ===== 6. WSPÓLNE LISTY (WYCENA I ZAMÓWIENIA) ===== */
+#ws_page.page-quotation ul.order_or_cart_items, #ws_page.page-order ul.order_or_cart_items { list-style: none !important; padding: 0 !important; margin: 32px 0 48px 0 !important; }
+#ws_page.page-quotation li.ooc_item, #ws_page.page-order li.ooc_item { display: flex !important; flex-wrap: wrap !important; justify-content: space-between !important; align-items: flex-start !important; padding: 24px 0 !important; border-top: 1px solid #DADADA !important; gap: 16px !important; }
+#ws_page.page-quotation li.ooc_item { border-bottom: 1px solid #DADADA !important; }
+#ws_page.page-order ul.totals li.ooc_item { border-top: none !important; border-bottom: 1px solid #DADADA !important; padding: 16px 0 !important; }
+#ws_page.page-order ul.totals li.ooc_item.grand_total { border-bottom: 2px solid #111111 !important; }
+#ws_page.page-quotation .item_presentation, #ws_page.page-order .item_presentation { display: flex !important; gap: 24px !important; flex: 1 1 auto !important; min-width: 240px !important; }
+#ws_page.page-quotation .item_thumbnail, #ws_page.page-order .item_thumbnail { flex: 0 0 100px !important; width: 100px !important; }
+#ws_page.page-quotation .item_description, #ws_page.page-order .item_description { flex: 1 1 auto !important; min-width: 0 !important; font-size: 12px !important; line-height: 1.6 !important; color: #6F6F6F !important; }
+#ws_page.page-order .item_quantity_and_actions { flex: 0 0 40px !important; text-align: right !important; }
+#ws_page.page-order .item_price_and_taxes { flex: 0 0 100px !important; text-align: right !important; }
+#ws_page.page-order .item_price_and_taxes .currency { font-weight: 500 !important; color: #111111 !important; }
 #ws_page.page-quotation form.quotation_form > p { margin-bottom: 24px !important; }
 #ws_page.page-quotation form.quotation_form label { display: block !important; margin-bottom: 8px !important; }
-#ws_page.page-quotation ul.order_or_cart_items { list-style: none !important; padding: 0 !important; margin: 32px 0 48px 0 !important; }
-#ws_page.page-quotation li.ooc_item { padding: 24px 0 !important; border-top: 1px solid #DADADA !important; border-bottom: 1px solid #DADADA !important; }
-#ws_page.page-quotation .item_presentation { display: flex !important; gap: 24px !important; align-items: flex-start !important; }
-#ws_page.page-quotation .item_thumbnail { flex: 0 0 100px !important; width: 100px !important; }
-#ws_page.page-quotation .item_description { flex: 1 1 auto !important; min-width: 0 !important; }
+#ws_page.page-order .text_block > br { display: none !important; }
 
-/* Cichy link "Back" na samym dole wyceny */
-#ws_page.page-quotation a.ajaxable.back {
-  display: inline-block !important;
-  font: 500 11px/1 Inter, sans-serif !important;
-  letter-spacing: 0.12em !important;
-  text-transform: uppercase !important;
-  color: #111111 !important;
-  text-decoration: underline !important;
-  text-underline-offset: 3px !important;
-  margin-top: 16px !important;
-  text-align: center !important;
-  width: 100% !important;
-}
-#ws_page.page-quotation a.ajaxable.back:hover { color: #6B6B6B !important; }
-/* ===== SZCZEGÓŁY ZAMÓWIENIA (ORDER) ===== */
+/* Wspólny cichy przycisk powrotu oraz pełna szerokość przycisków głównych */
+#ws_page.page-quotation a.ajaxable.back, #ws_page.page-order a.ajaxable.back { display: inline-block !important; font: 500 11px/1 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; text-decoration: underline !important; text-underline-offset: 3px !important; margin-top: 16px !important; text-align: center !important; width: 100% !important; }
+#ws_page.page-quotation a.ajaxable.back:hover, #ws_page.page-order a.ajaxable.back:hover { color: #6B6B6B !important; }
+#ws_page.page-lightbox a.ajaxable.request_quotation_link, #ws_page.page-lightbox .lightbox_meta > p > a.back, #ws_page.page-quotation input.submit, #ws_page.page-order a.button.forward { width: 100% !important; box-sizing: border-box !important; text-align: center !important; }
 
-/* 1. Główny przycisk płatności */
-#ws_page.page-order a.button.forward {
-  display: block !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  text-align: center !important;
-  margin: 24px 0 48px 0 !important;
-  border-radius: var(--pi-r-pill, 999px) !important;
-}
-
-/* Usuwamy tag <br> po statusie, by marginesy działały prawidłowo */
-#ws_page.page-order .text_block > br {
-  display: none !important;
-}
-
-/* 2. Listy przedmiotów i podsumowania */
-#ws_page.page-order ul.order_or_cart_items {
-  list-style: none !important;
-  padding: 0 !important;
-  margin: 0 0 32px 0 !important;
-}
-#ws_page.page-order li.ooc_item {
-  display: flex !important;
-  flex-wrap: wrap !important;
-  justify-content: space-between !important;
-  align-items: flex-start !important;
-  padding: 24px 0 !important;
-  border-top: 1px solid #DADADA !important;
-  gap: 16px;
-}
-#ws_page.page-order ul.totals li.ooc_item {
-  border-top: none !important;
-  border-bottom: 1px solid #DADADA !important;
-  padding: 16px 0 !important;
-}
-#ws_page.page-order ul.totals li.ooc_item.grand_total {
-  border-bottom: 2px solid #111111 !important;
-}
-
-/* 3. Kolumny w wierszu */
-#ws_page.page-order .item_presentation {
-  display: flex !important;
-  gap: 24px !important;
-  flex: 1 1 auto !important;
-  min-width: 240px !important;
-}
-#ws_page.page-order .item_thumbnail {
-  flex: 0 0 100px !important;
-  width: 100px !important;
-}
-#ws_page.page-order .item_description {
-  flex: 1 1 auto !important;
-  min-width: 0 !important;
-  font-size: 12px !important;
-  line-height: 1.6 !important;
-  color: #6F6F6F !important;
-}
-#ws_page.page-order .item_quantity_and_actions {
-  flex: 0 0 40px !important;
-  text-align: right !important;
-}
-#ws_page.page-order .item_price_and_taxes {
-  flex: 0 0 100px !important;
-  text-align: right !important;
-}
-#ws_page.page-order .item_price_and_taxes .currency {
-  font-weight: 500 !important;
-  color: #111111 !important;
-}
-
-/* 4. Cichy przycisk powrotu na dole */
-#ws_page.page-order a.ajaxable.back {
-  display: inline-block !important;
-  font: 500 11px/1 Inter, sans-serif !important;
-  letter-spacing: 0.12em !important;
-  text-transform: uppercase !important;
-  color: #111111 !important;
-  text-decoration: underline !important;
-  text-underline-offset: 3px !important;
-  margin-top: 16px !important;
-  text-align: center !important;
-  width: 100% !important;
-}
-#ws_page.page-order a.ajaxable.back:hover {
-  color: #6B6B6B !important;
-}
-/* ===== KOREKTA: GÓRNE PRZYCISKI I PUSTY STAN (LIGHTBOX) ===== */
-
-/* 1. Odsunięcie białych pigułek od menu i ich wyśrodkowanie */
-#ws_page.page-lightbox .page_actions {
-  margin-top: 48px !important;
-  margin-bottom: 48px !important;
-  justify-content: center !important;
-}
-
-/* 2. Elegancki układ dla pustego stanu (gdy znika pole nazwy) */
-#ws_page.page-lightbox .lightbox_meta:has(.short_message) {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  gap: 32px !important;
-}
-
-/* 3. Zwężenie samotnego dropdownu, by nie zajmował całych 640px */
-#ws_page.page-lightbox .lightbox_meta:has(.short_message) form {
-  max-width: 320px !important;
-}
-
-/* 4. Poprawne ułożenie komunikatu "Selection is empty" */
-#ws_page.page-lightbox .lightbox_meta .short_message {
-  grid-column: 1 / -1 !important;
-  margin: 16px 0 !important;
-}
-/* ===== KOREKTA: USUNIĘCIE CZARNEGO TŁA POD ZDJĘCIAMI (STRONA GŁÓWNA) ===== */
-
-.thumbs_wall .media .thumb,
-.thumbs_wall .media .media_wrap {
-  background: transparent !important;
-  border-radius: var(--pi-r-md, 16px) !important;
-}
+/* ===== 7. LIGHTBOX (KARTA SELEKCJI) ===== */
+#ws_page.page-lightbox .main_content, #ws_page.page-quotation .main_content { max-width: 640px !important; margin: 0 auto !important; float: none !important; width: 100% !important; }
+#ws_page.page-lightbox .page_meta { margin-top: 48px !important; justify-content: center !important; flex-wrap: wrap !important; }
+#ws_page.page-lightbox .page_actions { justify-content: center !important; width: 100% !important; }
+#ws_page.page-lightbox .main_content > .elem:has(> .user-bar-greeting) { justify-content: center !important; margin-bottom: 32px !important; }
+#ws_page.page-lightbox .lightbox_meta { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 24px !important; margin-bottom: 32px !important; }
+#ws_page.page-lightbox .lightbox_meta form { flex: auto !important; margin: 0 !important; width: 100% !important; }
+#ws_page.page-lightbox .lightbox_meta form label { display: block !important; margin-bottom: 8px !important; }
+#ws_page.page-lightbox .lightbox_meta:has(.short_message) { display: flex !important; flex-direction: column !important; align-items: center !important; gap: 32px !important; }
+#ws_page.page-lightbox .lightbox_meta:has(.short_message) form { max-width: 320px !important; }
+#ws_page.page-lightbox .lightbox_meta .short_message { grid-column: 1 / -1 !important; margin: 16px 0 !important; }
+#ws_page.page-lightbox .thumbs_wall { justify-content: center !important; gap: 32px 20px !important; }
