@@ -56,6 +56,10 @@ html body #component_menu span[class*="minicart" i] { padding-left: 8px !importa
    2. STRONA ZDJĘCIA (MEDIA PAGE) - UKŁAD WORKERA
    ========================================================================== */
 
+/* ==========================================================================
+   2. STRONA ZDJĘCIA (MEDIA PAGE) - UKŁAD WORKERA
+   ========================================================================== */
+
 #ws_page.page-media #block_main,
 #ws_page.page-media .block_inner,
 #ws_page.page-media #component_mainc,
@@ -91,7 +95,7 @@ html body #component_menu span[class*="minicart" i] { padding-left: 8px !importa
 .media_detail_wrapper img { max-height: calc(100vh - 60px) !important; max-width: 100% !important; width: auto !important; height: auto !important; object-fit: contain !important; }
 #main_content .media_detail_wrapper .media_wrap { background: transparent !important; border-radius: 0 !important; }
 
-/* Ukrywamy zbędne nakładki na zdjęciu */
+/* Ukrywamy nakładki na zdjęciu */
 #ws_page.page-media .media_detail_media .media_content_overlay,
 #ws_page.page-media .media_detail_media .media_detail_actions {
   display: none !important;
@@ -102,153 +106,146 @@ html body #component_menu span[class*="minicart" i] { padding-left: 8px !importa
   flex: 0 0 var(--pi-panel-width) !important; width: var(--pi-panel-width) !important; max-width: var(--pi-panel-width) !important;
   border-left: 1px solid #000000 !important; height: calc(100vh - 44px) !important; overflow-y: auto !important;
   position: sticky !important; top: 0 !important; right: 0 !important;
-  padding: 24px 28px 48px 28px !important; box-sizing: border-box !important; background: #FFFFFF !important;
+  padding: 32px 32px 64px 32px !important; box-sizing: border-box !important; background: #FFFFFF !important;
 }
 
-/* Panel Boczny: Pionowy Flexbox */
-#ws_page.page-media .col-4 .media_detail_meta_wrapper {
+/* Panel Boczny: Jednolity Flexbox */
+#ws_page.page-media .col-4:has(.media_detail_meta_wrapper) {
   display: flex !important; flex-direction: column !important;
 }
+#ws_page.page-media .col-4 .elem[data-type="media_metadata"] {
+  order: 1 !important; display: block !important; width: 100% !important;
+}
+#ws_page.page-media .col-4 .media_detail_meta_wrapper {
+  display: flex !important; flex-direction: column !important; position: static !important; padding: 0 !important;
+}
 
-/* Górny wiersz REF (ID z lewej, Lokalizacja z prawej) */
-#ws_page.page-media .col-4 .media_detail_meta_wrapper { position: relative !important; padding-top: 24px !important; }
+/* 1. Górny wiersz: REF + Lokalizacja */
 #ws_page.page-media .media_friendly_id {
-  position: absolute !important; top: 0 !important; left: 0 !important; margin: 0 !important;
-  font: 500 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important;
+  order: 1 !important; display: flex !important; justify-content: space-between !important; align-items: baseline !important;
+  width: 100% !important; position: static !important; margin: 0 0 16px 0 !important;
+  font: 600 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important;
 }
+#ws_page.page-media .media_friendly_id b { font-weight: 600 !important; }
 #ws_page.page-media .media_location {
-  position: absolute !important; top: 0 !important; right: 0 !important; margin: 0 !important; text-align: right !important;
-  font: 500 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important;
+  display: none !important; /* Lokalizację zastępuje naturalny widok lub wiersz REF */
 }
 
-/* Tytuł i opis */
+/* 2. Tytuł */
 #ws_page.page-media .col-4 .media_detail_meta_wrapper h1 {
   order: 2 !important; margin: 0 0 12px 0 !important;
-  font: 600 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important;
-}
-#ws_page.page-media .col-4 .media_description {
-  order: 3 !important; margin: 0 0 24px 0 !important;
-  font: 400 12px/1.6 Inter, sans-serif !important; color: #111111 !important;
+  font: 500 12px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important;
 }
 
-/* Przycisk ADD / REMOVE FROM SELECTION wyciągnięty z natywnego kontenera PhotoDeck */
+/* 3. Opis */
+#ws_page.page-media .col-4 .media_description {
+  order: 3 !important; margin: 0 0 28px 0 !important;
+}
+#ws_page.page-media .col-4 .media_description p {
+  font: 400 13px/1.6 Inter, sans-serif !important; color: #111111 !important; margin: 0 !important;
+}
+
+/* 4. Przycisk ADD / REMOVE FROM SELECTION */
 #ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) {
-  display: block !important;
-  position: absolute !important;
-  top: 140px !important;
-  right: 0 !important;
-  width: var(--pi-panel-width) !important;
-  height: auto !important;
-  margin: 0 !important;
-  padding: 0 28px !important;
-  box-sizing: border-box !important;
-  z-index: 50 !important;
-  pointer-events: none !important;
+  display: block !important; position: static !important; width: 100% !important; height: auto !important; margin: 0 !important; padding: 0 !important;
 }
 #ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .first.col-5,
-#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .first.col-6 {
+#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .first.col-6,
+#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .elem[data-type="spacer"] {
   display: none !important;
 }
 #ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .col-7,
 #ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .col-6,
-#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .page_meta {
-  display: block !important;
-  width: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  float: none !important;
-}
+#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .page_meta,
 #ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .media_detail_actions {
-  display: block !important;
-  width: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  pointer-events: auto !important;
+  display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; float: none !important;
 }
 #ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) form.button_to {
-  display: block !important;
-  width: 100% !important;
-  margin: 0 !important;
+  display: block !important; width: 100% !important; margin: 0 !important;
+}
+
+/* Wstrzyknięcie przycisku w panel prawy dokładnie pod opisem */
+#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) {
+  position: absolute !important; top: 154px !important; right: 0 !important; width: var(--pi-panel-width) !important;
+  padding: 0 32px !important; box-sizing: border-box !important; z-index: 50 !important; pointer-events: none !important;
+}
+#ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) .media_detail_actions {
+  pointer-events: auto !important;
 }
 #ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) input.lightbox_toggle {
-  display: block !important;
-  width: 100% !important;
-  height: 44px !important;
-  margin: 0 !important;
-  padding: 0 24px !important;
-  background: #111111 !important;
-  color: #FFFFFF !important;
-  border: 1px solid #111111 !important;
+  display: block !important; width: 100% !important; height: 46px !important; margin: 0 !important; padding: 0 24px !important;
+  background: #000000 !important; color: #FFFFFF !important; border: 1px solid #000000 !important;
   border-radius: var(--pi-r-pill, 999px) !important;
-  font: 500 10px/42px Inter, sans-serif !important;
-  letter-spacing: 0.12em !important;
-  text-transform: uppercase !important;
-  cursor: pointer !important;
-  text-align: center !important;
-  box-sizing: border-box !important;
-  transition: background 0.15s ease !important;
+  font: 500 11px/44px Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important;
+  cursor: pointer !important; text-align: center !important; box-sizing: border-box !important; transition: background 0.15s ease !important;
 }
 #ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) input.lightbox_toggle:hover {
-  background: #333333 !important;
+  background: #222222 !important;
 }
-
-/* Odstęp w panelu bocznym pod opisem na wstrzyknięty przycisk */
 #ws_page.page-media .col-4 .media_description {
-  margin-bottom: 68px !important;
+  margin-bottom: 76px !important; /* Przestrzeń pod opisem na przycisk */
 }
 
-@media (max-width: 900px) {
-  #ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) {
-    position: static !important;
-    width: 100% !important;
-    padding: 0 18px 24px 18px !important;
-  }
-  #ws_page.page-media .col-4 .media_description {
-    margin-bottom: 24px !important;
-  }
+/* 5. Sekcja 1: ARCHIVAL & TECHNICAL DATA */
+#ws_page.page-media .media_creation_date {
+  order: 5 !important; border-top: 1px solid #E5E5E5 !important; padding-top: 20px !important; margin-top: 0 !important;
 }
-
-/* Sekcja 1: Dane techniczne */
-#ws_page.page-media .media_creation_date { order: 5 !important; border-top: 1px solid #E5E5E5 !important; padding-top: 16px !important; margin-top: 0 !important; }
 #ws_page.page-media .media_creation_date::before {
-  content: "1. ARCHIVAL & TECHNICAL DATA"; display: block !important;
-  font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important;
+  content: "1. ARCHIVAL & TECHNICAL DATA"; display: flex !important; justify-content: space-between !important;
+  font: 600 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.1em !important; text-transform: uppercase !important; color: #111111 !important;
   margin: 0 0 16px 0 !important;
 }
 #ws_page.page-media .media_author { order: 6 !important; }
 #ws_page.page-media .media_copyright { order: 7 !important; }
-#ws_page.page-media .media_size { order: 8 !important; border-bottom: 1px solid #E5E5E5 !important; padding-bottom: 16px !important; margin-bottom: 0 !important; }
+#ws_page.page-media .media_size {
+  order: 8 !important; border-bottom: 1px solid #E5E5E5 !important; padding-bottom: 20px !important; margin-bottom: 0 !important;
+}
 
 #ws_page.page-media .media_detail_meta_wrapper > div:is(.media_creation_date, .media_author, .media_copyright, .media_size) {
   display: flex !important; justify-content: space-between !important; align-items: baseline !important;
-  padding: 6px 0 !important; font: 400 11px/1.5 Inter, sans-serif !important; color: #6F6F6F !important;
+  padding: 8px 0 !important; font: 400 11px/1.5 Inter, sans-serif !important; color: #767676 !important; text-transform: uppercase !important;
 }
-#ws_page.page-media .media_detail_meta_wrapper > div b { font-weight: 400 !important; color: #111111 !important; text-align: right !important; }
+#ws_page.page-media .media_detail_meta_wrapper > div b {
+  font-weight: 400 !important; color: #111111 !important; text-align: right !important; text-transform: none !important;
+}
 
-/* Sekcja 3: Słowa kluczowe */
+/* 6. Sekcja 2: PROCESSING PROTOCOL */
+#ws_page.page-media .col-4 .elem[data-type="raw"] {
+  order: 2 !important; width: 100% !important; margin: 0 !important;
+}
+#ws_page.page-media .col-4 .elem[data-type="raw"] > div {
+  border-top: none !important; border-bottom: 1px solid #E5E5E5 !important;
+  padding: 20px 0 24px 0 !important; margin: 0 !important;
+}
+#ws_page.page-media .col-4 .elem[data-type="raw"] p:first-child {
+  font: 600 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.1em !important; text-transform: uppercase !important; color: #111111 !important;
+  margin: 0 0 16px 0 !important;
+}
+#ws_page.page-media .col-4 .elem[data-type="raw"] p:first-child::before {
+  content: "2. ";
+}
+#ws_page.page-media .col-4 .elem[data-type="raw"] p:not(:first-child) {
+  font: 400 12px/1.6 Inter, sans-serif !important; color: #767676 !important; margin: 0 0 8px 0 !important;
+}
+#ws_page.page-media .col-4 .elem[data-type="raw"] span { color: #111111 !important; }
+
+/* 7. Sekcja 3: TAXONOMY & KEYWORDS */
 #ws_page.page-media .media_detail_keywords {
-  order: 9 !important; font-size: 0 !important; border-top: none !important; border-bottom: 1px solid #E5E5E5 !important;
-  padding: 24px 0 24px 0 !important; margin: 0 !important;
+  order: 9 !important; font-size: 0 !important; border-top: none !important; border-bottom: none !important;
+  padding: 20px 0 0 0 !important; margin: 0 !important;
 }
 #ws_page.page-media .media_detail_keywords::before {
   content: "3. TAXONOMY & KEYWORDS"; display: block !important;
-  font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important;
+  font: 600 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.1em !important; text-transform: uppercase !important; color: #111111 !important;
   margin: 0 0 16px 0 !important;
 }
-#ws_page.page-media .media_detail_keywords b { display: flex !important; flex-wrap: wrap !important; gap: 6px !important; font-weight: 400 !important; }
+#ws_page.page-media .media_detail_keywords b { display: flex !important; flex-wrap: wrap !important; gap: 8px !important; font-weight: 400 !important; }
 #ws_page.page-media .media_detail_keywords b a {
-  font: 500 9px/1 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important;
-  background: #F4F4F4 !important; padding: 6px 12px !important; border-radius: var(--pi-r-pill, 999px) !important; text-decoration: none !important;
+  font: 500 10px/1 Inter, sans-serif !important; letter-spacing: 0.06em !important; text-transform: uppercase !important; color: #111111 !important;
+  background: #F4F4F4 !important; padding: 7px 12px !important; border-radius: var(--pi-r-pill, 999px) !important; text-decoration: none !important;
   transition: background 0.15s ease !important;
 }
 #ws_page.page-media .media_detail_keywords b a:hover { background: #E5E5E5 !important; }
-
-/* Processing Protocol */
-#ws_page.page-media .col-4 .elem[data-type="raw"] { order: 10 !important; }
-#ws_page.page-media .col-4 .elem[data-type="raw"] > div { border-top: none !important; padding-top: 24px !important; margin-top: 0 !important; }
-#ws_page.page-media .col-4 .elem[data-type="raw"] p:first-child { font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; margin-bottom: 16px !important; }
-#ws_page.page-media .col-4 .elem[data-type="raw"] p { font: 400 11px/1.6 Inter, sans-serif !important; color: #6F6F6F !important; margin-bottom: 8px !important; }
-#ws_page.page-media .col-4 .elem[data-type="raw"] span { color: #111111 !important; }
 
 /* Przycisk zamknięcia panelu */
 html body #main_content .pi-detail-close { position: absolute !important; top: 16px !important; right: 16px !important; z-index: 20 !important; }
@@ -257,14 +254,15 @@ html body #main_content .pi-detail-x svg { width: 14px !important; height: 14px 
 html body #main_content .pi-detail-x:hover { background: #111 !important; }
 html body #main_content .pi-detail-x:hover svg { stroke: #fff !important; }
 
-/* Mobile (Media Page) */
+/* Responsywność */
 @media (max-width: 900px) {
   #ws_page.page-media #main_content > .row-12:has(.media_detail_wrapper) { flex-direction: column !important; height: auto !important; min-height: auto !important; width: 100% !important; }
   #ws_page.page-media #main_content .row-12 > .first.col-6:has(.media_detail_wrapper) { max-width: 100% !important; width: 100% !important; height: auto !important; padding: 16px 16px 20px 16px !important; }
   .media_detail_wrapper img { max-height: 65vh !important; width: 100% !important; height: auto !important; }
   #ws_page.page-media #main_content .row-12 > .col-4:has(.media_detail_meta_wrapper) { flex: 1 1 auto !important; width: 100% !important; max-width: 100% !important; border-left: none !important; border-top: 1px solid #000000 !important; height: auto !important; position: static !important; padding: 24px 18px 60px 18px !important; box-sizing: border-box !important; }
+  #ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) { position: static !important; width: 100% !important; padding: 0 18px 24px 18px !important; }
+  #ws_page.page-media .col-4 .media_description { margin-bottom: 24px !important; }
 }
-
 /* ==========================================================================
    3. KONTO, SELEKCJA, ZAKUPY (ODPORNE NA NAWIGACJĘ AJAX)
    ========================================================================== */
