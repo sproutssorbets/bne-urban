@@ -990,3 +990,91 @@ body.pi-acct .pi-acct-root form:has(input[type="text"], input[type="email"], inp
   width: 100% !important;
 }
 #ws_page.page-quotation a.ajaxable.back:hover { color: #6B6B6B !important; }
+/* ===== SZCZEGÓŁY ZAMÓWIENIA (ORDER) ===== */
+
+/* 1. Główny przycisk płatności */
+#ws_page.page-order a.button.forward {
+  display: block !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  text-align: center !important;
+  margin: 24px 0 48px 0 !important;
+  border-radius: var(--pi-r-pill, 999px) !important;
+}
+
+/* Usuwamy tag <br> po statusie, by marginesy działały prawidłowo */
+#ws_page.page-order .text_block > br {
+  display: none !important;
+}
+
+/* 2. Listy przedmiotów i podsumowania */
+#ws_page.page-order ul.order_or_cart_items {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 0 32px 0 !important;
+}
+#ws_page.page-order li.ooc_item {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  padding: 24px 0 !important;
+  border-top: 1px solid #DADADA !important;
+  gap: 16px;
+}
+#ws_page.page-order ul.totals li.ooc_item {
+  border-top: none !important;
+  border-bottom: 1px solid #DADADA !important;
+  padding: 16px 0 !important;
+}
+#ws_page.page-order ul.totals li.ooc_item.grand_total {
+  border-bottom: 2px solid #111111 !important;
+}
+
+/* 3. Kolumny w wierszu */
+#ws_page.page-order .item_presentation {
+  display: flex !important;
+  gap: 24px !important;
+  flex: 1 1 auto !important;
+  min-width: 240px !important;
+}
+#ws_page.page-order .item_thumbnail {
+  flex: 0 0 100px !important;
+  width: 100px !important;
+}
+#ws_page.page-order .item_description {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  font-size: 12px !important;
+  line-height: 1.6 !important;
+  color: #6F6F6F !important;
+}
+#ws_page.page-order .item_quantity_and_actions {
+  flex: 0 0 40px !important;
+  text-align: right !important;
+}
+#ws_page.page-order .item_price_and_taxes {
+  flex: 0 0 100px !important;
+  text-align: right !important;
+}
+#ws_page.page-order .item_price_and_taxes .currency {
+  font-weight: 500 !important;
+  color: #111111 !important;
+}
+
+/* 4. Cichy przycisk powrotu na dole */
+#ws_page.page-order a.ajaxable.back {
+  display: inline-block !important;
+  font: 500 11px/1 Inter, sans-serif !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: #111111 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px !important;
+  margin-top: 16px !important;
+  text-align: center !important;
+  width: 100% !important;
+}
+#ws_page.page-order a.ajaxable.back:hover {
+  color: #6B6B6B !important;
+}
