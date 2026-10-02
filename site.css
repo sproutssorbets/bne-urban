@@ -847,5 +847,64 @@ body.pi-acct .pi-acct-root form:has(input[type="text"], input[type="email"], inp
 #ws_page.page-client_home .order_actions a.submit_small,
 #ws_page.page-client_home #inline_subscription input.submit {
   border-radius: var(--pi-r-pill, 999px) !important;
+}/* ===== ZAOKRAGLENIA: KARTA SEKCJI (LIGHTBOX) ===== */
+
+#ws_page.page-lightbox input.submit_small,
+#ws_page.page-lightbox .lightbox_meta form.save_lightbox input.submit,
+#ws_page.page-lightbox a.ajaxable.request_quotation_link,
+#ws_page.page-lightbox a.back {
+  border-radius: var(--pi-r-pill, 999px) !important;
+}
+/* ===== FORMULARZ WYCENY (QUOTATION) ===== */
+
+/* Etykiety i odstępy w głównym formularzu */
+#ws_page.page-quotation form.quotation_form > p {
+  margin-bottom: 24px !important;
+}
+#ws_page.page-quotation form.quotation_form label {
+  display: block !important;
+  margin-bottom: 8px !important;
+}
+
+/* Lista przedmiotów (odwzorowanie siatki koszyka) */
+#ws_page.page-quotation ul.order_or_cart_items {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 32px 0 48px 0 !important;
+}
+#ws_page.page-quotation li.ooc_item {
+  padding: 24px 0 !important;
+  border-top: 1px solid #DADADA !important;
+  border-bottom: 1px solid #DADADA !important;
+}
+#ws_page.page-quotation .item_presentation {
+  display: flex !important;
+  gap: 24px !important;
+  align-items: flex-start !important;
+}
+#ws_page.page-quotation .item_thumbnail {
+  flex: 0 0 100px !important;
+  width: 100px !important;
+}
+#ws_page.page-quotation .item_description {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+
+/* Przycisk powrotu pod formularzem */
+#ws_page.page-quotation a.ajaxable.back {
+  display: inline-block !important;
+  font: 500 11px/1 Inter, sans-serif !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: #111111 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px !important;
+  margin-top: 16px !important;
+  text-align: center !important;
+  width: 100% !important;
+}
+#ws_page.page-quotation a.ajaxable.back:hover {
+  color: #6B6B6B !important;
 }
 
