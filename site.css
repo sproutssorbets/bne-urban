@@ -848,3 +848,70 @@ body.pi-acct .pi-acct-root form:has(input[type="text"], input[type="email"], inp
 #ws_page.page-client_home #inline_subscription input.submit {
   border-radius: var(--pi-r-pill, 999px) !important;
 }
+/* ===== KARTA SEKCJI (LIGHTBOX) - WIDOK REFERENCYJNY ===== */
+
+/* 1. Wyśrodkowana główna kolumna (ok. 640px) */
+#ws_page.page-lightbox .main_content {
+  max-width: 640px !important;
+  margin: 0 auto !important;
+  float: none !important;
+}
+
+/* 2. Przyciski górne jako tekst (Clear, Delete, New) */
+#ws_page.page-lightbox .page_actions {
+  justify-content: flex-start !important;
+  margin-bottom: 32px !important;
+}
+#ws_page.page-lightbox .page_actions input.submit_small {
+  background: transparent !important;
+  color: #111111 !important;
+  border: none !important;
+  border-bottom: 1px solid transparent !important;
+  height: 32px !important;
+  padding: 0 20px 0 0 !important;
+  border-radius: 0 !important;
+  font-weight: 500 !important;
+}
+#ws_page.page-lightbox .page_actions input.submit_small:hover {
+  background: transparent !important;
+  color: #111111 !important;
+  border-bottom-color: #111111 !important;
+}
+
+/* 3. Układ pół select/input obok siebie w 2 rzędach (Etykieta nad polem) */
+#ws_page.page-lightbox .lightbox_meta {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 24px !important;
+  margin-bottom: 48px !important;
+}
+#ws_page.page-lightbox .lightbox_meta form {
+  flex: auto !important;
+  margin: 0 !important;
+}
+#ws_page.page-lightbox .lightbox_meta form label {
+  display: block !important;
+  margin-bottom: 8px !important;
+}
+
+/* 4. Wyśrodkowana siatka miniatur */
+#ws_page.page-lightbox .thumbs_wall {
+  justify-content: center !important;
+  gap: 32px 20px !important;
+}
+
+/* 5. Minimalistyczne przyciski dolne (Continue / Quotation) */
+#ws_page.page-lightbox a.ajaxable.request_quotation_link,
+#ws_page.page-lightbox a.back {
+  background: transparent !important;
+  color: #111111 !important;
+  border: none !important;
+  border-bottom: 1px solid transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+#ws_page.page-lightbox a.ajaxable.request_quotation_link:hover,
+#ws_page.page-lightbox a.back:hover {
+  background: transparent !important;
+  border-bottom-color: #111111 !important;
+}
