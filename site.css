@@ -1078,3 +1078,30 @@ body.pi-acct .pi-acct-root form:has(input[type="text"], input[type="email"], inp
 #ws_page.page-order a.ajaxable.back:hover {
   color: #6B6B6B !important;
 }
+/* ===== KOREKTA: GÓRNE PRZYCISKI I PUSTY STAN (LIGHTBOX) ===== */
+
+/* 1. Odsunięcie białych pigułek od menu i ich wyśrodkowanie */
+#ws_page.page-lightbox .page_actions {
+  margin-top: 48px !important;
+  margin-bottom: 48px !important;
+  justify-content: center !important;
+}
+
+/* 2. Elegancki układ dla pustego stanu (gdy znika pole nazwy) */
+#ws_page.page-lightbox .lightbox_meta:has(.short_message) {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 32px !important;
+}
+
+/* 3. Zwężenie samotnego dropdownu, by nie zajmował całych 640px */
+#ws_page.page-lightbox .lightbox_meta:has(.short_message) form {
+  max-width: 320px !important;
+}
+
+/* 4. Poprawne ułożenie komunikatu "Selection is empty" */
+#ws_page.page-lightbox .lightbox_meta .short_message {
+  grid-column: 1 / -1 !important;
+  margin: 16px 0 !important;
+}
