@@ -348,3 +348,17 @@ html body[data-pi-shop] #main_content :is(a, input, button)[class*="button" i], 
 #ws_page.page-website_page-contact form :is(input[type="checkbox"] + label, label:has(input[type="checkbox"])) { display: inline !important; font: 400 12px/1.5 Inter, sans-serif !important; letter-spacing: 0 !important; text-transform: none !important; margin: 0 !important; cursor: pointer !important; }
 #ws_page.page-website_page-contact form :is(input[type="submit"], button[type="submit"]) { display: block !important; width: 100% !important; height: 48px !important; margin: 8px 0 16px 0 !important; padding: 0 !important; background: #111111 !important; color: #FFFFFF !important; border: 1px solid #111111 !important; border-radius: var(--pi-r-pill) !important; box-shadow: none !important; font: 500 11px/46px Inter, sans-serif !important; letter-spacing: 0.14em !important; text-transform: uppercase !important; text-align: center !important; cursor: pointer !important; -webkit-appearance: none !important; }
 #ws_page.page-website_page-contact form :is(input[type="submit"], button[type="submit"]):hover { background: #FFFFFF !important; color: #111111 !important; }
+/* ===== 8. POSZERZENIE GŁÓWNEGO KONTENERA DO 860px ===== */
+html body[data-pi-shop] {
+  --pi-shop-w: 860px !important;
+}
+
+body.pi-acct[data-pi-acct="selections"] .pi-acct-root,
+body.pi-acct[data-pi-acct="profile"] .pi-acct-root,
+body.pi-acct[data-pi-acct="form"] .pi-acct-root,
+body.pi-acct[data-pi-acct="selection"] .pi-acct-root,
+body.pi-acct .pi-acct-root .pi-acct-center,
+#ws_page.page-lightbox .main_content,
+#ws_page.page-quotation .main_content {
+  max-width: 860px !important;
+}
