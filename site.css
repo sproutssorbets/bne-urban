@@ -161,13 +161,13 @@ html body #component_menu span[class*="minicart" i] { padding-left: 8px !importa
   font-size: 0 !important; line-height: 0 !important; color: transparent !important;
 }
 #ws_page.page-media .media_detail_meta_wrapper > div.media_friendly_id b {
-  font: 500 10px/1.4 'JetBrains Mono', 'SF Mono', Menlo, monospace, Inter, sans-serif !important; 
+  font: 500 10px/1.4 Inter, sans-serif !important; 
   letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important;
 }
 #ws_page.page-media .media_detail_meta_wrapper > div.media_friendly_id b::before { content: "REF. "; }
 #ws_page.page-media .media_detail_meta_wrapper > div.media_friendly_id::after {
   content: "BRISBANE, QLD, AUSTRALIA";
-  font: 400 10px/1.4 'JetBrains Mono', 'SF Mono', Menlo, monospace, Inter, sans-serif !important; 
+  font: 400 10px/1.4 Inter, sans-serif !important; 
   color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important;
 }
 #ws_page.page-media .media_location { display: none !important; }
@@ -189,7 +189,6 @@ html body #component_menu span[class*="minicart" i] { padding-left: 8px !importa
 }
 
 /* --- ROW 4: Przycisk ADD TO SELECTION --- */
-/* Integrujemy blok pierwszego wiersza PhotoDecka prosto w nasz strumień metadanych! */
 #ws_page.page-media #main_content > .row-12:first-child {
   grid-row: 4 !important;
   display: block !important; width: 100% !important; margin-bottom: 32px !important;
@@ -207,98 +206,93 @@ html body #component_menu span[class*="minicart" i] { padding-left: 8px !importa
 #ws_page.page-media input.submit_small.lightbox_toggle {
   display: block !important; width: 100% !important; height: 38px !important; margin: 0 !important; padding: 0 20px !important;
   background: #000000 !important; color: #FFFFFF !important; border: 1px solid #000000 !important;
-  border-radius: 9999px !important; /* Niszczy sztywny border z THEME CSS */
+  border-radius: 9999px !important;
   font: 500 11px/36px Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important;
   cursor: pointer !important; text-align: center !important; box-sizing: border-box !important; transition: opacity 0.15s ease !important;
 }
 #ws_page.page-media input.submit_small.lightbox_toggle:hover { opacity: 0.88 !important; }
 
-/* --- ROW 5: 1. ARCHIVAL & TECHNICAL DATA (Nagłówek i data) --- */
+/* --- ROW 5, 6, 7, 8: 1. ARCHIVAL & TECHNICAL DATA --- */
 #ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date {
   grid-row: 5 !important;
-  border-top: 1px solid #E5E5E5 !important; padding-top: 20px !important; margin-top: 0 !important;
+  border-top: 1px solid #E5E5E5 !important; padding-top: 14px !important; margin-top: 0 !important;
   font-size: 0 !important; line-height: 0 !important; color: transparent !important;
-  display: flex !important; flex-direction: column !important;
+  display: flex !important; flex-direction: column !important; gap: 6px !important;
 }
 #ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date::before {
   content: "1. ARCHIVAL & TECHNICAL DATA"; display: block !important; width: 100% !important;
   font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important;
-  margin: 0 0 16px 0 !important;
-}
-#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date b {
-  display: flex !important; justify-content: space-between !important; align-items: baseline !important; width: 100% !important;
-  font-size: 0 !important; line-height: 1.5 !important;
-}
-#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date b::before {
-  content: "DATE"; font: 400 10px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important;
-}
-#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date time {
-  font: 400 11px/1.5 Inter, sans-serif !important; color: #111111 !important; text-align: right !important;
+  margin: 0 0 6px 0 !important;
 }
 
-/* --- ROW 6, 7, 8: Autoryzacja i Parametry Techniczne --- */
-#ws_page.page-media .media_detail_meta_wrapper > div.media_author { grid-row: 6 !important; }
-#ws_page.page-media .media_detail_meta_wrapper > div.media_copyright { grid-row: 7 !important; }
-#ws_page.page-media .media_detail_meta_wrapper > div.media_size { grid-row: 8 !important; border-bottom: 1px solid #E5E5E5 !important; padding-bottom: 20px !important; }
+#ws_page.page-media .media_author { grid-row: 6 !important; }
+#ws_page.page-media .media_copyright { grid-row: 7 !important; }
+#ws_page.page-media .media_size { grid-row: 8 !important; border-bottom: 1px solid #E5E5E5 !important; padding-bottom: 14px !important; margin-bottom: 0 !important; }
 
+#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date b,
 #ws_page.page-media .media_detail_meta_wrapper > div.media_author,
 #ws_page.page-media .media_detail_meta_wrapper > div.media_copyright,
 #ws_page.page-media .media_detail_meta_wrapper > div.media_size {
-  font-size: 0 !important; line-height: 0 !important; color: transparent !important;
   display: flex !important; justify-content: space-between !important; align-items: baseline !important;
-  padding-top: 6px !important; padding-bottom: 6px !important; margin: 0 !important;
+  width: 100% !important; font-size: 0 !important; line-height: 0 !important; color: transparent !important;
+  padding: 0 !important; margin: 0 0 6px 0 !important;
 }
-#ws_page.page-media .media_detail_meta_wrapper > div.media_author::before { content: "AUTHOR"; font: 400 10px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important; }
-#ws_page.page-media .media_detail_meta_wrapper > div.media_copyright::before { content: "RIGHTS"; font: 400 10px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important; }
-#ws_page.page-media .media_detail_meta_wrapper > div.media_size::before { content: "DIMENSIONS"; font: 400 10px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important; }
 
+#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date b::before { content: "DATE"; font: 400 9.5px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important; }
+#ws_page.page-media .media_detail_meta_wrapper > div.media_author::before { content: "AUTHOR"; font: 400 9.5px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important; }
+#ws_page.page-media .media_detail_meta_wrapper > div.media_copyright::before { content: "RIGHTS"; font: 400 9.5px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important; }
+#ws_page.page-media .media_detail_meta_wrapper > div.media_size::before { content: "DIMENSIONS"; font: 400 9.5px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important; }
+
+#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date time,
 #ws_page.page-media .media_detail_meta_wrapper > div.media_author b,
-#ws_page.page-media .media_detail_meta_wrapper > div.media_size b {
-  font: 400 11px/1.5 Inter, sans-serif !important; color: #111111 !important; text-align: right !important; font-weight: 400 !important;
-}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_size b,
 #ws_page.page-media .media_detail_meta_wrapper > div.media_copyright::after {
-  content: "© 2026 All rights reserved."; font: 400 11px/1.5 Inter, sans-serif !important; color: #111111 !important; text-align: right !important;
+  font: 400 11px/1.5 Inter, sans-serif !important; color: #111111 !important; text-align: right !important; text-transform: none !important; font-weight: 400 !important; letter-spacing: 0 !important;
 }
+#ws_page.page-media .media_detail_meta_wrapper > div.media_copyright::after { content: "© 2026 All rights reserved."; }
 
 /* --- ROW 9: 2. PROCESSING PROTOCOL --- */
-#ws_page.page-media .col-4 .elem[data-type="raw"] { grid-row: 9 !important; margin: 0 !important; }
+#ws_page.page-media .col-4 .elem[data-type="raw"] { grid-row: 9 !important; margin: 0 !important; width: 100% !important; }
 #ws_page.page-media .col-4 .elem[data-type="raw"] > div {
   border-top: none !important; border-bottom: 1px solid #E5E5E5 !important;
-  padding: 20px 0 !important; margin: 0 !important;
+  padding: 14px 0 16px 0 !important; margin: 0 !important;
 }
 #ws_page.page-media .col-4 .elem[data-type="raw"] p:first-child {
-  font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important; margin: 0 0 16px 0 !important;
+  font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important; margin: 0 0 10px 0 !important;
 }
 #ws_page.page-media .col-4 .elem[data-type="raw"] p:first-child::before { content: "2. "; }
 #ws_page.page-media .col-4 .elem[data-type="raw"] p:not(:first-child) {
-  font: 400 11px/1.5 Inter, sans-serif !important; color: #333333 !important; margin: 0 0 8px 0 !important;
+  font: 400 11.5px/1.5 Inter, sans-serif !important; color: #333333 !important; margin: 0 0 6px 0 !important;
 }
-#ws_page.page-media .col-4 .elem[data-type="raw"] span { color: #767676 !important; font-size: 10.5px !important; }
+#ws_page.page-media .col-4 .elem[data-type="raw"] span { color: #767676 !important; font-size: 11px !important; }
 
 /* --- ROW 10: 3. TAXONOMY & KEYWORDS --- */
+#ws_page.page-media .media_detail_keywords,
 #ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords {
   grid-row: 10 !important;
-  padding-top: 20px !important; padding-bottom: 64px !important; margin: 0 !important;
+  padding-top: 14px !important; padding-bottom: 64px !important; margin: 0 !important;
   border-top: none !important; border-bottom: none !important;
-  font-size: 0 !important; line-height: 0 !important; color: transparent !important;
 }
+#ws_page.page-media .media_detail_keywords::before,
 #ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords::before {
   content: "3. TAXONOMY & KEYWORDS"; display: block !important;
   font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important; margin: 0 0 12px 0 !important;
 }
+#ws_page.page-media .media_detail_keywords b,
 #ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords b {
-  font-size: 0 !important; line-height: 0 !important; letter-spacing: 0 !important; color: transparent !important;
-  display: block !important; font-weight: 400 !important;
+  font-size: 0 !important; line-height: 0 !important; color: transparent !important;
+  display: flex !important; flex-wrap: wrap !important; gap: 5px !important; font-weight: 400 !important;
 }
+#ws_page.page-media .media_detail_keywords b a,
 #ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords b a {
   display: inline-block !important;
   font: 400 9.5px/1.2 Inter, sans-serif !important;
   letter-spacing: 0.04em !important; text-transform: uppercase !important;
   color: #222222 !important; background: #FFFFFF !important; border: 1px solid #E5E5E5 !important;
-  padding: 4px 6px !important; margin: 0 5px 6px 0 !important; border-radius: 4px !important;
-  text-decoration: none !important; vertical-align: middle !important;
-  transition: border-color 0.15s ease, background 0.15s ease !important;
+  padding: 3px 6px !important; margin: 0 !important; border-radius: 3px !important;
+  text-decoration: none !important; transition: border-color 0.15s ease, background 0.15s ease !important;
 }
+#ws_page.page-media .media_detail_keywords b a:hover,
 #ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords b a:hover {
   border-color: #999999 !important; background: #F9F9F9 !important; color: #000000 !important;
 }
@@ -333,285 +327,6 @@ html body #component_menu span[class*="minicart" i] { padding-left: 8px !importa
       padding-left: 16px !important; padding-right: 16px !important;
   }
 }
-/* ==========================================================================
-   5. SEKCJA 1: ARCHIVAL & TECHNICAL DATA
-   ========================================================================== */
-
-#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date {
-  order: 5 !important;
-  border-top: 1px solid #E5E5E5 !important;
-  padding-top: 14px !important;
-  margin-top: 0 !important;
-  font-size: 0 !important; line-height: 0 !important; color: transparent !important;
-  display: flex !important; flex-direction: column !important;
-}
-
-#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date::before {
-  content: "1. ARCHIVAL & TECHNICAL DATA";
-  display: block !important; width: 100% !important;
-  font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important;
-  margin: 0 0 10px 0 !important;
-}
-
-#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date b {
-  display: flex !important; justify-content: space-between !important; align-items: baseline !important; width: 100% !important;
-  font-size: 0 !important; line-height: 1.5 !important;
-}
-#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date b::before {
-  content: "DATE"; font: 400 10px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important;
-}
-#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date time {
-  font: 400 11px/1.5 Inter, sans-serif !important; color: #111111 !important; text-align: right !important;
-}
-
-/* Wiersz AUTHOR */
-#ws_page.page-media .media_detail_meta_wrapper > div.media_author {
-  order: 6 !important; font-size: 0 !important; line-height: 0 !important; color: transparent !important;
-  display: flex !important; justify-content: space-between !important; align-items: baseline !important;
-  padding: 4px 0 !important; margin: 0 !important;
-}
-#ws_page.page-media .media_detail_meta_wrapper > div.media_author::before {
-  content: "AUTHOR"; font: 400 10px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important;
-}
-#ws_page.page-media .media_detail_meta_wrapper > div.media_author b {
-  font: 400 11px/1.5 Inter, sans-serif !important; color: #111111 !important; text-align: right !important; font-weight: 400 !important;
-}
-
-/* Wiersz COPYRIGHT */
-#ws_page.page-media .media_detail_meta_wrapper > div.media_copyright {
-  order: 7 !important; display: flex !important; justify-content: space-between !important; align-items: baseline !important;
-  padding: 4px 0 !important; margin: 0 !important; font-size: 0 !important; line-height: 0 !important; color: transparent !important;
-}
-#ws_page.page-media .media_detail_meta_wrapper > div.media_copyright::before {
-  content: "RIGHTS"; font: 400 10px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important;
-}
-#ws_page.page-media .media_detail_meta_wrapper > div.media_copyright::after {
-  content: "© 2026 All rights reserved.";
-  font: 400 11px/1.5 Inter, sans-serif !important; color: #111111 !important; text-align: right !important;
-}
-
-/* Wiersz DIMENSIONS / PHOTO SIZE */
-#ws_page.page-media .media_detail_meta_wrapper > div.media_size {
-  order: 8 !important; font-size: 0 !important; line-height: 0 !important; color: transparent !important;
-  border-bottom: 1px solid #E5E5E5 !important;
-  padding: 4px 0 14px 0 !important; margin: 0 !important;
-  display: flex !important; justify-content: space-between !important; align-items: baseline !important;
-}
-#ws_page.page-media .media_detail_meta_wrapper > div.media_size::before {
-  content: "DIMENSIONS"; font: 400 10px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important;
-}
-#ws_page.page-media .media_detail_meta_wrapper > div.media_size b {
-  font: 400 11px/1.5 Inter, sans-serif !important; color: #111111 !important; text-align: right !important; font-weight: 400 !important;
-}
-
-/* ==========================================================================
-   6. SEKCJA 2: PROCESSING PROTOCOL
-   ========================================================================== */
-
-#ws_page.page-media .col-4 .elem[data-type="raw"] {
-  order: 9 !important; width: 100% !important; margin: 0 !important;
-}
-#ws_page.page-media .col-4 .elem[data-type="raw"] > div {
-  border-top: none !important; border-bottom: 1px solid #E5E5E5 !important;
-  padding: 14px 0 16px 0 !important; margin: 0 !important;
-}
-#ws_page.page-media .col-4 .elem[data-type="raw"] p:first-child {
-  font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important;
-  margin: 0 0 10px 0 !important;
-}
-#ws_page.page-media .col-4 .elem[data-type="raw"] p:first-child::before {
-  content: "2. ";
-}
-#ws_page.page-media .col-4 .elem[data-type="raw"] p:not(:first-child) {
-  font: 400 11.5px/1.5 Inter, sans-serif !important; color: #333333 !important; margin: 0 0 6px 0 !important;
-}
-#ws_page.page-media .col-4 .elem[data-type="raw"] span {
-  color: #767676 !important; font-size: 11px !important;
-}
-
-/* ==========================================================================
-   7. SEKCJA 3: TAXONOMY & KEYWORDS (UKRYCIE PRZECINKÓW PRZEZ SPECYFICZNOŚĆ)
-   ========================================================================== */
-
-#ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords {
-  order: 10 !important; font-size: 0 !important; line-height: 0 !important; color: transparent !important;
-  border-top: none !important; border-bottom: none !important;
-  padding: 14px 0 0 0 !important; margin: 0 !important;
-}
-#ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords::before {
-  content: "3. TAXONOMY & KEYWORDS"; display: block !important;
-  font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important;
-  margin: 0 0 10px 0 !important;
-}
-
-/* Wycięcie przecinków: ustawiamy font-size: 0 na b oraz resetujemy line-height */
-#ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords b {
-  font-size: 0 !important;
-  line-height: 0 !important;
-  letter-spacing: 0 !important;
-  color: transparent !important;
-  display: block !important;
-  font-weight: 400 !important;
-}
-
-/* Przywrócenie kafelków na linkach <a> wewnątrz <b> */
-#ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords b a {
-  display: inline-block !important;
-  font: 400 9.5px/1.2 Inter, sans-serif !important;
-  letter-spacing: 0.04em !important;
-  text-transform: uppercase !important;
-  color: #222222 !important;
-  background: #FFFFFF !important;
-  border: 1px solid #E5E5E5 !important;
-  padding: 4px 6px !important;
-  margin: 0 4px 5px 0 !important;
-  border-radius: 4px !important;
-  text-decoration: none !important;
-  vertical-align: middle !important;
-  transition: border-color 0.15s ease, background 0.15s ease !important;
-}
-
-#ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords b a:hover {
-  border-color: #999999 !important;
-  background: #F9F9F9 !important;
-  color: #000000 !important;
-}
-
-/* Nagłówek i Wiersz DATE */
-#ws_page.page-media .media_creation_date {
-  order: 5 !important;
-  border-top: 1px solid #E5E5E5 !important;
-  padding-top: 14px !important;
-  margin-top: 0 !important;
-  font-size: 0 !important; /* Wycięcie tekstu 'Created:' */
-  display: flex !important;
-  flex-direction: column !important;
-}
-
-#ws_page.page-media .media_creation_date::before {
-  content: "1. ARCHIVAL & TECHNICAL DATA";
-  display: block !important; width: 100% !important;
-  font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important;
-  margin: 0 0 10px 0 !important;
-}
-
-#ws_page.page-media .media_creation_date b {
-  display: flex !important; justify-content: space-between !important; align-items: baseline !important; width: 100% !important;
-}
-#ws_page.page-media .media_creation_date b::before {
-  content: "DATE"; font: 400 10px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important;
-}
-#ws_page.page-media .media_creation_date time {
-  font: 400 11px/1.5 Inter, sans-serif !important; color: #111111 !important; text-align: right !important;
-}
-
-/* Wiersz AUTHOR */
-#ws_page.page-media .media_author {
-  order: 6 !important; font-size: 0 !important; display: flex !important; justify-content: space-between !important; align-items: baseline !important;
-  padding: 4px 0 !important;
-}
-#ws_page.page-media .media_author::before {
-  content: "AUTHOR"; font: 400 10px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important;
-}
-#ws_page.page-media .media_author b {
-  font: 400 11px/1.5 Inter, sans-serif !important; color: #111111 !important; text-align: right !important; font-weight: 400 !important;
-}
-
-/* Wiersz COPYRIGHT */
-#ws_page.page-media .media_copyright {
-  order: 7 !important; display: flex !important; justify-content: space-between !important; align-items: baseline !important;
-  padding: 4px 0 !important; font-size: 0 !important;
-}
-#ws_page.page-media .media_copyright::before {
-  content: "RIGHTS"; font: 400 10px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important;
-}
-#ws_page.page-media .media_copyright::after {
-  content: "© 2026 All rights reserved.";
-  font: 400 11px/1.5 Inter, sans-serif !important; color: #111111 !important; text-align: right !important;
-}
-
-/* Wiersz DIMENSIONS / PHOTO SIZE */
-#ws_page.page-media .media_size {
-  order: 8 !important; font-size: 0 !important; border-bottom: 1px solid #E5E5E5 !important;
-  padding: 4px 0 14px 0 !important; margin-bottom: 0 !important;
-  display: flex !important; justify-content: space-between !important; align-items: baseline !important;
-}
-#ws_page.page-media .media_size::before {
-  content: "DIMENSIONS"; font: 400 10px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important;
-}
-#ws_page.page-media .media_size b {
-  font: 400 11px/1.5 Inter, sans-serif !important; color: #111111 !important; text-align: right !important; font-weight: 400 !important;
-}
-
-/* ==========================================================================
-   6. SEKCJA 2: PROCESSING PROTOCOL (KOLEJNOŚĆ W FLEXIE: ORDER 9)
-   ========================================================================== */
-
-#ws_page.page-media .col-4 .elem[data-type="raw"] {
-  order: 9 !important; width: 100% !important; margin: 0 !important;
-}
-#ws_page.page-media .col-4 .elem[data-type="raw"] > div {
-  border-top: none !important; border-bottom: 1px solid #E5E5E5 !important;
-  padding: 14px 0 16px 0 !important; margin: 0 !important;
-}
-#ws_page.page-media .col-4 .elem[data-type="raw"] p:first-child {
-  font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important;
-  margin: 0 0 10px 0 !important;
-}
-#ws_page.page-media .col-4 .elem[data-type="raw"] p:first-child::before {
-  content: "2. ";
-}
-#ws_page.page-media .col-4 .elem[data-type="raw"] p:not(:first-child) {
-  font: 400 11.5px/1.5 Inter, sans-serif !important; color: #333333 !important; margin: 0 0 6px 0 !important;
-}
-#ws_page.page-media .col-4 .elem[data-type="raw"] span {
-  color: #767676 !important; font-size: 11px !important;
-}
-
-/* ==========================================================================
-   7. SEKCJA 3: TAXONOMY & KEYWORDS (KOLEJNOŚĆ W FLEXIE: ORDER 10)
-   ========================================================================== */
-
-#ws_page.page-media .media_detail_keywords {
-  order: 10 !important; font-size: 0 !important; border-top: none !important; border-bottom: none !important;
-  padding: 14px 0 0 0 !important; margin: 0 !important;
-}
-#ws_page.page-media .media_detail_keywords::before {
-  content: "3. TAXONOMY & KEYWORDS"; display: block !important;
-  font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important;
-  margin: 0 0 10px 0 !important;
-}
-
-/* Całkowite ukrycie przecinków: ustawienie zerowego fontu na b */
-#ws_page.page-media .media_detail_keywords b {
-  font-size: 0 !important;
-  line-height: 0 !important;
-  letter-spacing: 0 !important;
-  display: block !important;
-  font-weight: 400 !important;
-}
-
-/* Styl pojedynczego kafelka z przywróceniem fontu */
-#ws_page.page-media .media_detail_keywords b a {
-  display: inline-block !important;
-  font: 400 9.5px/1.2 Inter, sans-serif !important;
-  letter-spacing: 0.04em !important;
-  text-transform: uppercase !important;
-  color: #222222 !important;
-  background: #FFFFFF !important;
-  border: 1px solid #E5E5E5 !important;
-  padding: 4px 6px !important;
-  margin: 0 4px 5px 0 !important;
-  border-radius: var(--pi-r-xs, 4px) !important;
-  text-decoration: none !important;
-  vertical-align: middle !important;
-  transition: border-color 0.15s ease, background 0.15s ease !important;
-}
-
-#ws_page.page-media .media_detail_keywords b a:hover {
-  border-color: #999999 !important;
-  background: #F9F9F9 !important;
-}
 
 /* Przycisk zamknięcia panelu */
 html body #main_content .pi-detail-close { position: absolute !important; top: 16px !important; right: 16px !important; z-index: 20 !important; }
@@ -620,138 +335,6 @@ html body #main_content .pi-detail-x svg { width: 14px !important; height: 14px 
 html body #main_content .pi-detail-x:hover { background: #111 !important; }
 html body #main_content .pi-detail-x:hover svg { stroke: #fff !important; }
 
-/* Responsywność */
-@media (max-width: 900px) {
-  #ws_page.page-media #main_content > .row-12:has(.media_detail_wrapper) { flex-direction: column !important; height: auto !important; min-height: auto !important; width: 100% !important; }
-  #ws_page.page-media #main_content .row-12 > .first.col-6:has(.media_detail_wrapper) { max-width: 100% !important; width: 100% !important; height: auto !important; padding: 16px 16px 20px 16px !important; }
-  .media_detail_wrapper img { max-height: 65vh !important; width: 100% !important; height: auto !important; }
-  #ws_page.page-media #main_content .row-12 > .col-4:has(.media_detail_meta_wrapper) { flex: 1 1 auto !important; width: 100% !important; max-width: 100% !important; border-left: none !important; border-top: 1px solid #000000 !important; height: auto !important; position: static !important; padding: 24px 18px 60px 18px !important; box-sizing: border-box !important; }
-  #ws_page.page-media #main_content > .row-12:not(:has(.media_detail_wrapper)) { position: static !important; width: 100% !important; padding: 0 18px 24px 18px !important; }
-  #ws_page.page-media .col-4 .media_description { margin-bottom: 20px !important; }
-}
-
-/* ==========================================================================
-   5. SEKCJA 1: ARCHIVAL & TECHNICAL DATA (ROZBICIE NA CZYSTY UKŁAD 2-KOLUMN)
-   ========================================================================== */
-
-/* Nagłówek Sekcji 1 jako osobny blok */
-#ws_page.page-media .media_creation_date {
-  order: 5 !important;
-  border-top: 1px solid #E5E5E5 !important;
-  padding-top: 14px !important;
-  margin-top: 0 !important;
-  display: flex !important;
-  flex-direction: column !important; /* Przełamujemy flex na 2 wiersze: nagłówek na górze, data na dole */
-}
-
-#ws_page.page-media .media_creation_date::before {
-  content: "1. ARCHIVAL & TECHNICAL DATA";
-  display: block !important; width: 100% !important;
-  font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important;
-  margin: 0 0 10px 0 !important;
-}
-
-/* Wiersz z datą pod nagłówkiem */
-#ws_page.page-media .media_creation_date time {
-  display: flex !important; justify-content: space-between !important; align-items: baseline !important;
-  width: 100% !important; font: 400 11px/1.5 Inter, sans-serif !important; color: #111111 !important;
-}
-#ws_page.page-media .media_creation_date b {
-  display: flex !important; justify-content: space-between !important; width: 100% !important; font-weight: 400 !important;
-}
-#ws_page.page-media .media_creation_date b::before {
-  content: "DATE"; font: 400 10px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important;
-}
-
-/* Wiersze: Author, Copyright, Dimensions */
-#ws_page.page-media .media_author { order: 6 !important; }
-#ws_page.page-media .media_copyright { order: 7 !important; }
-#ws_page.page-media .media_size {
-  order: 8 !important;
-  border-bottom: 1px solid #E5E5E5 !important;
-  padding-bottom: 14px !important;
-  margin-bottom: 0 !important;
-}
-
-#ws_page.page-media .media_detail_meta_wrapper > div:is(.media_author, .media_copyright, .media_size) {
-  display: flex !important; justify-content: space-between !important; align-items: baseline !important;
-  padding: 4px 0 !important; font: 400 10px/1.5 Inter, sans-serif !important; color: #767676 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important;
-}
-
-#ws_page.page-media .media_detail_meta_wrapper > div:is(.media_author, .media_copyright, .media_size) b {
-  font: 400 11px/1.5 Inter, sans-serif !important; color: #111111 !important; text-align: right !important; text-transform: none !important; letter-spacing: 0 !important;
-}
-
-/* ==========================================================================
-   6. SEKCJA 2: PROCESSING PROTOCOL (WYPEŁNIONA MIĘDZY SEKCJA 1 A 3)
-   ========================================================================== */
-
-/* Wyciągamy div raw i pozycjonujemy go pod sekcją 1 */
-#ws_page.page-media .col-4 .elem[data-type="raw"] {
-  order: 2 !important; width: 100% !important; margin: 0 !important;
-}
-#ws_page.page-media .col-4 .elem[data-type="raw"] > div {
-  border-top: none !important; border-bottom: 1px solid #E5E5E5 !important;
-  padding: 14px 0 16px 0 !important; margin: 0 !important;
-}
-#ws_page.page-media .col-4 .elem[data-type="raw"] p:first-child {
-  font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important;
-  margin: 0 0 10px 0 !important;
-}
-#ws_page.page-media .col-4 .elem[data-type="raw"] p:first-child::before {
-  content: "2. ";
-}
-#ws_page.page-media .col-4 .elem[data-type="raw"] p:not(:first-child) {
-  font: 400 11.5px/1.5 Inter, sans-serif !important; color: #333333 !important; margin: 0 0 6px 0 !important;
-}
-#ws_page.page-media .col-4 .elem[data-type="raw"] span {
-  color: #767676 !important; font-size: 11px !important;
-}
-
-/* ==========================================================================
-   7. SEKCJA 3: TAXONOMY & KEYWORDS (UKRYCIE PRZECINKÓW + RAMKI TAGÓW)
-   ========================================================================== */
-
-/* Przenosimy sekcję słów kluczowych pod Processing Protocol */
-#ws_page.page-media .media_detail_keywords {
-  order: 9 !important; font-size: 0 !important; border-top: none !important; border-bottom: none !important;
-  padding: 14px 0 0 0 !important; margin: 0 !important;
-}
-#ws_page.page-media .media_detail_keywords::before {
-  content: "3. TAXONOMY & KEYWORDS"; display: block !important;
-  font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important;
-  margin: 0 0 10px 0 !important;
-}
-
-/* Ukrywamy surowe przecinki PhotoDecka przez font-size: 0 */
-#ws_page.page-media .media_detail_keywords b {
-  display: block !important;
-  font-size: 0 !important;
-  line-height: 0 !important;
-  font-weight: 400 !important;
-}
-
-/* Styl pojedynczego tagu */
-#ws_page.page-media .media_detail_keywords b a {
-  display: inline-block !important;
-  font: 400 9.5px/1.2 Inter, sans-serif !important;
-  letter-spacing: 0.04em !important;
-  text-transform: uppercase !important;
-  color: #222222 !important;
-  background: #FFFFFF !important;
-  border: 1px solid #E5E5E5 !important;
-  padding: 4px 6px !important;
-  margin: 0 4px 5px 0 !important; /* Odstępy zamiast flex gap usuwają problem przecinków */
-  border-radius: var(--pi-r-xs, 4px) !important;
-  text-decoration: none !important;
-  vertical-align: middle !important;
-  transition: border-color 0.15s ease, background 0.15s ease !important;
-}
-
-#ws_page.page-media .media_detail_keywords b a:hover {
-  border-color: #999999 !important;
-  background: #F9F9F9 !important;
-}
 /* ==========================================================================
    3. KONTO, SELEKCJA, ZAKUPY (ODPORNE NA NAWIGACJĘ AJAX)
    ========================================================================== */
