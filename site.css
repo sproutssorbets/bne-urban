@@ -915,3 +915,11 @@ body.pi-acct .pi-acct-root form:has(input[type="text"], input[type="email"], inp
   background: transparent !important;
   border-bottom-color: #111111 !important;
 }
+/* ===== ZAOKRAGLENIA: KARTA SEKCJI (LIGHTBOX) ===== */
+
+#ws_page.page-lightbox input.submit_small,
+#ws_page.page-lightbox .lightbox_meta form.save_lightbox input.submit,
+#ws_page.page-lightbox a.ajaxable.request_quotation_link,
+#ws_page.page-lightbox a.back {
+  border-radius: var(--pi-r-pill, 999px) !important;
+}
