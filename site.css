@@ -529,3 +529,69 @@ html body #main_content .pi-detail-x:hover svg { stroke: #fff !important; }
   #ws_page.page-media #main_content > .pi-x { right: 14px; top: 14px; }
   #ws_page.page-media #main_content > .pi-below { order: 11; grid-row: auto; padding: 0 16px 40px; }
 }
+
+/* ==========================================================================
+   KONTO: /client, /lightbox, /cart (sam CSS, bez JavaScriptu i bez zmian HTML)
+   Selektory oparte na #ws_page i #main_content, zeby nie zalezaly od klas dodawanych przez worker.
+   ========================================================================== */
+
+/* wezsza kolumna jak w poprzedniej wersji */
+#ws_page.page-client_home #main_content,
+#ws_page.page-lightbox #main_content { max-width: 640px !important; }
+
+/* wszystkie linie w jasnym szarym zamiast czarnych */
+#ws_page.page-client_home #main_content *:not(input):not(select):not(textarea):not(button):not(a):not(img),
+#ws_page.page-lightbox #main_content *:not(input):not(select):not(textarea):not(button):not(a):not(img) { border-color: #DADADA !important; }
+
+/* /client: przycisk NEW SELECTION jako pigulka */
+#ws_page.page-client_home #main_content h2 form.button_to input.submit_small {
+  border-radius: 999px !important; height: 36px !important; min-height: 36px !important; padding: 0 20px !important;
+  background: #111111 !important; color: #FFFFFF !important; border: 1px solid #111111 !important;
+  font: 500 10px/34px Inter, sans-serif !important; letter-spacing: 0.14em !important; text-transform: uppercase !important;
+}
+#ws_page.page-client_home #main_content h2 form.button_to input.submit_small:hover { background: #FFFFFF !important; color: #111111 !important; }
+
+/* /client: miniatury selekcji bez czarnej ramki, z zaokragleniem */
+#ws_page.page-client_home #main_content .galleries .thumb,
+#ws_page.page-client_home #main_content #lightboxes .thumb,
+#ws_page.page-client_home #main_content #lightboxes_shared .thumb {
+  display: block !important; width: auto !important; height: auto !important; min-height: 0 !important;
+  padding: 0 !important; margin: 0 !important; border: 0 !important; background: none !important;
+  border-radius: var(--pi-r-sm, 10px) !important; overflow: hidden !important; box-shadow: none !important;
+}
+#ws_page.page-client_home #main_content .galleries .media_wrap {
+  position: static !important; display: block !important; width: auto !important; height: auto !important;
+  padding: 0 !important; border: 0 !important; background: transparent !important;
+  border-radius: var(--pi-r-sm, 10px) !important; overflow: hidden !important;
+}
+#ws_page.page-client_home #main_content .galleries .thumb img {
+  display: block !important; width: 100% !important; height: auto !important; max-width: none !important;
+  border: 0 !important; border-radius: var(--pi-r-sm, 10px) !important; margin: 0 !important; background: none !important;
+}
+#ws_page.page-client_home #main_content .gallery_meta { margin: 10px 0 0 !important; padding: 0 !important; text-align: left !important; }
+#ws_page.page-client_home #main_content .pagination { text-align: center !important; font: 400 12px/1.4 Inter, sans-serif !important; margin: 28px 0 !important; }
+
+/* /lightbox: status na gorze, przyciski jako ciche linki po lewej */
+#ws_page.page-lightbox #main_content { display: flex !important; flex-direction: column !important; }
+#ws_page.page-lightbox #main_content > .elem:has(> .user-bar-greeting) { order: -1 !important; justify-content: flex-end !important; margin: 0 0 4px !important; }
+#ws_page.page-lightbox #main_content .page_actions { justify-content: flex-start !important; gap: 24px !important; margin: 8px 0 36px !important; }
+#ws_page.page-lightbox #main_content .page_actions :is(input.submit_small, a.button, a.btn, button) {
+  height: 32px !important; min-height: 32px !important; padding: 0 !important; background: transparent !important; color: #111111 !important;
+  border: 0 !important; border-bottom: 1px solid transparent !important; border-radius: 0 !important;
+  font: 500 11px/30px Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important;
+}
+#ws_page.page-lightbox #main_content .page_actions :is(input.submit_small, a.button, a.btn, button):hover {
+  background: transparent !important; color: #111111 !important; border-bottom-color: #111111 !important;
+}
+
+/* puste stany: wskazowka co zrobic (tekst z PhotoDecka zastapiony przez CSS) */
+#ws_page.page-cart #main_content .short_message:has(b, strong),
+#ws_page.page-lightbox #main_content .short_message:has(b, strong) { font-size: 0 !important; line-height: 0 !important; }
+#ws_page.page-cart #main_content .short_message b,
+#ws_page.page-lightbox #main_content .short_message b { font: 500 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; }
+#ws_page.page-cart #main_content .short_message::after,
+#ws_page.page-lightbox #main_content .short_message::after {
+  display: block; margin-top: 10px; font: 400 13px/1.6 Inter, sans-serif; letter-spacing: 0; text-transform: none; color: #6F6F6F;
+}
+#ws_page.page-cart #main_content .short_message::after { content: "To buy a licence, open a photograph and press License."; }
+#ws_page.page-lightbox #main_content .short_message::after { content: "Press the + icon on any photograph in the archive to add it here."; }
