@@ -444,3 +444,27 @@ html body #main_content .pi-detail-x:hover svg { stroke: #fff !important; }
 #ws_page.page-website_page-contact form :is(input[type="checkbox"] + label, label:has(input[type="checkbox"])) { display: inline !important; font: 400 12px/1.5 Inter, sans-serif !important; letter-spacing: 0 !important; text-transform: none !important; margin: 0 !important; cursor: pointer !important; }
 #ws_page.page-website_page-contact form :is(input[type="submit"], button[type="submit"]) { display: block !important; width: 100% !important; height: 48px !important; margin: 8px 0 16px 0 !important; padding: 0 !important; background: #111111 !important; color: #FFFFFF !important; border: 1px solid #111111 !important; border-radius: var(--pi-r-pill) !important; box-shadow: none !important; font: 500 11px/46px Inter, sans-serif !important; letter-spacing: 0.14em !important; text-transform: uppercase !important; text-align: center !important; cursor: pointer !important; -webkit-appearance: none !important; transition: background 0.15s ease, color 0.15s ease !important; }
 #ws_page.page-website_page-contact form :is(input[type="submit"], button[type="submit"]):hover { background: #FFFFFF !important; color: #111111 !important; }
+/* ===== Strona zdjecia: poprawki panelu ===== */
+#ws_page.page-media .media_detail_meta_wrapper > div.media_friendly_id { justify-content: flex-start !important; }
+#ws_page.page-media .media_detail_meta_wrapper > div.media_friendly_id::after { margin-left: auto !important; }
+
+#ws_page.page-media .media_detail_meta_wrapper > div.media_author,
+#ws_page.page-media .media_detail_meta_wrapper > div.media_copyright,
+#ws_page.page-media .media_detail_meta_wrapper > div.media_size { padding-left: 28px !important; padding-right: 28px !important; }
+#ws_page.page-media .media_detail_meta_wrapper > div.media_size { padding-bottom: 14px !important; margin-bottom: 0 !important; }
+
+/* megapiksele zamiast "wymiarow" */
+#ws_page.page-media .media_detail_meta_wrapper > div.media_size::before { content: "RESOLUTION"; }
+#ws_page.page-media .media_detail_meta_wrapper > div.media_size b::after { content: " MP"; }
+
+/* ukryj etykiete "Photo keywords:" */
+#ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords { font-size: 0 !important; line-height: 0 !important; }
+
+/* odstep miedzy przyciskami (gdy jest tez LICENSE) */
+#ws_page.page-media #main_content > .row-12:first-child form + form { margin-top: 8px !important; }
+
+@media (max-width: 900px) {
+  #ws_page.page-media .media_detail_meta_wrapper > div.media_author,
+  #ws_page.page-media .media_detail_meta_wrapper > div.media_copyright,
+  #ws_page.page-media .media_detail_meta_wrapper > div.media_size { padding-left: 16px !important; padding-right: 16px !important; }
+}
