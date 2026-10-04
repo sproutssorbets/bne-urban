@@ -37,7 +37,7 @@ button{cursor:pointer}
 .qicon{position:absolute;left:16px;width:16px;height:16px;fill:none;stroke:var(--mute);stroke-width:1.5;pointer-events:none}
 #q{width:100%;height:44px;border:none;background:transparent;padding:0 16px 0 42px;font-size:14px;outline:none}
 #q::placeholder{color:#666}
-#sug{display:none;position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:700;background:#fff;border:1px solid var(--ink);border-radius:var(--r-md);padding:6px;max-height:60vh;overflow:auto}
+#sug{display:none;position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:700;background:#fff;border:1px solid var(--ink);border-radius:var(--r-md);padding:6px;max-height:60vh;overflow:auto;box-shadow:0 10px 30px rgba(0,0,0,0.1)}
 #sug.open{display:block}
 .sg{display:flex;justify-content:space-between;gap:12px;padding:9px 12px;font-size:12px;cursor:pointer;border-radius:var(--r-sm)}
 .sg:hover,.sg.on{background:var(--ink);color:#fff}
@@ -59,10 +59,14 @@ button{cursor:pointer}
 #split{display:flex;flex:1;min-height:0;position:relative}
 #panel{display:none;flex:0 0 320px;width:320px;flex-direction:column;background:#fff;border-right:1px solid var(--line);min-height:0}
 #panel.open{display:flex}
-.ph{display:flex;justify-content:space-between;align-items:center;padding:8px 8px 8px 16px;flex:none}
+.ph{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;flex:none;border-bottom:1px solid var(--line)}
 .pt{font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase}
 .px{width:32px;height:32px;border:none;background:transparent;font-size:20px;font-weight:300;border-radius:50%}
 .px:hover{background:var(--chip)}
+/* Filter Search */
+.pf-search{padding:12px 16px 0;flex:none}
+.pf-search input{width:100%;height:36px;border:1px solid var(--line);border-radius:var(--r-sm);padding:0 12px;font-size:12px;background:#fafafa}
+.pf-search input:focus, .pf-search input:focus-visible{background:#fff;border-color:var(--ink);outline:none}
 #fgrid{flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin;padding-bottom:16px}
 .sec{border-bottom:1px solid #ececea}
 .sh{display:flex;align-items:center;gap:8px;width:100%;padding:16px 24px;border:none;background:transparent;font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;text-align:left}
@@ -83,7 +87,7 @@ button{cursor:pointer}
 .opt .c{margin-left:auto;font-size:11px;color:var(--mute);padding-top:1px}
 #done{flex:none;margin:12px 16px 16px;height:48px;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:var(--r-pill);font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase}
 #done:hover{background:#fff;color:var(--ink)}
-#main{flex:1 1 0;min-width:0;overflow-y:auto;padding:8px 24px 72px}
+#main{flex:1 1 0;min-width:0;overflow-y:auto;padding:8px 24px 72px;scroll-behavior:smooth}
 #info{display:flex;justify-content:space-between;gap:12px;font-size:11px;letter-spacing:.02em;color:var(--mute);padding:14px 0 12px;min-height:32px}
 #wall{position:relative;width:100%}
 .card{position:absolute;left:0;top:0;display:block;overflow:hidden;background:#ececea;border-radius:var(--r-md);isolation:isolate;color:#fff;text-decoration:none}
@@ -113,18 +117,60 @@ body.panel #mapcol{display:none}
 #note{display:none;align-items:center;justify-content:space-between;gap:16px;min-height:32px;padding:6px 16px 6px 24px;background:#fff;border-top:1px solid var(--line);font-size:11px;color:var(--mute);flex:none}
 #note button{border:none;background:transparent;font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;text-decoration:underline}
 #note.show{display:flex}
+
+/* Mobile Bottom Sheet & UI overrides */
 @media (max-width:900px){
  #bar{padding:8px 16px;gap:4px 20px;min-height:0;flex-wrap:wrap}
  #sub{padding:0 16px;flex-wrap:wrap}
  #dens{display:none}
  #main{padding:8px 16px 56px}
  #split{flex-direction:column}
- #mapcol{flex:none;width:100%;height:40%;order:-1;border-left:none;border-bottom:1px solid var(--line)}
- #panel.open{position:absolute;inset:0;width:100%;z-index:900;border-right:none}
+ #mapcol{flex:none;width:100%;height:45vh;order:-1;border-left:none;border-bottom:1px solid var(--line)}
+
+ /* Animowany panel Bottom Sheet */
+ #panel{
+    display:flex !important;
+    position:fixed; bottom:0; top:auto; left:0; right:0;
+    width:100%; height:85vh;
+    background:#fff; z-index:9999;
+    border-radius:24px 24px 0 0; border-right:none;
+    box-shadow:0 -10px 40px rgba(0,0,0,0.15);
+    transform:translateY(100%); visibility:hidden;
+    transition:transform 0.4s cubic-bezier(0.32, 0.72, 0, 1), visibility 0.4s;
+ }
+ #panel.open{
+    transform:translateY(0); visibility:visible;
+ }
+
  .qwrap{order:5;flex-basis:100%}
  #chips{order:4;flex-basis:100%}
 }
-@media (prefers-reduced-motion:reduce){.card img,.card::after,.ovt,.eye{transition:none;animation:none}}
+@media (prefers-reduced-motion:reduce){.card img,.card::after,.ovt,.eye,#panel{transition:none;animation:none}}
+.mm{display:flex;align-items:center;gap:10px;margin:0 0 6px;font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.mm .seg{display:inline-flex;border:1px solid var(--line);border-radius:var(--r-pill);overflow:hidden}
+.mm button{border:none;background:transparent;padding:5px 12px;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--mute);cursor:pointer}
+.mm button[aria-pressed=true]{background:var(--ink);color:#fff}
+#subr{display:flex;align-items:center;gap:24px}
+#sortw{position:relative;display:flex;align-items:center;gap:8px;height:44px;font-size:11px;letter-spacing:.06em;color:var(--mute)}
+#sortw .l{text-transform:uppercase;letter-spacing:.12em}
+#sortbtn{display:inline-flex;align-items:center;gap:8px;padding:6px 0;border:none;border-bottom:1px solid transparent;background:transparent;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink)}
+#sortbtn:hover,#sortbtn[aria-expanded=true]{border-bottom-color:var(--ink)}
+#sortbtn svg,#sortlist svg{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+#sortbtn .cv svg{width:12px;height:12px}
+#sortbtn .cv{display:inline-flex;margin-left:-2px}
+#sortlist{display:none;position:absolute;top:calc(100% + 4px);right:0;z-index:700;min-width:200px;background:#fff;border:1px solid var(--ink);border-radius:18px;padding:6px;box-shadow:0 10px 30px rgba(0,0,0,0.1);flex-direction:column;gap:2px}
+#sortlist.open{display:flex}
+.so{display:flex;align-items:center;gap:12px;padding:12px 16px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);border-radius:14px;cursor:pointer;transition:background .15s, color .15s}
+.so .sl{flex:1}
+.so .ck{display:inline-flex;visibility:hidden}
+.so[aria-selected=true] .ck{visibility:visible}
+.so:hover,.so.act{background:var(--ink);color:#fff}
+@media (max-width:900px){#sortlist{right:auto;left:0}}
+.cj{flex:none;font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+
+/* Mapbox Clustering Override styles */
+.mapboxgl-popup { padding-bottom: 50px; }
+.mapboxgl-popup-content { font-family: Inter, sans-serif; border-radius: 12px; padding: 12px 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
 </style>
 </head>
 <body class="map">
@@ -138,11 +184,17 @@ body.panel #mapcol{display:none}
   </div>
   <div id="sub">
     <div id="tabs" role="tablist"></div>
-    <div id="dens"><span class="l">Columns</span><button id="dm" type="button" aria-label="Fewer columns">&minus;</button><b id="dn">3</b><button id="dp" type="button" aria-label="More columns">+</button></div>
+    <div id="subr"><div id="sortw"><span class="l">Sort</span><button id="sortbtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="sortlist" aria-label="Sort photographs"></button><div id="sortlist" role="listbox" aria-label="Sort photographs"></div></div><div id="dens"><span class="l">Columns</span><button id="dm" type="button" aria-label="Fewer columns">&minus;</button><b id="dn">3</b><button id="dp" type="button" aria-label="More columns">+</button></div></div>
   </div>
   <div id="split">
     <aside id="panel" aria-label="Filters">
-      <div class="ph"><span class="pt">Filters</span><button class="px" id="pclose" type="button" aria-label="Close filters">&times;</button></div>
+      <div class="ph">
+         <span class="pt">Archive Filters</span>
+         <button class="px" id="pclose" type="button" aria-label="Close filters">&times;</button>
+      </div>
+      <div class="pf-search">
+         <input type="text" id="fsearch" placeholder="Quick find tags..." aria-label="Filter options">
+      </div>
       <div id="fgrid"></div>
       <button id="done" type="button">Show photographs</button>
     </aside>
@@ -167,38 +219,74 @@ var CFG={
   red:"#C62F28",
   linkTarget:"_top"
 };
+
+/* Kompleksowy słownik kontrolowany */
 var VOC={
   region:["Australia","Queensland","Brisbane","Brisbane Inner City","Brisbane River"],
   suburb:["Albion","Bowen Hills","Brisbane City","Fortitude Valley","Herston","Kangaroo Point","Kelvin Grove","Milton","New Farm","Newstead","Paddington","Red Hill","South Brisbane","Spring Hill","Teneriffe","West End","Woolloongabba"],
   year:["2026","2027","2028","2029","2030","2031","2032","2033"],
-  typology:["Queenslander","Cottage","Terrace","Duplex","Townhouse","Apartment","Social housing","Student housing","Office","Shopfront","Shopping centre","Hotel","Cafe","Restaurant","Pub","Bar","Kiosk","Mixed use","School","University","Hospital","Clinic","Government","Library","Museum","Gallery","Theatre","Stadium","Church","Place of worship","Community centre","Warehouse","Factory","Parking structure","Lowrise","Midrise","Highrise","Heritage","Adaptive reuse"],
-  site:["Construction site","Demolition site","Vacant site"],
-  architecture:["Verandah","Sleepout","Awning","Stumps","Louvre","Breezeway","Balcony","Roof","Facade","Weatherboard","Corrugated","Brick","Concrete","Timber","Glass","Metal"],
-  urban:["Street","Laneway","Bikeway","Footpath","Intersection","Roundabout","Overpass","Underpass","Tunnel","Retaining wall","Hill","Cliff","Bridge","Station","Stop","Ferry terminal","Pontoon","Railway","Powerlines","Streetlight","Traffic light","Bench","Bin","Bollard","Hydrant","Postbox","Fence","River","Creek","Park","Reserve","Tree","Canopy","Overgrowth"],
+  typology:[
+    "Queenslander","Cottage","Worker's cottage","Terrace","Duplex","Townhouse","Apartment","Social housing","Student housing","Boarding house",
+    "Office","Shopfront","Shopping centre","Hotel","Cafe","Restaurant","Pub","Bar","Kiosk","Mixed use","Arcade",
+    "School","University","Hospital","Clinic","Government","Library","Museum","Gallery","Theatre","Stadium","Church","Place of worship","Community centre",
+    "Warehouse","Woolstore","Factory","Wharf","Parking structure",
+    "Lowrise","Midrise","Highrise","Heritage","Adaptive reuse"
+  ],
+  architecture:[
+    "Verandah","Sleepout","Awning","Stumps","Louvre","Breezeway","Balcony","Roof","Facade","Parapet","Pediment","Chimney","Gable","Stairs"
+  ],
+  material:[
+    "Weatherboard","Corrugated iron","Timber","Brick","Concrete","Glass","Metal","Cast iron","Porphyry (Brisbane Tuff)","Sandstone","Tile"
+  ],
+  style:["Victorian","Federation","Art Deco","Brutalism","Mid-century modern","Contemporary"],
+  urban:[
+    "Street","Laneway","Bikeway","Footpath","Intersection","Roundabout","Overpass","Underpass","Tunnel","Retaining wall",
+    "Bridge","Station","Stop","Ferry terminal","Pontoon","Railway","Powerlines","Streetlight","Traffic light",
+    "Bench","Bin","Bollard","Hydrant","Postbox","Fence","Park","Reserve"
+  ],
+  flora:["Tree","Canopy","Overgrowth","Jacaranda","Mangroves","Moreton Bay Fig"],
+  topography:["River","Creek","Riverbank","Hill","Cliff","Floodplain"],
+  condition:["Construction site","Demolition site","Vacant site","Ruins","Renovation","Decay","Gentrification","Repurposed"],
+  activity:["Pedestrians","Cyclists","Street market","Crowds","Traffic"],
+  transport:["Bus","Train","Ferry","Bicycle","Car","Truck"],
   signage:["Roadsign","Streetsign","Wayfinding","Shop sign","Billboard","Neon","Plaque","Mural","Graffiti"],
-  scale:["Wide shot","Elevation","Perspective","Detail","Aerial","Elevated view","Skyline"],
+  scale:["Wide shot","Elevation","Perspective","Detail","Aerial","Elevated view","Skyline","Streetscape","Interior view"],
   brisbane2032:["Olympic Venue","Olympic Precinct","Olympic Infrastructure","Transport Upgrade","Athlete Village","Temporary Structure","Legacy Project"],
   orientation:["Horizontal","Vertical","Square"]
 };
-var GROUPS=[["Housing",["Queenslander","Cottage","Terrace","Duplex","Townhouse","Apartment","Social housing","Student housing"]],["Commercial",["Office","Shopfront","Shopping centre","Hotel","Cafe","Restaurant","Pub","Bar","Kiosk","Mixed use"]],["Public",["School","University","Hospital","Clinic","Government","Library","Museum","Gallery","Theatre","Stadium","Church","Place of worship","Community centre"]],["Industrial",["Warehouse","Factory","Parking structure"]],["Height",["Lowrise","Midrise","Highrise"]],["Heritage",["Heritage","Adaptive reuse"]]];
+
+var GROUPS=[
+  ["Housing",["Queenslander","Cottage","Worker's cottage","Terrace","Duplex","Townhouse","Apartment","Social housing","Student housing","Boarding house"]],
+  ["Commercial",["Office","Shopfront","Shopping centre","Hotel","Cafe","Restaurant","Pub","Bar","Kiosk","Mixed use","Arcade"]],
+  ["Public",["School","University","Hospital","Clinic","Government","Library","Museum","Gallery","Theatre","Stadium","Church","Place of worship","Community centre"]],
+  ["Industrial & Transport",["Warehouse","Woolstore","Factory","Wharf","Parking structure"]],
+  ["Height",["Lowrise","Midrise","Highrise"]],
+  ["Heritage & Status",["Heritage","Adaptive reuse"]]
+];
 var TG={};GROUPS.forEach(function(g){g[1].forEach(function(t){TG[t.toLowerCase()]=g[0]})});
-/* all: a photo must carry every selected term. Otherwise any selected term is enough. */
+
 var FACETS=[
   {key:"region",label:"Region",all:false},
   {key:"suburb",label:"Suburb",all:false,radio:true},
   {key:"year",label:"Time",all:false},
   {key:"typology",label:"Typology & use",all:true},
-  {key:"site",label:"Site activity",all:false},
-  {key:"architecture",label:"Architecture & material",all:true},
-  {key:"urban",label:"Urban context & infrastructure",all:true},
+  {key:"style",label:"Architectural style",all:true},
+  {key:"architecture",label:"Architectural components",all:true},
+  {key:"material",label:"Materials",all:true},
+  {key:"urban",label:"Urban context",all:true},
+  {key:"flora",label:"Flora & greenery",all:true},
+  {key:"topography",label:"Topography & environment",all:true},
+  {key:"condition",label:"Condition & lifecycle",all:true},
+  {key:"activity",label:"Street life & activity",all:true},
+  {key:"transport",label:"Transport",all:true},
   {key:"signage",label:"Visual communication",all:true},
-  {key:"scale",label:"Scale & perspective",all:true},
+  {key:"scale",label:"View & perspective",all:true},
   {key:"brisbane2032",label:"Brisbane 2032",all:true},
   {key:"orientation",label:"Orientation",all:false}
 ];
 var FBY={};FACETS.forEach(function(f){FBY[f.key]=f});
 
-var S={tab:"photo",q:"",loc:"",f:{},cols:0,map:true,panel:false,open:{suburb:true}};
+var S={tab:"photo",q:"",loc:"",f:{},mode:{},sort:"featured",cols:0,map:true,panel:false,open:{suburb:true}};
 var DATA=[],PLACES=[],PLACEBYNAME={},LIST=[],MAP=null,MAPREADY=false,MAPLOAD=false,FITTED=false,TQ=null;
 var $=function(id){return document.getElementById(id)};
 var lc=function(s){return String(s==null?"":s).toLowerCase().trim()};
@@ -218,6 +306,7 @@ function parseCSV(text){
     else cur+=c}
   if(cur!==""||row.length){row.push(cur);rows.push(row)}
   return rows}
+
 function loadPlaces(text){
   var t=parseCSV(text),idx={},out=[];
   if(t.length<2)return out;
@@ -233,6 +322,7 @@ function loadPlaces(text){
     var pl={id:id,name:name,street:g(r,"street"),suburb:g(r,"suburb"),lat:ok?lat:null,lng:ok?lng:null,titles:g(r,"titles").split(";")};
     seen[id]=pl;out.push(pl)}
   return out}
+
 function prep(){
   var byKey={};
   PLACES.forEach(function(pl){PLACEBYNAME[pl.name]=pl;[pl.name,pl.street].concat(pl.titles).forEach(function(k){k=lc(k);if(k&&!byKey[k])byKey[k]=pl})});
@@ -245,21 +335,113 @@ function prep(){
     p._place=pl&&pl.lat!=null?pl:null;
     p._loc=pl?pl.name:name;
     p._v={};
-    FACETS.forEach(function(F){var v=p[F.key];p._v[F.key]=(Array.isArray(v)?v:v?[v]:[]).map(lc)});
+    
+    FACETS.forEach(function(F){
+      var v=p[F.key];
+      
+      /* Automatyczne rozdzielanie starych faset z zachowaniem kompatybilności wstecznej */
+      if(F.key==="material" && !v && p.architecture){
+        var mats=VOC.material.map(lc);
+        var archList=(Array.isArray(p.architecture)?p.architecture:[p.architecture]).map(lc);
+        v=archList.filter(function(x){return mats.indexOf(x)>-1});
+      }
+      if(F.key==="flora" && !v && p.urban){
+        var floras=VOC.flora.map(lc);
+        var urbanList=(Array.isArray(p.urban)?p.urban:[p.urban]).map(lc);
+        v=urbanList.filter(function(x){return floras.indexOf(x)>-1});
+      }
+      if(F.key==="topography" && !v && p.urban){
+        var topos=VOC.topography.map(lc);
+        var urbanList=(Array.isArray(p.urban)?p.urban:[p.urban]).map(lc);
+        v=urbanList.filter(function(x){return topos.indexOf(x)>-1});
+      }
+      if(F.key==="condition" && !v && p.site){
+        v=p.site;
+      }
+      
+      p._v[F.key]=(Array.isArray(v)?v:v?[v]:[]).map(lc);
+    });
+
+    /* Skrypt czyszczący: permanentne usuwanie duplikatów z rozdzielonych faset we frontendzie */
+    var materialTerms = VOC.material.map(lc);
+    p._v.architecture = p._v.architecture.filter(function(tag) { return materialTerms.indexOf(tag) === -1; });
+
+    var floraTerms = VOC.flora.map(lc);
+    var topoTerms = VOC.topography.map(lc);
+    if(p._v.urban) {
+        p._v.urban = p._v.urban.filter(function(tag) { 
+            return floraTerms.indexOf(tag) === -1 && topoTerms.indexOf(tag) === -1; 
+        });
+    }
+
     p._hay=[p.title,p._loc,p.description,p.suburb,p.photoId,p.date,p.tokens].concat(FACETS.map(function(F){return p._v[F.key].join(" ")})).join(" ").toLowerCase()});
-  /* featured first, keep feed order otherwise */
+  
+  FACETS.forEach(function(F){MULTI[F.key]=!F.radio&&DATA.some(function(p){return p._v[F.key].length>1})});
   var f=[],o=[];DATA.forEach(function(p){(p.isFeatured?f:o).push(p)});
-  if(f.length&&o.length)DATA=f.concat(o)}
+  if(f.length&&o.length)DATA=f.concat(o);
+  DATA.forEach(function(p,i){p._i=i})}
+
+/* ---------- sorting ---------- */
+var SORTS=["featured","newest","oldest","name"];
+var SLABEL={featured:"Featured",newest:"Newest",oldest:"Oldest",name:"A to Z"};
+var SICON={
+  featured:'<path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/>',
+  newest:'<path d="M12 6v6l2 1"/><path d="M12.337 21.994a10 10 0 1 1 9.588-8.767"/><path d="m14 18 4 4 4-4"/><path d="M18 14v8"/>',
+  oldest:'<path d="M12 6v6l1.56.78"/><path d="M13.227 21.925a10 10 0 1 1 8.767-9.588"/><path d="m14 18 4-4 4 4"/><path d="M18 22v-8"/>',
+  name:'<path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="M20 8h-5"/><path d="M15 10V6.5a2.5 2.5 0 0 1 5 0V10"/><path d="M15 14h5l-5 6h5"/>',
+  chev:'<path d="m6 9 6 6 6-6"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>'
+};
+function sicon(k){return '<svg viewBox="0 0 24 24" aria-hidden="true">'+SICON[k]+'</svg>'}
+function cmpText(a,b){return String(a).localeCompare(String(b),undefined,{numeric:true,sensitivity:"base"})}
+var ADDR=/^(?:\d+[a-z]?\s*\/\s*)?(\d+)[a-z]?(?:\s*[-\u2013]\s*\d+[a-z]?)?[,\s]+(?=\D)/i;
+function addrKey(n){var s=String(n||"").trim(),m=ADDR.exec(s);return m?s.slice(m[0].length):s}
+function addrNum(n){var m=ADDR.exec(String(n||"").trim());return m?parseInt(m[1],10):0}
+function cmpAddr(a,b){return cmpText(addrKey(a),addrKey(b))||addrNum(a)-addrNum(b)||cmpText(a,b)}
+function cmpUuid(a,b){a=String(a||"");b=String(b||"");return a<b?-1:a>b?1:0}
+function newer(a,b){return cmpUuid(b.uuid,a.uuid)||a._i-b._i}
+function sortList(list){
+  var by={
+    featured:function(a,b){return (b.isFeatured?1:0)-(a.isFeatured?1:0)||newer(a,b)},
+    newest:newer,
+    oldest:function(a,b){return cmpUuid(a.uuid,b.uuid)||a._i-b._i},
+    name:function(a,b){return cmpAddr(a._name,b._name)||newer(a,b)}
+  }[S.sort]||newer;
+  return list.slice().sort(by)}
+
+var SORTI=0;
+function buildSortMenu(){
+  var m=$("sortlist");m.innerHTML="";
+  SORTS.forEach(function(k){
+    var o=el("div","so");o.id="so-"+k;o.setAttribute("role","option");o.setAttribute("data-val",k);
+    o.innerHTML=sicon(k)+'<span class="sl">'+SLABEL[k]+'</span><span class="ck">'+sicon("check")+'</span>';
+    m.appendChild(o)});
+  $("sortbtn").innerHTML='<span id="sortlabel">'+SLABEL[S.sort]+'</span><span class="cv">'+sicon("chev")+'</span>';
+}
+function syncSort(){
+  var b=$("sortbtn");
+  b.innerHTML='<span id="sortlabel">'+SLABEL[S.sort]+'</span><span class="cv">'+sicon("chev")+'</span>';
+  [].forEach.call($("sortlist").children,function(o){o.setAttribute("aria-selected",String(o.getAttribute("data-val")===S.sort))})
+}
+function sortOpen(v){
+  $("sortlist").classList.toggle("open",v);$("sortbtn").setAttribute("aria-expanded",String(v));
+  if(v){SORTI=Math.max(0,SORTS.indexOf(S.sort));sortAct()}else $("sortbtn").removeAttribute("aria-activedescendant")}
+function sortAct(){
+  [].forEach.call($("sortlist").children,function(o,i){o.classList.toggle("act",i===SORTI)});
+  $("sortbtn").setAttribute("aria-activedescendant","so-"+SORTS[SORTI])}
+function pickSort(k){S.sort=k;sortOpen(false);render();$("main").scrollTop=0}
 
 /* ---------- filtering ---------- */
 function selOf(key){return S.f[key]||[]}
+var MULTI={};
+function isAll(F){return S.mode[F.key]!==undefined?S.mode[F.key]==="all":!!F.all}
 function pass(p,except){
   if(except!=="loc"&&S.loc&&p._loc!==S.loc)return false;
   for(var i=0;i<FACETS.length;i++){
     var F=FACETS[i];if(F.key===except)continue;
     var sel=selOf(F.key);if(!sel.length)continue;
     var arr=p._v[F.key],j;
-    if(F.all){for(j=0;j<sel.length;j++)if(arr.indexOf(sel[j])<0)return false}
+    if(isAll(F)){for(j=0;j<sel.length;j++)if(arr.indexOf(sel[j])<0)return false}
     else{var ok=false;for(j=0;j<sel.length;j++)if(arr.indexOf(sel[j])>-1)ok=true;if(!ok)return false}}
   if(S.q){var t=S.q.toLowerCase().split(/\s+/).filter(Boolean);for(var k=0;k<t.length;k++)if(p._hay.indexOf(t[k])<0)return false}
   return true}
@@ -276,48 +458,87 @@ function optionsFor(F){
   order.forEach(function(t){if(present[lc(t)]){out.push(lc(t));delete present[lc(t)]}});
   Object.keys(present).sort().forEach(function(v){out.push(v)});
   return out}
+
 function renderPanel(){
   var host=$("fgrid"),top=host.scrollTop;host.innerHTML="";
+  var fq = $("fsearch") ? $("fsearch").value.toLowerCase().trim() : "";
+  
   FACETS.forEach(function(F){
     var opts=optionsFor(F);if(!opts.length)return;
-    var sel=selOf(F.key),isOpen=S.open[F.key]!==undefined?S.open[F.key]:sel.length>0;
+    
+    // Auto-expand logic based on search
+    var matches = {};
+    var hasMatch = false;
+    opts.forEach(function(v){
+      if(!fq || canon(F.key,v).toLowerCase().indexOf(fq)>-1){
+        matches[v] = true;
+        hasMatch = true;
+      }
+    });
+    
+    // Hide entire category if no matches found during search
+    if(fq && !hasMatch) return; 
+    
+    var sel=selOf(F.key), isOpen=S.open[F.key]!==undefined?S.open[F.key]:sel.length>0;
+    if(fq) isOpen = true; // Force open if searching
+    
     var sec=el("div","sec"),h=el("button","sh");h.type="button";h.setAttribute("data-sec",F.key);h.setAttribute("aria-expanded",String(isOpen));
     h.appendChild(el("span",null,F.label));
     if(sel.length)h.appendChild(el("span","badge",String(sel.length)));
     h.appendChild(el("span","ic",isOpen?"\u2212":"+"));sec.appendChild(h);
+    
     if(isOpen){
-      var body=el("div","sb"),shown=0,last="";
+      var body=el("div","sb"),shown=0,last="",allm=isAll(F);
+      if(MULTI[F.key]){
+        var mm=el("div","mm"),seg=el("span","seg");
+        mm.appendChild(el("span",null,"Match"));
+        seg.title="Any: photos with at least one selected term. All: photos with every selected term.";
+        [["any","Any"],["all","All"]].forEach(function(m){var b=el("button",null,m[1]);b.type="button";b.setAttribute("data-mkey",F.key);b.setAttribute("data-mval",m[0]);b.setAttribute("aria-pressed",String((m[0]==="all")===allm));seg.appendChild(b)});
+        mm.appendChild(seg);body.appendChild(mm)}
+        
       opts.forEach(function(v){
-        var n=0;for(var i=0;i<DATA.length;i++){var p=DATA[i];if(pass(p,F.key)&&p._v[F.key].indexOf(v)>-1)n++}
+        if(fq && !matches[v]) return; // Skip non-matching options entirely during search
+        
+        var n=0;for(var i=0;i<DATA.length;i++){var p=DATA[i];if((allm?pass(p,null):pass(p,F.key))&&p._v[F.key].indexOf(v)>-1)n++}
         var on=sel.indexOf(v)>-1;if(!n&&!on)return;
-        if(F.key==="typology"&&TG[v]&&TG[v]!==last){last=TG[v];body.appendChild(el("div","grp",last))}
+        
+        if(F.key==="typology"&&TG[v]&&TG[v]!==last){
+            last=TG[v];
+            body.appendChild(el("div","grp",last));
+        }
+        
         var lab=el("label","opt"),inp=document.createElement("input");
         inp.type="checkbox";inp.checked=on;inp.setAttribute("data-key",F.key);inp.setAttribute("data-val",v);
         lab.appendChild(inp);lab.appendChild(el("span","t",canon(F.key,v)));lab.appendChild(el("span","c",String(n)));
-        body.appendChild(lab);shown++});
-      if(!shown)body.appendChild(el("p","empty","Nothing in the current results"));
-      sec.appendChild(body)}
-    host.appendChild(sec)});
-  host.scrollTop=top}
+        body.appendChild(lab);
+        shown++;
+      });
+      if(!shown && !fq) body.appendChild(el("p","empty","Nothing in the current results"));
+      sec.appendChild(body)
+    }
+    host.appendChild(sec)
+  });
+  host.scrollTop=top;
+}
 
 /* ---------- chips / bar ---------- */
 function renderChips(){
   var host=$("chips");host.innerHTML="";
   function chip(key,val,text){var c=el("span","chip");c.appendChild(document.createTextNode(text));var b=el("button",null,"\u00D7");b.type="button";b.setAttribute("data-key",key);b.setAttribute("data-val",val);b.setAttribute("aria-label","Remove filter");c.appendChild(b);host.appendChild(c)}
   if(S.loc)chip("loc",S.loc,S.loc);
-  FACETS.forEach(function(F){selOf(F.key).forEach(function(v){chip(F.key,v,canon(F.key,v))})});
+  FACETS.forEach(function(F){selOf(F.key).forEach(function(v,i){if(i>0&&MULTI[F.key])host.appendChild(el("span","cj",isAll(F)?"and":"or"));chip(F.key,v,canon(F.key,v))})});
   var n=activeCount(),b=$("badge");b.hidden=!n;b.textContent=n;
   $("clear").style.display=n?"inline":"none"}
 
 /* ---------- tabs ---------- */
-function groupBy(list,fn){var m={},o=[];list.forEach(function(p){var k=fn(p);if(!k)return;if(!m[k]){m[k]={name:k,photos:[]};o.push(k)}m[k].photos.push(p)});o.sort(function(a,b){return a.localeCompare(b)});return o.map(function(k){return m[k]})}
+function groupBy(list,fn){var m={},o=[];list.forEach(function(p){var k=fn(p);if(!k)return;if(!m[k]){m[k]={name:k,photos:[]};o.push(k)}m[k].photos.push(p)});o.sort(cmpAddr);return o.map(function(k){return m[k]})}
 function renderTabs(counts){
   var host=$("tabs");host.innerHTML="";
   [["photo","Photographs"],["location","Locations"],["suburb","Suburbs"]].forEach(function(t){
     var b=el("button","tab"+(S.tab===t[0]?" on":""));b.type="button";b.setAttribute("role","tab");b.setAttribute("aria-selected",String(S.tab===t[0]));b.setAttribute("data-tab",t[0]);
     b.appendChild(document.createTextNode(t[1]));b.appendChild(el("span","n",String(counts[t[0]]||0)));host.appendChild(b)})}
 
-/* ---------- grid ---------- */
+/* ---------- masonry grid ---------- */
 var GAP=16;
 function cardEl(p){
   var a=el("a","card");a.href=p.pageUrl||"#";a.target=CFG.linkTarget;a.setAttribute("data-uuid",p.uuid);
@@ -326,6 +547,7 @@ function cardEl(p){
   a.appendChild(img);a.appendChild(el("span","ovt",p._name));
   var e=el("span","eye");e.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>';a.appendChild(e);
   a._p=p;return a}
+
 function layout(){
   var wall=$("wall");if(!wall||wall.style.display==="none")return;
   var w=wall.clientWidth||($("main").clientWidth-48)||1000,gap=w<520?10:GAP;
@@ -342,7 +564,7 @@ function layout(){
   wall.setAttribute("data-n",String(n));
   $("dn").textContent=String(n);$("dm").disabled=n<=min;$("dp").disabled=n>=max}
 
-/* ---------- map ---------- */
+/* ---------- map w/ clustering ---------- */
 function ensureMap(){
   if(MAP||MAPLOAD||!S.map)return;
   MAPLOAD=true;
@@ -350,21 +572,88 @@ function ensureMap(){
   if(window.mapboxgl){initMap();return}
   var l=document.createElement("link");l.rel="stylesheet";l.href="https://api.mapbox.com/mapbox-gl-js/"+CFG.mbVersion+"/mapbox-gl.css";document.head.appendChild(l);
   var s=document.createElement("script");s.src="https://api.mapbox.com/mapbox-gl-js/"+CFG.mbVersion+"/mapbox-gl.js";s.async=true;s.onload=initMap;s.onerror=function(){MAPLOAD=false};document.head.appendChild(s)}
+
 function initMap(){
   var box=$("mapbox");if(!box||!window.mapboxgl||MAP)return;
   window.mapboxgl.accessToken=CFG.token;
   MAP=new window.mapboxgl.Map({container:box,style:"mapbox://styles/mapbox/light-v11",center:[153.0307,-27.4598],zoom:12});
   MAP.addControl(new window.mapboxgl.NavigationControl({showCompass:false}),"top-right");
+  
   MAP.on("load",function(){
     MAPREADY=true;
-    MAP.addSource("places",{type:"geojson",data:{type:"FeatureCollection",features:[]}});
-    MAP.addLayer({id:"pins",type:"circle",source:"places",paint:{"circle-radius":["interpolate",["linear"],["get","n"],1,4.5,10,6.5,30,9],"circle-color":"#111111","circle-opacity":.5,"circle-stroke-width":1,"circle-stroke-color":"#ffffff","circle-stroke-opacity":.9}});
+    MAP.addSource("places",{
+        type:"geojson",
+        data:{type:"FeatureCollection",features:[]},
+        cluster: true,
+        clusterMaxZoom: 14,
+        clusterRadius: 50
+    });
+    
+    /* Cluster Layers */
+    MAP.addLayer({
+        id: "clusters",
+        type: "circle",
+        source: "places",
+        filter: ["has", "point_count"],
+        paint: {
+            "circle-color": ["step", ["get", "point_count"], "#111", 10, "#333", 50, "#555"],
+            "circle-radius": ["step", ["get", "point_count"], 15, 10, 20, 50, 25],
+            "circle-stroke-width": 1,
+            "circle-stroke-color": "#ffffff"
+        }
+    });
+
+    MAP.addLayer({
+        id: "cluster-count",
+        type: "symbol",
+        source: "places",
+        filter: ["has", "point_count"],
+        layout: {
+            "text-field": "{point_count_abbreviated}",
+            "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+            "text-size": 12
+        },
+        paint: { "text-color": "#ffffff" }
+    });
+
+    /* Unclustered Point Layers */
+    MAP.addLayer({
+        id: "unclustered-point",
+        type: "circle",
+        source: "places",
+        filter: ["!", ["has", "point_count"]],
+        paint: {
+            "circle-radius": ["interpolate",["linear"],["get","n"],1,4.5,10,6.5,30,9],
+            "circle-color": "#111111",
+            "circle-opacity": 0.5,
+            "circle-stroke-width": 1,
+            "circle-stroke-color": "#ffffff",
+            "circle-stroke-opacity": 0.9
+        }
+    });
+    
     MAP.addLayer({id:"hot",type:"circle",source:"places",filter:["==",["get","id"],""],paint:{"circle-radius":6.5,"circle-color":CFG.red,"circle-opacity":1,"circle-stroke-width":1,"circle-stroke-color":"#ffffff"}});
     MAP.addLayer({id:"sel",type:"circle",source:"places",filter:["==",["get","id"],selId()],paint:{"circle-radius":6.5,"circle-color":CFG.red,"circle-opacity":1,"circle-stroke-width":1,"circle-stroke-color":"#ffffff"}});
-    MAP.on("click","pins",function(e){var f=e.features&&e.features[0];if(!f)return;var pl=PLACEBYNAME[f.properties.name];if(!pl)return;S.loc=S.loc===pl.name?"":pl.name;S.tab="photo";render();$("main").scrollTop=0});
-    MAP.on("mousemove","pins",function(){MAP.getCanvas().style.cursor="pointer"});
-    MAP.on("mouseleave","pins",function(){MAP.getCanvas().style.cursor=""});
+    
+    /* Click Events */
+    MAP.on("click","unclustered-point",function(e){var f=e.features&&e.features[0];if(!f)return;var pl=PLACEBYNAME[f.properties.name];if(!pl)return;S.loc=S.loc===pl.name?"":pl.name;S.tab="photo";render();$("main").scrollTop=0});
+    MAP.on('click', 'clusters', function (e) {
+        var features = MAP.queryRenderedFeatures(e.point, { layers: ['clusters'] });
+        var clusterId = features[0].properties.cluster_id;
+        MAP.getSource('places').getClusterExpansionZoom(clusterId, function (err, zoom) {
+            if (err) return;
+            MAP.easeTo({ center: features[0].geometry.coordinates, zoom: zoom });
+        });
+    });
+
+    /* Cursor Management */
+    MAP.on("mouseenter","unclustered-point",function(){MAP.getCanvas().style.cursor="pointer"});
+    MAP.on("mouseleave","unclustered-point",function(){MAP.getCanvas().style.cursor=""});
+    MAP.on('mouseenter', 'clusters', function () { MAP.getCanvas().style.cursor = 'pointer'; });
+    MAP.on('mouseleave', 'clusters', function () { MAP.getCanvas().style.cursor = ''; });
+
     mapUpdate(true)})}
+
 function selId(){var pl=S.loc&&PLACEBYNAME[S.loc];return pl?pl.id:""}
 function mapUpdate(fit){
   if(!MAP||!MAPREADY)return;
@@ -379,7 +668,7 @@ function mapHot(id){if(MAP&&MAPREADY)MAP.setFilter("hot",["==",["get","id"],id||
 
 /* ---------- render ---------- */
 function render(){
-  LIST=DATA.filter(function(p){return pass(p,null)});
+  LIST=sortList(DATA.filter(function(p){return pass(p,null)}));
   var locs=groupBy(LIST,function(p){return p._loc}),subs=groupBy(LIST,function(p){return p.suburb});
   renderTabs({photo:LIST.length,location:locs.length,suburb:subs.length});
   renderChips();
@@ -404,8 +693,13 @@ function render(){
   $("ftoggle").setAttribute("aria-expanded",String(S.panel));
   $("mtoggle").textContent=S.map?"Grid":"Map";$("mtoggle").setAttribute("aria-pressed",String(S.map));
   $("dens").style.display=isGrid?"":"none";
+  $("sortw").style.display=isGrid?"":"none";syncSort();
   document.body.classList.toggle("map",S.map);document.body.classList.toggle("panel",S.panel);
   $("panel").classList.toggle("open",S.panel);
+  
+  // Wyczyść wyszukiwarkę panelu po renderze
+  if($("fsearch")) $("fsearch").value = "";
+  
   layout();mapUpdate(true);save()}
 
 /* ---------- search suggestions ---------- */
@@ -421,6 +715,7 @@ function buildSuggestions(q){
   var rank={location:0,suburb:1,keyword:2,photo:3};
   out.sort(function(a,b){return rank[a.type]-rank[b.type]||a.label.localeCompare(b.label)});
   return out.slice(0,8)}
+
 function showSug(){
   var h=$("sug");h.innerHTML="";
   if(!SG.length){h.classList.remove("open");return}
@@ -430,20 +725,67 @@ function showSug(){
 function pickSug(s){SG=[];SGI=-1;showSug();$("q").value="";S.q="";s.apply();if(s.type==="location"||s.type==="suburb"||s.type==="keyword")S.tab="photo";render()}
 function closeSug(){SG=[];SGI=-1;showSug()}
 
-/* ---------- state ---------- */
-function save(){try{window.sessionStorage.setItem("pi_browse",JSON.stringify({tab:S.tab,q:S.q,loc:S.loc,f:S.f,cols:S.cols,map:S.map,y:$("main").scrollTop}))}catch(e){}}
+/* ---------- state & URL sync ---------- */
+function syncUrl(){
+  try{
+    var p=new URLSearchParams();
+    if(S.tab!=="photo")p.set("tab",S.tab);
+    if(S.q)p.set("q",S.q);
+    if(S.loc)p.set("loc",S.loc);
+    if(S.sort!=="featured")p.set("sort",S.sort);
+    if(S.cols)p.set("cols",String(S.cols));
+    if(!S.map)p.set("map","0");
+    FACETS.forEach(function(F){
+      var v=selOf(F.key);if(v.length)p.set(F.key,v.join(","));
+      if(S.mode[F.key])p.set(F.key+"_mode",S.mode[F.key]);
+    });
+    var qs=p.toString();
+    var target=window.location.pathname+(qs?"?"+qs:"");
+    if(window.location.search!==target.slice(window.location.pathname.length))window.history.replaceState(null,"",target);
+  }catch(e){}
+}
+
+function save(){
+  try{
+    window.sessionStorage.setItem("pi_browse",JSON.stringify({tab:S.tab,q:S.q,loc:S.loc,f:S.f,mode:S.mode,sort:S.sort,cols:S.cols,map:S.map,y:$("main").scrollTop}));
+    syncUrl();
+  }catch(e){}
+}
+
 function restore(){
-  try{var r=JSON.parse(window.sessionStorage.getItem("pi_browse")||"null");if(!r)return 0;
-    S.tab=r.tab||"photo";S.q=r.q||"";S.loc=r.loc||"";S.f=r.f||{};S.cols=r.cols||0;if(typeof r.map==="boolean")S.map=r.map;
-    $("q").value=S.q;return r.y||0}catch(e){return 0}}
+  try{
+    var p=new URLSearchParams(window.location.search);
+    var hasUrl=p.toString().length>0;
+    if(hasUrl){
+      if(p.get("tab"))S.tab=p.get("tab");
+      if(p.get("q"))S.q=p.get("q");
+      if(p.get("loc"))S.loc=p.get("loc");
+      if(p.get("sort")&&SORTS.indexOf(p.get("sort"))>-1)S.sort=p.get("sort");
+      if(p.get("cols"))S.cols=parseInt(p.get("cols"),10)||0;
+      if(p.get("map")==="0")S.map=false;
+      FACETS.forEach(function(F){
+        var v=p.get(F.key);if(v)S.f[F.key]=v.split(",").map(lc).filter(Boolean);
+        var m=p.get(F.key+"_mode");if(m)S.mode[F.key]=m;
+      });
+      $("q").value=S.q;
+      return 0;
+    }
+    var r=JSON.parse(window.sessionStorage.getItem("pi_browse")||"null");if(!r)return 0;
+    S.tab=r.tab||"photo";S.q=r.q||"";S.loc=r.loc||"";S.f=r.f||{};S.mode=r.mode||{};S.sort=SORTS.indexOf(r.sort)>-1?r.sort:"featured";S.cols=r.cols||0;if(typeof r.map==="boolean")S.map=r.map;
+    $("q").value=S.q;return r.y||0
+  }catch(e){return 0}
+}
+
 (function readParams(){
-  try{var p=new URLSearchParams(window.location.search);
-    if(p.get("map")==="0")S.map=false;if(p.get("target"))CFG.linkTarget=p.get("target");
-    if(p.get("cols"))S.cols=parseInt(p.get("cols"),10)||0}catch(e){}
-  if(window.innerWidth<900)S.map=S.map&&false})();
+  try{
+    var p=new URLSearchParams(window.location.search);
+    if(p.get("target"))CFG.linkTarget=p.get("target");
+  }catch(e){}
+  if(window.innerWidth<900)S.map=false;
+})();
 
 /* ---------- events ---------- */
-function on(id,ev,fn){$(id).addEventListener(ev,fn)}
+function on(id,ev,fn){if($(id))$(id).addEventListener(ev,fn)}
 function wire(){
   on("ftoggle","click",function(){S.panel=!S.panel;render()});
   on("pclose","click",function(){S.panel=false;render()});
@@ -451,16 +793,35 @@ function wire(){
   on("mtoggle","click",function(){S.map=!S.map;if(S.map){S.panel=false;ensureMap()}render();if(MAP)setTimeout(function(){MAP.resize()},60)});
   on("clear","click",function(){S.f={};S.loc="";render()});
   on("noteok","click",function(){try{window.localStorage.setItem("pi_map_note","1")}catch(e){}$("note").classList.remove("show")});
+  
+  /* Filter Quick Search - calls renderPanel directly */
+  on("fsearch","input",function(){ renderPanel(); });
+
+  buildSortMenu();
+  on("sortbtn","click",function(){sortOpen(!$("sortlist").classList.contains("open"))});
+  on("sortbtn","keydown",function(e){
+    var open=$("sortlist").classList.contains("open"),k=e.key;
+    if(k==="Escape"&&open){e.preventDefault();e.stopPropagation();sortOpen(false)}
+    else if(k==="ArrowDown"||k==="ArrowUp"){e.preventDefault();if(!open)sortOpen(true);else{SORTI=(SORTI+(k==="ArrowDown"?1:-1)+SORTS.length)%SORTS.length;sortAct()}}
+    else if(open&&(k==="Enter"||k===" ")){e.preventDefault();pickSort(SORTS[SORTI])}
+    else if(open&&k==="Tab")sortOpen(false)});
+  on("sortlist","mousedown",function(e){e.preventDefault()});
+  on("sortlist","click",function(e){var o=e.target.closest&&e.target.closest(".so");if(o)pickSort(o.getAttribute("data-val"))});
+  document.addEventListener("click",function(e){if(!e.target.closest||!e.target.closest("#sortw"))sortOpen(false)});
   on("dm","click",function(){var n=parseInt($("wall").getAttribute("data-n")||"3",10);S.cols=Math.max(1,n-1);layout();save()});
   on("dp","click",function(){var n=parseInt($("wall").getAttribute("data-n")||"3",10);S.cols=Math.min(6,n+1);layout();save()});
   on("chips","click",function(e){var b=e.target.closest&&e.target.closest("button");if(!b)return;var k=b.getAttribute("data-key"),v=b.getAttribute("data-val");if(k==="loc")S.loc="";else{S.f[k]=(S.f[k]||[]).filter(function(x){return x!==v})}render()});
   on("tabs","click",function(e){var b=e.target.closest&&e.target.closest("button");if(!b)return;S.tab=b.getAttribute("data-tab");render()});
-  on("fgrid","click",function(e){var h=e.target.closest&&e.target.closest(".sh");if(!h)return;var k=h.getAttribute("data-sec"),cur=S.open[k]!==undefined?S.open[k]:selOf(k).length>0;S.open[k]=!cur;renderPanel()});
+  on("fgrid","click",function(e){var m=e.target.closest&&e.target.closest("[data-mkey]");if(m){S.mode[m.getAttribute("data-mkey")]=m.getAttribute("data-mval");render();return}var h=e.target.closest&&e.target.closest(".sh");if(!h)return;var k=h.getAttribute("data-sec"),cur=S.open[k]!==undefined?S.open[k]:selOf(k).length>0;S.open[k]=!cur;renderPanel()});
   on("fgrid","change",function(e){var i=e.target;if(i.getAttribute("data-key"))toggle(i.getAttribute("data-key"),i.getAttribute("data-val"))});
   on("locgrid","click",function(e){var b=e.target.closest&&e.target.closest(".lc");if(!b)return;var kind=b.getAttribute("data-kind"),name=b.getAttribute("data-name");
     if(kind==="location")S.loc=S.loc===name?"":name;else S.f.suburb=[lc(name)];S.tab="photo";render();$("main").scrollTop=0});
   var wall=$("wall");
-  wall.addEventListener("mouseover",function(e){var c=e.target.closest&&e.target.closest(".card");mapHot(c&&c._p&&c._p._place?c._p._place.id:"")});
+  wall.addEventListener("mouseover",function(e){
+    var c=e.target.closest&&e.target.closest(".card");
+    var id = c&&c._p&&c._p._place?c._p._place.id:"";
+    mapHot(id);
+  });
   wall.addEventListener("mouseleave",function(){mapHot("")});
   wall.addEventListener("click",function(){save()});
   on("q","input",function(){var v=this.value.trim();clearTimeout(TQ);TQ=setTimeout(function(){S.q=v;render()},120);
