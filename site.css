@@ -607,3 +607,15 @@ html body #main_content .pi-detail-x:hover svg { stroke: #fff !important; }
 #ws_page.page-lightbox #main_content :is(input[type="submit"], button, a.button, a.btn, a.request_quotation_link):hover {
   background: #FFFFFF !important; color: #111111 !important;
 }
+
+/* /lightbox: przyciski jak na /client (ostre, male, wysrodkowany tekst) */
+#ws_page.page-lightbox #main_content :is(input[type="submit"], button, a.button, a.btn, a.request_quotation_link) {
+  border-radius: 0 !important; height: 32px !important; min-height: 32px !important; padding: 0 18px !important;
+  width: auto !important; margin: 0 !important; display: inline-flex !important; align-items: center !important;
+  justify-content: center !important; text-align: center !important; background: #111111 !important; color: #FFFFFF !important;
+  border: 1px solid #111111 !important; font: 500 11px/1 Inter, sans-serif !important; letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+}
+#ws_page.page-lightbox #main_content :is(input[type="submit"], button, a.button, a.btn, a.request_quotation_link):hover {
+  background: #FFFFFF !important; color: #111111 !important;
+}
