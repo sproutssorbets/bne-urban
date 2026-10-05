@@ -616,3 +616,11 @@ html body #main_content .pi-detail-x:hover svg { stroke: #fff !important; }
   border: 1px solid #111111 !important; font: 500 11px/30px Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important;
 }
 #ws_page.page-lightbox #main_content .page_actions form.button_to input.submit_small:hover { background: #111111 !important; color: #FFFFFF !important; }
+
+/* strona zdjecia: przycisk mniejszy, kolumna wyrownana do litery H w HOME */
+@media (min-width: 1400px) { :root { --pi-panel-width: 639px; } }
+#ws_page.page-media #main_content input.submit_small.lightbox_toggle {
+  width: auto !important; height: 32px !important; padding: 0 22px !important;
+  display: inline-flex !important; align-items: center !important; justify-content: center !important;
+  font: 500 10px/1 Inter, sans-serif !important; letter-spacing: 0.14em !important;
+}
