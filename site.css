@@ -617,10 +617,13 @@ html body #main_content .pi-detail-x:hover svg { stroke: #fff !important; }
 }
 #ws_page.page-lightbox #main_content .page_actions form.button_to input.submit_small:hover { background: #111111 !important; color: #FFFFFF !important; }
 
-/* strona zdjecia: przycisk mniejszy, kolumna wyrownana do litery H w HOME */
+/* strona zdjecia: przycisk na szerokosc tekstu kolumny, 38 px, kolumna nieco wezsza */
 @media (min-width: 1400px) { :root { --pi-panel-width: 639px; } }
+#ws_page.page-media #main_content > .row-12:first-child {
+  width: auto !important; margin-left: 0 !important; margin-right: 0 !important;
+  padding-left: 28px !important; padding-right: 28px !important; box-sizing: border-box !important;
+}
 #ws_page.page-media #main_content input.submit_small.lightbox_toggle {
-  width: auto !important; height: 32px !important; padding: 0 22px !important;
-  display: inline-flex !important; align-items: center !important; justify-content: center !important;
-  font: 500 10px/1 Inter, sans-serif !important; letter-spacing: 0.14em !important;
+  display: block !important; width: 100% !important; height: 38px !important;
+  font: 500 10px/36px Inter, sans-serif !important; letter-spacing: 0.14em !important;
 }
