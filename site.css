@@ -595,3 +595,24 @@ html body #main_content .pi-detail-x:hover svg { stroke: #fff !important; }
 }
 #ws_page.page-cart #main_content .short_message::after { content: "To buy a licence, open a photograph and press License."; }
 #ws_page.page-lightbox #main_content .short_message::after { content: "Press the + icon on any photograph in the archive to add it here."; }
+
+/* /lightbox: uklad jak /client, pigulki */
+#ws_page.page-lightbox #main_content > .elem[data-type="gallery"] { display: block !important; }
+#ws_page.page-lightbox #main_content .user-bar-greeting { text-align: right !important; margin: 0 0 16px !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta { display: flex !important; flex-wrap: wrap !important; justify-content: flex-start !important; align-items: center !important; gap: 12px !important; margin: 0 0 28px !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta form { width: auto !important; max-width: none !important; margin: 0 !important; }
+#ws_page.page-lightbox #main_content p:has(> a.request_quotation_link) { display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 16px !important; margin: 28px 0 0 !important; }
+#ws_page.page-lightbox #main_content p > a.ajaxable.back { width: auto !important; margin: 0 !important; display: inline-block !important; text-align: left !important; }
+#ws_page.page-lightbox #main_content a.ajaxable.request_quotation_link {
+  width: auto !important; margin: 0 !important; height: 44px !important; padding: 0 24px !important; white-space: nowrap !important;
+  display: inline-flex !important; align-items: center !important; justify-content: center !important; text-align: center !important;
+  border-radius: var(--pi-r-pill, 999px) !important; background: #111111 !important; color: #FFFFFF !important; border: 1px solid #111111 !important;
+  text-decoration: none !important; font: 500 11px/1 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important;
+}
+#ws_page.page-lightbox #main_content a.ajaxable.request_quotation_link:hover { background: #FFFFFF !important; color: #111111 !important; }
+#ws_page.page-lightbox #main_content .page_actions { margin: 20px 0 0 !important; }
+#ws_page.page-lightbox #main_content .page_actions form.button_to input.submit_small {
+  height: 32px !important; padding: 0 18px !important; border-radius: var(--pi-r-pill, 999px) !important; background: #FFFFFF !important; color: #111111 !important;
+  border: 1px solid #111111 !important; font: 500 11px/30px Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important;
+}
+#ws_page.page-lightbox #main_content .page_actions form.button_to input.submit_small:hover { background: #111111 !important; color: #FFFFFF !important; }
