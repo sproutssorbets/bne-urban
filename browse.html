@@ -777,10 +777,6 @@ function restore(){
 }
 
 (function readParams(){
-  try{
-    var p=new URLSearchParams(window.location.search);
-    if(p.get("target"))CFG.linkTarget=p.get("target");
-  }catch(e){}
   if(window.innerWidth<900)S.map=false;
 })();
 
