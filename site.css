@@ -628,3 +628,7 @@ html body #main_content .pi-detail-x:hover svg { stroke: #fff !important; }
   font: 500 10px/36px Inter, sans-serif !important; letter-spacing: 0.14em !important;
 }
 #ws_page.page-media #main_content > .row-12:first-child .row-12 { margin-left: 0 !important; margin-right: 0 !important; }
+/* lightbox: mniejszy przycisk zapytania i ciasniejsze pastylki */
+#ws_page.page-lightbox #main_content a.ajaxable.request_quotation_link { height: 38px !important; padding: 0 18px !important; font-size: 10px !important; letter-spacing: 0.1em !important; }
+#ws_page.page-lightbox #main_content .page_actions { gap: 8px !important; }
+#ws_page.page-lightbox #main_content .page_actions form.button_to input.submit_small { padding: 0 14px !important; font-size: 10px !important; letter-spacing: 0.1em !important; }
