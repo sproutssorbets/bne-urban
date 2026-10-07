@@ -633,17 +633,26 @@ html body #main_content .pi-detail-x:hover svg { stroke: #fff !important; }
 #ws_page.page-lightbox #main_content .page_actions { gap: 8px !important; }
 #ws_page.page-lightbox #main_content .page_actions form.button_to input.submit_small { padding: 0 14px !important; font-size: 10px !important; letter-spacing: 0.1em !important; }
 
-/* lightbox v2: akcje od razu widoczne */
-#ws_page.page-lightbox #main_content > .elem[data-type="page_meta"] { order: -3 !important; }
-#ws_page.page-lightbox #main_content .page_actions { margin: 16px 0 0 !important; }
-#ws_page.page-lightbox #main_content .page_actions form:has(> input.share_icon) { order: 1 !important; }
-#ws_page.page-lightbox #main_content .page_actions form:has(> input.delete_icon) { order: 2 !important; }
+/* lightbox v3: jedna szyna akcji, jeden przycisk glowny */
+#ws_page.page-lightbox #main_content { flex-direction: row !important; flex-wrap: wrap !important; align-items: center !important; align-content: flex-start !important; column-gap: 8px !important; row-gap: 0 !important; padding-top: 16px !important; }
+#ws_page.page-lightbox #main_content :is(.elem[data-type="page_meta"], .elem[data-type="gallery"], .page_meta, .page_actions, .lightbox_meta:not(:has(select, .short_message))) { display: contents !important; }
+#ws_page.page-lightbox #main_content > .elem[data-type="spacer"] { display: none !important; }
+#ws_page.page-lightbox #main_content form { order: 1 !important; margin: 0 !important; }
+#ws_page.page-lightbox #main_content .page_actions form { flex: 0 0 auto !important; width: auto !important; }
+#ws_page.page-lightbox #main_content .page_actions form:has(> input.share_icon) { order: 2 !important; }
+#ws_page.page-lightbox #main_content .page_actions form:has(> input.delete_icon) { order: 3 !important; }
 #ws_page.page-lightbox #main_content .page_actions input.delete_icon { border-color: #BDBDBD !important; color: #6F6F6F !important; }
 #ws_page.page-lightbox #main_content .page_actions input.delete_icon:hover { border-color: #111111 !important; color: #FFFFFF !important; }
-#ws_page.page-lightbox #main_content .lightbox_meta:has(select) { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 16px !important; align-items: start !important; margin: 20px 0 24px !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta:not(:has(select)) form { flex: 0 0 auto !important; width: auto !important; text-align: left !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta:not(:has(select)) input[type="submit"] { height: 32px !important; min-height: 32px !important; padding: 0 14px !important; background: transparent !important; color: #111111 !important; border: 1px solid #111111 !important; font-size: 10px !important; letter-spacing: 0.1em !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta:not(:has(select)) input[type="submit"]:hover { background: #111111 !important; color: #FFFFFF !important; }
+#ws_page.page-lightbox #main_content .user-bar-greeting { order: 4 !important; flex: 0 0 auto !important; width: auto !important; margin: 0 0 0 auto !important; padding: 0 !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta:has(select) { order: 5 !important; flex: 0 0 100% !important; display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 16px !important; align-items: start !important; margin: 20px 0 0 !important; }
 #ws_page.page-lightbox #main_content .lightbox_meta:has(select) form { width: auto !important; min-width: 0 !important; margin: 0 !important; }
 #ws_page.page-lightbox #main_content .lightbox_meta:has(select) p { margin: 0 !important; }
 #ws_page.page-lightbox #main_content .lightbox_meta:has(select) label { display: block !important; margin: 0 0 6px !important; }
 #ws_page.page-lightbox #main_content .lightbox_meta:has(select) :is(select, input[type="text"]) { height: 44px !important; margin: 0 !important; }
-#ws_page.page-lightbox #main_content p:has(> a.request_quotation_link) { position: sticky !important; bottom: 0 !important; z-index: 40 !important; background: #FFFFFF !important; margin: 24px 0 0 !important; padding: 14px 0 !important; border-top: 1px solid #DADADA !important; flex-wrap: wrap !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta:has(.short_message) { order: 5 !important; flex: 0 0 100% !important; }
+#ws_page.page-lightbox #main_content .medias-list { order: 6 !important; flex: 0 0 100% !important; margin-top: 24px !important; }
+#ws_page.page-lightbox #main_content p:has(> a.request_quotation_link) { order: 7 !important; flex: 0 0 100% !important; position: sticky !important; bottom: 0 !important; z-index: 40 !important; background: #FFFFFF !important; margin: 24px 0 0 !important; padding: 14px 0 !important; border-top: 1px solid #DADADA !important; flex-wrap: wrap !important; }
 #ws_page.page-lightbox #main_content p:has(> a.request_quotation_link)::before { display: none !important; }
