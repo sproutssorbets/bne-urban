@@ -108,6 +108,15 @@ button{cursor:pointer}
 .ib:hover,.ib.on{background:#111;color:#fff}
 .ib svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .ib.busy{opacity:.45;pointer-events:none}
+.insel{position:absolute;z-index:3;top:10px;right:10px;width:30px;height:30px;border-radius:50%;background:#111;color:#fff;border:1px solid #111;display:none;align-items:center;justify-content:center;cursor:pointer;transition:background .15s,color .15s}
+.card.in-sel .insel{display:flex}
+.insel svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.insel .i-bin{display:none}
+.insel:hover{background:#fff;color:#111}
+.insel:hover .i-chk{display:none}
+.insel:hover .i-bin{display:block}
+.card.in-sel .acts .ib.sel{display:none}
+.insel.busy{opacity:.45;pointer-events:none}
 #locgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;padding:8px 0 40px}
 .lc{position:relative;display:block;aspect-ratio:4/3;overflow:hidden;background:#ececea;border-radius:var(--r-md);border:none;padding:0;text-align:left;color:#fff;isolation:isolate}
 .lc img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -546,13 +555,13 @@ function renderTabs(counts){
     b.appendChild(document.createTextNode(t[1]));b.appendChild(el("span","n",String(counts[t[0]]||0)));host.appendChild(b)})}
 
 /* ---------- selection: dodawanie i usuwanie z siatki ---------- */
-var SEL={},IC_PLUS='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',IC_BIN='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>',IC_CART='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L20 8H6"/><circle cx="9.5" cy="20" r="1.2"/><circle cx="17" cy="20" r="1.2"/></svg>',SELT=0;
+var SEL={},IC_PLUS='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',IC_BIN='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>',IC_CART='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L20 8H6"/><circle cx="9.5" cy="20" r="1.2"/><circle cx="17" cy="20" r="1.2"/></svg>',SELT=0,IC_CHK='<svg class="i-chk" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 function selPaintBtn(b){var on=!!SEL[b.getAttribute("data-uuid")],t=on?"Remove from selection":"Add to selection";b.classList.toggle("on",on);b.innerHTML=on?IC_BIN:IC_PLUS;b.setAttribute("title",t);b.setAttribute("aria-label",t);b.setAttribute("aria-pressed",String(on))}
-function selPaint(){var l=document.querySelectorAll(".ib.sel");for(var i=0;i<l.length;i++)selPaintBtn(l[i])}
+function selPaint(){var l=document.querySelectorAll(".ib.sel");for(var i=0;i<l.length;i++)selPaintBtn(l[i]);var c=document.querySelectorAll(".card");for(var j=0;j<c.length;j++){if(c[j]._p)c[j].classList.toggle("in-sel",!!SEL[c[j]._p.uuid])}}
 function selNum(n){try{var pd=window.parent.document,c=pd.querySelector(".menu_lightbox_item");if(!c)return;var a=c.querySelector("a")||c,p=c.querySelector(".client_minilightbox");if(n>0){if(!p){p=pd.createElement("span");p.className="client_minilightbox";a.appendChild(p)}p.classList.add("present");var tn=null,w=pd.createTreeWalker(p,4,null,false),x;while((x=w.nextNode())){if(x.nodeValue.trim()!==""){tn=x;break}}if(tn)tn.nodeValue=String(n);else p.appendChild(pd.createTextNode(String(n)))}else if(p){p.classList.remove("present");while(p.firstChild)p.removeChild(p.firstChild)}}catch(e){}}
 function selSync(){SELT=Date.now();return fetch("/lightbox",{credentials:"same-origin",cache:"no-store"}).then(function(r){if(!r.ok)throw 0;return r.text()}).then(function(t){var o={},re=/id="media_([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})"/g,m;while((m=re.exec(t)))o[m[1]]=1;SEL=o;selPaint();selNum(Object.keys(o).length)}).catch(function(){})}
 function selToggle(p,b){if(b.classList.contains("busy"))return;b.classList.add("busy");var on=!!SEL[p.uuid];fetch(p.pageUrl,{credentials:"same-origin"}).then(function(r){if(!r.ok)throw 0;return r.text()}).then(function(t){var d=new DOMParser().parseFromString(t,"text/html"),i=d.querySelector("input.lightbox_toggle"),f=i&&i.closest("form");if(!f||!f.action)throw 0;var fd=new FormData(f);if(on)fd.set("_method","delete");else fd.delete("_method");var u=f.action;if(u.indexOf("media=")<0)u+=(u.indexOf("?")<0?"?":"&")+"media="+encodeURIComponent(p.uuid);return fetch(u,{method:"POST",body:fd,credentials:"same-origin",headers:{"X-Requested-With":"XMLHttpRequest",Accept:"text/javascript, application/javascript, */*; q=0.01"}})}).then(function(r){if(!r.ok)throw 0;if(on)delete SEL[p.uuid];else SEL[p.uuid]=1;b.classList.remove("busy");selPaint();return selSync()}).catch(function(){b.classList.remove("busy");window.open(p.pageUrl,CFG.linkTarget||"_top")})}
-document.addEventListener("click",function(e){var t=e.target.closest?e.target.closest(".ib"):null;if(!t)return;var c=t.closest(".card");if(!c||!c._p)return;e.preventDefault();e.stopPropagation();if(t.classList.contains("sel"))selToggle(c._p,t);else{var u=c._p.pageUrl;window.open(u+(u.indexOf("?")<0?"?":"&")+"lic=1",CFG.linkTarget||"_top")}},true);
+document.addEventListener("click",function(e){var t=e.target.closest?e.target.closest(".ib,.insel"):null;if(!t)return;var c=t.closest(".card");if(!c||!c._p)return;e.preventDefault();e.stopPropagation();if(t.classList.contains("sel")||t.classList.contains("insel"))selToggle(c._p,t);else{var u=c._p.pageUrl;window.open(u+(u.indexOf("?")<0?"?":"&")+"lic=1",CFG.linkTarget||"_top")}},true);
 document.addEventListener("visibilitychange",function(){if(!document.hidden&&Date.now()-SELT>3000)selSync()});
 window.addEventListener("focus",function(){if(Date.now()-SELT>3000)selSync()});
 window.addEventListener("load",function(){setTimeout(selSync,1500)});
@@ -572,7 +581,7 @@ function cardEl(p){
   var img=document.createElement("img");img.src=p.thumb;img.alt=String(p.description||p.title||"").slice(0,160);img.loading="lazy";img.decoding="async";
   var ss=thumbSet(p);if(ss){img.sizes="300px";img.srcset=ss}
   a.appendChild(img);a.appendChild(el("span","ovt",p._name));
-  var acts=el("span","acts"),sb=el("span","ib sel");sb.setAttribute("role","button");sb.setAttribute("data-uuid",p.uuid);selPaintBtn(sb);acts.appendChild(sb);var lb=el("span","ib lic");lb.innerHTML=IC_CART;lb.setAttribute("title","License this photograph");lb.setAttribute("aria-hidden","true");acts.appendChild(lb);a.appendChild(acts);
+  var acts=el("span","acts"),sb=el("span","ib sel");sb.setAttribute("role","button");sb.setAttribute("data-uuid",p.uuid);selPaintBtn(sb);acts.appendChild(sb);var lb=el("span","ib lic");lb.innerHTML=IC_CART;lb.setAttribute("title","License this photograph");lb.setAttribute("aria-hidden","true");acts.appendChild(lb);a.appendChild(acts);var ib=el("span","insel");ib.setAttribute("role","button");ib.setAttribute("title","In selection. Click to remove");ib.setAttribute("aria-label","In selection. Click to remove");ib.innerHTML=IC_CHK+IC_BIN.replace("<svg ","<svg class=\"i-bin\" ");a.appendChild(ib);a.classList.toggle("in-sel",!!SEL[p.uuid]);
   a._p=p;return a}
 
 function layout(){
