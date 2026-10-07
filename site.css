@@ -706,3 +706,8 @@ html:not(.waiting_for_js) #ws_page.page-lightbox .medias-list > .media_slide:not
 #ws_page.page-lightbox #main_content p:has(> #lightbox_description) { margin-top: 24px !important; }
 #ws_page.page-lightbox #main_content p:has(> a.request_quotation_link) { margin-top: 40px !important; padding: 20px 0 32px !important; }
 #ws_page.page-lightbox #main_content { padding-bottom: 32px !important; }
+
+/* lightbox: bez dodatkowych kontrolek i rozmycia obok kosza (zdjecia z przypieta licencja) */
+#ws_page.page-lightbox .media_slide .thumb_links.overlay_ctrl:not(:has(input.lightbox_toggle)) { display: none !important; }
+#ws_page.page-lightbox .media_slide .thumb_links.overlay_ctrl { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: transparent !important; }
+#ws_page.page-lightbox .media_slide .thumb_links.overlay_ctrl > :not(form:has(input.lightbox_toggle)) { display: none !important; }
