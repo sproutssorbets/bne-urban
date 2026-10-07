@@ -656,3 +656,11 @@ html body #main_content .pi-detail-x:hover svg { stroke: #fff !important; }
 #ws_page.page-lightbox #main_content .medias-list { order: 6 !important; flex: 0 0 100% !important; margin-top: 24px !important; }
 #ws_page.page-lightbox #main_content p:has(> a.request_quotation_link) { order: 7 !important; flex: 0 0 100% !important; position: sticky !important; bottom: 0 !important; z-index: 40 !important; background: #FFFFFF !important; margin: 24px 0 0 !important; padding: 14px 0 !important; border-top: 1px solid #DADADA !important; flex-wrap: wrap !important; }
 #ws_page.page-lightbox #main_content p:has(> a.request_quotation_link)::before { display: none !important; }
+
+/* media v2: licencja jako jedyny przycisk glowny */
+#ws_page.page-media #main_content input.submit_small.price_icon,
+#ws_page.page-media #main_content input.submit_small.lightbox_toggle { display: block !important; width: 100% !important; height: 38px !important; min-height: 38px !important; padding: 0 20px !important; font: 500 10px/36px Inter, sans-serif !important; letter-spacing: 0.14em !important; text-transform: uppercase !important; text-align: center !important; border: 1px solid #111111 !important; border-radius: 9999px !important; box-sizing: border-box !important; }
+#ws_page.page-media #main_content input.submit_small.price_icon { background: #111111 !important; color: #FFFFFF !important; }
+#ws_page.page-media #main_content input.submit_small.price_icon:hover { background: #FFFFFF !important; color: #111111 !important; opacity: 1 !important; }
+#ws_page.page-media #main_content input.submit_small.lightbox_toggle { background: transparent !important; color: #111111 !important; }
+#ws_page.page-media #main_content input.submit_small.lightbox_toggle:hover { background: #111111 !important; color: #FFFFFF !important; opacity: 1 !important; }
