@@ -632,3 +632,19 @@ html body #main_content .pi-detail-x:hover svg { stroke: #fff !important; }
 #ws_page.page-lightbox #main_content a.ajaxable.request_quotation_link { height: 38px !important; padding: 0 18px !important; font-size: 10px !important; letter-spacing: 0.1em !important; }
 #ws_page.page-lightbox #main_content .page_actions { gap: 8px !important; }
 #ws_page.page-lightbox #main_content .page_actions form.button_to input.submit_small { padding: 0 14px !important; font-size: 10px !important; letter-spacing: 0.1em !important; }
+
+/* lightbox v2: akcje od razu widoczne */
+#ws_page.page-lightbox #main_content > .elem[data-type="page_meta"] { order: -3 !important; }
+#ws_page.page-lightbox #main_content .page_actions { margin: 16px 0 0 !important; }
+#ws_page.page-lightbox #main_content .page_actions form:nth-child(4) { order: 1 !important; }
+#ws_page.page-lightbox #main_content .page_actions form:nth-child(2) { order: 2 !important; }
+#ws_page.page-lightbox #main_content .page_actions form:nth-child(3) { order: 3 !important; }
+#ws_page.page-lightbox #main_content .page_actions form:is(:nth-child(2), :nth-child(3)) input.submit_small { border-color: #BDBDBD !important; color: #6F6F6F !important; }
+#ws_page.page-lightbox #main_content .page_actions form:is(:nth-child(2), :nth-child(3)) input.submit_small:hover { border-color: #111111 !important; color: #FFFFFF !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta:not(:has(.short_message)) { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 16px !important; align-items: start !important; margin: 20px 0 24px !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta:not(:has(.short_message)) form { width: auto !important; min-width: 0 !important; margin: 0 !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta:not(:has(.short_message)) p { margin: 0 !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta:not(:has(.short_message)) label { display: block !important; margin: 0 0 6px !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta:not(:has(.short_message)) :is(select, input[type="text"]) { height: 44px !important; margin: 0 !important; }
+#ws_page.page-lightbox #main_content p:has(> a.request_quotation_link) { position: sticky !important; bottom: 0 !important; z-index: 40 !important; background: #FFFFFF !important; margin: 24px 0 0 !important; padding: 14px 0 !important; border-top: 1px solid #DADADA !important; flex-wrap: wrap !important; }
+#ws_page.page-lightbox #main_content p:has(> a.request_quotation_link)::before { display: none !important; }
