@@ -96,11 +96,17 @@ button{cursor:pointer}
 .card:hover img{transform:scale(1.025)}
 .card::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0;background:linear-gradient(to top,rgba(0,0,0,.62),rgba(0,0,0,.18) 55%,rgba(0,0,0,.18));transition:opacity .15s}
 .card:hover::after,.card:focus-visible::after{opacity:1}
-.ovt{position:absolute;z-index:2;left:14px;right:60px;bottom:14px;font-size:11px;font-weight:500;line-height:1.3;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transition:opacity .15s}
+.ovt{position:absolute;z-index:2;left:14px;right:84px;bottom:14px;font-size:11px;font-weight:500;line-height:1.3;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transition:opacity .15s}
 .eye{position:absolute;z-index:2;right:12px;bottom:10px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s}
 .eye svg{width:20px;height:20px;fill:none;stroke:#fff;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .card:hover .ovt,.card:hover .eye,.card:focus-visible .ovt,.card:focus-visible .eye{opacity:1}
-@media (hover:none){.card::after,.ovt,.eye{opacity:1}}
+@media (hover:none){.card::after,.ovt,.eye,.acts{opacity:1}}
+.acts{position:absolute;z-index:3;right:10px;bottom:10px;display:flex;gap:6px;opacity:0;transition:opacity .15s}
+.card:hover .acts,.card:focus-visible .acts{opacity:1}
+.ib{width:30px;height:30px;border-radius:50%;border:1px solid #111;background:#fff;color:#111;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s,color .15s}
+.ib:hover,.ib.on{background:#111;color:#fff}
+.ib svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.ib.busy{opacity:.45;pointer-events:none}
 #locgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;padding:8px 0 40px}
 .lc{position:relative;display:block;aspect-ratio:4/3;overflow:hidden;background:#ececea;border-radius:var(--r-md);border:none;padding:0;text-align:left;color:#fff;isolation:isolate}
 .lc img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -538,6 +544,16 @@ function renderTabs(counts){
     var b=el("button","tab"+(S.tab===t[0]?" on":""));b.type="button";b.setAttribute("role","tab");b.setAttribute("aria-selected",String(S.tab===t[0]));b.setAttribute("data-tab",t[0]);
     b.appendChild(document.createTextNode(t[1]));b.appendChild(el("span","n",String(counts[t[0]]||0)));host.appendChild(b)})}
 
+/* ---------- selection: dodawanie i usuwanie z siatki ---------- */
+var SEL={},IC_PLUS='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',IC_BIN='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>',IC_CART='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L20 8H6"/><circle cx="9.5" cy="20" r="1.2"/><circle cx="17" cy="20" r="1.2"/></svg>',SELT=0;
+function selPaintBtn(b){var on=!!SEL[b.getAttribute("data-uuid")],t=on?"Remove from selection":"Add to selection";b.classList.toggle("on",on);b.innerHTML=on?IC_BIN:IC_PLUS;b.setAttribute("title",t);b.setAttribute("aria-label",t);b.setAttribute("aria-pressed",String(on))}
+function selPaint(){var l=document.querySelectorAll(".ib.sel");for(var i=0;i<l.length;i++)selPaintBtn(l[i])}
+function selSync(){SELT=Date.now();return fetch("/lightbox",{credentials:"same-origin",cache:"no-store"}).then(function(r){if(!r.ok)throw 0;return r.text()}).then(function(t){var o={},re=/id="media_([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})"/g,m;while((m=re.exec(t)))o[m[1]]=1;SEL=o;selPaint();try{var f=new DOMParser().parseFromString(t,"text/html").querySelector(".menu_lightbox_item"),pd=window.parent.document,c=pd.querySelector(".menu_lightbox_item");f&&c&&c.replaceWith(pd.importNode(f,true))}catch(e){}}).catch(function(){})}
+function selToggle(p,b){if(b.classList.contains("busy"))return;b.classList.add("busy");var on=!!SEL[p.uuid];fetch(p.pageUrl,{credentials:"same-origin"}).then(function(r){if(!r.ok)throw 0;return r.text()}).then(function(t){var d=new DOMParser().parseFromString(t,"text/html"),i=d.querySelector("input.lightbox_toggle"),f=i&&i.closest("form");if(!f||!f.action)throw 0;var fd=new FormData(f);if(on)fd.set("_method","delete");else fd.delete("_method");var u=f.action;if(u.indexOf("media=")<0)u+=(u.indexOf("?")<0?"?":"&")+"media="+encodeURIComponent(p.uuid);return fetch(u,{method:"POST",body:fd,credentials:"same-origin",headers:{"X-Requested-With":"XMLHttpRequest",Accept:"text/javascript, application/javascript, */*; q=0.01"}})}).then(function(r){if(!r.ok)throw 0;if(on)delete SEL[p.uuid];else SEL[p.uuid]=1;b.classList.remove("busy");selPaint();return selSync()}).catch(function(){b.classList.remove("busy");window.open(p.pageUrl,CFG.linkTarget||"_top")})}
+document.addEventListener("click",function(e){var b=e.target.closest?e.target.closest(".ib.sel"):null;if(!b)return;e.preventDefault();e.stopPropagation();var c=b.closest(".card");if(c&&c._p)selToggle(c._p,b)},true);
+document.addEventListener("visibilitychange",function(){if(!document.hidden&&Date.now()-SELT>3000)selSync()});
+window.addEventListener("focus",function(){if(Date.now()-SELT>3000)selSync()});
+selSync();
 /* ---------- masonry grid ---------- */
 var GAP=16;
 var DERIV=[["bigthumb",275,275],["large",600,450],["xgaplus",1152,864],["wqxga",2560,1600]];
@@ -553,7 +569,7 @@ function cardEl(p){
   var img=document.createElement("img");img.src=p.thumb;img.alt=String(p.description||p.title||"").slice(0,160);img.loading="lazy";img.decoding="async";
   var ss=thumbSet(p);if(ss){img.sizes="300px";img.srcset=ss}
   a.appendChild(img);a.appendChild(el("span","ovt",p._name));
-  var e=el("span","eye");e.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>';a.appendChild(e);
+  var acts=el("span","acts"),sb=el("span","ib sel");sb.setAttribute("role","button");sb.setAttribute("data-uuid",p.uuid);selPaintBtn(sb);acts.appendChild(sb);var lb=el("span","ib lic");lb.innerHTML=IC_CART;lb.setAttribute("title","License this photograph");lb.setAttribute("aria-hidden","true");acts.appendChild(lb);a.appendChild(acts);
   a._p=p;return a}
 
 function layout(){
