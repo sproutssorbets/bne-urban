@@ -40,7 +40,8 @@ html body .media_wrap::after { background: none !important; background-image: no
 .user-bar-greeting .client_logged_in { font-size: 0 !important; line-height: 0 !important; }
 .user-bar-greeting .client_logged_in::before { content: "You are logged in as "; font: 400 12px/1.4 Inter, sans-serif; color: #6F6F6F; }
 .user-bar-greeting .client_friendly_name { font: 500 12px/1.4 Inter, sans-serif !important; color: #111111 !important; }
-.user-bar-greeting .client_logged_in a { display: none !important; }
+.user-bar-greeting .client_logged_in a { display: inline !important; margin-left: 18px !important; font: 400 12px/1.4 Inter, sans-serif !important; letter-spacing: 0 !important; text-transform: none !important; color: #6F6F6F !important; text-decoration: underline !important; text-underline-offset: 3px !important; }
+.user-bar-greeting .client_logged_in a:hover { color: #111111 !important; }
 
 #flash_notice, #flash_error, #flash_warning, #flash_alert, #flash_success, #flash_info { position: fixed !important; left: 50% !important; right: auto !important; top: auto !important; bottom: 24px !important; transform: translateX(-50%) !important; width: max-content !important; max-width: min(92vw, 560px) !important; margin: 0 !important; padding: 14px 28px !important; z-index: 100000 !important; box-sizing: border-box !important; background: #111111 !important; color: #FFFFFF !important; border: none !important; border-radius: var(--pi-r-pill) !important; box-shadow: none !important; text-align: center !important; font: 500 12px/1.4 Inter, sans-serif !important; letter-spacing: 0.04em !important; }
 #flash_notice *, #flash_error *, #flash_warning *, #flash_alert *, #flash_success *, #flash_info * { margin: 0 !important; padding: 0 !important; color: inherit !important; font: inherit !important; background: transparent !important; }
