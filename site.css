@@ -701,3 +701,8 @@ html:not(.waiting_for_js) #ws_page.page-lightbox .medias-list > .media_slide:not
 #ws_page.page-lightbox #main_content .medias-list { margin-top: 8px !important; }
 #ws_page.page-lightbox #main_content :is(p, div, label):has(+ textarea),
 #ws_page.page-lightbox #main_content label[for*="note"] { margin-top: 24px !important; }
+
+/* lightbox: odstep nad polem Notes oraz wiecej oddechu na dole */
+#ws_page.page-lightbox #main_content p:has(> #lightbox_description) { margin-top: 24px !important; }
+#ws_page.page-lightbox #main_content p:has(> a.request_quotation_link) { margin-top: 40px !important; padding: 20px 0 32px !important; }
+#ws_page.page-lightbox #main_content { padding-bottom: 32px !important; }
