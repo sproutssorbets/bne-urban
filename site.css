@@ -714,3 +714,6 @@ html:not(.waiting_for_js) #ws_page.page-lightbox .medias-list > .media_slide:not
 #ws_page.page-lightbox .media_slide .thumb_links.overlay_ctrl:not(:has(input.lightbox_toggle)) { display: none !important; }
 #ws_page.page-lightbox .media_slide .thumb_links.overlay_ctrl { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: transparent !important; }
 #ws_page.page-lightbox .media_slide .thumb_links.overlay_ctrl > :not(form:has(input.lightbox_toggle)) { display: none !important; }
+
+/* spojna typografia akcji: 11 px / 400 / 0.1em (przyciski przy zamowieniach na /client) */
+#ws_page.page-client_home .order_actions a.submit_small { font-size: 11px !important; font-weight: 400 !important; letter-spacing: 0.1em !important; }
