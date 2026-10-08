@@ -46,7 +46,7 @@ button{cursor:pointer}
 /* sub bar */
 #sub{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding:0 24px;flex:none}
 #tabs{display:flex;gap:28px;overflow-x:auto;scrollbar-width:none}
-.tab{height:44px;border:none;border-bottom:1px solid transparent;background:transparent;font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#9a9a96;white-space:nowrap;padding:0}
+.tab{height:44px;border:none;border-bottom:1px solid transparent;background:transparent;font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6b6b66;white-space:nowrap;padding:0}
 .tab:hover{color:var(--ink)}
 .tab.on{color:var(--ink);border-bottom-color:var(--ink)}
 .tab .n{font-weight:400;margin-left:6px}
@@ -191,6 +191,21 @@ body.panel #mapcol{display:none}
 .mapboxgl-popup { padding-bottom: 50px; }
 .mapboxgl-popup-content { font-family: Inter, sans-serif; border-radius: 12px; padding: 12px 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
 </style>
+<style id="pi-filter-fixes">
+#intro{margin:0;padding:10px 24px 0;font-size:12px;line-height:1.5;color:#6b6b66}
+#intro[hidden]{display:none}
+.more{display:block;width:100%;padding:16px 24px;border:none;border-top:1px solid #ececea;background:transparent;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;text-align:left;color:#6b6b66;cursor:pointer}
+.more:hover{color:#111}
+.more:focus-visible,.sh:focus-visible,.tbtn:focus-visible,.tab:focus-visible,.chip button:focus-visible{outline:2px solid #111;outline-offset:2px}
+.tab,.sh,.chip,.opt .t{font-size:12px}
+@media (max-width:899px){
+ .tbtn,#sortbtn,#dm,#dp{min-height:44px;min-width:44px}
+ .px{width:44px;height:44px}
+ .chip button{padding:10px 10px;margin:-10px -6px -10px 0}
+ .opt{min-height:44px}
+ #intro{padding:8px 16px 0}
+}
+</style>
 </head>
 <body class="map">
 <div id="app">
@@ -205,6 +220,7 @@ body.panel #mapcol{display:none}
     <div id="tabs" role="tablist"></div>
     <div id="subr"><div id="sortw"><span class="l">Sort</span><button id="sortbtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="sortlist" aria-label="Sort photographs"></button><div id="sortlist" role="listbox" aria-label="Sort photographs"></div></div><div id="dens"><span class="l">Columns</span><button id="dm" type="button" aria-label="Fewer columns">&minus;</button><b id="dn">3</b><button id="dp" type="button" aria-label="More columns">+</button></div></div>
   </div>
+  <p id="intro">Brisbane urban photography, licensed per image. Add photos to your selection to license them.</p>
   <div id="split">
     <aside id="panel" aria-label="Filters">
       <div class="ph">
@@ -510,8 +526,10 @@ function renderPanel(){
   var host=$("fgrid"),top=host.scrollTop;host.innerHTML="";
   var fq = $("fsearch") ? $("fsearch").value.toLowerCase().trim() : "";
   
+  var PRIMARY={suburb:1,typology:1,material:1,year:1},hidden=0;
   FACETS.forEach(function(F){
     var opts=optionsFor(F);if(!opts.length)return;
+    if(!PRIMARY[F.key]&&!S.more&&!fq&&!selOf(F.key).length){hidden++;return}
     
     // Auto-expand logic based on search
     var matches = {};
@@ -565,6 +583,7 @@ function renderPanel(){
     }
     host.appendChild(sec)
   });
+  if(!fq&&(hidden||S.more)){var mb=el("button","more",S.more?"Fewer filters":"More filters ("+hidden+")");mb.type="button";mb.setAttribute("data-more","1");mb.setAttribute("aria-expanded",String(!!S.more));host.appendChild(mb)}
   host.scrollTop=top;
 }
 
@@ -575,7 +594,8 @@ function renderChips(){
   if(S.loc)chip("loc",S.loc,S.loc);
   FACETS.forEach(function(F){selOf(F.key).forEach(function(v,i){if(i>0&&MULTI[F.key])host.appendChild(el("span","cj",isAll(F)?"and":"or"));chip(F.key,v,canon(F.key,v))})});
   var n=activeCount(),b=$("badge");b.hidden=!n;b.textContent=n;
-  $("clear").style.display=n?"inline":"none"}
+  $("clear").style.display=n?"inline":"none";
+  var it=$("intro");if(it)it.hidden=!!(n||S.q)}
 
 /* ---------- tabs ---------- */
 function groupBy(list,fn){var m={},o=[];list.forEach(function(p){var k=fn(p);if(!k)return;if(!m[k]){m[k]={name:k,photos:[]};o.push(k)}m[k].photos.push(p)});o.sort(cmpAddr);return o.map(function(k){return m[k]})}
@@ -810,6 +830,15 @@ function syncUrl(){
     var target=window.location.pathname+(qs?"?"+qs:"");
     if(window.location.search!==target.slice(window.location.pathname.length))window.history.replaceState(null,"",target);
   }catch(e){}
+  try{
+    if(window.parent!==window&&location.search.indexOf("navfix=1")<0){
+      var P=window.parent,ps=new URLSearchParams(P.location.search),inn=new URLSearchParams(window.location.search);
+      inn.delete("cols");inn.delete("map");
+      var is=inn.toString();if(is)ps.set("pi",is);else ps.delete("pi");
+      var pq=ps.toString()?"?"+ps.toString():"";
+      if(P.location.search!==pq)P.history.replaceState(null,"",P.location.pathname+pq+P.location.hash);
+    }
+  }catch(e){}
 }
 
 function save(){
@@ -822,6 +851,11 @@ function save(){
 function restore(){
   try{
     var p=new URLSearchParams(window.location.search);
+    try{
+      var own=false;p.forEach(function(v,k){if(k!=="cols"&&k!=="map")own=true});
+      var pp=window.parent!==window?new URLSearchParams(window.parent.location.search).get("pi"):null;
+      if(!own&&pp){var np=new URLSearchParams(pp);if(p.get("cols"))np.set("cols",p.get("cols"));if(p.get("map"))np.set("map",p.get("map"));p=np}
+    }catch(e){}
     var hasUrl=p.toString().length>0;
     if(hasUrl){
       if(p.get("tab"))S.tab=p.get("tab");
@@ -875,7 +909,7 @@ function wire(){
   on("dp","click",function(){var n=parseInt($("wall").getAttribute("data-n")||"3",10);S.cols=Math.min(6,n+1);layout();save()});
   on("chips","click",function(e){var b=e.target.closest&&e.target.closest("button");if(!b)return;var k=b.getAttribute("data-key"),v=b.getAttribute("data-val");if(k==="loc")S.loc="";else{S.f[k]=(S.f[k]||[]).filter(function(x){return x!==v})}render()});
   on("tabs","click",function(e){var b=e.target.closest&&e.target.closest("button");if(!b)return;S.tab=b.getAttribute("data-tab");render()});
-  on("fgrid","click",function(e){var m=e.target.closest&&e.target.closest("[data-mkey]");if(m){S.mode[m.getAttribute("data-mkey")]=m.getAttribute("data-mval");render();return}var h=e.target.closest&&e.target.closest(".sh");if(!h)return;var k=h.getAttribute("data-sec"),cur=S.open[k]!==undefined?S.open[k]:selOf(k).length>0;S.open[k]=!cur;renderPanel()});
+  on("fgrid","click",function(e){if(e.target.closest&&e.target.closest("[data-more]")){S.more=!S.more;renderPanel();return}var m=e.target.closest&&e.target.closest("[data-mkey]");if(m){S.mode[m.getAttribute("data-mkey")]=m.getAttribute("data-mval");render();return}var h=e.target.closest&&e.target.closest(".sh");if(!h)return;var k=h.getAttribute("data-sec"),cur=S.open[k]!==undefined?S.open[k]:selOf(k).length>0;S.open[k]=!cur;renderPanel()});
   on("fgrid","change",function(e){var i=e.target;if(i.getAttribute("data-key"))toggle(i.getAttribute("data-key"),i.getAttribute("data-val"))});
   on("locgrid","click",function(e){var b=e.target.closest&&e.target.closest(".lc");if(!b)return;var kind=b.getAttribute("data-kind"),name=b.getAttribute("data-name");
     if(kind==="location")S.loc=S.loc===name?"":name;else S.f.suburb=[lc(name)];S.tab="photo";render();$("main").scrollTop=0});
