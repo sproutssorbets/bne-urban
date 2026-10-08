@@ -724,3 +724,7 @@ html:not(.waiting_for_js) #ws_page.page-lightbox .medias-list > .media_slide:not
 /* lightbox: linia statusu na samej gorze, jak na innych podstronach */
 #ws_page.page-lightbox #main_content::before { height: 20px; }
 #ws_page.page-lightbox #main_content .user-bar-greeting { order: -1 !important; flex: 0 0 100% !important; text-align: right !important; margin: 0 0 16px !important; }
+
+/* lightbox: linia statusu na samej gorze, jak na innych podstronach */
+#ws_page.page-lightbox #main_content::before { height: 20px; }
+#ws_page.page-lightbox #main_content .user-bar-greeting { order: -1 !important; flex: 0 0 100% !important; text-align: right !important; margin: 0 0 16px !important; }
