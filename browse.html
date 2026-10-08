@@ -162,10 +162,13 @@ body.panel #mapcol{display:none}
  #chips{order:4;flex-basis:100%}
 }
 @media (prefers-reduced-motion:reduce){.card img,.card::after,.ovt,.eye,#panel{transition:none;animation:none}}
-.mm{display:flex;align-items:center;gap:10px;margin:0 0 6px;font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
-.mm .seg{display:inline-flex;border:1px solid var(--line);border-radius:var(--r-pill);overflow:hidden}
-.mm button{border:none;background:transparent;padding:5px 12px;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--mute);cursor:pointer}
-.mm button[aria-pressed=true]{background:var(--ink);color:#fff}
+.mm{display:block;margin:0 0 10px;padding:9px 12px;background:var(--chip);border-radius:var(--r-sm);font-size:12px;line-height:1.5;font-weight:400;letter-spacing:0;text-transform:none;color:var(--ink)}
+.mm button{border:none;background:transparent;padding:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.mm button:hover{opacity:.6}
+.empty .eb{display:inline-flex;align-items:center;height:36px;padding:0 18px;margin:12px 12px 0 0;border:1px solid var(--ink);border-radius:var(--r-pill);background:#fff;color:var(--ink);font-size:11px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+.empty .eb:hover{background:var(--ink);color:#fff}
+.empty .ec{border:none;background:transparent;padding:0;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.empty .ec:hover{color:var(--ink)}
 #subr{display:flex;align-items:center;gap:24px}
 #sortw{position:relative;display:flex;align-items:center;gap:8px;height:44px;font-size:11px;letter-spacing:.06em;color:var(--mute)}
 #sortw .l{text-transform:uppercase;letter-spacing:.12em}
@@ -194,7 +197,7 @@ body.panel #mapcol{display:none}
   <div id="bar">
     <button class="tbtn" id="ftoggle" aria-expanded="false" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h9M16 7h5M3 17h5M12 17h9"/><circle cx="14" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>Filters</span><span class="badge" id="badge" hidden></span></button>
     <div id="chips"></div>
-    <button id="clear" type="button">Clear</button>
+    <button id="clear" type="button">Clear all</button>
     <div class="qwrap"><svg class="qicon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="q" type="text" autocomplete="off" spellcheck="false" placeholder="Search addresses, places, keywords" aria-label="Search the archive"><div id="sug" role="listbox"></div></div>
     <button class="tbtn" id="mtoggle" type="button" aria-pressed="true">Grid</button>
   </div>
@@ -451,6 +454,34 @@ function pickSort(k){S.sort=k;sortOpen(false);render();$("main").scrollTop=0}
 function selOf(key){return S.f[key]||[]}
 var MULTI={};
 function isAll(F){return S.mode[F.key]!==undefined?S.mode[F.key]==="all":!!F.all}
+function modeCount(F,all){var o=S.mode[F.key];S.mode[F.key]=all?"all":"any";var n=0;for(var i=0;i<DATA.length;i++)if(pass(DATA[i],null))n++;if(o===undefined)delete S.mode[F.key];else S.mode[F.key]=o;return n}
+function cntNow(){var n=0;for(var i=0;i<DATA.length;i++)if(pass(DATA[i],null))n++;return n}
+function bestRemoval(){
+  var best=null,c=[],o;
+  if(S.loc)c.push({k:"loc",v:S.loc,label:S.loc});
+  FACETS.forEach(function(F){selOf(F.key).forEach(function(v){c.push({k:F.key,v:v,label:canon(F.key,v)})})});
+  if(S.q)c.push({k:"q",v:S.q,label:"\u201C"+S.q+"\u201D"});
+  c.forEach(function(x){
+    if(x.k==="loc"){o=S.loc;S.loc="";x.n=cntNow();S.loc=o}
+    else if(x.k==="q"){o=S.q;S.q="";x.n=cntNow();S.q=o}
+    else{o=S.f[x.k];S.f[x.k]=o.filter(function(y){return y!==x.v});x.n=cntNow();S.f[x.k]=o}
+    if(x.n>0&&(!best||x.n>best.n))best=x});
+  return best}
+function dropFilter(x){
+  if(x.k==="loc")S.loc="";
+  else if(x.k==="q"){S.q="";$("q").value=""}
+  else S.f[x.k]=(S.f[x.k]||[]).filter(function(y){return y!==x.v});
+  render()}
+function emptyState(host){
+  var d=el("div","empty"),best=bestRemoval();
+  d.appendChild(el("b",null,"No photographs match."));
+  if(best){
+    d.appendChild(document.createTextNode("Without "+best.label+" you would see "+best.n+(best.n===1?" photograph.":" photographs.")));
+    d.appendChild(document.createElement("br"));
+    var b=el("button","eb","Remove "+best.label);b.type="button";b.addEventListener("click",function(){dropFilter(best)});d.appendChild(b)}
+  else d.appendChild(document.createTextNode("Clear a filter or change the search."));
+  var cl=el("button","ec","Clear all");cl.type="button";cl.addEventListener("click",function(){$("clear").click()});d.appendChild(cl);
+  host.appendChild(d)}
 function pass(p,except){
   if(except!=="loc"&&S.loc&&p._loc!==S.loc)return false;
   for(var i=0;i<FACETS.length;i++){
@@ -505,12 +536,12 @@ function renderPanel(){
     
     if(isOpen){
       var body=el("div","sb"),shown=0,last="",allm=isAll(F);
-      if(MULTI[F.key]){
-        var mm=el("div","mm"),seg=el("span","seg");
-        mm.appendChild(el("span",null,"Match"));
-        seg.title="Any: photos with at least one selected term. All: photos with every selected term.";
-        [["any","Any"],["all","All"]].forEach(function(m){var b=el("button",null,m[1]);b.type="button";b.setAttribute("data-mkey",F.key);b.setAttribute("data-mval",m[0]);b.setAttribute("aria-pressed",String((m[0]==="all")===allm));seg.appendChild(b)});
-        mm.appendChild(seg);body.appendChild(mm)}
+      if(MULTI[F.key]&&sel.length>1){
+        var mm=el("div","mm"),nn=sel.length,both=nn===2?"both":"all "+nn;
+        mm.appendChild(document.createTextNode(allm?"Photos with "+both+" selected terms. ":"Photos with at least one of the "+nn+" selected terms. "));
+        var lk=el("button",null,allm?"Show photos with any of them ("+modeCount(F,false)+")":"Show only photos with "+both+" ("+modeCount(F,true)+")");
+        lk.type="button";lk.setAttribute("data-mkey",F.key);lk.setAttribute("data-mval",allm?"any":"all");
+        mm.appendChild(lk);body.appendChild(mm)}
         
       opts.forEach(function(v){
         if(fq && !matches[v]) return; // Skip non-matching options entirely during search
@@ -722,7 +753,7 @@ function render(){
       var img=document.createElement("img");img.src=g.photos[0].thumb;img.alt="";img.loading="lazy";b.appendChild(img);
       var t=el("span","lt",g.name);t.appendChild(el("span","ln",g.photos.length+(g.photos.length===1?" photograph":" photographs")));b.appendChild(t);lg.appendChild(b)});
     word=S.tab==="location"?(groups.length===1?"location":"locations"):(groups.length===1?"suburb":"suburbs");num=groups.length}
-  if(!num){var d=el("div","empty");d.appendChild(el("b",null,"Nothing matches."));d.appendChild(document.createTextNode("Clear a filter or change the search."));em.appendChild(d)}
+  if(!num)emptyState(em);
   var missing=DATA.filter(function(p){return !p._place&&pass(p,null)}).length;
   $("count").textContent=num+" "+word+(missing&&isGrid&&S.map?" \u00B7 "+missing+" not on the map":"");
   $("done").textContent="Show "+LIST.length+(LIST.length===1?" photograph":" photographs");
