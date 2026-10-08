@@ -302,7 +302,7 @@ var FACETS=[
 ];
 var FBY={};FACETS.forEach(function(f){FBY[f.key]=f});
 
-var S={tab:"photo",q:"",loc:"",f:{},mode:{},sort:"featured",cols:0,map:true,panel:false,open:{suburb:true}};
+var S={tab:"photo",q:"",loc:"",f:{},mode:{},sort:"featured",cols:3,map:true,panel:false,open:{suburb:true}};
 var DATA=[],PLACES=[],PLACEBYNAME={},LIST=[],MAP=null,MAPREADY=false,MAPLOAD=false,FITTED=false,TQ=null;
 var $=function(id){return document.getElementById(id)};
 var lc=function(s){return String(s==null?"":s).toLowerCase().trim()};
@@ -797,7 +797,7 @@ function restore(){
       if(p.get("q"))S.q=p.get("q");
       if(p.get("loc"))S.loc=p.get("loc");
       if(p.get("sort")&&SORTS.indexOf(p.get("sort"))>-1)S.sort=p.get("sort");
-      if(p.get("cols"))S.cols=parseInt(p.get("cols"),10)||0;
+      if(p.get("cols"))S.cols=parseInt(p.get("cols"),10)||3;
       if(p.get("map")==="0")S.map=false;
       FACETS.forEach(function(F){
         var v=p.get(F.key);if(v)S.f[F.key]=v.split(",").map(lc).filter(Boolean);
@@ -807,7 +807,7 @@ function restore(){
       return 0;
     }
     var r=JSON.parse(window.sessionStorage.getItem("pi_browse")||"null");if(!r)return 0;
-    S.tab=r.tab||"photo";S.q=r.q||"";S.loc=r.loc||"";S.f=r.f||{};S.mode=r.mode||{};S.sort=SORTS.indexOf(r.sort)>-1?r.sort:"featured";S.cols=r.cols||0;if(typeof r.map==="boolean")S.map=r.map;
+    S.tab=r.tab||"photo";S.q=r.q||"";S.loc=r.loc||"";S.f=r.f||{};S.mode=r.mode||{};S.sort=SORTS.indexOf(r.sort)>-1?r.sort:"featured";S.cols=r.cols||3;if(typeof r.map==="boolean")S.map=r.map;
     $("q").value=S.q;return r.y||0
   }catch(e){return 0}
 }
