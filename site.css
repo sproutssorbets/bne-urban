@@ -728,3 +728,8 @@ html:not(.waiting_for_js) #ws_page.page-lightbox .medias-list > .media_slide:not
 /* lightbox: linia statusu na samej gorze, jak na innych podstronach */
 #ws_page.page-lightbox #main_content::before { height: 20px; }
 #ws_page.page-lightbox #main_content .user-bar-greeting { order: -1 !important; flex: 0 0 100% !important; text-align: right !important; margin: 0 0 16px !important; }
+
+/* /client: okladki selekcji w prawdziwych proporcjach (jak w selection) */
+#ws_page.page-client_home .galleries.thumbs_grid { align-items: start !important; }
+#ws_page.page-client_home .galleries .thumb { height: auto !important; aspect-ratio: auto !important; }
+#ws_page.page-client_home .galleries .thumb img { width: 100% !important; height: auto !important; object-fit: contain !important; display: block !important; }
