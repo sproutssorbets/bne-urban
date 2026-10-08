@@ -717,3 +717,6 @@ html:not(.waiting_for_js) #ws_page.page-lightbox .medias-list > .media_slide:not
 
 /* spojna typografia akcji: 11 px / 400 / 0.1em (przyciski przy zamowieniach na /client) */
 #ws_page.page-client_home .order_actions a.submit_small { font-size: 11px !important; font-weight: 400 !important; letter-spacing: 0.1em !important; }
+
+/* lightbox: ukryty formularz zapisu nazwy nie zajmuje miejsca w rzedzie przyciskow */
+#ws_page.page-lightbox #main_content form.full_width:not(:has(:is(input[type="text"], textarea))) { display: none !important; }
