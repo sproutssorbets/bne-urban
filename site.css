@@ -746,5 +746,5 @@ html:not(.waiting_for_js) #ws_page.page-lightbox .medias-list > .media_slide:not
 #ws_page.page-lightbox #main_content .short_message .pi-empty-btn:hover { background: #FFFFFF; color: #111111 !important; }
 #ws_page.page-lightbox #main_content .short_message .pi-empty-link { margin-top: 18px; font: 400 11px/1.4 Inter, sans-serif; letter-spacing: 0.1em; text-transform: uppercase; color: #111111 !important; text-decoration: underline; text-underline-offset: 3px; }
 .pi-quote-note{display:block;margin-top:8px;font-size:11px;line-height:1.5;color:#666}
-.pi-quote-intro{margin:0 0 24px;padding:14px 16px;border:1px solid #111;font-size:12px;line-height:1.6}
-.pi-quote-intro b{display:block;margin-bottom:4px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.pi-quote-intro{margin:8px 0 36px;padding:24px 28px;border:1px solid #111;border-radius:14px!important;font-size:12px;line-height:1.75}
+.pi-quote-intro b{display:block;margin-bottom:10px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
