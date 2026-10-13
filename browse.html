@@ -229,8 +229,11 @@ body.panel #mapcol{display:none}
  .mapboxgl-ctrl-attrib-button{width:32px;height:32px}
 
  /* po wlaczeniu mapy lista zdjec ma wiecej miejsca: nizsza mapa, bez tekstu wstepnego */
- body.map #mapcol{height:34vh;height:34svh}
  body.map #intro{display:none}
+ /* widok mapy: caly obszar pod paskiem sie przewija (mapa, potem pelna lista zdjec), niezaleznie od wysokosci ramki */
+ body.map #split{overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+ body.map #mapcol{flex:none;height:38vh;height:38svh;min-height:200px}
+ body.map #main{flex:none;overflow:visible;min-height:70vh}
 }
 </style>
 </head>
