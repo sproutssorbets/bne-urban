@@ -206,6 +206,33 @@ body.panel #mapcol{display:none}
  #intro{padding:8px 16px 0}
 }
 </style>
+<style id="pi-mobile-ux">
+/* Mobile UX, rev. 14 Oct 2026. Tylko ekrany do 900px, desktop bez zmian. */
+@media (max-width:900px){
+ /* 16px w polach: iOS Safari nie przybliza strony po dotknieciu pola */
+ #q,.pf-search input{font-size:16px}
+ .pf-search input{height:44px}
+
+ /* zakladki: wezszy odstep i tracking, zeby wszystkie trzy mieszcza sie w 390px */
+ #tabs{gap:18px;scroll-snap-type:x proximity}
+ .tab{letter-spacing:.08em;scroll-snap-align:start}
+
+ /* cele dotykowe 44px bez zmiany wygladu: niewidzialna strefa wokol przyciskow na kartach */
+ .ib{position:relative}
+ .ib::before,.insel::before{content:"";position:absolute;inset:-8px}
+ #clear,#note button{min-height:44px;min-width:44px}
+ .sg{min-height:44px;align-items:center}
+ .empty .eb{height:44px}
+
+ /* kontrolki mapy */
+ .mapboxgl-ctrl-group button{width:44px;height:44px}
+ .mapboxgl-ctrl-attrib-button{width:32px;height:32px}
+
+ /* po wlaczeniu mapy lista zdjec ma wiecej miejsca: nizsza mapa, bez tekstu wstepnego */
+ body.map #mapcol{height:34vh;height:34svh}
+ body.map #intro{display:none}
+}
+</style>
 </head>
 <body class="map">
 <div id="app">
