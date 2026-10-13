@@ -748,3 +748,7 @@ html:not(.waiting_for_js) #ws_page.page-lightbox .medias-list > .media_slide:not
 .pi-quote-note{display:block;margin-top:8px;font-size:11px;line-height:1.5;color:#666}
 .pi-quote-intro{margin:8px 0 36px;padding:24px 28px;border:1px solid #111;border-radius:14px!important;font-size:12px;line-height:1.75}
 .pi-quote-intro b{display:block;margin-bottom:10px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.pi-quote-intro ol{list-style:none;margin:0 0 16px;padding:0;counter-reset:q}
+.pi-quote-intro li{counter-increment:q;display:flex;gap:12px;align-items:center;padding:5px 0}
+.pi-quote-intro li:before{content:counter(q);flex:0 0 22px;height:22px;line-height:22px;text-align:center;border:1px solid #111;border-radius:50%;font-size:10px;font-weight:600}
+.pi-quote-intro p{margin:0;padding-top:14px;border-top:1px solid #e5e5e5;color:#555}
