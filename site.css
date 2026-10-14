@@ -972,50 +972,88 @@ form.button_to[action="/quotations/new"] input[type=submit]:hover{background:#11
   font-weight: 600;
 }
 
-/* PhotoIndex: "Tell us about a site" popup (CSS only, no script).
-   The link #pi-site-request opens the box through :target, "Close" and the dark background close it.
-   Without this CSS the box simply shows as plain text on the page. */
-.pi-modal { display: none; }
-.pi-modal:target {
-  display: flex;
+/* PhotoIndex: "Tell us about a site" popup (CSS only, no script, no # links).
+   Uses the native <details> element, because PhotoDeck rebuilds page content on # links.
+   Open: click the button. Close: click the dark background or the word Close.
+   Without this CSS the block still works as a plain expandable text. */
+.pi-sr { display: inline-block; margin: 0 16px 12px 0; }
+.pi-sr > summary { list-style: none; cursor: pointer; }
+.pi-sr > summary::-webkit-details-marker { display: none; }
+.pi-sr-btn {
+  display: inline-block;
+  box-sizing: border-box;
+  height: 44px;
+  line-height: 42px;
+  padding: 0 24px;
+  border: 1px solid #111111;
+  border-radius: 999px;
+  font: 500 11px/42px Inter, sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  background: transparent;
+  color: #111111;
+}
+.pi-sr:not([open]) > .pi-sr-btn:hover { background: #111111; color: #F7F7F5; }
+.pi-sr[open] > .pi-sr-btn {
   position: fixed;
   inset: 0;
   z-index: 10000;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  box-sizing: border-box;
-}
-.pi-modal-bg {
-  position: absolute;
-  inset: 0;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
   background: rgba(17, 17, 17, 0.5);
+  color: transparent;
+  font-size: 0;
+  line-height: 0;
   cursor: default;
 }
-.pi-modal-box {
-  position: relative;
+.pi-sr[open] > .pi-sr-btn::after {
+  content: "Close";
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  font: 500 11px/1 Inter, sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  cursor: pointer;
+}
+.pi-sr .pi-modal-box { display: none; }
+.pi-sr[open] .pi-modal-box {
+  display: block;
+  position: fixed;
+  z-index: 10001;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   box-sizing: border-box;
-  width: 100%;
+  width: calc(100% - 40px);
   max-width: 460px;
   padding: 36px 32px 32px;
   background: #FFFFFF;
   border-radius: 28px;
   font-family: Inter, sans-serif;
 }
-.pi-modal-box p { text-align: left; }
-.pi-modal-x {
-  position: absolute;
-  top: 18px;
-  right: 24px;
-  font: 500 11px/1 Inter, sans-serif;
+.pi-sr .pi-modal-box p { text-align: left; }
+.pi-modal-go {
+  display: inline-block;
+  box-sizing: border-box;
+  height: 44px;
+  line-height: 42px;
+  padding: 0 24px;
+  border: 1px solid #111111;
+  border-radius: 999px;
+  font: 500 11px/42px Inter, sans-serif;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #6B6B6B;
   text-decoration: none;
+  background: #111111;
+  color: #F7F7F5;
 }
-.pi-modal-x:hover { color: #111111; }
-.pi-modal-go:hover { background: transparent !important; color: #111111 !important; }
-.pi-open-site:hover { background: #111111 !important; color: #F7F7F5 !important; }
+.pi-modal-go:hover { background: transparent; color: #111111; }
 @media (max-width: 680px) {
-  .pi-modal-box { padding: 32px 24px 24px; border-radius: 20px; }
+  .pi-sr[open] .pi-modal-box { padding: 32px 24px 24px; border-radius: 20px; }
 }
