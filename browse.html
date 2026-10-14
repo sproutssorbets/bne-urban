@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -230,6 +229,20 @@ body.panel #mapcol{display:none}
 
  /* po wlaczeniu mapy lista zdjec ma wiecej miejsca: nizsza mapa, bez tekstu wstepnego */
  body.map #intro{display:none}
+ #intro{display:none}
+
+ /* zwarty pasek: Filters, wyszukiwanie i Map w jednym wierszu */
+ #bar{flex-wrap:wrap;gap:4px 12px;padding:6px 16px}
+ .qwrap{order:1;flex:1 1 120px;min-width:0}
+ #ftoggle{order:0}
+ #mtoggle{order:2}
+ #chips{order:4;flex-basis:100%}
+ #clear{order:5}
+ #q{padding-right:8px;text-overflow:ellipsis}
+
+ /* chowanie panelu przy przewijaniu: ujemny margines wypycha pasek i zakladki poza ramke */
+ #bar{transition:margin-top .25s ease}
+ body.hdr-hide #bar{margin-top:calc(-1 * var(--hh,0px))}
 
  /* przelacznik 1 / 2 kolumn na telefonie (skrypt juz go obsluguje, tu tylko go odslaniamy) */
  #dens{display:flex}
@@ -239,6 +252,13 @@ body.panel #mapcol{display:none}
  body.map #split{overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
  body.map #mapcol{flex:none;height:38vh;height:38svh;min-height:200px}
  body.map #main{flex:none;overflow:visible;min-height:70vh}
+}
+@media (prefers-reduced-motion:reduce){#bar{transition:none}}
+/* ekrany dotykowe: bez gradientu, podpisu i ikony oka na zdjeciach, zostaja tylko przyciski akcji */
+@media (hover:none){
+ .card::after,.card:hover::after,.ovt,.eye{display:none}
+ .card:hover img{transform:none}
+ .acts{opacity:1}
 }
 </style>
 </head>
@@ -967,6 +987,17 @@ function wire(){
   document.addEventListener("keydown",function(e){if(e.key==="Escape"){if(S.panel){S.panel=false;render()}else if(S.loc){S.loc="";render()}}});
   var rt=null;window.addEventListener("resize",function(){clearTimeout(rt);rt=setTimeout(function(){layout();if(MAP)MAP.resize()},150)});
   window.addEventListener("pagehide",save);
+  /* telefon: gorny panel (pasek + zakladki) chowa sie przy przewijaniu w dol i wraca przy przewijaniu w gore */
+  (function(){var m=$("main"),mq=window.matchMedia("(max-width:900px)"),last=0,hid=false,quiet=0;
+    function measure(){var b=$("bar"),u=$("sub");if(b&&u)document.documentElement.style.setProperty("--hh",(b.offsetHeight+u.offsetHeight)+"px")}
+    function set(v){if(v===hid)return;if(v)measure();hid=v;quiet=Date.now()+450;document.body.classList.toggle("hdr-hide",v)}
+    m.addEventListener("scroll",function(){
+      if(!mq.matches){if(hid)set(false);return}
+      var y=m.scrollTop;if(Date.now()<quiet){last=y;return}
+      if(S.panel||document.activeElement===$("q")||y<60){set(false);last=y;return}
+      var d=y-last;if(Math.abs(d)<12)return;
+      set(d>0&&y>140);last=y},{passive:true});
+    mq.addEventListener&&mq.addEventListener("change",function(){set(false)})})();
   if(window.ResizeObserver)new ResizeObserver(function(){layout()}).observe($("main"));
   window.__pi={S:S,render:render,get data(){return DATA},get list(){return LIST}}}
 
@@ -975,6 +1006,8 @@ function fail(msg){$("count").textContent=msg}
 function init(){
   wire();
   var y=restore();
+  if(window.innerWidth<900&&(!S.cols||S.cols>2))S.cols=1;
+  if(window.innerWidth<900)$("q").placeholder="Search the archive";
   Promise.all([
     fetch(CFG.photosUrl).then(function(r){if(!r.ok)throw new Error("photos HTTP "+r.status);return r.json()}),
     fetch(CFG.locationsUrl).then(function(r){return r.ok?r.text():""}).catch(function(){return ""})
