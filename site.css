@@ -1,4 +1,1004 @@
+/* strona /client: blok przeniesiony z Theme CSS */
+#ws_page.page-client_home{.text_block{padding-top:24px!important}#inline_subscription{border:1px solid var(--r)!important;padding:32px!important;text-align:center!important;margin-bottom:40px!important}#inline_subscription p{font-size:12px!important;color:var(--m)!important;margin:0 0 16px!important;line-height:1.6!important}#inline_subscription input.submit{height:44px!important;padding:0 24px!important;background:var(--t)!important;color:var(--b)!important;border:1px solid var(--t)!important;font-family:var(--f)!important;font-size:11px!important;font-weight:500!important;letter-spacing:0.14em!important;text-transform:uppercase!important;cursor:pointer!important;border-radius:0!important}.text_block>h2{display:flex!important;align-items:center!important;justify-content:space-between!important;font-size:11px!important;font-weight:500!important;letter-spacing:0.1em!important;text-transform:uppercase!important;color:var(--t)!important;border-bottom:1px solid var(--r)!important;padding:0 0 12px!important;margin:40px 0 24px!important}.main_content h2 input.submit_small{height:32px!important;padding:0 16px!important;background:var(--t)!important;color:var(--b)!important;border:1px solid var(--t)!important;font-family:var(--f)!important;font-size:10px!important;font-weight:500!important;letter-spacing:0.1em!important;text-transform:uppercase!important;cursor:pointer!important;border-radius:0!important}.galleries.thumbs_grid{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(140px,1fr))!important;gap:24px!important}.main_content h2 form,.galleries .gallery{margin:0!important}.galleries .thumb{border:1px solid var(--r)!important;overflow:hidden!important}.galleries .thumb img{width:100%!important;height:auto!important}.gallery_meta{margin-top:8px!important}.gallery_title a{font-family:var(--f)!important;font-size:11px!important;color:var(--t)!important;text-decoration:none!important}ul.orders_index{display:block!important;list-style:none!important;margin:0 0 40px!important;padding:0!important}li.order{display:flex!important;width:100%!important;align-items:center!important;justify-content:space-between!important;margin:0!important;padding:20px 0!important;border-bottom:1px solid var(--r)!important}.order_details{display:flex!important;align-items:center!important;gap:32px!important}.order_details,.date_and_price,.date,.price.currency{margin:0!important;padding:0!important;min-width:100px!important}.order_details{flex-wrap:nowrap!important}.order_description{margin:0!important;padding:0!important;display:flex!important;align-items:center!important;height:auto!important}.date_and_price{display:flex!important;align-items:center!important;gap:24px!important}.date_and_price>div,.order_description>div{border:0!important}.order_details,.order_description,.date{font-family:var(--f)!important;font-size:12px!important;color:var(--m)!important;min-width:90px!important}.price.currency a{font-family:var(--f)!important;font-size:13px!important;font-weight:500!important;color:var(--t)!important;text-decoration:none!important}.order_meta .tag{border:1px solid var(--r)!important;padding:3px 9px!important;font-family:var(--f)!important;font-size:10px!important;letter-spacing:0.1em!important;text-transform:uppercase!important;color:var(--m)!important}.order_actions{border-top:0!important;opacity:1!important;margin:0!important;padding:0!important;height:auto!important}.order_actions a.submit_small{height:32px!important;padding:0 16px!important;display:inline-flex!important;align-items:center!important;background:transparent!important;color:var(--t)!important;border:1px solid var(--t)!important;font-family:var(--f)!important;font-size:10px!important;font-weight:500!important;letter-spacing:0.1em!important;text-transform:uppercase!important;text-decoration:none!important;border-radius:0!important}.order_actions a.submit_small:hover{background:var(--t)!important;color:var(--b)!important}}
+
+/*
+ * PhotoIndex: warstwa z workera (bez JavaScriptu).
+ * Laduje sie PO THEME i CUSTOM z panelu PhotoDecka.
+ */
+
+:root {
+  --pi-panel-width: clamp(480px, 26vw, 680px);
+  --pi-peek: clamp(150px, 26vh, 240px);
+  --pi-r-xs: 4px;
+  --pi-r-sm: 10px;
+  --pi-r-md: 16px;
+  --pi-r-lg: 28px;
+  --pi-r-pill: 999px;
+  --pi-thumb: 176px;
+  --pi-shop-w: 688px;
+}
+
+/* ==========================================================================
+   1. GLOBALNE REGUŁY, STRONA GŁÓWNA, RESET
+   ========================================================================== */
+#ws_page.front-page #component_mainc,
+#ws_page.front-page #main_content,
+#ws_page.front-page iframe:not([src*="navfix"]),
+#ws_page:not(.page-media) #component_mainc {
+  display: block !important;
+  width: 100% !important;
+  min-height: calc(100vh - 44px) !important;
+}
+#ws_page.front-page iframe:not([src*="navfix"]) {
+  border: none !important;
+}
+
+.arrows_overlay, .arrows_overlay *, .media_detail_media .arrows_overlay, .media_slide .arrows_overlay, .arrow_prev, .arrow_next { display: none !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }
+.media_detail_wrapper img { border-radius: 0 !important; }
+.thumbs_wall .media .thumb, .thumbs_wall .media .media_wrap, .thumbs_wall .media img { background: transparent !important; border-radius: var(--pi-r-md, 16px) !important; }
+html body .media_wrap::after { background: none !important; background-image: none !important; opacity: 0 !important; }
+
+/* Status logowania i komunikaty */
+.user-bar-greeting { margin: 0 !important; padding: 14px 20px 0 !important; text-align: right !important; }
+.user-bar-greeting .client_logged_in { font-size: 0 !important; line-height: 0 !important; }
+.user-bar-greeting .client_logged_in::before { content: "You are logged in as "; font: 400 12px/1.4 Inter, sans-serif; color: #6F6F6F; }
+.user-bar-greeting .client_friendly_name { font: 500 12px/1.4 Inter, sans-serif !important; color: #111111 !important; }
+.user-bar-greeting .client_logged_in a { display: inline !important; margin-left: 18px !important; font: 400 12px/1.4 Inter, sans-serif !important; letter-spacing: 0 !important; text-transform: none !important; color: #6F6F6F !important; text-decoration: underline !important; text-underline-offset: 3px !important; }
+.user-bar-greeting .client_logged_in a:hover { color: #111111 !important; }
+
+#flash_notice, #flash_error, #flash_warning, #flash_alert, #flash_success, #flash_info { position: fixed !important; left: 50% !important; right: auto !important; top: auto !important; bottom: 24px !important; transform: translateX(-50%) !important; width: max-content !important; max-width: min(92vw, 560px) !important; margin: 0 !important; padding: 14px 28px !important; z-index: 100000 !important; box-sizing: border-box !important; background: #111111 !important; color: #FFFFFF !important; border: none !important; border-radius: var(--pi-r-pill) !important; box-shadow: none !important; text-align: center !important; font: 500 12px/1.4 Inter, sans-serif !important; letter-spacing: 0.04em !important; }
+#flash_notice *, #flash_error *, #flash_warning *, #flash_alert *, #flash_success *, #flash_info * { margin: 0 !important; padding: 0 !important; color: inherit !important; font: inherit !important; background: transparent !important; }
+.text_block .short_message { max-width: 640px; margin: 64px auto 0 !important; text-align: center !important; font: 400 13px/1.6 Inter, sans-serif !important; color: #6F6F6F !important; letter-spacing: 0 !important; }
+.text_block .short_message b, .text_block .short_message strong { display: block; margin-bottom: 10px; font: 500 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em; text-transform: uppercase; color: #111111 !important; }
+#cart_wrapper > .short_message:only-child { font: 500 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase; color: #111111 !important; }
+
+/* Okna PhotoDeck (Popups) */
+html body .pi-popup { background: #FFFFFF !important; border: none !important; border-radius: var(--pi-r-lg) !important; overflow: hidden !important; box-shadow: none !important; font-family: Inter, sans-serif !important; color: #111111 !important; }
+html body .pi-popup :is(h1, h2, h3, h4, .title) { font: 500 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; }
+html body .pi-popup :is(input[type="text"], input[type="email"], input[type="password"], input[type="tel"], select) { height: 52px !important; box-sizing: border-box !important; border: 1px solid #D9D9D6 !important; border-radius: var(--pi-r-md) !important; padding: 0 18px !important; background: #FFFFFF !important; box-shadow: none !important; outline: none !important; font: 400 14px/1.4 Inter, sans-serif !important; color: #111111 !important; }
+html body .pi-popup :is(input[type="text"], input[type="email"], input[type="password"], input[type="tel"], select):focus { border-color: #111111 !important; }
+html body .pi-popup :is(input[type="submit"], button, a.button, a.btn, a[href*="/cart"]):not([class*="close" i]) { display: inline-flex !important; align-items: center !important; justify-content: center !important; height: 44px !important; padding: 0 24px !important; background: #111111 !important; color: #FFFFFF !important; border: 1px solid #111111 !important; border-radius: var(--pi-r-pill) !important; font: 500 11px/1 Inter, sans-serif !important; letter-spacing: 0.14em !important; text-transform: uppercase !important; text-decoration: none !important; cursor: pointer !important; transition: background 0.15s ease, color 0.15s ease !important; }
+html body .pi-popup :is(input[type="submit"], button, a.button, a.btn, a[href*="/cart"]):not([class*="close" i]):hover { background: #FFFFFF !important; color: #111111 !important; }
+html body .pi-popup a:not(.button):not(.btn):not([href*="/cart"]) { color: #6B6B6B !important; text-decoration: underline !important; text-underline-offset: 3px !important; }
+html body .pi-popup a:not(.button):not(.btn):not([href*="/cart"]):hover { color: #111111 !important; }
+html body .pi-popup img { border-radius: var(--pi-r-sm) !important; }
+
+/* Menu Minibadges */
+.client_minilightbox { padding-left: 8px !important; padding-right: 9px !important; }
+html body #component_menu ul.component_menu_content li.menu_lightbox_item a span.client_minilightbox, html body #component_menu a[href*="/cart"], html body #component_menu a[href*="/cart"] * { border-radius: var(--pi-r-pill) !important; align-items: center !important; }
+html body #component_menu span[class*="minicart" i] { padding-left: 8px !important; padding-right: 9px !important; align-items: center !important; }
+
+/* ==========================================================================
+   2. STRONA ZDJĘCIA (MEDIA PAGE) - DEFINITYWNY CSS GRID (OMINIĘCIE THEME/CUSTOM)
+   ========================================================================== */
+
+#ws_page.page-media #block_main,
+#ws_page.page-media .block_inner,
+#ws_page.page-media #component_mainc,
+#ws_page.page-media .component_main_content,
+#ws_page.page-media #main_content,
+#ws_page.page-media main#block_main .main_content {
+  margin-top: 0 !important; margin-bottom: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; border-top: none !important;
+}
+
+/* Ukryj sztuczne odstępy generowane przez PhotoDeck */
+#ws_page.page-media #main_content > .elem[data-type="spacer"] { display: none !important; }
+
+/* 1. TWORZYMY GŁÓWNĄ SIATKĘ STRONY (GRID) */
+#ws_page.page-media #main_content {
+  display: grid !important;
+  grid-template-columns: 1fr var(--pi-panel-width) !important;
+  grid-auto-rows: min-content !important;
+  min-height: calc(100vh - 44px) !important;
+  position: relative !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
+}
+
+/* Tło i obramowanie panelu bocznego jest rysowane przez sztuczny element pod spodem */
+#ws_page.page-media #main_content::after {
+  content: "" !important;
+  grid-column: 2 !important;
+  grid-row: 1 / 30 !important; /* Sięga do samego dołu */
+  background: #FFFFFF !important;
+  border-left: 1px solid #E5E5E5 !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Spłaszczenie przeszkadzających zagnieżdżeń HTML PhotoDecka */
+#ws_page.page-media #main_content > .row-12:has(> .col-4),
+#ws_page.page-media .col-4,
+#ws_page.page-media .col-4 > .elem[data-type="media_metadata"],
+#ws_page.page-media .col-4 > .elem[data-type="media_metadata"] > .media_detail_meta_wrapper {
+  display: contents !important;
+}
+
+/* ==================== LEWA KOLUMNA (ZDJĘCIE W STICKY VIEWPORT) ==================== */
+#ws_page.page-media #main_content > .row-12:has(> .col-4) > .first.col-6 {
+  grid-column: 1 !important;
+  grid-row: 1 / 30 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 16px !important;
+  height: calc(100vh - 44px - var(--pi-peek)) !important;
+  position: sticky !important;
+  top: 44px !important; /* Zdjęcie zablokowane podczas przewijania panelu bocznego! */
+  box-sizing: border-box !important;
+  z-index: 1 !important;
+}
+.media_detail_wrapper { display: flex !important; align-items: center !important; justify-content: center !important; position: relative !important; width: 100% !important; height: 100% !important; }
+.media_detail_wrapper img { max-height: calc(100vh - 44px - var(--pi-peek) - 32px) !important; max-width: 100% !important; width: auto !important; height: auto !important; object-fit: contain !important; border-radius: 0 !important; }
+#main_content .media_detail_wrapper .media_wrap { background: transparent !important; border-radius: 0 !important; }
+
+/* Czyste zdjęcie - usuwamy domyślne ikony na obrazku */
+#ws_page.page-media .media_detail_media .media_content_overlay,
+#ws_page.page-media .media_detail_media .media_detail_actions { display: none !important; }
+
+/* ==================== PRAWA KOLUMNA (PANEL BOCZNY) ==================== */
+
+/* Ustawiamy globalny lewy/prawy margines dla zawartości panelu oraz wyciągamy ponad tło */
+#ws_page.page-media .media_friendly_id,
+#ws_page.page-media .col-4 h1,
+#ws_page.page-media .media_description,
+#ws_page.page-media #main_content > .row-12:first-child,
+#ws_page.page-media .media_creation_date,
+#ws_page.page-media .media_author,
+#ws_page.page-media .media_copyright,
+#ws_page.page-media .media_size,
+#ws_page.page-media .col-4 .elem[data-type="raw"],
+#ws_page.page-media .media_detail_keywords {
+  grid-column: 2 !important;
+  padding-left: 28px !important;
+  padding-right: 28px !important;
+  box-sizing: border-box !important;
+  z-index: 1 !important;
+}
+
+/* --- ROW 1: REF ID i Lokalizacja --- */
+#ws_page.page-media .media_detail_meta_wrapper > div.media_friendly_id {
+  grid-row: 1 !important;
+  padding-top: 24px !important;
+  display: flex !important; justify-content: space-between !important; align-items: baseline !important;
+  margin: 0 0 16px 0 !important;
+  font-size: 0 !important; line-height: 0 !important; color: transparent !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_friendly_id b {
+  font: 500 10px/1.4 Inter, sans-serif !important; 
+  letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_friendly_id b::before { content: "REF. "; }
+#ws_page.page-media .media_detail_meta_wrapper > div.media_friendly_id::after {
+  content: "BRISBANE, QLD, AUSTRALIA";
+  font: 400 10px/1.4 Inter, sans-serif !important; 
+  color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important;
+}
+#ws_page.page-media .media_location { display: none !important; }
+
+/* --- ROW 2: Tytuł Zdjęcia --- */
+#ws_page.page-media .col-4 h1,
+#ws_page.page-media .media_detail_meta_wrapper h1 {
+  grid-row: 2 !important; margin: 0 0 10px 0 !important;
+  font: 500 11px/1.45 Inter, sans-serif !important; letter-spacing: 0.06em !important; text-transform: uppercase !important; color: #111111 !important;
+}
+
+/* --- ROW 3: Field Notes / Opis --- */
+#ws_page.page-media .col-4 .media_description,
+#ws_page.page-media .media_detail_meta_wrapper .media_description {
+  grid-row: 3 !important; margin: 0 0 24px 0 !important;
+}
+#ws_page.page-media .col-4 .media_description p {
+  font: 400 12px/1.55 Inter, sans-serif !important; color: #333333 !important; margin: 0 !important;
+}
+
+/* --- ROW 4: Przycisk ADD TO SELECTION --- */
+#ws_page.page-media #main_content > .row-12:first-child {
+  grid-row: 4 !important;
+  display: block !important; width: 100% !important; margin-bottom: 32px !important;
+}
+#ws_page.page-media #main_content > .row-12:first-child .col-5,
+#ws_page.page-media #main_content > .row-12:first-child .first.col-6 { display: none !important; }
+#ws_page.page-media #main_content > .row-12:first-child .col-7,
+#ws_page.page-media #main_content > .row-12:first-child .col-6,
+#ws_page.page-media #main_content > .row-12:first-child .elem,
+#ws_page.page-media #main_content > .row-12:first-child .page_meta,
+#ws_page.page-media #main_content > .row-12:first-child .page_actions,
+#ws_page.page-media #main_content > .row-12:first-child form {
+  display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important;
+}
+#ws_page.page-media input.submit_small.lightbox_toggle {
+  display: block !important; width: 100% !important; height: 38px !important; margin: 0 !important; padding: 0 20px !important;
+  background: #000000 !important; color: #FFFFFF !important; border: 1px solid #000000 !important;
+  border-radius: 9999px !important;
+  font: 500 11px/36px Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important;
+  cursor: pointer !important; text-align: center !important; box-sizing: border-box !important; transition: opacity 0.15s ease !important;
+}
+#ws_page.page-media input.submit_small.lightbox_toggle:hover { opacity: 0.88 !important; }
+
+/* --- ROW 5, 6, 7, 8: 1. ARCHIVAL & TECHNICAL DATA --- */
+#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date {
+  grid-row: 5 !important;
+  border-top: 1px solid #E5E5E5 !important; padding-top: 14px !important; margin-top: 0 !important;
+  font-size: 0 !important; line-height: 0 !important; color: transparent !important;
+  display: flex !important; flex-direction: column !important; gap: 6px !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date::before {
+  content: "1. ARCHIVAL & TECHNICAL DATA"; display: block !important; width: 100% !important;
+  font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important;
+  margin: 0 0 6px 0 !important;
+}
+
+#ws_page.page-media .media_author { grid-row: 7 !important; }
+#ws_page.page-media .media_copyright { grid-row: 8 !important; }
+#ws_page.page-media .media_size { grid-row: 6 !important; }
+
+#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date b,
+#ws_page.page-media .media_detail_meta_wrapper > div.media_author,
+#ws_page.page-media .media_detail_meta_wrapper > div.media_copyright,
+#ws_page.page-media .media_detail_meta_wrapper > div.media_size {
+  display: flex !important; justify-content: space-between !important; align-items: baseline !important;
+  width: 100% !important; font-size: 0 !important; line-height: 0 !important; color: transparent !important;
+  padding: 0 !important; margin: 0 0 6px 0 !important;
+}
+
+#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date b::before { content: "DATE"; font: 400 9.5px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important; }
+#ws_page.page-media .media_detail_meta_wrapper > div.media_author::before { content: "AUTHOR"; font: 400 9.5px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important; }
+#ws_page.page-media .media_detail_meta_wrapper > div.media_copyright::before { content: "RIGHTS"; font: 400 9.5px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important; }
+#ws_page.page-media .media_detail_meta_wrapper > div.media_size::before { content: "DIMENSIONS"; font: 400 9.5px/1.5 Inter, sans-serif !important; color: #767676 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important; }
+
+#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date time,
+#ws_page.page-media .media_detail_meta_wrapper > div.media_author b,
+#ws_page.page-media .media_detail_meta_wrapper > div.media_size b,
+#ws_page.page-media .media_detail_meta_wrapper > div.media_copyright::after {
+  font: 400 11px/1.5 Inter, sans-serif !important; color: #111111 !important; text-align: right !important; text-transform: none !important; font-weight: 400 !important; letter-spacing: 0 !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_copyright::after { content: "© 2026 All rights reserved."; }
+
+/* --- ROW 9: 2. PROCESSING PROTOCOL --- */
+#ws_page.page-media .col-4 .elem[data-type="raw"] { grid-row: 9 !important; margin: 0 !important; width: 100% !important; }
+#ws_page.page-media .col-4 .elem[data-type="raw"] > div {
+  border-top: none !important; border-bottom: 1px solid #E5E5E5 !important;
+  padding: 14px 0 16px 0 !important; margin: 0 !important;
+}
+#ws_page.page-media .col-4 .elem[data-type="raw"] p:first-child {
+  font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important; margin: 0 0 10px 0 !important;
+}
+#ws_page.page-media .col-4 .elem[data-type="raw"] p:first-child::before { content: "2. "; }
+#ws_page.page-media .col-4 .elem[data-type="raw"] p:not(:first-child) {
+  font: 400 11.5px/1.5 Inter, sans-serif !important; color: #333333 !important; margin: 0 0 6px 0 !important;
+}
+#ws_page.page-media .col-4 .elem[data-type="raw"] span { color: #767676 !important; font-size: 11px !important; }
+
+/* --- ROW 10: 3. TAXONOMY & KEYWORDS --- */
+#ws_page.page-media .media_detail_keywords,
+#ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords {
+  grid-row: 10 !important;
+  padding-top: 14px !important; padding-bottom: 64px !important; margin: 0 !important;
+  border-top: none !important; border-bottom: none !important;
+}
+#ws_page.page-media .media_detail_keywords::before,
+#ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords::before {
+  content: "3. TAXONOMY & KEYWORDS"; display: block !important;
+  font: 600 10px/1.4 Inter, sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; color: #111111 !important; margin: 0 0 12px 0 !important;
+}
+#ws_page.page-media .media_detail_keywords b,
+#ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords b {
+  font-size: 0 !important; line-height: 0 !important; color: transparent !important;
+  display: flex !important; flex-wrap: wrap !important; gap: 5px !important; font-weight: 400 !important;
+}
+#ws_page.page-media .media_detail_keywords b a,
+#ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords b a {
+  display: inline-block !important;
+  font: 400 9.5px/1.2 Inter, sans-serif !important;
+  letter-spacing: 0.04em !important; text-transform: uppercase !important;
+  color: #222222 !important; background: #FFFFFF !important; border: 1px solid #E5E5E5 !important;
+  padding: 3px 6px !important; margin: 0 !important; border-radius: 3px !important;
+  text-decoration: none !important; transition: border-color 0.15s ease, background 0.15s ease !important;
+}
+#ws_page.page-media .media_detail_keywords b a:hover,
+#ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords b a:hover {
+  border-color: #999999 !important; background: #F9F9F9 !important; color: #000000 !important;
+}
+
+/* ==================== RESPONSYWNOŚĆ ==================== */
+@media (max-width: 900px) {
+  #ws_page.page-media #main_content { display: flex !important; flex-direction: column !important; }
+  #ws_page.page-media #main_content::after { display: none !important; }
+  #ws_page.page-media #main_content > .row-12:has(> .col-4) > .first.col-6 { position: static !important; height: auto !important; width: 100% !important; padding: 16px !important; }
+  
+  /* Flex order replikuje grid layout */
+  #ws_page.page-media .media_friendly_id { order: 1 !important; }
+  #ws_page.page-media .col-4 h1 { order: 2 !important; }
+  #ws_page.page-media .media_description { order: 3 !important; }
+  #ws_page.page-media #main_content > .row-12:first-child { order: 4 !important; padding: 0 16px !important; margin-bottom: 24px !important;}
+  #ws_page.page-media .media_creation_date { order: 5 !important; }
+  #ws_page.page-media .media_author { order: 7 !important; }
+  #ws_page.page-media .media_copyright { order: 8 !important; }
+  #ws_page.page-media .media_size { order: 6 !important; }
+  #ws_page.page-media .col-4 .elem[data-type="raw"] { order: 9 !important; }
+  #ws_page.page-media .media_detail_keywords { order: 10 !important; }
+  
+  #ws_page.page-media .media_friendly_id,
+  #ws_page.page-media .col-4 h1,
+  #ws_page.page-media .media_description,
+  #ws_page.page-media .media_creation_date,
+  #ws_page.page-media .media_author,
+  #ws_page.page-media .media_copyright,
+  #ws_page.page-media .media_size,
+  #ws_page.page-media .col-4 .elem[data-type="raw"],
+  #ws_page.page-media .media_detail_keywords {
+      padding-left: 16px !important; padding-right: 16px !important;
+  }
+}
+
+/* Przycisk zamknięcia panelu */
+html body #main_content .pi-detail-close { position: absolute !important; top: 16px !important; right: 16px !important; z-index: 20 !important; }
+html body #main_content .pi-detail-x { position: absolute !important; top: 24px !important; right: 14px !important; width: 36px !important; height: 36px !important; border: 1px solid #111 !important; border-radius: 50% !important; background: #fff !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; z-index: 30 !important; }
+html body #main_content .pi-detail-x svg { width: 14px !important; height: 14px !important; fill: none !important; stroke: #111 !important; stroke-width: 1.6 !important; }
+html body #main_content .pi-detail-x:hover { background: #111 !important; }
+html body #main_content .pi-detail-x:hover svg { stroke: #fff !important; }
+
+/* ==========================================================================
+   3. KONTO, SELEKCJA, ZAKUPY (ODPORNE NA NAWIGACJĘ AJAX)
+   ========================================================================== */
+
+:is(#ws_page.page-client_home, #ws_page.page-lightbox, #ws_page.page-quotation, #ws_page.page-cart, #ws_page.page-order, #ws_page.page-payment) .main_content {
+  width: 100% !important; max-width: var(--pi-shop-w) !important; margin: 0 auto !important; float: none !important;
+  padding: 0 24px !important; box-sizing: border-box !important; font-family: 'Inter', sans-serif !important; color: #111111 !important;
+}
+:is(#ws_page.page-client_home, #ws_page.page-lightbox, #ws_page.page-quotation, #ws_page.page-cart, #ws_page.page-order, #ws_page.page-payment) :is(h1, h2, h3, h4) {
+  font-weight: 500 !important; color: #111111 !important;
+}
+
+/* Pigułki i zaokrąglenia */
+:is(#ws_page.page-client_home, #ws_page.page-lightbox, #ws_page.page-quotation, #ws_page.page-cart, #ws_page.page-order, #ws_page.page-payment) :is(input[type="submit"], button, a.button, a.btn, .btn) {
+  border-radius: var(--pi-r-pill, 999px) !important; text-align: center !important; text-decoration: none !important;
+  font: 400 11px/1.3 Inter, sans-serif !important; letter-spacing: 0.1em !important; text-transform: uppercase !important;
+  height: 44px !important; padding: 0 24px !important; background: #111111 !important; color: #FFFFFF !important; border: 1px solid #111111 !important;
+  cursor: pointer !important; display: inline-flex !important; align-items: center !important; justify-content: center !important;
+  transition: background 0.15s ease, color 0.15s ease !important;
+}
+:is(#ws_page.page-client_home, #ws_page.page-lightbox, #ws_page.page-quotation, #ws_page.page-cart, #ws_page.page-order, #ws_page.page-payment) :is(input[type="submit"], button, a.button, a.btn, .btn):hover {
+  background: #FFFFFF !important; color: #111111 !important;
+}
+:is(#ws_page.page-client_home, #ws_page.page-lightbox, #ws_page.page-quotation, #ws_page.page-cart, #ws_page.page-order, #ws_page.page-payment) img {
+  border-radius: var(--pi-r-sm, 10px) !important;
+}
+
+/* Przyciski CTA pełnej szerokości */
+#ws_page.page-quotation input.submit,
+#ws_page.page-order a.button.forward,
+#ws_page.page-lightbox a.ajaxable.request_quotation_link {
+  width: 100% !important; margin: 24px 0 !important; height: 44px !important; line-height: 1.3 !important;
+}
+
+/* Ciche przyciski powrotu */
+:is(#ws_page.page-quotation, #ws_page.page-order, #ws_page.page-lightbox) a.ajaxable.back {
+  display: block !important; width: 100% !important; text-align: center !important;
+  font: 500 11px/1 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important;
+  color: #111111 !important; text-decoration: underline !important; text-underline-offset: 3px !important; margin-top: 16px !important;
+  background: transparent !important; padding: 0 !important; border: none !important; height: auto !important;
+}
+:is(#ws_page.page-quotation, #ws_page.page-order, #ws_page.page-lightbox) a.ajaxable.back:hover { color: #6B6B6B !important; }
+
+/* Pola formularzy */
+:is(#ws_page.page-client_home, #ws_page.page-lightbox, #ws_page.page-quotation, #ws_page.page-cart, #ws_page.page-payment) :is(input[type="text"], input[type="email"], input[type="password"], input[type="tel"], select, textarea) {
+  width: 100% !important; box-sizing: border-box !important; border: 1px solid #D9D9D6 !important; border-radius: var(--pi-r-md, 16px) !important;
+  padding: 0 18px !important; margin: 0 0 20px 0 !important; background: #FFFFFF !important; box-shadow: none !important; outline: none !important;
+  font: 400 14px/1.4 Inter, sans-serif !important; color: #111111 !important;
+}
+:is(#ws_page.page-client_home, #ws_page.page-lightbox, #ws_page.page-quotation, #ws_page.page-cart, #ws_page.page-payment) :is(input[type="text"], input[type="email"], input[type="password"], input[type="tel"], select):not([multiple]) { height: 52px !important; }
+:is(#ws_page.page-client_home, #ws_page.page-lightbox, #ws_page.page-quotation, #ws_page.page-cart, #ws_page.page-payment) select {
+  appearance: none !important; padding-right: 44px !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23111' stroke-width='1.3'/%3E%3C/svg%3E") !important;
+  background-position: right 18px center !important; background-repeat: no-repeat !important; background-size: 12px 8px !important;
+}
+:is(#ws_page.page-client_home, #ws_page.page-lightbox, #ws_page.page-quotation, #ws_page.page-cart, #ws_page.page-payment) textarea { padding: 14px 18px !important; min-height: 96px !important; resize: vertical !important; }
+:is(#ws_page.page-client_home, #ws_page.page-lightbox, #ws_page.page-quotation, #ws_page.page-cart, #ws_page.page-payment) label { display: block !important; font: 500 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; margin: 0 0 8px 0 !important; }
+
+/* Wspólne listy transakcyjne (Koszyk, Wycena, Zamówienia) */
+:is(#ws_page.page-quotation, #ws_page.page-order, #ws_page.page-cart) ul.order_or_cart_items { display: flex !important; flex-direction: column !important; width: 100% !important; list-style: none !important; padding: 0 !important; margin: 32px 0 48px 0 !important; gap: 0 !important; }
+:is(#ws_page.page-quotation, #ws_page.page-order, #ws_page.page-cart) li.ooc_item { display: flex !important; flex-wrap: wrap !important; justify-content: space-between !important; align-items: flex-start !important; padding: 24px 0 !important; border-top: 1px solid #DADADA !important; gap: 16px !important; width: 100% !important; box-sizing: border-box !important; }
+#ws_page.page-quotation li.ooc_item { border-bottom: 1px solid #DADADA !important; }
+#ws_page.page-order ul.totals li.ooc_item { border-top: none !important; border-bottom: 1px solid #DADADA !important; padding: 16px 0 !important; }
+#ws_page.page-order ul.totals li.ooc_item.grand_total { border-bottom: 2px solid #111111 !important; }
+.item_presentation { display: flex !important; gap: 24px !important; flex: 1 1 auto !important; min-width: 240px !important; }
+.item_thumbnail { flex: 0 0 100px !important; width: 100px !important; }
+.item_description { flex: 1 1 auto !important; min-width: 0 !important; font: 400 12px/1.6 Inter, sans-serif !important; color: #6F6F6F !important; }
+.item_quantity_and_actions { flex: 0 0 40px !important; text-align: right !important; }
+.item_price_and_taxes { flex: 0 0 100px !important; text-align: right !important; }
+.item_price_and_taxes .currency { font-weight: 500 !important; color: #111111 !important; }
+#ws_page.page-order .text_block > br { display: none !important; }
+
+/* Lightbox (Karta Selekcji) */
+#ws_page.page-lightbox .page_actions { display: flex !important; justify-content: center !important; align-items: center !important; gap: 12px !important; margin: 48px 0 !important; }
+#ws_page.page-lightbox .page_actions input.submit_small { height: 32px !important; min-height: 32px !important; padding: 0 16px !important; background: transparent !important; color: #111111 !important; border: 1px solid #111111 !important; }
+#ws_page.page-lightbox .page_actions input.submit_small:hover { background: #111111 !important; color: #FFFFFF !important; }
+#ws_page.page-lightbox .main_content > .elem:has(> .user-bar-greeting) { display: flex !important; justify-content: center !important; margin-bottom: 32px !important; }
+#ws_page.page-lightbox .lightbox_meta { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 24px !important; margin-bottom: 32px !important; }
+#ws_page.page-lightbox .lightbox_meta form { flex: auto !important; margin: 0 !important; width: 100% !important; }
+#ws_page.page-lightbox .lightbox_meta:has(.short_message) { display: flex !important; flex-direction: column !important; align-items: center !important; gap: 32px !important; }
+#ws_page.page-lightbox .lightbox_meta:has(.short_message) form { max-width: 320px !important; }
+#ws_page.page-lightbox .lightbox_meta .short_message { grid-column: 1 / -1 !important; margin: 16px 0 !important; }
+#ws_page.page-lightbox .thumbs_wall { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)) !important; justify-content: center !important; gap: 32px 20px !important; position: static !important; height: auto !important; }
+#ws_page.page-lightbox .thumbs_wall .media { position: static !important; transform: none !important; width: auto !important; height: auto !important; margin: 0 !important; padding: 0 !important; }
+#ws_page.page-lightbox .thumbs_wall .media .thumb img { width: 100% !important; height: auto !important; max-width: 100% !important; }
+#ws_page.page-lightbox .thumbs_wall .thumb_links input.icon { width: 28px !important; height: 28px !important; border-radius: 50% !important; background-color: rgba(17,17,17,0.6) !important; background-position: center !important; background-repeat: no-repeat !important; background-size: 14px 14px !important; border: none !important; }
+#ws_page.page-lightbox .thumbs_wall .thumb_links input.icon.lightbox_icon { background-color: #FFFFFF !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='1.8' stroke-linecap='round'%3E%3Cpath d='M12 5v14M5 12h14'/%3E%3C/svg%3E") !important; }
+#ws_page.page-lightbox .thumbs_wall .thumb_links input.icon.lightbox_inv_icon { background-color: #111111 !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12l5 5L20 6'/%3E%3C/svg%3E") !important; }
+#ws_page.page-lightbox .thumbs_wall .thumb_meta { width: 100% !important; padding: 10px 0 0 !important; text-align: left !important; border: none !important; }
+
+/* Client Home */
+#ws_page.page-client_home .galleries.thumbs_grid { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)) !important; gap: 32px 20px !important; }
+#ws_page.page-client_home .galleries .thumb img { width: 100% !important; height: auto !important; }
+#ws_page.page-client_home .gallery_meta h2 { font: 500 12px/1.3 Inter, sans-serif !important; letter-spacing: 0 !important; text-transform: none !important; margin-top: 10px !important; text-align: left !important; }
+#ws_page.page-client_home .order_meta .tag { border-radius: var(--pi-r-pill, 999px) !important; padding: 4px 12px !important; }
+
+/* ==========================================================================
+   4. FORMULARZ KONTAKTOWY (Natywny)
+   ========================================================================== */
+
+#ws_page.page-website_page-contact form label { display: block !important; font: 500 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; margin: 0 0 4px 0 !important; padding: 0 !important; border: none !important; }
+#ws_page.page-website_page-contact form :is(input[type="text"], input[type="email"], input[type="tel"]) { width: 100% !important; height: 52px !important; box-sizing: border-box !important; border: 1px solid #D9D9D6 !important; border-radius: var(--pi-r-md) !important; padding: 0 18px !important; margin: 0 0 20px 0 !important; background: #FFFFFF !important; box-shadow: none !important; outline: none !important; font: 400 15px/1.4 Inter, sans-serif !important; color: #111111 !important; }
+#ws_page.page-website_page-contact form textarea { width: 100% !important; box-sizing: border-box !important; min-height: 96px; resize: vertical; border: 1px solid #D9D9D6 !important; border-radius: var(--pi-r-md) !important; padding: 14px 18px !important; margin: 0 0 20px 0 !important; background: #FFFFFF !important; box-shadow: none !important; outline: none !important; font: 400 14px/1.5 Inter, sans-serif !important; color: #111111 !important; }
+#ws_page.page-website_page-contact form :is(input[type="text"], input[type="email"], input[type="tel"], textarea):focus { border-color: #111111 !important; }
+#ws_page.page-website_page-contact form input[type="checkbox"] { -webkit-appearance: none !important; appearance: none !important; display: inline-block !important; flex-shrink: 0 !important; width: 16px !important; height: 16px !important; margin: 2px 10px 0 0 !important; padding: 0 !important; border: 1px solid #111111 !important; border-radius: var(--pi-r-xs) !important; background: #FFFFFF center / 12px no-repeat !important; cursor: pointer !important; vertical-align: top !important; }
+#ws_page.page-website_page-contact form input[type="checkbox"]:checked { background-color: #111111 !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E") !important; }
+#ws_page.page-website_page-contact form :is(input[type="checkbox"] + label, label:has(input[type="checkbox"])) { display: inline !important; font: 400 12px/1.5 Inter, sans-serif !important; letter-spacing: 0 !important; text-transform: none !important; margin: 0 !important; cursor: pointer !important; }
+#ws_page.page-website_page-contact form :is(input[type="submit"], button[type="submit"]) { display: block !important; width: 100% !important; height: 44px !important; margin: 8px 0 16px 0 !important; padding: 0 !important; background: #111111 !important; color: #FFFFFF !important; border: 1px solid #111111 !important; border-radius: var(--pi-r-pill) !important; box-shadow: none !important; font: 400 11px/42px Inter, sans-serif !important; letter-spacing: 0.1em !important; text-transform: uppercase !important; text-align: center !important; cursor: pointer !important; -webkit-appearance: none !important; transition: background 0.15s ease, color 0.15s ease !important; }
+#ws_page.page-website_page-contact form :is(input[type="submit"], button[type="submit"]):hover { background: #FFFFFF !important; color: #111111 !important; }
+
+/* ==========================================================================
+   STRONA ZDJECIA: wyglad zblizony do poprzedniej wersji (bez JavaScriptu)
+   ========================================================================== */
+#ws_page.page-media .media_detail_meta_wrapper > div.media_friendly_id { justify-content: flex-start !important; }
+#ws_page.page-media .media_detail_meta_wrapper > div.media_friendly_id::after { margin-left: auto !important; }
+#ws_page.page-media .media_detail_meta_wrapper > div.media_friendly_id b { font-weight: 600 !important; }
+
+/* opis i przycisk */
+#ws_page.page-media .col-4 .media_description p { font-size: 13.5px !important; line-height: 1.6 !important; color: #111111 !important; }
+#ws_page.page-media input.submit_small.lightbox_toggle,
+#ws_page.page-media input.price_icon { height: 44px !important; font: 500 10px/42px Inter, sans-serif !important; letter-spacing: 0.14em !important; }
+#ws_page.page-media #main_content > .row-12:first-child form + form { margin-top: 8px !important; }
+
+/* 1. ARCHIVAL & TECHNICAL DATA: linie wewnatrz marginesow panelu */
+#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date {
+  border-top: 0 !important; gap: 10px !important;
+  background: linear-gradient(#DADADA, #DADADA) 28px 0 / calc(100% - 56px) 1px no-repeat !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date::before,
+#ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords::before {
+  padding-bottom: 14px !important; margin-bottom: 4px !important; border-bottom: 1px solid #DADADA !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_size,
+#ws_page.page-media .media_detail_meta_wrapper > div.media_author,
+#ws_page.page-media .media_detail_meta_wrapper > div.media_copyright {
+  padding-left: 28px !important; padding-right: 28px !important; margin-bottom: 10px !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_copyright {
+  margin-bottom: 0 !important; padding-bottom: 16px !important;
+  background: linear-gradient(#DADADA, #DADADA) 28px 100% / calc(100% - 56px) 1px no-repeat !important;
+}
+#ws_page.page-media .media_detail_meta_wrapper > div.media_copyright::before { content: "COPYRIGHT"; }
+
+/* DIMENSIONS: wymiary w pikselach wstawia worker (span.pi-dim), natywne "28.0" ukryte */
+#ws_page.page-media .media_detail_meta_wrapper > div.media_size b { display: none !important; }
+#ws_page.page-media .media_detail_meta_wrapper > div.media_size .pi-dim {
+  font: 400 11px/1.5 Inter, sans-serif !important; color: #111111 !important; text-align: right !important; letter-spacing: 0 !important; text-transform: none !important;
+}
+
+/* 2. PROCESSING PROTOCOL */
+#ws_page.page-media .col-4 .elem[data-type="raw"] > div { border-bottom-color: #DADADA !important; }
+#ws_page.page-media .col-4 .elem[data-type="raw"] p:first-child { padding-bottom: 14px !important; margin-bottom: 14px !important; border-bottom: 1px solid #DADADA !important; }
+
+/* 3. TAXONOMY & KEYWORDS: etykieta ukryta, tagi jako pigulki */
+#ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords { font-size: 0 !important; line-height: 0 !important; }
+#ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords b { gap: 6px !important; }
+#ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords b a {
+  border: 1px solid #DADADA !important; border-radius: 999px !important; padding: 6px 11px !important;
+  font: 500 10px/1 Inter, sans-serif !important; letter-spacing: 0.06em !important;
+}
+
+/* przycisk zamkniecia (link wstawiany przez worker) */
+#ws_page.page-media #main_content > .pi-x {
+  position: absolute; top: 24px; right: calc(var(--pi-panel-width) + 14px); z-index: 30;
+  width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+  border: 1px solid #111111; border-radius: 50%; background: #FFFFFF; text-decoration: none;
+}
+#ws_page.page-media #main_content > .pi-x svg { width: 14px; height: 14px; fill: none; stroke: #111111; stroke-width: 1.6; }
+#ws_page.page-media #main_content > .pi-x:hover { background: #111111; }
+#ws_page.page-media #main_content > .pi-x:hover svg { stroke: #FFFFFF; }
+
+/* Index / Previous / Next oraz "More from" (HTML dokladany przez worker) */
+#ws_page.page-media #main_content > .pi-below { grid-column: 1 / -1; grid-row: 30; position: relative; z-index: 2; padding: 0 12px 48px; background: #FFFFFF; font-family: Inter, sans-serif; }
+.pi-pn { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 44px; border-bottom: 1px solid #DADADA; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #666666; }
+.pi-pn a { color: #000000 !important; text-decoration: none !important; }
+.pi-pn a:hover { text-decoration: underline !important; }
+.pi-pn-nav { display: flex; align-items: center; gap: 20px; }
+.pi-pn .off { opacity: 0.3; }
+.pi-h { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 28px 0 12px; padding-top: 12px; border-top: 1px solid #000000; font-size: 11px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; }
+.pi-h span { color: #666666; font-weight: 400; letter-spacing: 0.06em; }
+.pi-more { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; align-items: start; }
+.pi-more a { display: block; overflow: hidden; border-radius: var(--pi-r-md, 16px); background: #ECECEA; }
+.pi-more img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+@media (max-width: 900px) {
+  #ws_page.page-media .media_detail_meta_wrapper > div.media_author,
+  #ws_page.page-media .media_detail_meta_wrapper > div.media_copyright,
+  #ws_page.page-media .media_detail_meta_wrapper > div.media_size { padding-left: 16px !important; padding-right: 16px !important; }
+  #ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date { background-position: 16px 0 !important; background-size: calc(100% - 32px) 1px !important; }
+  #ws_page.page-media .media_detail_meta_wrapper > div.media_copyright { background-position: 16px 100% !important; background-size: calc(100% - 32px) 1px !important; }
+  #ws_page.page-media #main_content > .pi-x { right: 14px; top: 14px; }
+  #ws_page.page-media #main_content > .pi-below { order: 11; grid-row: auto; padding: 0 16px 40px; }
+}
+
+/* ==========================================================================
+   KONTO: /client, /lightbox, /cart (sam CSS, bez JavaScriptu i bez zmian HTML)
+   Selektory oparte na #ws_page i #main_content, zeby nie zalezaly od klas dodawanych przez worker.
+   ========================================================================== */
+
+/* wezsza kolumna jak w poprzedniej wersji */
+#ws_page.page-client_home #main_content { max-width: 688px !important; }
+#ws_page.page-lightbox #main_content { max-width: 640px !important; }
+
+/* wszystkie linie w jasnym szarym zamiast czarnych */
+#ws_page.page-client_home #main_content *:not(input):not(select):not(textarea):not(button):not(a):not(img),
+#ws_page.page-lightbox #main_content *:not(input):not(select):not(textarea):not(button):not(a):not(img) { border-color: #DADADA !important; }
+
+/* /client: przycisk NEW SELECTION jako pigulka */
+#ws_page.page-client_home #main_content h2 form.button_to input.submit_small {
+  border-radius: 999px !important; height: 32px !important; min-height: 32px !important; padding: 0 14px !important;
+  background: transparent !important; color: #111111 !important; border: 1px solid #111111 !important;
+  font: 400 11px/30px Inter, sans-serif !important; letter-spacing: 0.1em !important; text-transform: uppercase !important;
+}
+#ws_page.page-client_home #main_content h2 form.button_to input.submit_small:hover { background: #111111 !important; color: #FFFFFF !important; }
+
+/* /client: miniatury selekcji bez czarnej ramki, z zaokragleniem */
+#ws_page.page-client_home #main_content .galleries .thumb,
+#ws_page.page-client_home #main_content #lightboxes .thumb,
+#ws_page.page-client_home #main_content #lightboxes_shared .thumb {
+  display: block !important; width: auto !important; height: auto !important; min-height: 0 !important;
+  padding: 0 !important; margin: 0 !important; border: 0 !important; background: none !important;
+  border-radius: var(--pi-r-sm, 10px) !important; overflow: hidden !important; box-shadow: none !important;
+}
+#ws_page.page-client_home #main_content .galleries .media_wrap {
+  position: static !important; display: block !important; width: auto !important; height: auto !important;
+  padding: 0 !important; border: 0 !important; background: transparent !important;
+  border-radius: var(--pi-r-sm, 10px) !important; overflow: hidden !important;
+}
+#ws_page.page-client_home #main_content .galleries .thumb img {
+  display: block !important; width: 100% !important; height: auto !important; max-width: none !important;
+  border: 0 !important; border-radius: var(--pi-r-sm, 10px) !important; margin: 0 !important; background: none !important;
+}
+#ws_page.page-client_home #main_content .gallery_meta { margin: 10px 0 0 !important; padding: 0 !important; text-align: left !important; }
+#ws_page.page-client_home #main_content .pagination { text-align: center !important; font: 400 12px/1.4 Inter, sans-serif !important; margin: 28px 0 !important; }
+
+/* /lightbox: status na gorze, przyciski jako ciche linki po lewej */
+#ws_page.page-lightbox #main_content { display: flex !important; flex-direction: column !important; }
+#ws_page.page-lightbox #main_content > .elem:has(> .user-bar-greeting) { order: -1 !important; justify-content: flex-end !important; margin: 0 0 4px !important; }
+#ws_page.page-lightbox #main_content .page_actions { justify-content: flex-start !important; gap: 24px !important; margin: 8px 0 36px !important; }
+#ws_page.page-lightbox #main_content .page_actions :is(input.submit_small, a.button, a.btn, button) {
+  height: 32px !important; min-height: 32px !important; padding: 0 !important; background: transparent !important; color: #111111 !important;
+  border: 0 !important; border-bottom: 1px solid transparent !important; border-radius: 0 !important;
+  font: 500 11px/30px Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important;
+}
+#ws_page.page-lightbox #main_content .page_actions :is(input.submit_small, a.button, a.btn, button):hover {
+  background: transparent !important; color: #111111 !important; border-bottom-color: #111111 !important;
+}
+
+/* puste stany: wskazowka co zrobic (tekst z PhotoDecka zastapiony przez CSS) */
+#ws_page.page-cart #main_content .short_message:has(b, strong),
+#ws_page.page-lightbox #main_content .short_message:has(b, strong) { font-size: 0 !important; line-height: 0 !important; }
+#ws_page.page-cart #main_content .short_message b,
+#ws_page.page-lightbox #main_content .short_message b { font: 500 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; }
+#ws_page.page-cart #main_content .short_message::after,
+#ws_page.page-lightbox #main_content .short_message::after {
+  display: block; margin-top: 10px; font: 400 13px/1.6 Inter, sans-serif; letter-spacing: 0; text-transform: none; color: #6F6F6F;
+}
+#ws_page.page-cart #main_content .short_message::after { content: "To buy a licence, open a photograph and press License."; }
+#ws_page.page-lightbox #main_content .short_message::after { content: "Press the + icon on any photograph in the archive to add it here."; }
+
+/* /lightbox: uklad jak /client, pigulki */
+#ws_page.page-lightbox #main_content > .elem[data-type="gallery"] { display: block !important; }
+#ws_page.page-lightbox #main_content .user-bar-greeting { text-align: right !important; margin: 0 0 16px !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta { display: flex !important; flex-wrap: wrap !important; justify-content: flex-start !important; align-items: center !important; gap: 12px !important; margin: 0 0 28px !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta form { width: auto !important; max-width: none !important; margin: 0 !important; }
+#ws_page.page-lightbox #main_content p:has(> a.request_quotation_link) { display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 16px !important; margin: 28px 0 0 !important; }
+#ws_page.page-lightbox #main_content p > a.ajaxable.back { width: auto !important; margin: 0 !important; display: inline-block !important; text-align: left !important; }
+#ws_page.page-lightbox #main_content a.ajaxable.request_quotation_link {
+  width: auto !important; margin: 0 !important; height: 44px !important; padding: 0 24px !important; white-space: nowrap !important;
+  display: inline-flex !important; align-items: center !important; justify-content: center !important; text-align: center !important;
+  border-radius: var(--pi-r-pill, 999px) !important; background: #111111 !important; color: #FFFFFF !important; border: 1px solid #111111 !important;
+  text-decoration: none !important; font: 500 11px/1 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important;
+}
+#ws_page.page-lightbox #main_content a.ajaxable.request_quotation_link:hover { background: #FFFFFF !important; color: #111111 !important; }
+#ws_page.page-lightbox #main_content .page_actions { margin: 20px 0 0 !important; }
+#ws_page.page-lightbox #main_content .page_actions form.button_to input.submit_small {
+  height: 32px !important; padding: 0 18px !important; border-radius: var(--pi-r-pill, 999px) !important; background: #FFFFFF !important; color: #111111 !important;
+  border: 1px solid #111111 !important; font: 500 11px/30px Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important;
+}
+#ws_page.page-lightbox #main_content .page_actions form.button_to input.submit_small:hover { background: #111111 !important; color: #FFFFFF !important; }
+
+/* strona zdjecia: przycisk na szerokosc tekstu kolumny, 38 px, kolumna nieco wezsza */
+@media (min-width: 1400px) { :root { --pi-panel-width: 639px; } }
+#ws_page.page-media #main_content > .row-12:first-child {
+  width: auto !important; margin-left: 0 !important; margin-right: 0 !important;
+  padding-left: 28px !important; padding-right: 28px !important; box-sizing: border-box !important;
+}
+#ws_page.page-media #main_content input.submit_small.lightbox_toggle {
+  display: block !important; width: 100% !important; height: 38px !important;
+  font: 500 10px/36px Inter, sans-serif !important; letter-spacing: 0.14em !important;
+}
+#ws_page.page-media #main_content > .row-12:first-child .row-12 { margin-left: 0 !important; margin-right: 0 !important; }
+/* lightbox: mniejszy przycisk zapytania i ciasniejsze pastylki */
+#ws_page.page-lightbox #main_content a.ajaxable.request_quotation_link { height: 38px !important; padding: 0 18px !important; font-size: 10px !important; letter-spacing: 0.1em !important; }
+#ws_page.page-lightbox #main_content .page_actions { gap: 8px !important; }
+#ws_page.page-lightbox #main_content .page_actions form.button_to input.submit_small { padding: 0 14px !important; font-size: 10px !important; letter-spacing: 0.1em !important; }
+
+/* lightbox v3: jedna szyna akcji, jeden przycisk glowny */
+#ws_page.page-lightbox #main_content { flex-direction: row !important; flex-wrap: wrap !important; align-items: center !important; align-content: flex-start !important; column-gap: 8px !important; row-gap: 0 !important; padding-top: 16px !important; }
+#ws_page.page-lightbox #main_content :is(.elem[data-type="page_meta"], .elem[data-type="gallery"], .page_meta, .page_actions, .lightbox_meta:not(:has(select, .short_message))) { display: contents !important; }
+#ws_page.page-lightbox #main_content > .elem[data-type="spacer"] { display: none !important; }
+#ws_page.page-lightbox #main_content form { order: 1 !important; margin: 0 !important; }
+#ws_page.page-lightbox #main_content .page_actions form { flex: 0 0 auto !important; width: auto !important; }
+#ws_page.page-lightbox #main_content .page_actions form:has(> input.share_icon) { order: 2 !important; }
+#ws_page.page-lightbox #main_content .page_actions form:has(> input.delete_icon) { order: 3 !important; }
+#ws_page.page-lightbox #main_content .page_actions input.delete_icon { border-color: #BDBDBD !important; color: #6F6F6F !important; }
+#ws_page.page-lightbox #main_content .page_actions input.delete_icon:hover { border-color: #111111 !important; color: #FFFFFF !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta:not(:has(select)) form { flex: 0 0 auto !important; width: auto !important; text-align: left !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta:not(:has(select)) input[type="submit"] { height: 32px !important; min-height: 32px !important; padding: 0 14px !important; background: transparent !important; color: #111111 !important; border: 1px solid #111111 !important; font-size: 10px !important; letter-spacing: 0.1em !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta:not(:has(select)) input[type="submit"]:hover { background: #111111 !important; color: #FFFFFF !important; }
+#ws_page.page-lightbox #main_content .user-bar-greeting { order: 4 !important; flex: 0 0 auto !important; width: auto !important; margin: 0 0 0 auto !important; padding: 0 !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta:has(select) { order: 5 !important; flex: 0 0 100% !important; display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 16px !important; align-items: start !important; margin: 20px 0 0 !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta:has(select) form { width: auto !important; min-width: 0 !important; margin: 0 !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta:has(select) p { margin: 0 !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta:has(select) label { display: block !important; margin: 0 0 6px !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta:has(select) :is(select, input[type="text"]) { height: 44px !important; margin: 0 !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta:has(.short_message) { order: 5 !important; flex: 0 0 100% !important; }
+#ws_page.page-lightbox #main_content .medias-list { order: 6 !important; flex: 0 0 100% !important; margin-top: 24px !important; }
+#ws_page.page-lightbox #main_content p:has(> a.request_quotation_link) { order: 7 !important; flex: 0 0 100% !important; position: sticky !important; bottom: 0 !important; z-index: 40 !important; background: #FFFFFF !important; margin: 24px 0 0 !important; padding: 14px 0 !important; border-top: 1px solid #DADADA !important; flex-wrap: wrap !important; }
+#ws_page.page-lightbox #main_content p:has(> a.request_quotation_link)::before { display: none !important; }
+
+/* media v2: licencja jako jedyny przycisk glowny */
+#ws_page.page-media #main_content input.submit_small.price_icon,
+#ws_page.page-media #main_content input.submit_small.lightbox_toggle { display: block !important; width: 100% !important; height: 38px !important; min-height: 38px !important; padding: 0 20px !important; font: 500 10px/36px Inter, sans-serif !important; letter-spacing: 0.14em !important; text-transform: uppercase !important; text-align: center !important; border: 1px solid #111111 !important; border-radius: 9999px !important; box-sizing: border-box !important; }
+#ws_page.page-media #main_content input.submit_small.price_icon { background: #111111 !important; color: #FFFFFF !important; }
+#ws_page.page-media #main_content input.submit_small.price_icon:hover { background: #FFFFFF !important; color: #111111 !important; opacity: 1 !important; }
+#ws_page.page-media #main_content input.submit_small.lightbox_toggle { background: transparent !important; color: #111111 !important; }
+#ws_page.page-media #main_content input.submit_small.lightbox_toggle:hover { background: #111111 !important; color: #FFFFFF !important; opacity: 1 !important; }
+
+/* lightbox: ikona kosza na miniaturach */
+#ws_page.page-lightbox .media_slide .media_content_overlay { display: block !important; position: absolute !important; inset: 0 !important; opacity: 1 !important; visibility: visible !important; pointer-events: none !important; }
+#ws_page.page-lightbox .media_slide .thumb_links.overlay_ctrl { opacity: 1 !important; visibility: visible !important; transform: none !important; pointer-events: auto !important; top: 10px !important; right: 10px !important; }
+#ws_page.page-lightbox .media_slide .thumb_links.overlay_ctrl input.lightbox_toggle { display: block !important; width: 30px !important; height: 30px !important; min-width: 30px !important; padding: 0 !important; margin: 0 !important; border: 1px solid #111111 !important; border-radius: 50% !important; background: #FFFFFF url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111111' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16M9 7V4.5h6V7M6.5 7l.8 12.5h9.4L17.5 7M10 11v5.5M14 11v5.5'/%3E%3C/svg%3E") center / 15px 15px no-repeat !important; filter: none !important; box-shadow: none !important; cursor: pointer !important; font-size: 0 !important; }
+#ws_page.page-lightbox .media_slide .thumb_links.overlay_ctrl input.lightbox_toggle:hover { filter: invert(1) !important; }
+
+/* lightbox: usuniete zdjecia znikaja z listy (po inicjalizacji PhotoDecka) */
+html:not(.waiting_for_js) #ws_page.page-lightbox .medias-list > .media_slide:not(.lightbox_select):has(input.lightbox_toggle.lightbox_icon) { display: none !important; }
+
+/* ==========================================================================
+   UJEDNOLICENIE KART I FORMULARZY: kolumna 640 px, te same pola i etykiety, dwa rodzaje przyciskow
+   ========================================================================== */
+#ws_page.page-website_page-contact .text_block { max-width: 680px !important; }
+:is(body[data-pi-acct="profile"] #ws_page, #ws_page[class*="page-user"]) #main_content { width: 100% !important; max-width: 688px !important; margin: 0 auto !important; padding: 0 24px !important; box-sizing: border-box !important; float: none !important; font-family: 'Inter', sans-serif !important; }
+:is(body[data-pi-acct="profile"] #ws_page, #ws_page[class*="page-user"]) #main_content :is(.text_block, .elem) { width: 100% !important; max-width: none !important; margin-left: 0 !important; margin-right: 0 !important; padding-left: 0 !important; padding-right: 0 !important; box-sizing: border-box !important; }
+:is(body[data-pi-acct="profile"] #ws_page, #ws_page[class*="page-user"]) form select { padding-right: 44px !important; }
+:is(body[data-pi-acct="profile"] #ws_page, #ws_page[class*="page-user"]) form label { display: block !important; font: 500 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; margin: 0 0 4px 0 !important; padding: 0 !important; border: none !important; }
+:is(body[data-pi-acct="profile"] #ws_page, #ws_page[class*="page-user"]) form :is(input[type="text"], input[type="email"], input[type="tel"], input[type="password"], select) { width: 100% !important; height: 52px !important; box-sizing: border-box !important; border: 1px solid #D9D9D6 !important; border-radius: var(--pi-r-md) !important; padding: 0 18px !important; margin: 0 0 20px 0 !important; background: #FFFFFF !important; box-shadow: none !important; outline: none !important; font: 400 15px/1.4 Inter, sans-serif !important; color: #111111 !important; }
+:is(body[data-pi-acct="profile"] #ws_page, #ws_page[class*="page-user"]) form textarea { width: 100% !important; box-sizing: border-box !important; min-height: 96px; resize: vertical; border: 1px solid #D9D9D6 !important; border-radius: var(--pi-r-md) !important; padding: 14px 18px !important; margin: 0 0 20px 0 !important; background: #FFFFFF !important; box-shadow: none !important; outline: none !important; font: 400 14px/1.5 Inter, sans-serif !important; color: #111111 !important; }
+:is(body[data-pi-acct="profile"] #ws_page, #ws_page[class*="page-user"]) form :is(input[type="text"], input[type="email"], input[type="tel"], input[type="password"], select, textarea):focus { border-color: #111111 !important; }
+:is(body[data-pi-acct="profile"] #ws_page, #ws_page[class*="page-user"]) form input[type="checkbox"] { -webkit-appearance: none !important; appearance: none !important; display: inline-block !important; flex-shrink: 0 !important; width: 16px !important; height: 16px !important; margin: 2px 10px 0 0 !important; padding: 0 !important; border: 1px solid #111111 !important; border-radius: var(--pi-r-xs) !important; background: #FFFFFF center / 12px no-repeat !important; cursor: pointer !important; vertical-align: top !important; }
+:is(body[data-pi-acct="profile"] #ws_page, #ws_page[class*="page-user"]) form input[type="checkbox"]:checked { background-color: #111111 !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E") !important; }
+:is(body[data-pi-acct="profile"] #ws_page, #ws_page[class*="page-user"]) form :is(input[type="checkbox"] + label, label:has(input[type="checkbox"])) { display: inline !important; font: 400 12px/1.5 Inter, sans-serif !important; letter-spacing: 0 !important; text-transform: none !important; margin: 0 !important; cursor: pointer !important; }
+:is(body[data-pi-acct="profile"] #ws_page, #ws_page[class*="page-user"]) form :is(input[type="submit"], button[type="submit"]) { display: block !important; width: 100% !important; height: 44px !important; margin: 8px 0 16px 0 !important; padding: 0 !important; background: #111111 !important; color: #FFFFFF !important; border: 1px solid #111111 !important; border-radius: var(--pi-r-pill) !important; box-shadow: none !important; font: 400 11px/42px Inter, sans-serif !important; letter-spacing: 0.1em !important; text-transform: uppercase !important; text-align: center !important; cursor: pointer !important; -webkit-appearance: none !important; transition: background 0.15s ease, color 0.15s ease !important; }
+:is(body[data-pi-acct="profile"] #ws_page, #ws_page[class*="page-user"]) form :is(input[type="submit"], button[type="submit"]):hover { background: #FFFFFF !important; color: #111111 !important; }
+:is(body[data-pi-acct="profile"] #ws_page, #ws_page[class*="page-user"]) #main_content a:not(.user-bar-greeting *):not(.button):not(.btn):not(.submit) { font: 500 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; text-decoration: underline !important; text-underline-offset: 3px !important; }
+:is(body[data-pi-acct="profile"] #ws_page, #ws_page[class*="page-user"]) #main_content a:not(.user-bar-greeting *):not(.button):not(.btn):not(.submit):hover { color: #6B6B6B !important; }
+
+/* lightbox: wiecej oddechu u gory */
+#ws_page.page-lightbox #main_content { row-gap: 16px !important; }
+#ws_page.page-lightbox #main_content::before { content: ""; flex: 0 0 100%; height: 16px; order: -1; }
+#ws_page.page-lightbox #main_content .user-bar-greeting { margin-bottom: 8px !important; }
+#ws_page.page-lightbox #main_content .medias-list { margin-top: 8px !important; }
+#ws_page.page-lightbox #main_content :is(p, div, label):has(+ textarea),
+#ws_page.page-lightbox #main_content label[for*="note"] { margin-top: 24px !important; }
+
+/* lightbox: odstep nad polem Notes oraz wiecej oddechu na dole */
+#ws_page.page-lightbox #main_content p:has(> #lightbox_description) { margin-top: 24px !important; }
+#ws_page.page-lightbox #main_content p:has(> a.request_quotation_link) { margin-top: 40px !important; padding: 20px 0 32px !important; }
+#ws_page.page-lightbox #main_content { padding-bottom: 32px !important; }
+
+/* lightbox: bez dodatkowych kontrolek i rozmycia obok kosza (zdjecia z przypieta licencja) */
+#ws_page.page-lightbox .media_slide .thumb_links.overlay_ctrl:not(:has(input.lightbox_toggle)) { display: none !important; }
+#ws_page.page-lightbox .media_slide .thumb_links.overlay_ctrl { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: transparent !important; }
+#ws_page.page-lightbox .media_slide .thumb_links.overlay_ctrl > :not(form:has(input.lightbox_toggle)) { display: none !important; }
+
+/* spojna typografia akcji: 11 px / 400 / 0.1em (przyciski przy zamowieniach na /client) */
+#ws_page.page-client_home .order_actions a.submit_small { font-size: 11px !important; font-weight: 400 !important; letter-spacing: 0.1em !important; }
+
+/* lightbox: ukryty formularz zapisu nazwy nie zajmuje miejsca w rzedzie przyciskow */
+#ws_page.page-lightbox #main_content form.full_width:not(:has(:is(input[type="text"], textarea))) { display: none !important; }
+
+/* lightbox: linia statusu na samej gorze, jak na innych podstronach */
+#ws_page.page-lightbox #main_content::before { height: 20px; }
+#ws_page.page-lightbox #main_content .user-bar-greeting { order: -1 !important; flex: 0 0 100% !important; text-align: right !important; margin: 0 0 16px !important; }
+
+/* lightbox: linia statusu na samej gorze, jak na innych podstronach */
+#ws_page.page-lightbox #main_content::before { height: 20px; }
+#ws_page.page-lightbox #main_content .user-bar-greeting { order: -1 !important; flex: 0 0 100% !important; text-align: right !important; margin: 0 0 16px !important; }
+
+/* /client: okladki selekcji w prawdziwych proporcjach (jak w selection) */
+#ws_page.page-client_home .galleries.thumbs_grid { align-items: start !important; }
+#ws_page.page-client_home .galleries .thumb { height: auto !important; aspect-ratio: auto !important; }
+#ws_page.page-client_home .galleries .thumb img { width: 100% !important; height: auto !important; object-fit: contain !important; display: block !important; }
+
+/* lightbox: pusta selection (przyjazny komunikat) */
+#ws_page.page-lightbox #main_content .short_message:has(.pi-empty) { font-size: 0 !important; line-height: 0 !important; margin: 40px auto 0 !important; max-width: 420px !important; }
+#ws_page.page-lightbox #main_content .short_message:has(.pi-empty)::after { content: none !important; display: none !important; }
+#ws_page.page-lightbox #main_content .short_message .pi-empty { display: flex; flex-direction: column; align-items: center; text-align: center; }
+#ws_page.page-lightbox #main_content .short_message .pi-empty-ic { width: 40px; height: 40px; border-radius: 50%; border: 1px solid #111111; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
+#ws_page.page-lightbox #main_content .short_message .pi-empty-ic svg { width: 16px; height: 16px; fill: none; stroke: #111111; stroke-width: 1.7; stroke-linecap: round; }
+#ws_page.page-lightbox #main_content .short_message .pi-empty b { display: block !important; font: 500 18px/1.3 Inter, sans-serif !important; letter-spacing: 0 !important; text-transform: none !important; color: #111111 !important; margin: 0 0 12px !important; }
+#ws_page.page-lightbox #main_content .short_message .pi-empty-tx { display: block; font: 400 13px/1.6 Inter, sans-serif; color: #6F6F6F; max-width: 360px; margin-bottom: 28px; }
+#ws_page.page-lightbox #main_content .short_message .pi-empty-btn { display: inline-flex; align-items: center; justify-content: center; height: 44px; padding: 0 28px; border-radius: 999px; background: #111111; color: #FFFFFF !important; font: 400 11px/1 Inter, sans-serif; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none !important; border: 1px solid #111111; }
+#ws_page.page-lightbox #main_content .short_message .pi-empty-btn:hover { background: #FFFFFF; color: #111111 !important; }
+#ws_page.page-lightbox #main_content .short_message .pi-empty-link { margin-top: 18px; font: 400 11px/1.4 Inter, sans-serif; letter-spacing: 0.1em; text-transform: uppercase; color: #111111 !important; text-decoration: underline; text-underline-offset: 3px; }
+.pi-quote-note{display:block;margin-top:8px;font-size:11px;line-height:1.5;color:#666}
+.pi-quote-intro{margin:8px 0 36px;padding:24px 28px;border:1px solid #111;border-radius:14px!important;font-size:12px;line-height:1.75}
+.pi-quote-intro b{display:block;margin-bottom:10px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.pi-quote-intro ol{list-style:none;margin:0 0 16px;padding:0;counter-reset:q}
+.pi-quote-intro li{counter-increment:q;display:flex;gap:12px;align-items:center;padding:5px 0}
+.pi-quote-intro li:before{content:counter(q);flex:0 0 22px;height:22px;line-height:22px;text-align:center;border:1px solid #111;border-radius:50%;font-size:10px;font-weight:600}
+.pi-quote-intro p{margin:0;padding-top:14px;border-top:1px solid #e5e5e5;color:#555}
+/* Commercial quote: przycisk, notka, ramka z krokami */
+.pi-qnote{display:block;margin:10px 4px 18px;font-size:11px;line-height:1.6;color:#666}
+form.button_to[action="/quotations/new"] input[type=submit]{background:transparent!important;color:#111!important;border:1px solid #111!important}
+form.button_to[action="/quotations/new"] input[type=submit]:hover{background:#111!important;color:#F7F7F5!important}
+
+.pi-qbox{margin:12px 0 40px;padding:28px 32px;background:#F7F7F5;border:1px solid #E4E4E0;border-radius:16px!important}
+.pi-qb-title{margin:0 0 20px;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+.pi-qb-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;counter-reset:qb}
+.pi-qb-steps li{counter-increment:qb;display:flex;flex-direction:column;gap:4px;margin:0;padding:0;font-size:12px;line-height:1.6;color:#444}
+.pi-qb-steps li:before{content:counter(qb);display:flex;align-items:center;justify-content:center;width:24px;height:24px;margin-bottom:8px;border:1px solid #111;border-radius:50%;font-size:10px;font-weight:600;color:#111}
+.pi-qb-steps b{font-size:12px;font-weight:600;color:#111}
+.pi-qb-hint{margin:24px 0 0;padding-top:18px;border-top:1px solid #E4E4E0;font-size:12px;line-height:1.6;color:#666}
+@media (max-width:640px){.pi-qb-steps{grid-template-columns:1fr;gap:18px}.pi-qbox{padding:22px 20px}}
+.pi-qnote{display:block;margin:10px 4px 18px;font-size:11px;line-height:1.6;color:#666}
+form.button_to[action="/quotations/new"] input[type=submit]{background:transparent!important;color:#111!important;border:1px solid #111!important}
+form.button_to[action="/quotations/new"] input[type=submit]:hover{background:#111!important;color:#F7F7F5!important}
+.pi-qbox{margin:12px 0 40px;padding:28px 32px;background:#F7F7F5;border:1px solid #E4E4E0;border-radius:16px!important}
+.pi-qb-title{margin:0 0 20px;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+.pi-qb-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;counter-reset:qb}
+.pi-qb-steps li{counter-increment:qb;display:flex;flex-direction:column;gap:4px;margin:0;padding:0;font-size:12px;line-height:1.6;color:#444}
+.pi-qb-steps li:before{content:counter(qb);display:flex;align-items:center;justify-content:center;width:24px;height:24px;margin-bottom:8px;border:1px solid #111;border-radius:50%;font-size:10px;font-weight:600;color:#111}
+.pi-qb-steps b{font-size:12px;font-weight:600;color:#111}
+.pi-qb-hint{margin:24px 0 0;padding-top:18px;border-top:1px solid #E4E4E0;font-size:12px;line-height:1.6;color:#666}
+@media (max-width:640px){.pi-qb-steps{grid-template-columns:1fr;gap:18px}.pi-qbox{padding:22px 20px}}
+
+
+/* ==========================================================================
+   MOBILE UX, rev. 14 Oct 2026 (karta zdjecia). Tylko ekrany do 900px.
+   ========================================================================== */
+@media (max-width: 900px) {
+  /* slowa kluczowe: wieksze cele dotykowe, wiekszy odstep, czytelniejszy tekst */
+  #ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords b {
+    display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 8px !important;
+  }
+  #ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords b a {
+    display: flex !important; align-items: center !important; box-sizing: border-box !important; min-height: 40px !important; padding: 8px 14px !important;
+    font-size: 11px !important; line-height: 1.25 !important; overflow-wrap: anywhere !important;
+  }
+  /* przyciski zamkniecia 44px */
+  html body #main_content .pi-detail-x,
+  #ws_page.page-media #main_content > .pi-x { width: 44px !important; height: 44px !important; }
+}
+
+/* ==========================================================================
+   STOPKA NA TELEFONIE (.pi-footer): zwarty uklad. Tylko ekrany do 900px.
+   Marka i opis na gorze, nizej trzy kolumny linkow, na dole jedna linia praw i ABN.
+   !important, bo stopka ma wlasne reguly w Theme/Custom CSS panelu PhotoDecka.
+   ========================================================================== */
+@media (max-width: 900px) {
+  html body .pi-footer {
+    display: grid !important; grid-template-columns: repeat(3, auto) !important; justify-content: space-between !important;
+    gap: 20px 16px !important; padding: 24px 16px 8px !important; margin: 0 !important;
+    border: 0 !important; border-top: 1px solid #111111 !important;
+  }
+  html body .pi-footer > div { padding: 0 !important; margin: 0 !important; border: 0 !important; min-width: 0 !important; }
+  html body .pi-footer > div:first-child { grid-column: 1 / -1 !important; }
+  html body .pi-footer b {
+    display: block !important; margin: 0 0 6px !important; padding: 0 !important;
+    font: 500 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.14em !important; text-transform: uppercase !important; color: #111111 !important;
+  }
+  html body .pi-footer p { margin: 0 0 6px !important; max-width: 36em; font: 400 13px/1.5 Inter, sans-serif !important; color: #6B6B6B !important; }
+  html body .pi-footer small { display: block !important; margin: 0 !important; font: 400 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.06em !important; text-transform: uppercase !important; color: #6B6B6B !important; }
+  html body .pi-footer a {
+    display: flex !important; align-items: center !important; min-height: 40px !important; margin: 0 !important; padding: 0 !important;
+    border: 0 !important; font: 400 11px/1.3 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; text-decoration: none !important;
+  }
+  html body .pi-footer-bottom {
+    display: flex !important; flex-direction: column !important; gap: 0 !important; margin: 0 !important; padding: 8px 16px 20px !important;
+    border: 0 !important; font: 400 11px/1.6 Inter, sans-serif !important; color: #6B6B6B !important;
+  }
+  html body .pi-footer-bottom a { display: inline-flex !important; align-items: center !important; min-height: 32px !important; color: #6B6B6B !important; text-decoration: underline !important; text-underline-offset: 3px !important; }
+}
+
+/* ==========================================================================
+   STOPKA MOBILNA: ROZWIJANE SEKCJE (.pi-footer-m), bez JavaScriptu (natywne <details>)
+   Fragment HTML jest dodawany obok desktopowej stopki. Gdy go nie ma, dziala zwarta wersja wyzej.
+   ========================================================================== */
+.pi-footer-m { display: none; }
+@media (max-width: 900px) {
+  body:has(.pi-footer-m) .pi-footer { display: none !important; }
+  html body .pi-footer-m { display: block !important; margin: 0 !important; padding: 0 !important; border-top: 1px solid #111111 !important; background: #FFFFFF !important; }
+  html body .pi-footer-m details { margin: 0 !important; padding: 0 !important; border-bottom: 1px solid #111111 !important; }
+  html body .pi-footer-m summary {
+    display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 16px !important;
+    min-height: 56px !important; margin: 0 !important; padding: 0 16px !important; list-style: none !important; cursor: pointer !important;
+    font: 500 12px/1.3 Inter, sans-serif !important; letter-spacing: 0.14em !important; text-transform: uppercase !important; color: #111111 !important;
+    -webkit-tap-highlight-color: transparent;
+  }
+  html body .pi-footer-m summary::-webkit-details-marker { display: none !important; }
+  html body .pi-footer-m summary::marker { content: "" !important; }
+  html body .pi-footer-m summary::after {
+    content: ""; flex: none; width: 18px; height: 10px; transition: transform 0.2s ease;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 10' fill='none' stroke='%23111' stroke-width='1.6' stroke-linecap='square'%3E%3Cpath d='M1 1l8 8 8-8'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+  html body .pi-footer-m details[open] summary::after { transform: rotate(180deg); }
+  html body .pi-footer-m summary:focus-visible { outline: 2px solid #111111; outline-offset: -2px; }
+  html body .pi-footer-m .pi-fm-links { padding: 0 0 8px !important; }
+  html body .pi-footer-m .pi-fm-links a {
+    display: flex !important; align-items: center !important; min-height: 44px !important; margin: 0 !important; padding: 0 16px !important; border: 0 !important;
+    font: 400 12px/1.3 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #6B6B6B !important; text-decoration: none !important;
+  }
+  html body .pi-footer-m .pi-fm-links a:active, html body .pi-footer-m .pi-fm-links a:hover { color: #111111 !important; }
+  html body .pi-footer-m .pi-fm-brand { margin: 0 !important; padding: 24px 16px 4px !important; text-align: center !important; font: 400 12px/1.6 Inter, sans-serif !important; color: #6B6B6B !important; }
+  html body .pi-footer-m .pi-fm-brand b { display: block !important; margin: 0 0 4px !important; font: 500 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.14em !important; text-transform: uppercase !important; color: #111111 !important; }
+  /* wspolny dolny wiersz (prawa, ABN, Sitemap) wysrodkowany */
+  body:has(.pi-footer-m) .pi-footer-bottom { align-items: center !important; text-align: center !important; padding: 12px 16px 24px !important; }
+}
+
+/* ==========================================================================
+   STRONA WYCENY (page-quotation) NA TELEFONIE: jedna linia miedzy zdjeciami
+   Wczesniej: gorna i dolna linia kazdego wiersza nakladaly sie (grubsza szara kreska), a w srodku
+   wiersza byla jeszcze czarna linia z motywu. Zostaje cienka szara linia pod kazdym wierszem.
+   ========================================================================== */
+@media (max-width: 900px) {
+  #ws_page.page-quotation ul.order_or_cart_items li.ooc_item { border-top: 0 !important; border-bottom: 1px solid #DADADA !important; }
+  #ws_page.page-quotation ul.order_or_cart_items li.ooc_item:first-child { border-top: 1px solid #DADADA !important; }
+  #ws_page.page-quotation ul.order_or_cart_items li.ooc_item :is(div, p, span, fieldset, form, section, table, thead, tbody, tr, td, th, ul, ol, li) { border-top: 0 !important; }
+  #ws_page.page-quotation ul.order_or_cart_items li.ooc_item hr { display: none !important; }
+}
+/* PhotoIndex: short description under "Use Type" in the licence window.
+   Pure CSS (needs :has(), supported by current Chrome, Safari, Edge, Firefox).
+   Text follows the selected use type. Keep in sync with the Terms (clauses 6, 8, 9). */
+form.calculator p:has(select[name="pricing[use_type]"])::after {
+  display: block;
+  white-space: pre-line;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #6B6B6B;
+  margin: 12px 0 0;
+}
+
+/* Editorial (news, books, articles) */
+form.calculator:has(select[name="pricing[use_type]"] option[value="web_ad"]:checked) p:has(select[name="pricing[use_type]"])::after {
+  content: "\2022  News, books, articles and magazines\A \2022  Editorial use only, not advertising\A \2022  Credit required";
+}
+
+/* Editorial Inside Placement or Back Cover */
+form.calculator:has(select[name="pricing[use_type]"] option[value="print_ad"]:checked) p:has(select[name="pricing[use_type]"])::after {
+  content: "\2022  Editorial use inside a publication or on its back cover\A \2022  Not advertising\A \2022  Credit required";
+}
+
+/* Internal and unpublished */
+form.calculator:has(select[name="pricing[use_type]"] option[value="newspaper"]:checked) p:has(select[name="pricing[use_type]"])::after {
+  content: "\2022  Reports, presentations and planning submissions\A \2022  Not published or shown to the public\A \2022  No credit required";
+}
+
+/* Website, digital and broadcast */
+form.calculator:has(select[name="pricing[use_type]"] option[value="magazine"]:checked) p:has(select[name="pricing[use_type]"])::after {
+  content: "\2022  Websites, social media, apps, email and online video\A \2022  Commercial and advertising use\A \2022  One Project, for the territory and duration chosen";
+}
+
+/* Print and marketing materials */
+form.calculator:has(select[name="pricing[use_type]"] option[value="display_decor"]:checked) p:has(select[name="pricing[use_type]"])::after {
+  content: "\2022  Brochures, flyers, reports and other printed marketing\A \2022  Commercial use for one Project";
+}
+
+/* Print Ad or Display */
+form.calculator:has(select[name="pricing[use_type]"] option[value="display_ad_outdoor"]:checked) p:has(select[name="pricing[use_type]"])::after {
+  content: "\2022  Paid print advertisements and displays\A \2022  Commercial use for one Project";
+}
+
+/* Art print */
+form.calculator:has(select[name="pricing[use_type]"] option[value="brochure"]:checked) p:has(select[name="pricing[use_type]"])::after {
+  content: "\2022  Prints for display in homes, offices, hotels and galleries\A \2022  Credit required where the print is exhibited";
+}
+
+/* Property listing */
+form.calculator:has(select[name="pricing[use_type]"] option[value="fkgrnu"]:checked) p:has(select[name="pricing[use_type]"])::after {
+  content: "\2022  One property listing, online and in paid ads for that property\A \2022  No credit required\A \2022  Marketing a whole building or several dwellings? Request a quote";
+}
 /* PhotoIndex: licence window (Custom CSS/HTML).
+   Needs :has() (current Chrome, Safari, Edge, Firefox).
+   Part 1: short description under "Use Type" in the buying window (Rights-Managed profile only).
+   Part 2: the quotation window keeps its choices but shows no price and no Add To Cart.
+   Keep part 1 in sync with the Terms (clauses 6, 7, 8). */
+
+/* ---------- Part 1: buying window ---------- */
+.treepricingprofile_01a08ede-2421-7948-bcf9-78d543451086 form.calculator p:has(select[name="pricing[use_type]"])::after {
+  display: block;
+  white-space: pre-line;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #6B6B6B;
+  margin: 12px 0 0;
+}
+
+/* Editorial */
+.treepricingprofile_01a08ede-2421-7948-bcf9-78d543451086 form.calculator:has(select[name="pricing[use_type]"] option[value="web_ad"]:checked) p:has(select[name="pricing[use_type]"])::after {
+  content: "\2022  News, books, articles and magazines\A \2022  Editorial use only, not advertising\A \2022  Credit required\A \2022  No time limit\A \A Covers, advertising or several photos? Request a quote: licensing@photoindex.au";
+}
+
+/* Internal and unpublished */
+.treepricingprofile_01a08ede-2421-7948-bcf9-78d543451086 form.calculator:has(select[name="pricing[use_type]"] option[value="newspaper"]:checked) p:has(select[name="pricing[use_type]"])::after {
+  content: "\2022  Reports, presentations and planning submissions\A \2022  Not published or shown to the public\A \2022  No credit required\A \2022  No time limit";
+}
+
+/* Single Property Listing, digital */
+.treepricingprofile_01a08ede-2421-7948-bcf9-78d543451086 form.calculator:has(select[name="pricing[use_type]"] option[value="fkgrnu"]:checked) p:has(select[name="pricing[use_type]"])::after {
+  content: "\2022  One property: portals, agent's website, social media, email\A \2022  Paid online ads for that property\A \2022  No credit required\A \2022  Remove when the term ends\A \A Need several photos or a longer term? Please get in touch: licensing@photoindex.au";
+}
+
+/* Single Property Listing, digital + print */
+.treepricingprofile_01a08ede-2421-7948-bcf9-78d543451086 form.calculator:has(select[name="pricing[use_type]"] option[value="mcligv"]:checked) p:has(select[name="pricing[use_type]"])::after {
+  content: "\2022  One property: everything in digital, plus print\A \2022  Brochures, flyers, window displays and press ads\A \2022  No credit required\A \2022  Printed copies may stay in use\A \A Need several photos or a longer term? Please get in touch: licensing@photoindex.au";
+}
+
+/* ---------- Part 2: quotation window ---------- */
+.treepricingprofile_01a133c5-4407-7842-bce8-24edab9fa43a form.calculator p:has(select[name="pricing[use_type]"])::after {
+  display: block;
+  white-space: pre-line;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #6B6B6B;
+  margin: 12px 0 0;
+  content: "\2022  Campaigns, websites, print, advertising, several photos, exclusivity\A \2022  We reply within 2 business days\A \2022  You pay only after you accept the quotation";
+}
+
+/* no price, no cart */
+.price_calculator:has(.treepricingprofile_01a133c5-4407-7842-bce8-24edab9fa43a) .price_and_action {
+  display: none !important;
+}
+
+/* the quotation link becomes the main button */
+.price_calculator:has(.treepricingprofile_01a133c5-4407-7842-bce8-24edab9fa43a) .request_quotation_link {
+  font-size: 0;
+  margin: 24px 0 0;
+  padding: 0;
+  text-align: center;
+}
+.price_calculator:has(.treepricingprofile_01a133c5-4407-7842-bce8-24edab9fa43a) .request_quotation_link br {
+  display: none;
+}
+.price_calculator:has(.treepricingprofile_01a133c5-4407-7842-bce8-24edab9fa43a) .request_quotation_link a {
+  display: block;
+  box-sizing: border-box;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  padding: 16px 24px;
+  background: #111;
+  color: #fff !important;
+  border-radius: 999px;
+  text-decoration: none;
+}
+.price_calculator:has(.treepricingprofile_01a133c5-4407-7842-bce8-24edab9fa43a) .request_quotation_link a:hover {
+  opacity: 0.85;
+}/* PhotoIndex: licence window (Custom CSS/HTML).
    Needs :has() (current Chrome, Safari, Edge, Firefox).
    Part 1: short description under "Use Type" in the buying window (Rights-Managed profile only).
    Part 2: the quotation window keeps its choices but shows no price and no Add To Cart.
