@@ -89,6 +89,8 @@ button{cursor:pointer}
 #done:hover{background:#fff;color:var(--ink)}
 #main{flex:1 1 0;min-width:0;overflow-y:auto;padding:8px 24px 72px;scroll-behavior:smooth}
 #info{display:flex;justify-content:space-between;gap:12px;font-size:11px;letter-spacing:.02em;color:var(--mute);padding:14px 0 12px;min-height:32px}
+#siteask{flex:none;font-size:11px;letter-spacing:.02em;color:var(--mute);text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+#siteask:hover{color:var(--ink)}
 #wall{position:relative;width:100%}
 .card{position:absolute;left:0;top:0;display:block;overflow:hidden;background:#ececea;border-radius:var(--r-md);isolation:isolate;color:#fff;text-decoration:none}
 .card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;animation:fade .5s both;transition:transform .8s cubic-bezier(.4,0,.2,1)}
@@ -125,6 +127,9 @@ button{cursor:pointer}
 .lc.on{outline:2px solid var(--ink);outline-offset:-2px}
 .empty{padding:32px 0;color:#666;font-size:13px;max-width:520px}
 .empty b{display:block;color:#000;font-weight:500;margin-bottom:4px}
+.empty .ek{margin-top:24px;padding-top:16px;border-top:1px solid var(--line)}
+.empty .ek a{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.empty .ek a:hover{color:var(--mute)}
 #mapcol{display:none;flex:0 0 42%;position:relative;border-left:1px solid var(--line);background:#fff}
 body.map #mapcol{display:block}
 body.panel #mapcol{display:none}
@@ -292,7 +297,7 @@ body.panel #mapcol{display:none}
       <button id="done" type="button">Show photographs</button>
     </aside>
     <main id="main">
-      <div id="info"><span id="count">Loading archive&hellip;</span></div>
+      <div id="info"><span id="count">Loading archive&hellip;</span><a id="siteask" href="/request-a-site" target="_top">Missing a site? Tell us</a></div>
       <div id="locgrid" style="display:none"></div>
       <div id="wall"></div>
       <div id="empty"></div>
@@ -555,6 +560,8 @@ function emptyState(host){
     var b=el("button","eb","Remove "+best.label);b.type="button";b.addEventListener("click",function(){dropFilter(best)});d.appendChild(b)}
   else d.appendChild(document.createTextNode("Clear a filter or change the search."));
   var cl=el("button","ec","Clear all");cl.type="button";cl.addEventListener("click",function(){$("clear").click()});d.appendChild(cl);
+  var ask=el("div","ek");ask.appendChild(document.createTextNode("Not in the archive yet? "));
+  var ak=el("a",null,"Tell us the address.");ak.href="/request-a-site";ak.target=CFG.linkTarget;ask.appendChild(ak);d.appendChild(ask);
   host.appendChild(d)}
 function pass(p,except){
   if(except!=="loc"&&S.loc&&p._loc!==S.loc)return false;
