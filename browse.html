@@ -231,11 +231,11 @@ body.panel #mapcol{display:none}
  body.map #intro{display:none}
  #intro{display:none}
 
- /* zwarty pasek: Filters, wyszukiwanie i Map w jednym wierszu */
- #bar{flex-wrap:wrap;gap:4px 12px;padding:6px 16px}
- .qwrap{order:1;flex:1 1 120px;min-width:0}
- #ftoggle{order:0}
- #mtoggle{order:2}
+ /* pasek: wyszukiwanie na calej szerokosci, pod nim Filters i Map */
+ #bar{flex-wrap:wrap;gap:0 12px;padding:8px 16px 0}
+ .qwrap{order:0;flex:1 1 100%;min-width:0}
+ #ftoggle{order:1}
+ #mtoggle{order:2;margin-left:auto}
  #chips{order:4;flex-basis:100%}
  #clear{order:5}
  #q{padding-right:8px;text-overflow:ellipsis}
@@ -1016,7 +1016,6 @@ function init(){
   wire();
   var y=restore();
   if(window.innerWidth<900&&(!S.cols||S.cols>2))S.cols=1;
-  if(window.innerWidth<900)$("q").placeholder="Search the archive";
   Promise.all([
     fetch(CFG.photosUrl).then(function(r){if(!r.ok)throw new Error("photos HTTP "+r.status);return r.json()}),
     fetch(CFG.locationsUrl).then(function(r){return r.ok?r.text():""}).catch(function(){return ""})
