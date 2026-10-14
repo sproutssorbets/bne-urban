@@ -871,3 +871,54 @@ form.button_to[action="/quotations/new"] input[type=submit]:hover{background:#11
   #ws_page.page-quotation ul.order_or_cart_items li.ooc_item :is(div, p, span, fieldset, form, section, table, thead, tbody, tr, td, th, ul, ol, li) { border-top: 0 !important; }
   #ws_page.page-quotation ul.order_or_cart_items li.ooc_item hr { display: none !important; }
 }
+/* PhotoIndex: short description under "Use Type" in the licence window.
+   Pure CSS (needs :has(), supported by current Chrome, Safari, Edge, Firefox).
+   Text follows the selected use type. Keep in sync with the Terms (clauses 6, 8, 9). */
+form.calculator p:has(select[name="pricing[use_type]"])::after {
+  display: block;
+  white-space: pre-line;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #6B6B6B;
+  margin: 12px 0 0;
+}
+
+/* Editorial (news, books, articles) */
+form.calculator:has(select[name="pricing[use_type]"] option[value="web_ad"]:checked) p:has(select[name="pricing[use_type]"])::after {
+  content: "\2022  News, books, articles and magazines\A \2022  Editorial use only, not advertising\A \2022  Credit required";
+}
+
+/* Editorial Inside Placement or Back Cover */
+form.calculator:has(select[name="pricing[use_type]"] option[value="print_ad"]:checked) p:has(select[name="pricing[use_type]"])::after {
+  content: "\2022  Editorial use inside a publication or on its back cover\A \2022  Not advertising\A \2022  Credit required";
+}
+
+/* Internal and unpublished */
+form.calculator:has(select[name="pricing[use_type]"] option[value="newspaper"]:checked) p:has(select[name="pricing[use_type]"])::after {
+  content: "\2022  Reports, presentations and planning submissions\A \2022  Not published or shown to the public\A \2022  No credit required";
+}
+
+/* Website, digital and broadcast */
+form.calculator:has(select[name="pricing[use_type]"] option[value="magazine"]:checked) p:has(select[name="pricing[use_type]"])::after {
+  content: "\2022  Websites, social media, apps, email and online video\A \2022  Commercial and advertising use\A \2022  One Project, for the territory and duration chosen";
+}
+
+/* Print and marketing materials */
+form.calculator:has(select[name="pricing[use_type]"] option[value="display_decor"]:checked) p:has(select[name="pricing[use_type]"])::after {
+  content: "\2022  Brochures, flyers, reports and other printed marketing\A \2022  Commercial use for one Project";
+}
+
+/* Print Ad or Display */
+form.calculator:has(select[name="pricing[use_type]"] option[value="display_ad_outdoor"]:checked) p:has(select[name="pricing[use_type]"])::after {
+  content: "\2022  Paid print advertisements and displays\A \2022  Commercial use for one Project";
+}
+
+/* Art print */
+form.calculator:has(select[name="pricing[use_type]"] option[value="brochure"]:checked) p:has(select[name="pricing[use_type]"])::after {
+  content: "\2022  Prints for display in homes, offices, hotels and galleries\A \2022  Credit required where the print is exhibited";
+}
+
+/* Property listing */
+form.calculator:has(select[name="pricing[use_type]"] option[value="fkgrnu"]:checked) p:has(select[name="pricing[use_type]"])::after {
+  content: "\2022  One property listing, online and in paid ads for that property\A \2022  No credit required\A \2022  Marketing a whole building or several dwellings? Request a quote";
+}
