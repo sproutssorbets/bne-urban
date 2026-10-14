@@ -23,13 +23,13 @@
    ========================================================================== */
 #ws_page.front-page #component_mainc,
 #ws_page.front-page #main_content,
-#ws_page.front-page iframe,
+#ws_page.front-page iframe:not([src*="navfix"]),
 #ws_page:not(.page-media) #component_mainc {
   display: block !important;
   width: 100% !important;
   min-height: calc(100vh - 44px) !important;
 }
-#ws_page.front-page iframe {
+#ws_page.front-page iframe:not([src*="navfix"]) {
   border: none !important;
 }
 
@@ -792,9 +792,32 @@ form.button_to[action="/quotations/new"] input[type=submit]:hover{background:#11
   #ws_page.page-media #main_content > .pi-x { width: 44px !important; height: 44px !important; }
 }
 
-/* Pomocnicza ramka navfix (ladowana tylko po to, by podpiac obsluge klikniec) nie moze zajmowac miejsca.
-   Reguly #ws_page.front-page iframe wyzej wymuszaja min-height na kazdej ramce, wiec bez tego robi sie pusty pas pod stopka. */
-#ws_page.front-page iframe[src*="navfix"] {
-  position: absolute !important; width: 1px !important; height: 1px !important; min-height: 0 !important;
-  border: 0 !important; opacity: 0 !important; pointer-events: none !important; overflow: hidden !important;
+/* ==========================================================================
+   STOPKA NA TELEFONIE (.pi-footer): zwarty uklad. Tylko ekrany do 900px.
+   Marka i opis na gorze, nizej trzy kolumny linkow, na dole jedna linia praw i ABN.
+   !important, bo stopka ma wlasne reguly w Theme/Custom CSS panelu PhotoDecka.
+   ========================================================================== */
+@media (max-width: 900px) {
+  html body .pi-footer {
+    display: grid !important; grid-template-columns: repeat(3, auto) !important; justify-content: space-between !important;
+    gap: 20px 16px !important; padding: 24px 16px 8px !important; margin: 0 !important;
+    border: 0 !important; border-top: 1px solid #111111 !important;
+  }
+  html body .pi-footer > div { padding: 0 !important; margin: 0 !important; border: 0 !important; min-width: 0 !important; }
+  html body .pi-footer > div:first-child { grid-column: 1 / -1 !important; }
+  html body .pi-footer b {
+    display: block !important; margin: 0 0 6px !important; padding: 0 !important;
+    font: 500 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.14em !important; text-transform: uppercase !important; color: #111111 !important;
+  }
+  html body .pi-footer p { margin: 0 0 6px !important; max-width: 36em; font: 400 13px/1.5 Inter, sans-serif !important; color: #6B6B6B !important; }
+  html body .pi-footer small { display: block !important; margin: 0 !important; font: 400 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.06em !important; text-transform: uppercase !important; color: #6B6B6B !important; }
+  html body .pi-footer a {
+    display: flex !important; align-items: center !important; min-height: 40px !important; margin: 0 !important; padding: 0 !important;
+    border: 0 !important; font: 400 11px/1.3 Inter, sans-serif !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; color: #111111 !important; text-decoration: none !important;
+  }
+  html body .pi-footer-bottom {
+    display: flex !important; flex-direction: column !important; gap: 0 !important; margin: 0 !important; padding: 8px 16px 20px !important;
+    border: 0 !important; font: 400 11px/1.6 Inter, sans-serif !important; color: #6B6B6B !important;
+  }
+  html body .pi-footer-bottom a { display: inline-flex !important; align-items: center !important; min-height: 32px !important; color: #6B6B6B !important; text-decoration: underline !important; text-underline-offset: 3px !important; }
 }
