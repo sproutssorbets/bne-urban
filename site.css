@@ -971,3 +971,24 @@ form.button_to[action="/quotations/new"] input[type=submit]:hover{background:#11
 .pi-qbox .pi-qb-hint::first-line {
   font-weight: 600;
 }
+
+/* /lightbox: "Save for later" w jednym rzedzie z przyciskami akcji, notatka pod spodem na cala szerokosc */
+#ws_page.page-lightbox #main_content { display: flex !important; flex-flow: row wrap !important; align-items: center !important; align-content: flex-start !important; gap: 12px !important; }
+#ws_page.page-lightbox #main_content > .elem[data-type="spacer"] { display: none !important; }
+html body #ws_page.page-lightbox #main_content > .elem[data-type="page_meta"],
+html body #ws_page.page-lightbox #main_content > .elem[data-type="gallery"],
+html body #ws_page.page-lightbox #main_content .page_meta,
+html body #ws_page.page-lightbox #main_content .page_actions,
+html body #ws_page.page-lightbox #main_content div.lightbox_meta,
+html body #ws_page.page-lightbox #main_content div.lightbox_meta > form { display: contents !important; }
+#ws_page.page-lightbox #main_content .user-bar-greeting { order: -1 !important; flex: 0 0 100% !important; }
+#ws_page.page-lightbox #main_content .page_actions > form { margin: 0 !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta p { width: 100% !important; max-width: none !important; box-sizing: border-box !important; margin: 0 !important; flex: 0 0 100% !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta p:has(input[type="submit"]) { order: 50 !important; width: auto !important; flex: none !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta p:has(select) { order: 60 !important; margin-top: 16px !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta p:has(#lightbox_title) { order: 70 !important; margin-top: 8px !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta p:has(#lightbox_title) input { max-width: 320px !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta p:has(textarea) { order: 80 !important; margin-top: 8px !important; }
+#ws_page.page-lightbox #main_content .lightbox_meta textarea { width: 100% !important; max-width: none !important; box-sizing: border-box !important; }
+#ws_page.page-lightbox #main_content .thumbs_wall { order: 90 !important; flex: 0 0 100% !important; margin-top: 28px !important; }
+#ws_page.page-lightbox #main_content > .elem[data-type="gallery"] > p { order: 100 !important; flex: 0 0 100% !important; }
