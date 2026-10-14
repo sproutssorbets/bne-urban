@@ -254,11 +254,12 @@ body.panel #mapcol{display:none}
  body.map #main{flex:none;overflow:visible;min-height:70vh}
 }
 @media (prefers-reduced-motion:reduce){#bar{transition:none}}
-/* ekrany dotykowe: bez gradientu, podpisu i ikony oka na zdjeciach, zostaja tylko przyciski akcji */
+/* ekrany dotykowe: bez gradientu i ikony oka; podpis jako biala pastylka obok przyciskow akcji */
 @media (hover:none){
- .card::after,.card:hover::after,.ovt,.eye{display:none}
+ .card::after,.card:hover::after,.eye{display:none}
  .card:hover img{transform:none}
  .acts{opacity:1}
+ .ovt{opacity:1;left:10px;right:auto;bottom:12px;max-width:calc(100% - 100px);padding:7px 11px;border-radius:var(--r-pill);background:rgba(255,255,255,.92);color:var(--ink);font-size:11px;line-height:1.2;letter-spacing:.06em}
 }
 </style>
 </head>
