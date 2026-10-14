@@ -783,9 +783,12 @@ form.button_to[action="/quotations/new"] input[type=submit]:hover{background:#11
    ========================================================================== */
 @media (max-width: 900px) {
   /* slowa kluczowe: wieksze cele dotykowe, wiekszy odstep, czytelniejszy tekst */
-  #ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords b { gap: 8px !important; }
+  #ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords b {
+    display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 8px !important;
+  }
   #ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords b a {
-    padding: 12px 14px !important; font-size: 11px !important;
+    display: flex !important; align-items: center !important; box-sizing: border-box !important; min-height: 40px !important; padding: 8px 14px !important;
+    font-size: 11px !important; line-height: 1.25 !important; overflow-wrap: anywhere !important;
   }
   /* przyciski zamkniecia 44px */
   html body #main_content .pi-detail-x,
