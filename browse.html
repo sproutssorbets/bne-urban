@@ -254,15 +254,17 @@ body.panel #mapcol{display:none}
  body.map #main{flex:none;overflow:visible;min-height:70vh;background:#fff;position:relative;z-index:6}
 }
 @media (prefers-reduced-motion:reduce){#bar{transition:none}}
-/* ekrany dotykowe: bez gradientu i ikony oka; podpis jako biala pastylka obok przyciskow akcji */
+/* ekrany dotykowe: podpis taki jak na desktopie (bialy, wielkie litery), max 2 wiersze;
+   przyciemnienie tylko pas pod tekstem, reszta zdjecia bez nakladki */
 @media (hover:none){
  .card::after,.card:hover::after,.eye{display:none}
  .card:hover img{transform:none}
  .acts{opacity:1}
- .ovt{opacity:1;left:10px;right:auto;bottom:12px;max-width:calc(100% - 100px);padding:7px 11px;border-radius:var(--r-pill);background:rgba(255,255,255,.92);color:var(--ink);font-size:11px;line-height:1.2;letter-spacing:.06em}
+ .ovt{opacity:1;left:0;right:0;bottom:0;padding:32px 96px 14px 14px;background:linear-gradient(to top,rgba(0,0,0,.6),rgba(0,0,0,0));white-space:normal;overflow:visible;text-overflow:clip;font-size:11px;font-weight:500;line-height:1.3;letter-spacing:.04em;text-transform:uppercase;color:#fff;pointer-events:none}
+ .ovtt{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
  .card{container-type:inline-size}
- /* waska karta (2 kolumny): podpis nad przyciskami, na calej szerokosci */
- @container (max-width:270px){.ovt{bottom:50px;max-width:calc(100% - 20px)}}
+ /* waska karta (2 kolumny): podpis na calej szerokosci nad przyciskami */
+ @container (max-width:270px){.ovt{padding-right:14px;padding-bottom:54px}}
 }
 </style>
 </head>
@@ -690,7 +692,7 @@ function cardEl(p){
   a.title=p.description||p.title||"";a.setAttribute("aria-label",(p.title||"")+", "+(p.date||""));
   var img=document.createElement("img");img.src=p.thumb;img.alt=String(p.description||p.title||"").slice(0,160);img.loading="lazy";img.decoding="async";
   var ss=thumbSet(p);if(ss){img.sizes="300px";img.srcset=ss}
-  a.appendChild(img);a.appendChild(el("span","ovt",p._name));
+  a.appendChild(img);var ov=el("span","ovt");ov.appendChild(el("span","ovtt",p._name));a.appendChild(ov);
   var acts=el("span","acts"),sb=el("span","ib sel");sb.setAttribute("role","button");sb.setAttribute("data-uuid",p.uuid);selPaintBtn(sb);acts.appendChild(sb);var lb=el("span","ib lic");lb.innerHTML=IC_CART;lb.setAttribute("title","License this photograph");lb.setAttribute("aria-hidden","true");acts.appendChild(lb);a.appendChild(acts);var ib=el("span","insel");ib.setAttribute("role","button");ib.setAttribute("title","In selection. Click to remove");ib.setAttribute("aria-label","In selection. Click to remove");ib.innerHTML=IC_CHK+IC_BIN.replace("<svg ","<svg class=\"i-bin\" ");a.appendChild(ib);a.classList.toggle("in-sel",!!SEL[p.uuid]);
   a._p=p;return a}
 
