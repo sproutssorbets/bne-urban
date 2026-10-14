@@ -230,6 +230,11 @@ body.panel #mapcol{display:none}
 
  /* po wlaczeniu mapy lista zdjec ma wiecej miejsca: nizsza mapa, bez tekstu wstepnego */
  body.map #intro{display:none}
+
+ /* przelacznik 1 / 2 kolumn na telefonie (skrypt juz go obsluguje, tu tylko go odslaniamy) */
+ #dens{display:flex}
+ #dens .l{display:none}
+ #subr{gap:12px}
  /* widok mapy: caly obszar pod paskiem sie przewija (mapa, potem pelna lista zdjec), niezaleznie od wysokosci ramki */
  body.map #split{overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
  body.map #mapcol{flex:none;height:38vh;height:38svh;min-height:200px}

@@ -791,3 +791,10 @@ form.button_to[action="/quotations/new"] input[type=submit]:hover{background:#11
   html body #main_content .pi-detail-x,
   #ws_page.page-media #main_content > .pi-x { width: 44px !important; height: 44px !important; }
 }
+
+/* Pomocnicza ramka navfix (ladowana tylko po to, by podpiac obsluge klikniec) nie moze zajmowac miejsca.
+   Reguly #ws_page.front-page iframe wyzej wymuszaja min-height na kazdej ramce, wiec bez tego robi sie pusty pas pod stopka. */
+#ws_page.front-page iframe[src*="navfix"] {
+  position: absolute !important; width: 1px !important; height: 1px !important; min-height: 0 !important;
+  border: 0 !important; opacity: 0 !important; pointer-events: none !important; overflow: hidden !important;
+}
