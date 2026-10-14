@@ -922,3 +922,80 @@ form.calculator:has(select[name="pricing[use_type]"] option[value="brochure"]:ch
 form.calculator:has(select[name="pricing[use_type]"] option[value="fkgrnu"]:checked) p:has(select[name="pricing[use_type]"])::after {
   content: "\2022  One property listing, online and in paid ads for that property\A \2022  No credit required\A \2022  Marketing a whole building or several dwellings? Request a quote";
 }
+/* PhotoIndex: licence window (Custom CSS/HTML).
+   Needs :has() (current Chrome, Safari, Edge, Firefox).
+   Part 1: short description under "Use Type" in the buying window (Rights-Managed profile only).
+   Part 2: the quotation window keeps its choices but shows no price and no Add To Cart.
+   Keep part 1 in sync with the Terms (clauses 6, 7, 8). */
+
+/* ---------- Part 1: buying window ---------- */
+.treepricingprofile_01a08ede-2421-7948-bcf9-78d543451086 form.calculator p:has(select[name="pricing[use_type]"])::after {
+  display: block;
+  white-space: pre-line;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #6B6B6B;
+  margin: 12px 0 0;
+}
+
+/* Editorial */
+.treepricingprofile_01a08ede-2421-7948-bcf9-78d543451086 form.calculator:has(select[name="pricing[use_type]"] option[value="web_ad"]:checked) p:has(select[name="pricing[use_type]"])::after {
+  content: "\2022  News, books, articles and magazines\A \2022  Editorial use only, not advertising\A \2022  Credit required\A \2022  No time limit\A \A Covers, advertising or several photos? Request a quote: licensing@photoindex.au";
+}
+
+/* Internal and unpublished */
+.treepricingprofile_01a08ede-2421-7948-bcf9-78d543451086 form.calculator:has(select[name="pricing[use_type]"] option[value="newspaper"]:checked) p:has(select[name="pricing[use_type]"])::after {
+  content: "\2022  Reports, presentations and planning submissions\A \2022  Not published or shown to the public\A \2022  No credit required\A \2022  No time limit";
+}
+
+/* Single Property Listing, digital */
+.treepricingprofile_01a08ede-2421-7948-bcf9-78d543451086 form.calculator:has(select[name="pricing[use_type]"] option[value="fkgrnu"]:checked) p:has(select[name="pricing[use_type]"])::after {
+  content: "\2022  One property: portals, agent's website, social media, email\A \2022  Paid online ads for that property\A \2022  No credit required\A \2022  Remove when the term ends\A \A Need several photos or a longer term? Please get in touch: licensing@photoindex.au";
+}
+
+/* Single Property Listing, digital + print */
+.treepricingprofile_01a08ede-2421-7948-bcf9-78d543451086 form.calculator:has(select[name="pricing[use_type]"] option[value="mcligv"]:checked) p:has(select[name="pricing[use_type]"])::after {
+  content: "\2022  One property: everything in digital, plus print\A \2022  Brochures, flyers, window displays and press ads\A \2022  No credit required\A \2022  Printed copies may stay in use\A \A Need several photos or a longer term? Please get in touch: licensing@photoindex.au";
+}
+
+/* ---------- Part 2: quotation window ---------- */
+.treepricingprofile_01a133c5-4407-7842-bce8-24edab9fa43a form.calculator p:has(select[name="pricing[use_type]"])::after {
+  display: block;
+  white-space: pre-line;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #6B6B6B;
+  margin: 12px 0 0;
+  content: "\2022  Campaigns, websites, print, advertising, several photos, exclusivity\A \2022  We reply within 2 business days\A \2022  You pay only after you accept the quotation";
+}
+
+/* no price, no cart */
+.price_calculator:has(.treepricingprofile_01a133c5-4407-7842-bce8-24edab9fa43a) .price_and_action {
+  display: none !important;
+}
+
+/* the quotation link becomes the main button */
+.price_calculator:has(.treepricingprofile_01a133c5-4407-7842-bce8-24edab9fa43a) .request_quotation_link {
+  font-size: 0;
+  margin: 24px 0 0;
+  padding: 0;
+  text-align: center;
+}
+.price_calculator:has(.treepricingprofile_01a133c5-4407-7842-bce8-24edab9fa43a) .request_quotation_link br {
+  display: none;
+}
+.price_calculator:has(.treepricingprofile_01a133c5-4407-7842-bce8-24edab9fa43a) .request_quotation_link a {
+  display: block;
+  box-sizing: border-box;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  padding: 16px 24px;
+  background: #111;
+  color: #fff !important;
+  border-radius: 999px;
+  text-decoration: none;
+}
+.price_calculator:has(.treepricingprofile_01a133c5-4407-7842-bce8-24edab9fa43a) .request_quotation_link a:hover {
+  opacity: 0.85;
+}
