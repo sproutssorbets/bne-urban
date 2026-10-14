@@ -971,3 +971,51 @@ form.button_to[action="/quotations/new"] input[type=submit]:hover{background:#11
 .pi-qbox .pi-qb-hint::first-line {
   font-weight: 600;
 }
+
+/* PhotoIndex: "Tell us about a site" popup (CSS only, no script).
+   The link #pi-site-request opens the box through :target, "Close" and the dark background close it.
+   Without this CSS the box simply shows as plain text on the page. */
+.pi-modal { display: none; }
+.pi-modal:target {
+  display: flex;
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.pi-modal-bg {
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 17, 17, 0.5);
+  cursor: default;
+}
+.pi-modal-box {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 460px;
+  padding: 36px 32px 32px;
+  background: #FFFFFF;
+  border-radius: 28px;
+  font-family: Inter, sans-serif;
+}
+.pi-modal-box p { text-align: left; }
+.pi-modal-x {
+  position: absolute;
+  top: 18px;
+  right: 24px;
+  font: 500 11px/1 Inter, sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #6B6B6B;
+  text-decoration: none;
+}
+.pi-modal-x:hover { color: #111111; }
+.pi-modal-go:hover { background: transparent !important; color: #111111 !important; }
+.pi-open-site:hover { background: #111111 !important; color: #F7F7F5 !important; }
+@media (max-width: 680px) {
+  .pi-modal-box { padding: 32px 24px 24px; border-radius: 20px; }
+}
