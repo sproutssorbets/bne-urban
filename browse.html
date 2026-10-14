@@ -254,17 +254,14 @@ body.panel #mapcol{display:none}
  body.map #main{flex:none;overflow:visible;min-height:70vh;background:#fff;position:relative;z-index:6}
 }
 @media (prefers-reduced-motion:reduce){#bar{transition:none}}
-/* ekrany dotykowe: podpis taki jak na desktopie (bialy, wielkie litery), max 2 wiersze;
-   przyciemnienie tylko pas pod tekstem, reszta zdjecia bez nakladki */
+/* ekrany dotykowe: podpis taki jak na desktopie (bialy, wielkie litery, max 2 wiersze),
+   w jednym wierszu z przyciskami akcji; przyciemnienie tylko pas pod tym wierszem */
 @media (hover:none){
  .card::after,.card:hover::after,.eye{display:none}
  .card:hover img{transform:none}
  .acts{opacity:1}
- .ovt{opacity:1;left:0;right:0;bottom:0;padding:32px 96px 14px 14px;background:linear-gradient(to top,rgba(0,0,0,.6),rgba(0,0,0,0));white-space:normal;overflow:visible;text-overflow:clip;font-size:11px;font-weight:500;line-height:1.3;letter-spacing:.04em;text-transform:uppercase;color:#fff;pointer-events:none}
- .ovtt{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
- .card{container-type:inline-size}
- /* waska karta (2 kolumny): podpis na calej szerokosci nad przyciskami */
- @container (max-width:270px){.ovt{padding-right:14px;padding-bottom:54px}}
+ .ovt{opacity:1;left:0;right:0;bottom:0;display:flex;align-items:center;min-height:72px;padding:32px 88px 10px 14px;background:linear-gradient(to top,rgba(0,0,0,.6),rgba(0,0,0,0));white-space:normal;overflow:visible;text-overflow:clip;font-size:11px;font-weight:500;line-height:1.3;letter-spacing:.04em;text-transform:uppercase;color:#fff;pointer-events:none}
+ .ovtt{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;min-width:0}
 }
 </style>
 </head>
