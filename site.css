@@ -871,7 +871,6 @@ form.button_to[action="/quotations/new"] input[type=submit]:hover{background:#11
   #ws_page.page-quotation ul.order_or_cart_items li.ooc_item :is(div, p, span, fieldset, form, section, table, thead, tbody, tr, td, th, ul, ol, li) { border-top: 0 !important; }
   #ws_page.page-quotation ul.order_or_cart_items li.ooc_item hr { display: none !important; }
 }
-
 /* PhotoIndex: licence window (Custom CSS/HTML).
    Needs :has() (current Chrome, Safari, Edge, Firefox).
    Part 1: short description under "Use Type" in the buying window (Rights-Managed profile only).
@@ -888,14 +887,19 @@ form.button_to[action="/quotations/new"] input[type=submit]:hover{background:#11
   margin: 12px 0 0;
 }
 
-/* Editorial */
+/* Digital */
 .treepricingprofile_01a08ede-2421-7948-bcf9-78d543451086 form.calculator:has(select[name="pricing[use_type]"] option[value="web_ad"]:checked) p:has(select[name="pricing[use_type]"])::after {
-  content: "\2022  News, books, articles and magazines\A \2022  Editorial use only, not advertising\A \2022  Credit required\A \2022  No time limit\A \A Covers, advertising or several photos? Request a quote: licensing@photoindex.au";
+  content: "\2022  One Project: websites, social media, blogs, email and apps\A \2022  Online use only, no print\A \2022  No time limit\A \A Print, advertising campaigns or several photos? Request a quote: licensing@photoindex.au";
 }
 
-/* Internal and unpublished */
+/* Digital & Limited Print */
 .treepricingprofile_01a08ede-2421-7948-bcf9-78d543451086 form.calculator:has(select[name="pricing[use_type]"] option[value="newspaper"]:checked) p:has(select[name="pricing[use_type]"])::after {
-  content: "\2022  Reports, presentations and planning submissions\A \2022  Not published or shown to the public\A \2022  No credit required\A \2022  No time limit";
+  content: "\2022  Everything in Digital, plus print\A \2022  Brochures, reports and presentations\A \2022  Print run up to 5,000 copies\A \2022  No time limit\A \A Larger print runs or several photos? Request a quote: licensing@photoindex.au";
+}
+
+/* Publishing & Editorial */
+.treepricingprofile_01a08ede-2421-7948-bcf9-78d543451086 form.calculator:has(select[name="pricing[use_type]"] option[value="ytylvi"]:checked) p:has(select[name="pricing[use_type]"])::after {
+  content: "\2022  Books, e-books, magazines, newspapers and news websites\A \2022  Editorial use only, not advertising\A \2022  Credit required\A \2022  No time limit\A \A Covers, advertising or several photos? Request a quote: licensing@photoindex.au";
 }
 
 /* Single Property Listing, digital */
@@ -916,7 +920,7 @@ form.button_to[action="/quotations/new"] input[type=submit]:hover{background:#11
   line-height: 1.6;
   color: #6B6B6B;
   margin: 12px 0 0;
-  content: "\2022  Campaigns, websites, print, advertising, several photos, exclusivity\A \2022  We reply within 2 business days\A \2022  You pay only after you accept the quotation";
+  content: "\2022  Campaigns, advertising, larger print runs, several photos, exclusivity\A \2022  We reply within 2 business days\A \2022  You pay only after you accept the quotation";
 }
 
 /* no price, no cart */
