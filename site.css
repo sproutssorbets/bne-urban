@@ -1004,7 +1004,7 @@ form.button_to[action="/quotations/new"] input[type=submit]:hover{background:#11
   padding: 0;
   border: 0;
   border-radius: 0;
-  background: rgba(17, 17, 17, 0.5);
+  background: rgba(17, 17, 17, 0.72);
   color: transparent;
   font-size: 0;
   line-height: 0;
@@ -1013,8 +1013,11 @@ form.button_to[action="/quotations/new"] input[type=submit]:hover{background:#11
 .pi-sr[open] > .pi-sr-btn::after {
   content: "Close";
   position: fixed;
-  top: 20px;
-  right: 24px;
+  top: 16px;
+  right: 20px;
+  padding: 11px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 999px;
   font: 500 11px/1 Inter, sans-serif;
   letter-spacing: 0.14em;
   text-transform: uppercase;
