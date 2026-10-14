@@ -250,8 +250,8 @@ body.panel #mapcol{display:none}
  #subr{gap:12px}
  /* widok mapy: caly obszar pod paskiem sie przewija (mapa, potem pelna lista zdjec), niezaleznie od wysokosci ramki */
  body.map #split{overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
- body.map #mapcol{flex:none;height:38vh;height:38svh;min-height:200px}
- body.map #main{flex:none;overflow:visible;min-height:70vh}
+ body.map #mapcol{flex:none;position:sticky;top:0;z-index:5;height:34vh;height:34svh;min-height:180px}
+ body.map #main{flex:none;overflow:visible;min-height:70vh;background:#fff;position:relative;z-index:6}
 }
 @media (prefers-reduced-motion:reduce){#bar{transition:none}}
 /* ekrany dotykowe: bez gradientu i ikony oka; podpis jako biala pastylka obok przyciskow akcji */
@@ -260,6 +260,9 @@ body.panel #mapcol{display:none}
  .card:hover img{transform:none}
  .acts{opacity:1}
  .ovt{opacity:1;left:10px;right:auto;bottom:12px;max-width:calc(100% - 100px);padding:7px 11px;border-radius:var(--r-pill);background:rgba(255,255,255,.92);color:var(--ink);font-size:11px;line-height:1.2;letter-spacing:.06em}
+ .card{container-type:inline-size}
+ /* waska karta (2 kolumny): podpis nad przyciskami, na calej szerokosci */
+ @container (max-width:270px){.ovt{bottom:50px;max-width:calc(100% - 20px)}}
 }
 </style>
 </head>
@@ -943,7 +946,7 @@ function wire(){
   on("ftoggle","click",function(){S.panel=!S.panel;render()});
   on("pclose","click",function(){S.panel=false;render()});
   on("done","click",function(){S.panel=false;render()});
-  on("mtoggle","click",function(){S.map=!S.map;if(S.map){S.panel=false;ensureMap()}render();if(MAP)setTimeout(function(){MAP.resize()},60)});
+  on("mtoggle","click",function(){S.map=!S.map;if(window.innerWidth<900){if(S.map){S.colsPrev=S.cols;S.cols=2}else if(S.colsPrev){S.cols=S.colsPrev;S.colsPrev=0}}if(S.map){S.panel=false;ensureMap()}render();if(MAP)setTimeout(function(){MAP.resize()},60)});
   on("clear","click",function(){S.f={};S.loc="";render()});
   on("noteok","click",function(){try{window.localStorage.setItem("pi_map_note","1")}catch(e){}$("note").classList.remove("show")});
   
@@ -989,15 +992,21 @@ function wire(){
   var rt=null;window.addEventListener("resize",function(){clearTimeout(rt);rt=setTimeout(function(){layout();if(MAP)MAP.resize()},150)});
   window.addEventListener("pagehide",save);
   /* telefon: gorny panel (pasek + zakladki) chowa sie przy przewijaniu w dol i wraca przy przewijaniu w gore */
-  (function(){var m=$("main"),mq=window.matchMedia("(max-width:900px)"),last=0,hid=false,quiet=0;
+  (function(){var mq=window.matchMedia("(max-width:900px)"),last=0,hid=false,quiet=0;
     function measure(){var b=$("bar"),u=$("sub");if(b&&u)document.documentElement.style.setProperty("--hh",(b.offsetHeight+u.offsetHeight)+"px")}
     function set(v){if(v===hid)return;if(v)measure();hid=v;quiet=Date.now()+450;document.body.classList.toggle("hdr-hide",v)}
-    m.addEventListener("scroll",function(){
+    function onScroll(e){
       if(!mq.matches){if(hid)set(false);return}
-      var y=m.scrollTop;if(Date.now()<quiet){last=y;return}
+      /* w widoku mapy przewija sie #split, w siatce #main: reaguj tylko na aktywny kontener */
+      var mapView=document.body.classList.contains("map");
+      if(e.currentTarget===$("main")&&mapView)return;
+      if(e.currentTarget===$("split")&&!mapView)return;
+      var y=e.currentTarget.scrollTop;if(Date.now()<quiet){last=y;return}
       if(S.panel||document.activeElement===$("q")||y<60){set(false);last=y;return}
       var d=y-last;if(Math.abs(d)<12)return;
-      set(d>0&&y>140);last=y},{passive:true});
+      set(d>0&&y>140);last=y}
+    $("main").addEventListener("scroll",onScroll,{passive:true});
+    $("split").addEventListener("scroll",onScroll,{passive:true});
     mq.addEventListener&&mq.addEventListener("change",function(){set(false)})})();
   if(window.ResizeObserver)new ResizeObserver(function(){layout()}).observe($("main"));
   window.__pi={S:S,render:render,get data(){return DATA},get list(){return LIST}}}
