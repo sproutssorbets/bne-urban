@@ -992,3 +992,8 @@ html body #ws_page.page-lightbox #main_content div.lightbox_meta > form { displa
 #ws_page.page-lightbox #main_content .lightbox_meta textarea { width: 100% !important; max-width: none !important; box-sizing: border-box !important; }
 #ws_page.page-lightbox #main_content .thumbs_wall { order: 90 !important; flex: 0 0 100% !important; margin-top: 28px !important; }
 #ws_page.page-lightbox #main_content > .elem[data-type="gallery"] > p { order: 100 !important; flex: 0 0 100% !important; }
+
+/* Podstrony tresci (/about, /method, /privacy, /licensing): etykiety sekcji wersalikami jak w menu, oddech nad przyciskiem.
+   PhotoDeck usuwa text-transform z inline style, wiec wersaliki ustawia ta klasa. */
+.pi-content-page .pi-label { font: 500 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.14em !important; text-transform: uppercase !important; color: #111111 !important; }
+.pi-content-page a.pi-btn { margin-top: 20px !important; }
