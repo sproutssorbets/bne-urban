@@ -986,3 +986,18 @@ html body #ws_page.page-lightbox #main_content div.lightbox_meta > form { displa
    PhotoDeck usuwa text-transform z inline style, wiec wersaliki ustawia ta klasa. */
 .pi-content-page .pi-label { font: 500 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.14em !important; text-transform: uppercase !important; color: #111111 !important; }
 .pi-content-page a.pi-btn { margin-top: 20px !important; }
+/* smoothness */
+html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a,button,input[type=submit]{touch-action:manipulation}
+p{text-wrap:pretty}
+@media (prefers-reduced-motion:no-preference){
+form.new_message :is(input,select,textarea){transition:background-color .2s ease,box-shadow .2s ease}
+form.new_message input[type=submit]{transition:background-color .2s ease,transform .15s ease}
+form.new_message input[type=submit]:active{transform:scale(.985)}
+}
+form.new_message :is(input[type=text],input[type=email],input[type=tel],select,textarea):focus{background-color:#fff!important;box-shadow:0 0 0 1px #000;outline:0}
+@media (max-width:768px){
+form.new_message :is(input,select,textarea){font-size:16px!important}
+form.new_message input[type=submit]{height:48px!important}
+}
