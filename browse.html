@@ -299,6 +299,7 @@ body.panel #mapcol{display:none}
 @media (max-width:900px){
  #mfab{display:block;position:fixed;top:auto;left:0;right:0;margin:0 auto;width:max-content;max-width:calc(100vw - 32px);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:9000;height:44px;padding:0 22px;border:0;border-radius:999px;background:#111;color:#fff;font:500 12px/1 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 4px 16px rgba(0,0,0,.28);cursor:pointer;white-space:nowrap}
  body.panel #mfab{display:none}
+ body.framed #mfab{display:none !important}
  #mtoggle{display:none}
  #clear{order:2;margin-left:auto}
  #chips{order:4;flex-wrap:wrap;overflow-x:visible;overflow-y:auto;max-height:84px;row-gap:6px;padding-bottom:6px}
@@ -771,6 +772,23 @@ function ensureMap(){
   var s=document.createElement("script");s.src="https://api.mapbox.com/mapbox-gl-js/"+CFG.mbVersion+"/mapbox-gl.js";s.async=true;s.onload=initMap;s.onerror=function(){MAPLOAD=false};document.head.appendChild(s)}
 
 
+
+function syncParentFab(label,hide){
+  /* na stronie glownej przegladarka siedzi w ramce: przycisk wstawiamy do strony nadrzednej (ta sama domena), zeby byl przypiety do dolu prawdziwego ekranu */
+  try{
+    var P=window.parent;if(!P||P===window)return;
+    var D=P.document,id="pi-mfab-parent",b=D.getElementById(id);
+    if(window.innerWidth>900){if(b)b.style.display="none";return}
+    document.body.classList.add("framed");
+    if(!b){
+      b=D.createElement("button");b.id=id;b.type="button";
+      b.style.cssText="position:fixed;left:0;right:0;margin:0 auto;width:max-content;max-width:calc(100vw - 32px);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:2147483000;height:44px;padding:0 24px;border:0;border-radius:999px;background:#111;color:#fff;font:500 12px/1 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 4px 16px rgba(0,0,0,.28);cursor:pointer;-webkit-tap-highlight-color:transparent";
+      b.addEventListener("click",function(){$("mtoggle").click()});
+      D.body.appendChild(b);
+    }
+    b.textContent=label;b.style.display=hide?"none":"block";
+  }catch(e){}
+}
 var PINPOP=null;
 function showPinPopup(pl,coords){
   if(PINPOP){PINPOP.remove();PINPOP=null}
@@ -904,7 +922,7 @@ function render(){
   $("count").textContent=num+" "+word+(missing&&isGrid&&S.map?" \u00B7 "+missing+" not on the map":"");
   $("done").textContent="Show "+LIST.length+(LIST.length===1?" photograph":" photographs");
   $("ftoggle").setAttribute("aria-expanded",String(S.panel));
-  $("mtoggle").textContent=S.map?"Grid":"Map";$("mfab").textContent=S.map?"Grid":"Map";$("mtoggle").setAttribute("aria-pressed",String(S.map));
+  $("mtoggle").textContent=S.map?"Grid":"Map";$("mfab").textContent=S.map?"Grid":"Map";syncParentFab(S.map?"Grid":"Map",S.panel);$("mtoggle").setAttribute("aria-pressed",String(S.map));
   $("dens").style.display=isGrid?"":"none";
   $("sortw").style.display=isGrid?"":"none";syncSort();
   document.body.classList.toggle("map",S.map);document.body.classList.toggle("panel",S.panel);
@@ -1096,6 +1114,29 @@ function init(){
     if(y)setTimeout(function(){$("main").scrollTop=y},60)
   }).catch(function(){fail("The archive could not be loaded. Please try again in a moment.")})}
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+<script>
+/* telefon: ramka na stronie glownej ma wypelnic dokladnie widoczny ekran pod naglowkiem (ta sama domena, wiec mozna zmierzyc rodzica) */
+(function(){
+  function fit(){
+    try{
+      var f=window.frameElement,P=window.parent;
+      if(!f||P===window)return;
+      if(window.innerWidth>900){f.style.removeProperty("height");return}
+      var vh=(P.visualViewport&&P.visualViewport.height)||P.innerHeight;
+      var top=f.getBoundingClientRect().top+(P.pageYOffset||0);
+      var h=Math.max(320,Math.floor(vh-top));
+      f.style.setProperty("height",h+"px","important");
+      f.style.setProperty("min-height","0","important");
+    }catch(e){}
+  }
+  fit();
+  window.addEventListener("load",fit);
+  window.addEventListener("resize",fit);
+  window.addEventListener("orientationchange",function(){setTimeout(fit,250)});
+  try{window.parent.addEventListener("resize",fit);if(window.parent.visualViewport)window.parent.visualViewport.addEventListener("resize",fit)}catch(e){}
+  setTimeout(fit,400);setTimeout(fit,1500);
 })();
 </script>
 </body>
