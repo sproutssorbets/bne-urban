@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script>(function(){if(location.search.indexOf("navfix=1")<0||window.parent===window)return;try{var P=window.parent,d=P.document;if(!d.__piNavFix){d.__piNavFix=1;d.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest("#component_menu a.ajaxable,a.ajaxable.back,.component_logo_text_content a");if(a&&!d.getElementById("photoindex-site-style")&&!e.defaultPrevented&&a.href&&a.origin===P.location.origin&&e.button===0&&!e.metaKey&&!e.ctrlKey&&!e.shiftKey){e.preventDefault();e.stopPropagation();P.location.href=a.href}},true)}}catch(x){}window.stop()})()</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PhotoIndex Archive Browser</title>
+<title>Urban Archive Browser</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -310,7 +310,7 @@ body.panel #mapcol{display:none}
 (function(){
 "use strict";
 var CFG={
-  photosUrl:"https://www.photoindex.au/api/photos.json",
+  photosUrl:"/api/photos.json",
   locationsUrl:"https://raw.githubusercontent.com/sproutssorbets/bne-urban/main/locations.csv",
   token:"pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ",
   mbVersion:"v3.0.1",
