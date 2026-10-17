@@ -298,7 +298,7 @@ body.panel #mapcol{display:none}
 #mfab{display:none}
 @media (max-width:900px){
  #mfab{display:block;position:fixed;top:auto;left:0;right:0;margin:0 auto;width:max-content;max-width:calc(100vw - 32px);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:9000;height:44px;padding:0 22px;border:0;border-radius:999px;background:#111;color:#fff;font:500 12px/1 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 4px 16px rgba(0,0,0,.28);cursor:pointer;white-space:nowrap}
- body.panel #mfab{display:none}
+ body.panel #mfab,body.map #mfab{display:none}
  #dens{display:none}
  body.map{position:fixed;inset:0;width:100%;overflow:hidden}
  body.map #app{height:100%}
