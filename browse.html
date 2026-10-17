@@ -291,7 +291,8 @@ body.panel #mapcol{display:none}
 <style id="pi-mobile-map">
 .pinpop .pp-t{font:500 13px/1.3 Inter,Arial,sans-serif;color:#111}
 .pinpop .pp-w{font:400 12px/1.3 Inter,Arial,sans-serif;color:#6b6b6b;margin-top:2px}
-.pinpop .pp-c{font:500 11px/1 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#111;margin-top:8px}
+.pinpop .pp-c{display:block;width:100%;min-height:44px;margin-top:8px;padding:0 14px;border:0;border-radius:999px;background:#111;color:#fff;font:500 11px/1 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+@media (min-width:901px){.pinpop .pp-c{min-height:34px}}
 @media (max-width:900px){.mapboxgl-popup{padding-bottom:0}}
 /* telefon: mapa na cala ramke, przelacznik Mapa/Lista jako pigulka u dolu; desktop bez zmian */
 #mfab{display:none}
@@ -776,7 +777,7 @@ function showPinPopup(pl,coords){
   var t=document.createElement("div");t.className="pp-t";t.textContent=pl.name;box.appendChild(t);
   var where=[pl.street,pl.suburb].filter(function(x){return x&&x!==pl.name}).join(", ");
   if(where){var w=document.createElement("div");w.className="pp-w";w.textContent=where;box.appendChild(w)}
-  var c=document.createElement("div");c.className="pp-c";c.textContent=n+(n===1?" photograph":" photographs");box.appendChild(c);
+  var c=document.createElement("button");c.type="button";c.className="pp-c";c.textContent="View "+n+(n===1?" photograph":" photographs")+" \u203A";c.addEventListener("click",function(){if(PINPOP){PINPOP.remove();PINPOP=null}if(window.innerWidth<900){if(S.map)$("mtoggle").click()}else{$("main").scrollTop=0}});box.appendChild(c);
   PINPOP=new window.mapboxgl.Popup({closeButton:false,closeOnClick:true,offset:16,maxWidth:"260px"}).setLngLat(coords).setDOMContent(box).addTo(MAP);
 }
 function initMap(){
@@ -838,13 +839,14 @@ function initMap(){
         }
     });
     
+    MAP.addLayer({id:"pin-hit",type:"circle",source:"places",filter:["!",["has","point_count"]],paint:{"circle-radius":(window.matchMedia&&window.matchMedia("(pointer:coarse)").matches)?26:14,"circle-color":"#000000","circle-opacity":0.01}});
     MAP.addLayer({id:"hot-glow",type:"circle",source:"places",filter:["==",["get","id"],""],paint:{"circle-radius":18,"circle-color":CFG.red,"circle-opacity":0.2}});
     MAP.addLayer({id:"hot",type:"circle",source:"places",filter:["==",["get","id"],""],paint:{"circle-radius":9,"circle-color":CFG.red,"circle-opacity":1,"circle-stroke-width":3,"circle-stroke-color":"#ffffff"}});
     MAP.addLayer({id:"sel-glow",type:"circle",source:"places",filter:["==",["get","id"],selId()],paint:{"circle-radius":18,"circle-color":CFG.red,"circle-opacity":0.2}});
     MAP.addLayer({id:"sel",type:"circle",source:"places",filter:["==",["get","id"],selId()],paint:{"circle-radius":9,"circle-color":CFG.red,"circle-opacity":1,"circle-stroke-width":3,"circle-stroke-color":"#ffffff"}});
     
     /* Click Events */
-    MAP.on("click","unclustered-point",function(e){var f=e.features&&e.features[0];if(!f)return;var pl=PLACEBYNAME[f.properties.name];if(!pl)return;S.loc=S.loc===pl.name?"":pl.name;S.tab="photo";render();$("main").scrollTop=0;showPinPopup(S.loc?pl:null,f.geometry.coordinates)});
+    MAP.on("click","pin-hit",function(e){var f=e.features&&e.features[0];if(!f)return;var pl=PLACEBYNAME[f.properties.name];if(!pl)return;S.loc=S.loc===pl.name?"":pl.name;S.tab="photo";render();$("main").scrollTop=0;showPinPopup(S.loc?pl:null,f.geometry.coordinates)});
     MAP.on('click', 'clusters', function (e) {
         var features = MAP.queryRenderedFeatures(e.point, { layers: ['clusters'] });
         var clusterId = features[0].properties.cluster_id;
@@ -855,8 +857,8 @@ function initMap(){
     });
 
     /* Cursor Management */
-    MAP.on("mouseenter","unclustered-point",function(){MAP.getCanvas().style.cursor="pointer"});
-    MAP.on("mouseleave","unclustered-point",function(){MAP.getCanvas().style.cursor=""});
+    MAP.on("mouseenter","pin-hit",function(){MAP.getCanvas().style.cursor="pointer"});
+    MAP.on("mouseleave","pin-hit",function(){MAP.getCanvas().style.cursor=""});
     MAP.on('mouseenter', 'clusters', function () { MAP.getCanvas().style.cursor = 'pointer'; });
     MAP.on('mouseleave', 'clusters', function () { MAP.getCanvas().style.cursor = ''; });
 
