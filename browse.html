@@ -265,6 +265,19 @@ body.panel #mapcol{display:none}
  #intro{padding-bottom:12px}
  #main{scrollbar-width:thin;scrollbar-color:#c8c8c4 transparent}
 }
+/* szeroki ekran: zakladki, sortowanie i kolumny nad lista; mapa zaczyna sie od razu pod wyszukiwarka */
+@media (min-width:1200px){
+ #app{display:grid;height:100%;grid-template-columns:auto minmax(0,1fr) 0;grid-template-rows:auto auto auto minmax(0,1fr) auto}
+ body.map:not(.panel) #app{grid-template-columns:auto minmax(0,1fr) 42%}
+ #split{display:contents;border-top:none}
+ #bar{grid-column:1/-1;grid-row:1;border-bottom:1px solid var(--line)}
+ #sub{grid-column:2;grid-row:2}
+ #intro{grid-column:2;grid-row:3}
+ #panel{grid-column:1;grid-row:2/5}
+ #main{grid-column:2;grid-row:4;min-height:0}
+ #mapcol{grid-column:3;grid-row:2/5}
+ #note{grid-column:1/-1;grid-row:5}
+}
 /* ekrany dotykowe: podpis taki jak na desktopie (bialy, wielkie litery, max 2 wiersze),
    w jednym wierszu z przyciskami akcji; przyciemnienie tylko pas pod tym wierszem */
 @media (hover:none){
