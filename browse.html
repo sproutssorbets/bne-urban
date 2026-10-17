@@ -259,6 +259,12 @@ body.panel #mapcol{display:none}
  body.map #main{flex:none;overflow:visible;min-height:70vh;background:#fff;position:relative;z-index:6}
 }
 @media (prefers-reduced-motion:reduce){#bar{transition:none}}
+/* desktop: mapa jako zaokraglona karta, gorna krawedz rowno z pierwszym rzedem zdjec */
+@media (min-width:901px){
+ #mapcol{border-left:none;background:transparent}
+ #mapbox{inset:47px 24px 16px 0;border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden}
+ #main{scrollbar-width:thin;scrollbar-color:#c8c8c4 transparent}
+}
 /* ekrany dotykowe: podpis taki jak na desktopie (bialy, wielkie litery, max 2 wiersze),
    w jednym wierszu z przyciskami akcji; przyciemnienie tylko pas pod tym wierszem */
 @media (hover:none){
