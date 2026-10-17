@@ -259,10 +259,10 @@ body.panel #mapcol{display:none}
  body.map #main{flex:none;overflow:visible;min-height:70vh;background:#fff;position:relative;z-index:6}
 }
 @media (prefers-reduced-motion:reduce){#bar{transition:none}}
-/* desktop: mapa jako zaokraglona karta, gorna krawedz rowno z pierwszym rzedem zdjec */
+/* desktop: lista i mapa startuja z jednej linii; mapa na cala wysokosc, bez przesuniec przy przewijaniu */
 @media (min-width:901px){
- #mapcol{border-left:none;background:transparent}
- #mapbox{inset:47px 24px 16px 0;border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden}
+ #split{border-top:1px solid var(--line)}
+ #intro{padding-bottom:12px}
  #main{scrollbar-width:thin;scrollbar-color:#c8c8c4 transparent}
 }
 /* ekrany dotykowe: podpis taki jak na desktopie (bialy, wielkie litery, max 2 wiersze),
