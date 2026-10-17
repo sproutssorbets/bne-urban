@@ -298,6 +298,9 @@ body.panel #mapcol{display:none}
 @media (max-width:900px){
  #mfab{display:block;position:fixed;top:auto;left:0;right:0;margin:0 auto;width:max-content;max-width:calc(100vw - 32px);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:9000;height:44px;padding:0 22px;border:0;border-radius:999px;background:#111;color:#fff;font:500 12px/1 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 4px 16px rgba(0,0,0,.28);cursor:pointer;white-space:nowrap}
  body.panel #mfab{display:none}
+ #dens{display:none}
+ body.map{position:fixed;inset:0;width:100%;overflow:hidden}
+ body.map #app{height:100%}
  html,body{height:100dvh}
  #app{height:100dvh}
  body.map #sub{display:none}
@@ -741,9 +744,9 @@ function cardEl(p){
 function layout(){
   var wall=$("wall");if(!wall||wall.style.display==="none")return;
   var w=wall.clientWidth||($("main").clientWidth-48)||1000,gap=w<520?10:GAP;
-  var max=Math.max(1,Math.min(6,Math.floor((w+gap)/(130+gap)))),min=w<520?1:2;if(min>max)min=max;
+  var max=Math.max(1,Math.min(6,Math.floor((w+gap)/(130+gap)))),min=(w<520||window.innerWidth<900)?1:2;if(min>max)min=max;
   var auto=w<300?1:Math.max(2,Math.min(6,Math.round(w/300)));
-  var n=Math.max(min,Math.min(max,S.cols||auto));
+  var n=Math.max(min,Math.min(max,window.innerWidth<900?1:(S.cols||auto)));
   var cw=(w-(n-1)*gap)/n,cols=[],i;for(i=0;i<n;i++)cols.push(0);
   var kids=wall.children;
   for(i=0;i<kids.length;i++){var k=kids[i],r=k._p?k._p._ratio:.667,h=cw*r,c=0;
@@ -1006,7 +1009,7 @@ function wire(){
   on("pclose","click",function(){S.panel=false;render()});
   on("done","click",function(){S.panel=false;render()});
   on("mfab","click",function(){$("mtoggle").click()});
-  on("mtoggle","click",function(){S.map=!S.map;if(window.innerWidth<900){if(S.map){S.colsPrev=S.cols;S.cols=2}else if(S.colsPrev){S.cols=S.colsPrev;S.colsPrev=0}}if(S.map){S.panel=false;ensureMap()}render();if(MAP)setTimeout(function(){MAP.resize()},60)});
+  on("mtoggle","click",function(){S.map=!S.map;if(S.map){S.panel=false;ensureMap()}render();if(MAP)setTimeout(function(){MAP.resize()},60)});
   on("clear","click",function(){S.f={};S.loc="";render()});
   on("noteok","click",function(){try{window.localStorage.setItem("pi_map_note","1")}catch(e){}$("note").classList.remove("show")});
   
