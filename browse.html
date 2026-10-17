@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#111;--mute:#6b6b6b;--line:#dadada;--bg:#fff;--chip:#f1f1ef;--red:#1215DB;--r-sm:10px;--r-md:16px;--r-pill:999px;--bar:72px}
+:root{--ink:#111;--mute:#6b6b6b;--line:#dadada;--bg:#fff;--chip:#f1f1ef;--red:#FF3B1F;--r-sm:10px;--r-md:16px;--r-pill:999px;--bar:72px}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
 body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
@@ -333,7 +333,7 @@ var CFG={
   locationsUrl:"https://raw.githubusercontent.com/sproutssorbets/bne-urban/main/locations.csv",
   token:"pk.eyJ1IjoicGhvdG9pbmRleCIsImEiOiJjbW44aHl6NnMwYW1nMnBxMHdwc2VraTltIn0.B_Xqmf3Asxs1m_SVXIc7XQ",
   mbVersion:"v3.0.1",
-  red:"#1215DB",
+  red:"#FF3B1F",
   linkTarget:"_top"
 };
 
@@ -803,8 +803,10 @@ function initMap(){
         }
     });
     
-    MAP.addLayer({id:"hot",type:"circle",source:"places",filter:["==",["get","id"],""],paint:{"circle-radius":6.5,"circle-color":CFG.red,"circle-opacity":1,"circle-stroke-width":1,"circle-stroke-color":"#ffffff"}});
-    MAP.addLayer({id:"sel",type:"circle",source:"places",filter:["==",["get","id"],selId()],paint:{"circle-radius":6.5,"circle-color":CFG.red,"circle-opacity":1,"circle-stroke-width":1,"circle-stroke-color":"#ffffff"}});
+    MAP.addLayer({id:"hot-glow",type:"circle",source:"places",filter:["==",["get","id"],""],paint:{"circle-radius":18,"circle-color":CFG.red,"circle-opacity":0.2}});
+    MAP.addLayer({id:"hot",type:"circle",source:"places",filter:["==",["get","id"],""],paint:{"circle-radius":9,"circle-color":CFG.red,"circle-opacity":1,"circle-stroke-width":3,"circle-stroke-color":"#ffffff"}});
+    MAP.addLayer({id:"sel-glow",type:"circle",source:"places",filter:["==",["get","id"],selId()],paint:{"circle-radius":18,"circle-color":CFG.red,"circle-opacity":0.2}});
+    MAP.addLayer({id:"sel",type:"circle",source:"places",filter:["==",["get","id"],selId()],paint:{"circle-radius":9,"circle-color":CFG.red,"circle-opacity":1,"circle-stroke-width":3,"circle-stroke-color":"#ffffff"}});
     
     /* Click Events */
     MAP.on("click","unclustered-point",function(e){var f=e.features&&e.features[0];if(!f)return;var pl=PLACEBYNAME[f.properties.name];if(!pl)return;S.loc=S.loc===pl.name?"":pl.name;S.tab="photo";render();$("main").scrollTop=0});
@@ -833,9 +835,9 @@ function mapUpdate(fit){
   PLACES.forEach(function(pl){if(pl.lat==null||!counts[pl.id])return;feats.push({type:"Feature",properties:{id:pl.id,name:pl.name,n:counts[pl.id]},geometry:{type:"Point",coordinates:[pl.lng,pl.lat]}});
     minLng=Math.min(minLng,pl.lng);maxLng=Math.max(maxLng,pl.lng);minLat=Math.min(minLat,pl.lat);maxLat=Math.max(maxLat,pl.lat)});
   var src=MAP.getSource("places");if(src)src.setData({type:"FeatureCollection",features:feats});
-  MAP.setFilter("sel",["==",["get","id"],selId()]);
+  MAP.setFilter("sel",["==",["get","id"],selId()]);MAP.setFilter("sel-glow",["==",["get","id"],selId()]);
   if(fit&&!FITTED&&feats.length){FITTED=true;MAP.fitBounds([[minLng,minLat],[maxLng,maxLat]],{padding:60,duration:0,maxZoom:15})}}
-function mapHot(id){if(MAP&&MAPREADY)MAP.setFilter("hot",["==",["get","id"],id||""])}
+function mapHot(id){if(MAP&&MAPREADY){MAP.setFilter("hot",["==",["get","id"],id||""]);MAP.setFilter("hot-glow",["==",["get","id"],id||""])}}
 
 /* ---------- render ---------- */
 function render(){
