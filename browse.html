@@ -314,6 +314,19 @@ body.panel #mapcol{display:none}
  body.map #main{display:none}
 }
 </style>
+<style id="pi-mobile-polish">
+#siteask2,#totop{display:none}
+@media (max-width:900px){
+ .tbtn,.chip,#clear,.tab,.sh,.opt .c,#info,#siteask,#done,.empty .ec,#sortbtn,.so,#note button{font-size:12px}
+ .grp,.cj{font-size:11px}
+ #siteask{display:none}
+ #siteask2{display:block;margin:28px 0 8px;padding:12px 0;text-align:center;font-size:12px;letter-spacing:.02em;color:var(--mute);text-decoration:underline;text-underline-offset:3px}
+ #totop{display:flex;align-items:center;justify-content:center;position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:8000;width:44px;height:44px;padding:0;border:1px solid var(--ink);border-radius:0;background:#fff;color:var(--ink);opacity:0;pointer-events:none;transition:opacity .2s}
+ #totop svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+ body.showtop #totop{opacity:1;pointer-events:auto}
+ body.map #totop,body.panel #totop{display:none}
+}
+</style>
 </head>
 <body class="map">
 <button id="mfab" type="button" aria-label="Switch between map and grid"></button>
@@ -347,9 +360,11 @@ body.panel #mapcol{display:none}
       <div id="locgrid" style="display:none"></div>
       <div id="wall"></div>
       <div id="empty"></div>
+      <a id="siteask2" href="/request-a-site" target="_top">Missing a site? Tell us</a>
     </main>
     <div id="mapcol"><div id="mapbox"></div></div>
   </div>
+  <button id="totop" type="button" aria-label="Back to top"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
   <div id="note"><span>Map by Mapbox. Loading it shares your IP address with Mapbox.</span><button id="noteok" type="button">OK</button></div>
 </div>
 <script>
@@ -1139,6 +1154,11 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   try{window.parent.addEventListener("resize",fit);if(window.parent.visualViewport)window.parent.visualViewport.addEventListener("resize",fit)}catch(e){}
   setTimeout(fit,400);setTimeout(fit,1500);
 })();
+</script>
+<script>
+(function(){var m=document.getElementById("main"),t=document.getElementById("totop");if(!m||!t)return;
+m.addEventListener("scroll",function(){document.body.classList.toggle("showtop",m.scrollTop>700)},{passive:true});
+t.addEventListener("click",function(){m.scrollTo({top:0,behavior:"smooth"})});})();
 </script>
 </body>
 </html>
