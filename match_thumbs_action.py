@@ -52,7 +52,8 @@ def fetch_xml(url):
             body = resp.read()
     except urllib.error.HTTPError as e:
         print(f"HTTP error {e.code} przy pobieraniu medias.xml", file=sys.stderr)
-        print(f"Treść odpowiedzi (pierwsze 500 znaków): {e.read()[:500]!r}", file=sys.stderr)
+        body_txt = re.sub(r"auth=[^<&\" ]+", "auth=XXX", e.read()[:500].decode("utf-8", "replace"))
+        print(f"Treść odpowiedzi (pierwsze 500 znaków): {body_txt!r}", file=sys.stderr)
         sys.exit(1)
     except urllib.error.URLError as e:
         print(f"Błąd połączenia przy pobieraniu medias.xml: {e.reason}", file=sys.stderr)
@@ -257,8 +258,8 @@ def main():
             "count": str(len(group_sorted)),
             "address": title_key,
             "ref": anchor["filename"],
-            "archiveUrl": "https://www.photoindex.au/?search=" + urllib.parse.quote_plus(title_key),
-            "licenseUrl": "https://www.photoindex.au/licensing",
+            "archiveUrl": "https://www.urbanarchive.au/?search=" + urllib.parse.quote_plus(title_key),
+            "licenseUrl": "https://www.urbanarchive.au/licensing",
             "thumb": "",
             "shoot_dates": date_str,
             "update_batch": update_batch,
