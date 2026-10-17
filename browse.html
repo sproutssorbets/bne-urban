@@ -288,8 +288,21 @@ body.panel #mapcol{display:none}
  .ovtt{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;min-width:0}
 }
 </style>
+<style id="pi-mobile-map">
+/* telefon: mapa na cala ramke, przelacznik Mapa/Lista jako pigulka u dolu; desktop bez zmian */
+#mfab{display:none}
+@media (max-width:900px){
+ #mfab{display:block;position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:20;height:44px;padding:0 22px;border:0;border-radius:999px;background:#111;color:#fff;font:500 12px/1 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 4px 16px rgba(0,0,0,.28);cursor:pointer;white-space:nowrap}
+ body.panel #mfab{display:none}
+ body.map #sub{display:none}
+ body.map #split{overflow:hidden}
+ body.map #mapcol{position:absolute;inset:0;height:auto;min-height:0;z-index:1;border:0}
+ body.map #main{display:none}
+}
+</style>
 </head>
 <body class="map">
+<button id="mfab" type="button" aria-label="Switch between map and grid"></button>
 <div id="app">
   <div id="bar">
     <button class="tbtn" id="ftoggle" aria-expanded="false" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h9M16 7h5M3 17h5M12 17h9"/><circle cx="14" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>Filters</span><span class="badge" id="badge" hidden></span></button>
@@ -864,7 +877,7 @@ function render(){
   $("count").textContent=num+" "+word+(missing&&isGrid&&S.map?" \u00B7 "+missing+" not on the map":"");
   $("done").textContent="Show "+LIST.length+(LIST.length===1?" photograph":" photographs");
   $("ftoggle").setAttribute("aria-expanded",String(S.panel));
-  $("mtoggle").textContent=S.map?"Grid":"Map";$("mtoggle").setAttribute("aria-pressed",String(S.map));
+  $("mtoggle").textContent=S.map?"Grid":"Map";$("mfab").textContent=S.map?"Show "+LIST.length+(LIST.length===1?" photograph":" photographs"):"Map";$("mtoggle").setAttribute("aria-pressed",String(S.map));
   $("dens").style.display=isGrid?"":"none";
   $("sortw").style.display=isGrid?"":"none";syncSort();
   document.body.classList.toggle("map",S.map);document.body.classList.toggle("panel",S.panel);
@@ -973,6 +986,7 @@ function wire(){
   on("ftoggle","click",function(){S.panel=!S.panel;render()});
   on("pclose","click",function(){S.panel=false;render()});
   on("done","click",function(){S.panel=false;render()});
+  on("mfab","click",function(){$("mtoggle").click()});
   on("mtoggle","click",function(){S.map=!S.map;if(window.innerWidth<900){if(S.map){S.colsPrev=S.cols;S.cols=2}else if(S.colsPrev){S.cols=S.colsPrev;S.colsPrev=0}}if(S.map){S.panel=false;ensureMap()}render();if(MAP)setTimeout(function(){MAP.resize()},60)});
   on("clear","click",function(){S.f={};S.loc="";render()});
   on("noteok","click",function(){try{window.localStorage.setItem("pi_map_note","1")}catch(e){}$("note").classList.remove("show")});
