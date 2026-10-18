@@ -1024,3 +1024,21 @@ form.new_message input[type=submit]{height:48px!important}
   html body #toggable_nav .client_minicart:empty { display: none !important; }
   html body #toggable_nav a { justify-content: center !important; text-align: center !important; }
 }
+
+/* ==========================================================================
+   PODGLAD ZDJECIA NA TELEFONIE: przycisk zamkniecia przypiety do ekranu.
+   Widoczne kolko 30 px (jak przyciski na zdjeciach), pole dotyku 44 px.
+   ========================================================================== */
+@media (max-width: 900px) {
+  html body #ws_page.page-media #main_content > .pi-x {
+    position: fixed !important; top: calc(10px + env(safe-area-inset-top, 0px)) !important; right: 10px !important; left: auto !important;
+    width: 44px !important; height: 44px !important; border: 0 !important; background: transparent !important;
+    z-index: 2147483000 !important; -webkit-tap-highlight-color: transparent;
+  }
+  html body #ws_page.page-media #main_content > .pi-x::before {
+    content: ""; position: absolute; inset: 7px; border: 1px solid #111111; border-radius: 50%; background: #FFFFFF; transition: background .15s;
+  }
+  html body #ws_page.page-media #main_content > .pi-x svg { position: relative; width: 12px !important; height: 12px !important; }
+  html body #ws_page.page-media #main_content > .pi-x:active::before { background: #111111; }
+  html body #ws_page.page-media #main_content > .pi-x:active svg { stroke: #FFFFFF; }
+}
