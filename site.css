@@ -1077,3 +1077,22 @@ form.new_message input[type=submit]{height:48px!important}
 @media (max-width: 340px) {
   #ws_page.page-media #main_content > .row-12:first-child .page_meta .media_detail_actions > form.button_to { flex-basis: 100% !important; }
 }
+
+/* ==========================================================================
+   STRONA ZDJECIA: pobranie low-res jako okragla ikona w rogu zdjecia.
+   Formularz przenosi skrypt z Workera (PI_DL_SCRIPT) do .media_wrap.
+   Widoczne kolko 30 px, pole dotyku 44 px.
+   ========================================================================== */
+#ws_page.page-media .media_wrap > form.pi-dl {
+  position: absolute !important; right: 5px !important; bottom: 5px !important; z-index: 6 !important;
+  width: 44px !important; height: 44px !important; margin: 0 !important; padding: 0 !important; display: block !important;
+}
+#ws_page.page-media .media_wrap > form.pi-dl input.comp_download_icon {
+  display: block !important; width: 44px !important; height: 44px !important; min-width: 0 !important; min-height: 0 !important;
+  margin: 0 !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; opacity: 1 !important;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4v11M7 11l5 5 5-5M5 20h14'/%3E%3C/svg%3E") no-repeat center / 14px 14px,
+              radial-gradient(circle at center, #FFFFFF 0, #FFFFFF 14px, #111111 14px, #111111 15px, rgba(17,17,17,0) 15.5px) !important;
+  color: transparent !important; font-size: 0 !important; line-height: 0 !important; text-indent: -9999px !important; overflow: hidden !important;
+  cursor: pointer !important; -webkit-tap-highlight-color: transparent;
+}
+#ws_page.page-media .media_wrap > form.pi-dl input.comp_download_icon:hover { filter: invert(1) !important; }
