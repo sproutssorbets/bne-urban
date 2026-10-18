@@ -1009,3 +1009,18 @@ form.new_message input[type=submit]{height:48px!important}
   padding: 20px 48px !important;
   margin-top: 8px;
 }
+
+/* ==========================================================================
+   MENU NA TELEFONIE: liczniki (Selection, Cart) nie wypychaja napisow z osi.
+   Pusty licznik znika, licznik z liczba wisi tuz za napisem (szerokosc 0).
+   ========================================================================== */
+@media (max-width: 900px) {
+  html body #toggable_nav .client_minilightbox,
+  html body #toggable_nav .client_minicart {
+    display: inline-block !important; width: 0 !important; min-width: 0 !important; overflow: visible !important;
+    white-space: nowrap !important; margin: 0 0 0 6px !important; padding: 0 !important;
+  }
+  html body #toggable_nav .client_minilightbox:empty,
+  html body #toggable_nav .client_minicart:empty { display: none !important; }
+  html body #toggable_nav a { justify-content: center !important; text-align: center !important; }
+}
