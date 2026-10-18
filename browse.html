@@ -794,7 +794,7 @@ function syncParentFab(label,hide){
   try{
     var P=window.parent;if(!P||P===window)return;
     var D=P.document,id="pi-mfab-parent",b=D.getElementById(id);
-    if(window.innerWidth>900){if(b)b.style.display="none";return}
+    if(window.innerWidth>900){if(b)b.style.display="none";D.body.style.paddingBottom="";return}
     document.body.classList.add("framed");
     if(!b){
       b=D.createElement("button");b.id=id;b.type="button";
@@ -803,6 +803,7 @@ function syncParentFab(label,hide){
       D.body.appendChild(b);
     }
     b.textContent=label;b.style.display=hide?"none":"block";
+    D.body.style.paddingBottom=hide?"":"calc(80px + env(safe-area-inset-bottom,0px))";
   }catch(e){}
 }
 var PINPOP=null;
