@@ -802,9 +802,18 @@ function syncParentFab(label,hide){
       b.addEventListener("click",function(){$("mtoggle").click()});
       D.body.appendChild(b);
     }
-    b.textContent=label;b.style.display=hide?"none":"block";
-    D.body.style.paddingBottom=hide?"":"calc(80px + env(safe-area-inset-bottom,0px))";
+    b.textContent=label;FABST.hide=!!hide;fabApply(P,D,b);
+    if(!FABT)FABT=setInterval(function(){try{var bb=D.getElementById(id);if(bb)fabApply(P,D,bb)}catch(e){}},400);
   }catch(e){}
+}
+var FABST={hide:false},FABT=0;
+function fabApply(P,D,b){
+  /* kolejnosc na starcie (telefon): okno aplikacji, pasek cookies, dopiero potem przycisk Map/Grid; gdy nikt nie kliknie cookies, przycisk pojawia sie po 7 s */
+  var hold=D.documentElement.classList.contains("ua-hold");
+  var bh=parseFloat(P.getComputedStyle(D.documentElement).getPropertyValue("--cookies-acceptance-bar-height"))||0;
+  var ok=!FABST.hide&&!hold&&(bh===0||P.performance.now()>7000);
+  b.style.display=ok?"block":"none";
+  D.body.style.paddingBottom=ok?"calc(80px + env(safe-area-inset-bottom,0px))":"";
 }
 var PINPOP=null;
 function showPinPopup(pl,coords){
