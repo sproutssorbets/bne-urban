@@ -189,6 +189,7 @@ body.panel #mapcol{display:none}
 .so[aria-selected=true] .ck{visibility:visible}
 .so:hover,.so.act{background:var(--ink);color:#fff}
 @media (max-width:900px){#sortlist{right:auto;left:0}}
+.msw{display:flex;align-items:center;gap:6px;padding:10px 0 14px;border-bottom:1px solid var(--line,#DADADA);margin-bottom:6px}.msw .ml{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin-right:4px}.msw button{font:inherit;font-size:11px;padding:6px 10px;border:1px solid #111;background:transparent;color:#111;border-radius:999px;cursor:pointer}.msw button.on{background:#111;color:#fff}
 .cj{flex:none;font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
 
 /* Mapbox Clustering Override styles */
@@ -447,7 +448,7 @@ var FACETS=[
 ];
 var FBY={};FACETS.forEach(function(f){FBY[f.key]=f});
 
-var S={tab:"photo",q:"",loc:"",f:{},mode:{},sort:"featured",cols:3,map:true,panel:false,open:{suburb:true}};
+var S={tab:"photo",q:"",loc:"",f:{},match:"all",sort:"featured",cols:3,map:true,panel:false,open:{suburb:true}};
 var DATA=[],PLACES=[],PLACEBYNAME={},LIST=[],MAP=null,MAPREADY=false,MAPLOAD=false,FITTED=false,LASTSIG="",TQ=null;
 var $=function(id){return document.getElementById(id)};
 var lc=function(s){return String(s==null?"":s).toLowerCase().trim()};
@@ -595,8 +596,8 @@ function pickSort(k){S.sort=k;sortOpen(false);render();$("main").scrollTop=0}
 /* ---------- filtering ---------- */
 function selOf(key){return S.f[key]||[]}
 var MULTI={};
-function isAll(F){return S.mode[F.key]!==undefined?S.mode[F.key]==="all":!!F.all}
-function modeCount(F,all){var o=S.mode[F.key];S.mode[F.key]=all?"all":"any";var n=0;for(var i=0;i<DATA.length;i++)if(pass(DATA[i],null))n++;if(o===undefined)delete S.mode[F.key];else S.mode[F.key]=o;return n}
+function isAll(F){return !!F.all&&S.match==="all"}
+function matchCount(m){var o=S.match;S.match=m;var n=cntNow();S.match=o;return n}
 function cntNow(){var n=0;for(var i=0;i<DATA.length;i++)if(pass(DATA[i],null))n++;return n}
 function bestRemoval(){
   var best=null,c=[],o;
@@ -652,6 +653,8 @@ function optionsFor(F){
 
 function renderPanel(){
   var host=$("fgrid"),top=host.scrollTop;host.innerHTML="";
+  var nsel=0;FACETS.forEach(function(F){if(F.all)nsel+=selOf(F.key).length});
+  if(nsel>1){var sw=el("div","msw");sw.appendChild(el("span","ml","Match"));["any","all"].forEach(function(m){var b=el("button",m===S.match?"on":"",m==="any"?"Any (OR) "+matchCount("any"):"All (AND) "+matchCount("all"));b.type="button";b.setAttribute("data-match",m);b.setAttribute("aria-pressed",String(m===S.match));sw.appendChild(b)});host.appendChild(sw)}
   var fq = $("fsearch") ? $("fsearch").value.toLowerCase().trim() : "";
   
   var PRIMARY={suburb:1,typology:1,material:1,year:1},hidden=0;
@@ -682,12 +685,7 @@ function renderPanel(){
     
     if(isOpen){
       var body=el("div","sb"),shown=0,last="",allm=isAll(F);
-      if(MULTI[F.key]&&sel.length>1){
-        var mm=el("div","mm"),nn=sel.length,both=nn===2?"both":"all "+nn;
-        mm.appendChild(document.createTextNode(allm?"Photos with "+both+" selected terms. ":"Photos with at least one of the "+nn+" selected terms. "));
-        var lk=el("button",null,allm?"Show photos with any of them ("+modeCount(F,false)+")":"Show only photos with "+both+" ("+modeCount(F,true)+")");
-        lk.type="button";lk.setAttribute("data-mkey",F.key);lk.setAttribute("data-mval",allm?"any":"all");
-        mm.appendChild(lk);body.appendChild(mm)}
+
         
       opts.forEach(function(v){
         if(fq && !matches[v]) return; // Skip non-matching options entirely during search
@@ -1035,8 +1033,9 @@ function syncUrl(){
     if(!S.map)p.set("map","0");
     FACETS.forEach(function(F){
       var v=selOf(F.key);if(v.length)p.set(F.key,v.join(","));
-      if(S.mode[F.key])p.set(F.key+"_mode",S.mode[F.key]);
+      
     });
+    if(S.match==="any")p.set("match","any");
     var qs=p.toString();
     var target=window.location.pathname+(qs?"?"+qs:"");
     if(window.location.search!==target.slice(window.location.pathname.length))window.history.replaceState(null,"",target);
@@ -1054,7 +1053,7 @@ function syncUrl(){
 
 function save(){
   try{
-    window.sessionStorage.setItem("pi_browse",JSON.stringify({tab:S.tab,q:S.q,loc:S.loc,f:S.f,mode:S.mode,sort:S.sort,cols:S.cols,map:S.map,y:$("main").scrollTop}));
+    window.sessionStorage.setItem("pi_browse",JSON.stringify({tab:S.tab,q:S.q,loc:S.loc,f:S.f,match:S.match,sort:S.sort,cols:S.cols,map:S.map,y:$("main").scrollTop}));
     syncUrl();
   }catch(e){}
 }
@@ -1075,15 +1074,16 @@ function restore(){
       if(p.get("sort")&&SORTS.indexOf(p.get("sort"))>-1)S.sort=p.get("sort");
       if(p.get("cols"))S.cols=parseInt(p.get("cols"),10)||3;
       if(p.get("map")==="0")S.map=false;
+      var mt=p.get("match");if(mt==="any"||mt==="all")S.match=mt;
       FACETS.forEach(function(F){
         var v=p.get(F.key);if(v)S.f[F.key]=v.split(",").map(lc).filter(Boolean);
-        var m=p.get(F.key+"_mode");if(m)S.mode[F.key]=m;
+        
       });
       $("q").value=S.q;
       return 0;
     }
     var r=JSON.parse(window.sessionStorage.getItem("pi_browse")||"null");if(!r)return 0;
-    S.tab=r.tab||"photo";S.q=r.q||"";S.loc=r.loc||"";S.f=r.f||{};S.mode=r.mode||{};S.sort=SORTS.indexOf(r.sort)>-1?r.sort:"featured";S.cols=r.cols||3;if(typeof r.map==="boolean")S.map=r.map;
+    S.tab=r.tab||"photo";S.q=r.q||"";S.loc=r.loc||"";S.f=r.f||{};S.match=r.match==="any"?"any":"all";S.sort=SORTS.indexOf(r.sort)>-1?r.sort:"featured";S.cols=r.cols||3;if(typeof r.map==="boolean")S.map=r.map;
     $("q").value=S.q;return r.y||0
   }catch(e){return 0}
 }
@@ -1121,7 +1121,7 @@ function wire(){
   on("dp","click",function(){var n=parseInt($("wall").getAttribute("data-n")||"3",10);S.cols=Math.min(6,n+1);layout();save()});
   on("chips","click",function(e){var b=e.target.closest&&e.target.closest("button");if(!b)return;var k=b.getAttribute("data-key"),v=b.getAttribute("data-val");if(k==="loc")S.loc="";else{S.f[k]=(S.f[k]||[]).filter(function(x){return x!==v})}render()});
   on("tabs","click",function(e){var b=e.target.closest&&e.target.closest("button");if(!b)return;S.tab=b.getAttribute("data-tab");render()});
-  on("fgrid","click",function(e){if(e.target.closest&&e.target.closest("[data-more]")){S.more=!S.more;renderPanel();return}var m=e.target.closest&&e.target.closest("[data-mkey]");if(m){S.mode[m.getAttribute("data-mkey")]=m.getAttribute("data-mval");render();return}var h=e.target.closest&&e.target.closest(".sh");if(!h)return;var k=h.getAttribute("data-sec"),cur=S.open[k]!==undefined?S.open[k]:selOf(k).length>0;S.open[k]=!cur;renderPanel()});
+  on("fgrid","click",function(e){if(e.target.closest&&e.target.closest("[data-more]")){S.more=!S.more;renderPanel();return}var m=e.target.closest&&e.target.closest("[data-match]");if(m){S.match=m.getAttribute("data-match");render();return}var h=e.target.closest&&e.target.closest(".sh");if(!h)return;var k=h.getAttribute("data-sec"),cur=S.open[k]!==undefined?S.open[k]:selOf(k).length>0;S.open[k]=!cur;renderPanel()});
   on("fgrid","change",function(e){var i=e.target;if(i.getAttribute("data-key"))toggle(i.getAttribute("data-key"),i.getAttribute("data-val"))});
   on("locgrid","click",function(e){var b=e.target.closest&&e.target.closest(".lc");if(!b)return;var kind=b.getAttribute("data-kind"),name=b.getAttribute("data-name");
     if(kind==="location")S.loc=S.loc===name?"":name;else S.f.suburb=[lc(name)];S.tab="photo";render();$("main").scrollTop=0});
