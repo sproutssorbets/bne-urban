@@ -316,6 +316,7 @@ body.panel #mapcol{display:none}
 </style>
 <style id="pi-mobile-polish">
 #siteask2,#totop{display:none}
+body.framed #totop{display:none !important}
 #note,#note.show{display:none !important}
 @media (max-width:900px){
  .tbtn,.chip,#clear,.tab,.sh,.opt .c,#info,#siteask,#done,.empty .ec,#sortbtn,.so,#note button{font-size:12px}
@@ -808,7 +809,22 @@ function syncParentFab(label,hide){
     if(!FABT)FABT=setInterval(function(){try{var bb=D.getElementById(id);if(bb)fabApply(P,D,bb)}catch(e){}},400);
   }catch(e){}
 }
-var FABST={hide:false,menu:false,mt:0},FABT=0;
+var FABST={hide:false,menu:false,mt:0},FABT=0,PLOCK=null;
+function parentLock(){
+  /* telefon: strona nadrzedna stoi w miejscu, dopoki lista zdjec nie dojedzie do konca; dopiero wtedy mozna dojechac do stopki */
+  try{
+    var P=window.parent;if(!P||P===window)return;
+    var D=P.document,h=D.documentElement,m=document.getElementById("main"),lock=false;
+    if(window.innerWidth<=900&&m){
+      var atEnd=m.scrollTop+m.clientHeight>=m.scrollHeight-8;
+      lock=!atEnd&&(P.scrollY||0)<=2;
+    }
+    if(lock===PLOCK)return;PLOCK=lock;
+    h.style.overflow=lock?"hidden":"";D.body.style.overflow=lock?"hidden":"";
+    h.style.overscrollBehavior=lock?"none":"";
+    if(!P.__uapl){P.__uapl=1;P.addEventListener("scroll",function(){try{parentLock()}catch(e){}},{passive:true})}
+  }catch(e){}
+}
 function fabApply(P,D,b){
   /* kolejnosc na starcie (telefon): okno aplikacji, pasek cookies, dopiero potem przycisk Map/Grid; gdy nikt nie kliknie cookies, przycisk pojawia sie po 7 s */
   var hold=D.documentElement.classList.contains("ua-hold");
@@ -819,8 +835,25 @@ function fabApply(P,D,b){
   b.style.display="block";
   b.style.opacity=ok?"1":"0";b.style.transform=ok?"none":"translateY(14px)";b.style.pointerEvents=ok?"auto":"none";
   b.tabIndex=ok?0:-1;b.setAttribute("aria-hidden",ok?"false":"true");
+  parentLock();topBtn();
   if(!D.body.__uat){D.body.__uat=1;D.body.style.transition="padding-bottom .3s ease"}
   D.body.style.paddingBottom=ok?"calc(80px + env(safe-area-inset-bottom,0px))":"";
+}
+function topBtn(){
+  /* przycisk "do gory" zyje w stronie nadrzednej (jak Map/Grid), zeby zawsze byl przy dolnej krawedzi prawdziwego ekranu */
+  try{
+    var P=window.parent;if(!P||P===window||window.innerWidth>900)return;
+    var D=P.document,id="pi-totop-parent",b=D.getElementById(id);
+    if(!b){
+      b=D.createElement("button");b.id=id;b.type="button";b.setAttribute("aria-label","Back to top");
+      b.innerHTML="<svg viewBox='0 0 24 24' width='18' height='18' aria-hidden='true' style='fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round'><path d='M12 19V5M5 12l7-7 7 7'/></svg>";
+      b.style.cssText="position:fixed;right:16px;bottom:calc(16px + var(--cookies-acceptance-bar-height,0px) + env(safe-area-inset-bottom,0px));width:44px;height:44px;padding:0;border:0;border-radius:50%;background:#111;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.28);opacity:0;pointer-events:none;transform:translateY(14px);transition:opacity .3s ease,transform .3s cubic-bezier(.2,.8,.2,1),bottom .25s ease;z-index:2147483000;-webkit-tap-highlight-color:transparent;cursor:pointer";
+      b.addEventListener("click",function(){var m=document.getElementById("main"),g=document.getElementById("fgrid");[m,g].forEach(function(e){if(e&&e.scrollTop>0)e.scrollTo({top:0,behavior:"smooth"})})});
+      D.body.appendChild(b);
+    }
+    var cl=document.body.classList,on=!!window.__piTop&&!cl.contains("map")&&!cl.contains("panel")&&!FABST.menu;
+    b.style.opacity=on?"1":"0";b.style.transform=on?"none":"translateY(14px)";b.style.pointerEvents=on?"auto":"none";b.tabIndex=on?0:-1;
+  }catch(e){}
 }
 var PINPOP=null;
 function showPinPopup(pl,coords){
@@ -1113,6 +1146,7 @@ function wire(){
   window.addEventListener("pagehide",save);
   /* telefon: gorny panel (pasek + zakladki) chowa sie przy przewijaniu w dol i wraca przy przewijaniu w gore */
   (function(){var mq=window.matchMedia("(max-width:900px)"),last=0,hid=false,quiet=0;
+    window.__piSeed=function(y){last=y;quiet=Date.now()+1200};
     function measure(){var b=$("bar"),u=$("sub");if(b&&u)document.documentElement.style.setProperty("--hh",(b.offsetHeight+u.offsetHeight)+"px")}
     function set(v){if(v===hid)return;if(v)measure();hid=v;quiet=Date.now()+450;document.body.classList.toggle("hdr-hide",v)}
     function onScroll(e){
@@ -1136,6 +1170,9 @@ function fail(msg){$("count").textContent=msg}
 function init(){
   wire();
   var y=restore();
+  try{history.scrollRestoration="manual";if(window.parent!==window)window.parent.history.scrollRestoration="manual"}catch(e){}
+  var RM=document.getElementById("main"),reveal=function(){if(RM){RM.style.opacity="";}};
+  if(y&&RM){RM.style.opacity="0";RM.style.transition="opacity .25s ease";setTimeout(reveal,3500)}
   if(window.innerWidth<900&&(!S.cols||S.cols>2))S.cols=1;
   Promise.all([
     fetch(CFG.photosUrl).then(function(r){if(!r.ok)throw new Error("photos HTTP "+r.status);return r.json()}),
@@ -1145,8 +1182,8 @@ function init(){
     if(!DATA.length)throw new Error("empty");
     PLACES=loadPlaces(res[1]);prep();render();
     if(S.map)ensureMap();
-    if(y){var mm=$("main"),jump=function(){mm.style.scrollBehavior="auto";mm.scrollTop=y};jump();requestAnimationFrame(jump);setTimeout(function(){jump();mm.style.scrollBehavior=""},120)}
-  }).catch(function(){fail("The archive could not be loaded. Please try again in a moment.")})}
+    if(y){try{window.__piSeed(y)}catch(e){}var mm=$("main"),jump=function(){mm.style.scrollBehavior="auto";mm.scrollTop=y};jump();requestAnimationFrame(function(){jump();reveal()});setTimeout(function(){jump();mm.style.scrollBehavior=""},120)}else reveal()
+  }).catch(function(){reveal();fail("The archive could not be loaded. Please try again in a moment.")})}
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
 })();
 </script>
@@ -1176,8 +1213,8 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
 <script>
 (function(){var m=document.getElementById("main"),t=document.getElementById("totop");if(!m||!t)return;
 var g=document.getElementById("fgrid");
-function chk(){var y=Math.max(m.scrollTop||0,g?g.scrollTop||0:0,window.scrollY||0);document.body.classList.toggle("showtop",y>700)}
-document.addEventListener("scroll",chk,{passive:true,capture:true});
+function chk(){var y=Math.max(m.scrollTop||0,g?g.scrollTop||0:0,window.scrollY||0);document.body.classList.toggle("showtop",y>700);window.__piTop=y>700;try{topBtn()}catch(e){}}
+document.addEventListener("scroll",function(){chk();try{parentLock()}catch(e){}},{passive:true,capture:true});
 setInterval(chk,600);chk();
 t.addEventListener("click",function(){[m,g].forEach(function(e){if(e&&e.scrollTop>0)e.scrollTo({top:0,behavior:"smooth"})});if(window.scrollY>0)window.scrollTo({top:0,behavior:"smooth"})});})();
 </script>
