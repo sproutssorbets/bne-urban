@@ -332,6 +332,27 @@ body.framed #totop{display:none !important}
  body.map #totop,body.panel #totop{display:none}
 }
 </style>
+<style id="pi-mockup">
+/* szeroki ekran: jeden styl etykiet jak w makiecie: 11px, waga 400, wersaliki, .1em; aktywna 500 + kreska */
+@media (min-width:1200px){
+ .tbtn,.tab,#sortw .l,#sortbtn,#dens .l,#dens b,#mtoggle2{font-size:11px;font-weight:400;letter-spacing:.1em;text-transform:uppercase}
+ .tab.on,#mtoggle2[aria-pressed=true]{font-weight:500}
+ .tab .n{font-weight:inherit}
+ #ftoggle{font-weight:500}
+ #mtoggle2{height:44px;padding:0;margin:0;border:none;border-bottom:1px solid transparent;background:transparent;color:var(--mute);align-self:flex-end}
+ #mtoggle2:hover{color:var(--ink)}
+ #mtoggle2[aria-pressed=true]{color:var(--ink);border-bottom-color:var(--ink)}
+ #sortbtn{padding:0;height:44px;border-bottom:none}
+ #sortbtn{color:var(--ink)}
+ #dens b{color:var(--ink)}
+ #subr{gap:24px;align-items:flex-end}
+ #sortw,#dens{height:44px}
+ #bar{padding-left:20px;padding-right:20px;gap:8px 20px}
+ #sub{padding:0 20px;gap:20px}
+ #intro{padding-left:20px;padding-right:20px}
+ #main{padding-left:20px;padding-right:20px}
+}
+</style>
 </head>
 <body class="map">
 <button id="mfab" type="button" aria-label="Switch between map and grid"></button>
