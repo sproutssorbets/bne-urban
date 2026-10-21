@@ -1198,3 +1198,11 @@ html body #block_navib #toggable_nav #component_menu :is(.client_minilightbox, .
   html body .pi-footer > div, html body .pi-footer > div:first-child, html body .pi-footer > div:nth-child(3) { grid-column: auto !important; }
   html body .pi-footer a, html body .pi-footer p { font-size: 13px !important; line-height: 1.6 !important; }
 }
+
+/* menu desktop: stale odstepy 32px zamiast rozciagania; HOME na osi 58%, SELECTION/ACCOUNT/CART do prawej krawedzi */
+@media (min-width: 1200px) {
+  html body #block_navib #toggable_nav #component_menu ul.component_menu_content { justify-content: flex-start !important; }
+  html body #block_navib #toggable_nav #component_menu ul.component_menu_content > li.menu_item { margin: 0 32px 0 0 !important; }
+  html body #block_navib #toggable_nav #component_menu ul.component_menu_content > li.menu_item:nth-child(7) { margin-left: auto !important; }
+  html body #block_navib #toggable_nav #component_menu ul.component_menu_content > li.menu_item:nth-child(9) { margin-right: 0 !important; }
+}
