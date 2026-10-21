@@ -502,7 +502,7 @@ html body #main_content .pi-detail-x:hover svg { stroke: #fff !important; }
 #ws_page.page-media #main_content > .pi-x:hover svg { stroke: #FFFFFF; }
 
 /* Index / Previous / Next oraz "More from" (HTML dokladany przez worker) */
-#ws_page.page-media #main_content > .pi-below { grid-column: 1 / -1; grid-row: 30; position: relative; z-index: 2; padding: 0 12px 48px; background: #FFFFFF; font-family: Inter, sans-serif; }
+#ws_page.page-media #main_content > .pi-below { grid-column: 1 / -1; grid-row: 30; position: relative; z-index: 2; margin-top: 44px; padding: 0 12px 48px; background: #FFFFFF; font-family: Inter, sans-serif; }
 .pi-pn { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 44px; border-bottom: 1px solid #DADADA; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #666666; }
 .pi-pn a { color: #000000 !important; text-decoration: none !important; }
 .pi-pn a:hover { text-decoration: underline !important; }
@@ -521,7 +521,7 @@ html body #main_content .pi-detail-x:hover svg { stroke: #fff !important; }
   #ws_page.page-media .media_detail_meta_wrapper > div.media_creation_date { background-position: 16px 0 !important; background-size: calc(100% - 32px) 1px !important; }
   #ws_page.page-media .media_detail_meta_wrapper > div.media_copyright { background-position: 16px 100% !important; background-size: calc(100% - 32px) 1px !important; }
   #ws_page.page-media #main_content > .pi-x { right: 14px; top: 14px; }
-  #ws_page.page-media #main_content > .pi-below { order: 11; grid-row: auto; padding: 0 16px 40px; }
+  #ws_page.page-media #main_content > .pi-below { order: 11; grid-row: auto; margin-top: 0; padding: 0 16px 40px; }
 }
 
 /* ==========================================================================
