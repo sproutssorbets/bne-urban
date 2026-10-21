@@ -1187,3 +1187,7 @@ html body #ws_page.page-media .media_detail_meta_wrapper > div:is(.media_author,
 html body #ws_page.page-media .media_detail_meta_wrapper > div:is(.media_author,.media_size) > :is(b,.pi-dim) { grid-column: 2 !important; grid-row: 1 !important; }
 html body #ws_page.page-media .media_detail_meta_wrapper > div.media_copyright::after { grid-column: 2 !important; grid-row: 1 !important; }
 @media (min-width: 901px) { html body #ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords b { gap: 0 0.2em !important; } }
+
+/* menu: puste li znikaja takze przy wyzszej specyficznosci regul motywu */
+html body #block_navib #toggable_nav #component_menu ul.component_menu_content > li:not(:has(> a)):not(#_) { display: none !important; }
+html body #block_navib #toggable_nav #component_menu :is(.client_minilightbox, .client_minicart):empty:not(#_) { display: none !important; }
