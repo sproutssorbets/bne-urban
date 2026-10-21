@@ -1191,3 +1191,10 @@ html body #ws_page.page-media .media_detail_meta_wrapper > div.media_copyright::
 /* menu: puste li znikaja takze przy wyzszej specyficznosci regul motywu */
 html body #block_navib #toggable_nav #component_menu ul.component_menu_content > li:not(:has(> a)):not(#_) { display: none !important; }
 html body #block_navib #toggable_nav #component_menu :is(.client_minilightbox, .client_minicart):empty:not(#_) { display: none !important; }
+
+/* stopka desktop: kolumna marki do osi 58% (jak menu i mapa), trzy rowne kolumny, 16px odstepu, tekst 13px */
+@media (min-width: 901px) {
+  html body .pi-footer { grid-template-columns: calc(58vw - 36px) repeat(3, minmax(0, 1fr)) !important; column-gap: 16px !important; font-size: 13px !important; }
+  html body .pi-footer > div, html body .pi-footer > div:first-child, html body .pi-footer > div:nth-child(3) { grid-column: auto !important; }
+  html body .pi-footer a, html body .pi-footer p { font-size: 13px !important; line-height: 1.6 !important; }
+}
