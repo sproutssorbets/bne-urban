@@ -844,7 +844,8 @@ form.button_to[action="/quotations/new"] input[type=submit]:hover{background:#11
   }
   html body .pi-footer-m .pi-fm-links a:active, html body .pi-footer-m .pi-fm-links a:hover { color: #111111 !important; }
   html body .pi-footer-m .pi-fm-brand { margin: 0 !important; padding: 24px 16px 4px !important; text-align: center !important; font: 400 12px/1.6 Inter, sans-serif !important; color: #6B6B6B !important; }
-  html body .pi-footer-m .pi-fm-brand b { display: block !important; margin: 0 0 4px !important; font: 500 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.14em !important; text-transform: uppercase !important; color: #111111 !important; }
+  html body .pi-footer-m .pi-fm-brand b { display: flex !important; align-items: center !important; justify-content: center !important; gap: 12px !important; margin: 0 0 8px !important; font: 600 16px/1 Inter, sans-serif !important; letter-spacing: 0 !important; text-transform: none !important; color: #111111 !important; }
+  html body .pi-footer-m .pi-fm-brand b::before { content: ""; flex: none; width: 34px; height: 24px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 27 19'%3E%3Cpath d='M0 .8A.8 .8 0 0 1 .8 0H6V13H0ZM7 0H13V13H7ZM0 14H13V19H.8A.8 .8 0 0 1 0 18.2ZM14 0H17.8L22.15 4.15 21.8 5H14ZM14 6H20V19H14ZM21 6H23.8L27 9.2V18.2A.8 .8 0 0 1 26.2 19H21Z'/%3E%3C/svg%3E") center / contain no-repeat; }
   /* wspolny dolny wiersz (prawa, ABN, Sitemap) wysrodkowany */
   body:has(.pi-footer-m) .pi-footer-bottom { align-items: center !important; text-align: center !important; padding: 12px 16px 24px !important; }
 }
