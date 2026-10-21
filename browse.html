@@ -195,6 +195,8 @@ body.panel #mapcol{display:none}
 /* Mapbox Clustering Override styles */
 .mapboxgl-popup { padding-bottom: 50px; }
 .mapboxgl-popup-content { font-family: Inter, sans-serif; border-radius: 12px; padding: 12px 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+#mtoggle2{display:none}
+@media (min-width:1200px){#mtoggle{display:none}#mtoggle2{display:inline-flex}}
 </style>
 <style id="pi-filter-fixes">
 #intro{margin:0;padding:10px 24px 0;font-size:12px;line-height:1.5;color:#6b6b66}
@@ -343,7 +345,7 @@ body.framed #totop{display:none !important}
   </div>
   <div id="sub">
     <div id="tabs" role="tablist"></div>
-    <div id="subr"><div id="sortw"><span class="l">Sort</span><button id="sortbtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="sortlist" aria-label="Sort photographs"></button><div id="sortlist" role="listbox" aria-label="Sort photographs"></div></div><div id="dens"><span class="l">Columns</span><button id="dm" type="button" aria-label="Fewer columns">&minus;</button><b id="dn">3</b><button id="dp" type="button" aria-label="More columns">+</button></div></div>
+    <div id="subr"><button class="tbtn" id="mtoggle2" type="button" aria-pressed="true">Grid</button><div id="sortw"><span class="l">Sort</span><button id="sortbtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="sortlist" aria-label="Sort photographs"></button><div id="sortlist" role="listbox" aria-label="Sort photographs"></div></div><div id="dens"><span class="l">Columns</span><button id="dm" type="button" aria-label="Fewer columns">&minus;</button><b id="dn">3</b><button id="dp" type="button" aria-label="More columns">+</button></div></div>
   </div>
   <p id="intro">Systematic urban photography of Brisbane, licensed per image. Add photographs to your selection to continue.</p>
   <div id="split">
@@ -985,7 +987,7 @@ function render(){
   $("count").textContent=num+" "+word+(missing&&isGrid&&S.map?" \u00B7 "+missing+" not on the map":"");
   $("done").textContent="Show "+LIST.length+(LIST.length===1?" photograph":" photographs");
   $("ftoggle").setAttribute("aria-expanded",String(S.panel));
-  $("mtoggle").textContent=S.map?"Grid":"Map";$("mfab").textContent=S.map?"Grid":"Map";syncParentFab(S.map?"Grid":"Map",S.panel);$("mtoggle").setAttribute("aria-pressed",String(S.map));
+  $("mtoggle").textContent=S.map?"Grid":"Map";$("mfab").textContent=S.map?"Grid":"Map";syncParentFab(S.map?"Grid":"Map",S.panel);$("mtoggle").setAttribute("aria-pressed",String(S.map));var m2=$("mtoggle2");if(m2){m2.textContent=S.map?"Grid":"Map";m2.setAttribute("aria-pressed",String(S.map))}
   $("dens").style.display=isGrid?"":"none";
   $("sortw").style.display=isGrid?"":"none";syncSort();
   document.body.classList.toggle("map",S.map);document.body.classList.toggle("panel",S.panel);
@@ -1096,7 +1098,7 @@ function wire(){
   on("ftoggle","click",function(){S.panel=!S.panel;render()});
   on("pclose","click",function(){S.panel=false;render()});
   on("done","click",function(){S.panel=false;render()});
-  on("mfab","click",function(){$("mtoggle").click()});
+  on("mfab","click",function(){$("mtoggle").click()});on("mtoggle2","click",function(){$("mtoggle").click()});
   on("mtoggle","click",function(){S.map=!S.map;if(S.map){S.panel=false;ensureMap()}render();if(MAP)setTimeout(function(){MAP.resize();if(S.map){LASTSIG="";mapUpdate(true)}},60)});
   on("clear","click",function(){S.f={};S.loc="";render()});
   on("noteok","click",function(){try{window.localStorage.setItem("pi_map_note","1")}catch(e){}$("note").classList.remove("show")});
