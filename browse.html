@@ -388,8 +388,14 @@ body.framed #totop{display:none !important}
 .more:hover{color:var(--mute)}
 #fgrid{padding-bottom:88px}
 #fgrid .empty{padding:8px var(--pe) 16px;max-width:none}
-#done{margin:12px var(--pe) 16px;border-radius:var(--r-sm)}
+#done{margin:12px var(--pe) 16px;height:44px;border-radius:var(--r-pill)}
 .chip{background:transparent;border:1px solid var(--line);letter-spacing:.1em}
+@media (min-width:1200px){
+.chip{border:0;padding:0;gap:6px;font-weight:400;color:var(--ink)}
+.chip button{color:var(--mute);font-size:13px;padding:0 4px}
+#chips{gap:20px;margin-left:12px}
+.qwrap{background:transparent;border-radius:0;border-bottom:1px solid var(--line)}
+}
 </style>
 </head>
 <body class="map">
