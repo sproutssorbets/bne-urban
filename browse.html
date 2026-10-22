@@ -368,17 +368,21 @@ body.framed #totop{display:none !important}
 .pf-search{padding:12px var(--pe) 0}
 .pf-search input{height:36px;padding:0;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;font-size:13px}
 .pf-search input:focus,.pf-search input:focus-visible{background:transparent;border-bottom-color:var(--ink)}
-.msw{padding:12px var(--pe);gap:16px;margin-bottom:0}
+.msw{padding:12px var(--pe) 4px;gap:16px;margin-bottom:0;border-bottom:0}
 .msw .ml{font-size:11px;letter-spacing:.1em;margin-right:0}
 .msw button{padding:0;border:0;border-radius:0;background:transparent;color:var(--mute);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
 .msw button.on{background:transparent;color:var(--ink);font-weight:500;text-decoration:underline;text-underline-offset:4px}
-.sh{padding:16px var(--pe);letter-spacing:.1em}
-.sb{padding:0 var(--pe) 12px}
-.opt{margin:0;padding:6px 0;border-radius:0;font-size:13px}
-.opt:hover{background:transparent;color:var(--mute)}
+.sec{border-bottom:0}
+.sh{padding:24px var(--pe) 8px;letter-spacing:.1em}
+.sb{padding:0 var(--pe)}
+.opt{margin:0;padding:4px 0;border-radius:0;font-size:13px}
+.opt .t{color:var(--mute)}
+.opt .c{color:#999}
+.opt:hover{background:transparent}
+.opt:hover .t{color:var(--ink)}
 .opt .t::before{display:none}
-.opt input:checked+.t{text-decoration:underline;text-underline-offset:3px}
-.more{display:flex;align-items:center;padding:16px var(--pe);border-top:0;border-bottom:1px solid #ececea;font-size:11px;font-weight:500;letter-spacing:.1em;color:var(--ink)}
+.opt input:checked+.t{color:var(--ink);font-weight:500}
+.more{display:flex;align-items:center;padding:24px var(--pe) 16px;border-top:0;border-bottom:0;font-size:11px;font-weight:500;letter-spacing:.1em;color:var(--ink)}
 .more::after{content:"+";margin-left:auto;font-size:14px;font-weight:400}
 .more[aria-expanded=true]::after{content:"\2212"}
 .more:hover{color:var(--mute)}
