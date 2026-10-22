@@ -1187,3 +1187,22 @@ html body #ws_page.page-media .media_detail_meta_wrapper > div:is(.media_author,
 html body #ws_page.page-media .media_detail_meta_wrapper > div:is(.media_author,.media_size) > :is(b,.pi-dim) { grid-column: 2 !important; grid-row: 1 !important; }
 html body #ws_page.page-media .media_detail_meta_wrapper > div.media_copyright::after { grid-column: 2 !important; grid-row: 1 !important; }
 @media (min-width: 901px) { html body #ws_page.page-media .media_detail_meta_wrapper > div.media_detail_keywords b { gap: 0 0.2em !important; } }
+
+/* menu: puste li znikaja takze przy wyzszej specyficznosci regul motywu */
+html body #block_navib #toggable_nav #component_menu ul.component_menu_content > li:not(:has(> a)):not(#_) { display: none !important; }
+html body #block_navib #toggable_nav #component_menu :is(.client_minilightbox, .client_minicart):empty:not(#_) { display: none !important; }
+
+/* stopka desktop: kolumna marki do osi 58% (jak menu i mapa), trzy rowne kolumny, 16px odstepu, tekst 13px */
+@media (min-width: 901px) {
+  html body .pi-footer { grid-template-columns: calc(58vw - 36px) repeat(3, minmax(0, 1fr)) !important; column-gap: 16px !important; font-size: 13px !important; }
+  html body .pi-footer > div, html body .pi-footer > div:first-child, html body .pi-footer > div:nth-child(3) { grid-column: auto !important; }
+  html body .pi-footer a, html body .pi-footer p { font-size: 13px !important; line-height: 1.6 !important; }
+}
+
+/* menu desktop: stale odstepy 32px zamiast rozciagania; HOME na osi 58%, SELECTION/ACCOUNT/CART do prawej krawedzi */
+@media (min-width: 1200px) {
+  html body #block_navib #toggable_nav #component_menu ul.component_menu_content { justify-content: flex-start !important; }
+  html body #block_navib #toggable_nav #component_menu ul.component_menu_content > li.menu_item { margin: 0 32px 0 0 !important; }
+  html body #block_navib #toggable_nav #component_menu ul.component_menu_content > li.menu_item:nth-child(7) { margin-left: auto !important; }
+  html body #block_navib #toggable_nav #component_menu ul.component_menu_content > li.menu_item:nth-child(9) { margin-right: 0 !important; }
+}

@@ -358,6 +358,22 @@ body.framed #totop{display:none !important}
  .ovt,.chip,.sh,.pt,.so,#done,.more,.grp,.msw .ml,.cj{letter-spacing:.1em}
  .grp,.msw .ml,.cj{font-size:11px}
  #info,#siteask{letter-spacing:0}
+ /* filtry: jedna lewa krawedz 20px */
+ .ph{padding:12px 20px}
+ .pf-search{padding:12px 20px 0}
+ .pf-search input{height:36px;padding:0;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;font-size:13px}
+ .pf-search input:focus,.pf-search input:focus-visible{background:transparent;border-bottom-color:var(--ink)}
+ .sh{padding:16px 20px;letter-spacing:.1em}
+ .sb{padding:0 20px 12px}
+ .opt{margin:0;padding:6px 0;border-radius:0;font-size:13px}
+ .opt:hover{background:transparent;color:var(--mute)}
+ .opt .t::before{display:none}
+ .opt input:checked+.t{text-decoration:underline;text-underline-offset:3px}
+ .more{display:flex;align-items:center;padding:16px 20px;border-top:0;border-bottom:1px solid #ececea;font-size:11px;font-weight:500;letter-spacing:.1em;color:var(--ink)}
+ .more::after{content:"+";margin-left:auto;font-size:14px;font-weight:400}
+ .more[aria-expanded=true]::after{content:"\2212"}
+ .more:hover{color:var(--mute)}
+ #done{margin:12px 20px 16px;border-radius:var(--r-sm)}
 }
 </style>
 </head>
