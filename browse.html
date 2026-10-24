@@ -397,6 +397,23 @@ body.framed #totop{display:none !important}
 #chips{gap:20px;margin-left:12px}
 }
 </style>
+<style>
+/* district page (district=1) */
+body.district #bar,body.district #sub,body.district #intro,body.district #info,body.district #mapcol,body.district #mfab,body.district #siteask2,body.district #panel{display:none !important}
+#dhead{display:none}
+body.district #dhead{display:block;padding:40px 0 32px;margin-bottom:24px;border-bottom:1px solid var(--line)}
+#dhead .dcols{display:flex;flex-wrap:wrap;gap:32px 64px;justify-content:space-between;align-items:flex-start}
+#dhead .dl{flex:1 1 360px;min-width:0}
+#dhead .dr{flex:0 1 420px;min-width:260px;width:100%}
+#dhead .dk{font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--mute)}
+#dhead h1{margin:14px 0 0;font-size:28px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;line-height:1.2}
+#dhead p{margin:20px 0 0;max-width:640px;font-size:14px;font-weight:300;line-height:1.7}
+#dhead table{width:100%;border-collapse:collapse}
+#dhead td{padding:10px 0;border-bottom:1px solid var(--line);font-size:12px}
+#dhead tr:first-child td{border-top:1px solid var(--line)}
+#dhead td:first-child{width:170px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
+#dhead td:last-child{text-align:right}
+</style>
 </head>
 <body class="map">
 <button id="mfab" type="button" aria-label="Switch between map and grid"></button>
@@ -516,6 +533,7 @@ var FACETS=[
 var FBY={};FACETS.forEach(function(f){FBY[f.key]=f});
 
 var S={tab:"photo",q:"",loc:"",f:{},match:"all",sort:"featured",cols:3,map:true,panel:false,open:{suburb:true}};
+var DIST=new URLSearchParams(location.search).get("district")==="1";
 var DATA=[],PLACES=[],PLACEBYNAME={},LIST=[],MAP=null,MAPREADY=false,MAPLOAD=false,FITTED=false,LASTSIG="",TQ=null;
 var $=function(id){return document.getElementById(id)};
 var lc=function(s){return String(s==null?"":s).toLowerCase().trim()};
@@ -854,6 +872,7 @@ function ensureMap(){
 
 
 function syncParentFab(label,hide){
+  if(DIST)return;
   /* na stronie glownej przegladarka siedzi w ramce: przycisk wstawiamy do strony nadrzednej (ta sama domena), zeby byl przypiety do dolu prawdziwego ekranu */
   try{
     var P=window.parent;if(!P||P===window)return;
@@ -1050,6 +1069,7 @@ function render(){
   if(!num)emptyState(em);
   var missing=DATA.filter(function(p){return !p._place&&pass(p,null)}).length;
   $("count").textContent=num+" "+word+(missing&&isGrid&&S.map?" \u00B7 "+missing+" not on the map":"");
+  distHead();
   $("done").textContent="Show "+LIST.length+(LIST.length===1?" photograph":" photographs");
   $("ftoggle").setAttribute("aria-expanded",String(S.panel));
   $("mtoggle").textContent=S.map?"Grid":"Map";$("mfab").textContent=S.map?"Grid":"Map";syncParentFab(S.map?"Grid":"Map",S.panel);$("mtoggle").setAttribute("aria-pressed",String(S.map));var m2=$("mtoggle2");if(m2){m2.textContent=S.map?"Grid":"Map";m2.setAttribute("aria-pressed",String(S.map))}
@@ -1088,6 +1108,7 @@ function closeSug(){SG=[];SGI=-1;showSug()}
 
 /* ---------- state & URL sync ---------- */
 function syncUrl(){
+  if(DIST)return;
   try{
     var p=new URLSearchParams();
     if(S.tab!=="photo")p.set("tab",S.tab);
@@ -1230,11 +1251,35 @@ function wire(){
   if(window.ResizeObserver)new ResizeObserver(function(){layout()}).observe($("main"));
   window.__pi={S:S,render:render,get data(){return DATA},get list(){return LIST}}}
 
+/* ---------- district page header ---------- */
+var DINFO=null,DREQ=false;
+function distHead(){
+  if(!DIST)return;
+  var h=$("dhead");if(!h){h=el("div");h.id="dhead";$("main").insertBefore(h,$("main").firstChild)}
+  h.textContent="";
+  if(!LIST.length)return;
+  var name=LIST[0].suburb||"",key=lc(name).replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
+  var places=groupBy(LIST,function(p){return p._loc}).length,last=0;
+  LIST.forEach(function(p){var m=/^(\d{4})(\d{2})(\d{2})/.exec(p.photoId||"");if(m){var t=Date.UTC(+m[1],+m[2]-1,+m[3]);if(t>last)last=t}});
+  var ld=last?new Date(last).toLocaleDateString("en-AU",{day:"numeric",month:"long",year:"numeric",timeZone:"UTC"}):"";
+  var intro=(DINFO&&DINFO[key]&&DINFO[key].intro)||"";
+  var cols=el("div","dcols"),l=el("div","dl"),r=el("div","dr");
+  l.appendChild(el("div","dk","Archive / Brisbane"));
+  l.appendChild(el("h1",null,name));
+  if(intro)String(intro).split(/\n{2,}/).forEach(function(t){if(t.trim())l.appendChild(el("p",null,t.trim()))});
+  var tb=document.createElement("table");
+  [["Places photographed",String(places)],["Photographs, "+name,String(LIST.length)],["Photographs, total",String(DATA.length)],["Last photographed",ld]].forEach(function(row){
+    if(!row[1])return;var tr=document.createElement("tr");tr.appendChild(el("td",null,row[0]));tr.appendChild(el("td",null,row[1]));tb.appendChild(tr)});
+  r.appendChild(tb);cols.appendChild(l);cols.appendChild(r);h.appendChild(cols);
+  if(!DREQ){DREQ=true;fetch("/api/districts.json").then(function(x){return x.ok?x.json():{}}).then(function(j){DINFO=j||{};distHead()}).catch(function(){})}
+}
+
 /* ---------- init ---------- */
 function fail(msg){$("count").textContent=msg}
 function init(){
   wire();
   var y=restore();
+  if(DIST){S.map=false;S.tab="photo";S.sort="featured";S.panel=false;document.body.classList.add("district")}
   try{history.scrollRestoration="manual";if(window.parent!==window)window.parent.history.scrollRestoration="manual"}catch(e){}
   var RM=document.getElementById("main"),reveal=function(){if(RM){RM.style.opacity="";}};
   if(y&&RM){RM.style.opacity="0";RM.style.transition="opacity .25s ease";setTimeout(reveal,3500)}
