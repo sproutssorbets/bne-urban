@@ -567,7 +567,7 @@ function loadPlaces(text){
     var ok=isFinite(lat)&&isFinite(lng)&&lng>152.5&&lng<153.6&&lat>-28.1&&lat<-26.6;
     var id=lc(name);
     if(seen[id]){if(ok&&seen[id].lat==null){seen[id].lat=lat;seen[id].lng=lng}continue}
-    var pl={id:id,name:name,street:g(r,"street"),suburb:g(r,"suburb"),lat:ok?lat:null,lng:ok?lng:null,titles:g(r,"titles").split(";")};
+    var pl={id:id,name:name,street:g(r,"street"),suburb:g(r,"suburb"),site:g(r,"site_id"),lat:ok?lat:null,lng:ok?lng:null,titles:g(r,"titles").split(";")};
     seen[id]=pl;out.push(pl)}
   return out}
 
@@ -1260,7 +1260,7 @@ function distHead(){
   h.textContent="";
   if(!LIST.length)return;
   var name=LIST[0].suburb||"",key=lc(name).replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
-  var places=groupBy(LIST,function(p){return p._loc}).length,last=0;
+  var places=groupBy(LIST,function(p){var pl=PLACEBYNAME[p._loc];return (pl&&pl.site)||p._loc}).length,last=0;
   LIST.forEach(function(p){var m=/^(\d{4})(\d{2})(\d{2})/.exec(p.photoId||"");if(m){var t=Date.UTC(+m[1],+m[2]-1,+m[3]);if(t>last)last=t}});
   var ld=last?new Date(last).toLocaleDateString("en-AU",{day:"numeric",month:"long",year:"numeric",timeZone:"UTC"}):"";
   var intro=(DINFO&&DINFO[key]&&DINFO[key].intro)||"";

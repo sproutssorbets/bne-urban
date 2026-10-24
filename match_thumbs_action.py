@@ -182,7 +182,7 @@ def main():
     with open(CSV_PATH, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         fieldnames = list(reader.fieldnames)
-        for col in ["thumbs", "images", "titles"]:
+        for col in ["thumbs", "images", "titles", "site_id"]:
             if col not in fieldnames:
                 fieldnames.append(col)
         for row in reader:
@@ -266,6 +266,7 @@ def main():
             "thumbs": thumbs,
             "images": images,
             "titles": title_key,
+            "site_id": "",  # nadawany ponizej
         }
         rows.append(new_row)
         new_rows_added.append(title_key)
@@ -326,6 +327,17 @@ def main():
               file=sys.stderr)
         for fname in files_kept_unused:
             print(f"  - {fname}", file=sys.stderr)
+
+    # --- site_id: stały numer miejsca (UA-SITE-0001...), nadawany raz i nigdy nie zmieniany ---
+    used_nums = [int(m.group(1)) for r in rows
+                 for m in [re.fullmatch(r"UA-SITE-(\d+)", (r.get("site_id") or "").strip())] if m]
+    next_num = max(used_nums, default=0) + 1
+    for row in sorted((r for r in rows if not (r.get("site_id") or "").strip()),
+                      key=lambda r: (r.get("ref") or "")):
+        row["site_id"] = f"UA-SITE-{next_num:04d}"
+        print(f"site_id {row['site_id']}: {row.get('street')}", file=sys.stderr)
+        next_num += 1
+        changed = True
 
     if not changed:
         print("Brak zmian — locations.csv już aktualny.")
