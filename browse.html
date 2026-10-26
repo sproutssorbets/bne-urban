@@ -318,10 +318,17 @@ body.panel #mapcol{display:none}
 }
 </style>
 <style id="pi-desktop-fab">
+#mseg{display:none}
 @media (min-width:901px){
- #mfab{display:block;position:fixed;left:50%;transform:translateX(-50%);bottom:24px;z-index:9000;height:44px;padding:0 22px;border:0;border-radius:999px;background:#111;color:#fff;font:500 12px/1 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 4px 16px rgba(0,0,0,.28);cursor:pointer;white-space:nowrap}
- body.panel #mfab,body.district #mfab{display:none}
- #mtoggle,#mtoggle2{display:none!important}
+ #mfab,#mtoggle,#mtoggle2{display:none!important}
+ #mseg{display:flex;position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:9000;padding:4px;gap:2px;border-radius:999px;background:#fff;border:1px solid #111;box-shadow:0 4px 16px rgba(0,0,0,.18);transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .3s ease}
+ #mseg.away{transform:translate(-50%,80px);opacity:0;pointer-events:none}
+ #mseg button{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 16px;border:0;border-radius:999px;background:transparent;color:#111;font:500 12px/1 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap}
+ #mseg button[aria-pressed=true]{background:#111;color:#fff}
+ #mseg button:focus-visible{outline:2px solid #111;outline-offset:2px}
+ #mseg svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+ #mseg .n{font-weight:400;opacity:.65}
+ body.panel #mseg,body.district #mseg{display:none}
 }
 </style>
 <style id="pi-mobile-polish">
@@ -425,6 +432,7 @@ body.district #dhead{display:block;padding:28px 0 24px;margin-bottom:20px;border
 </head>
 <body class="map">
 <button id="mfab" type="button" aria-label="Switch between map and grid"></button>
+<div id="mseg" role="group" aria-label="Switch between grid and map"><button type="button" id="msg-grid" aria-pressed="false" title="Photographs only (M)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5"/><rect x="13.5" y="4" width="6.5" height="6.5"/><rect x="4" y="13.5" width="6.5" height="6.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5"/></svg>Grid</button><button type="button" id="msg-map" aria-pressed="true" title="Photographs and map (M)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.6-6-10a6 6 0 0 1 12 0c0 4.4-6 10-6 10z"/><circle cx="12" cy="11" r="2.2"/></svg>Map<span class="n" id="msgn"></span></button></div>
 <div id="app">
   <div id="bar">
     <button class="tbtn" id="ftoggle" aria-expanded="false" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h9M16 7h5M3 17h5M12 17h9"/><circle cx="14" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>Filters</span><span class="badge" id="badge" hidden></span></button>
@@ -1081,6 +1089,7 @@ function render(){
   $("done").textContent="Show "+LIST.length+(LIST.length===1?" photograph":" photographs");
   $("ftoggle").setAttribute("aria-expanded",String(S.panel));
   $("mtoggle").textContent=S.map?"Grid":"Map";$("mfab").textContent=S.map?"Grid":"Map";syncParentFab(S.map?"Grid":"Map",S.panel);$("mtoggle").setAttribute("aria-pressed",String(S.map));var m2=$("mtoggle2");if(m2){m2.textContent=S.map?"Grid":"Map";m2.setAttribute("aria-pressed",String(S.map))}
+  var sg=$("msg-grid"),sm=$("msg-map");if(sg&&sm){sg.setAttribute("aria-pressed",String(!S.map));sm.setAttribute("aria-pressed",String(S.map));var cp={};DATA.forEach(function(p){if(p._place&&pass(p,"loc"))cp[p._place.id]=1});var nn=Object.keys(cp).length;$("msgn").textContent=nn?" \u00B7 "+nn:""}
   $("dens").style.display=isGrid?"":"none";
   $("sortw").style.display=isGrid?"":"none";syncSort();
   document.body.classList.toggle("map",S.map);document.body.classList.toggle("panel",S.panel);
@@ -1184,6 +1193,7 @@ function restore(){
 
 (function readParams(){
   if(window.innerWidth<900)S.map=false;
+  else{try{if(window.localStorage.getItem("pi_map_pref")==="0"&&!/[?&]map=/.test(window.location.search)&&!window.sessionStorage.getItem("pi_browse"))S.map=false}catch(e){}}
 })();
 
 /* ---------- events ---------- */
@@ -1193,7 +1203,10 @@ function wire(){
   on("pclose","click",function(){S.panel=false;render()});
   on("done","click",function(){S.panel=false;render()});
   on("mfab","click",function(){$("mtoggle").click()});on("mtoggle2","click",function(){$("mtoggle").click()});
-  on("mtoggle","click",function(){S.map=!S.map;if(S.map){S.panel=false;ensureMap()}render();if(MAP)setTimeout(function(){MAP.resize();if(S.map){LASTSIG="";mapUpdate(true)}},60)});
+  on("msg-grid","click",function(){if(S.map)$("mtoggle").click()});on("msg-map","click",function(){if(!S.map)$("mtoggle").click()});
+  document.addEventListener("keydown",function(e){if(e.key!=="m"&&e.key!=="M")return;if(e.metaKey||e.ctrlKey||e.altKey)return;var t=e.target,tg=t&&t.tagName;if(tg==="INPUT"||tg==="TEXTAREA"||tg==="SELECT"||(t&&t.isContentEditable))return;if(window.innerWidth<901||document.body.classList.contains("district"))return;e.preventDefault();$("mtoggle").click()});
+  (function(){var m=$("main"),sg=$("mseg"),last=0;if(!m||!sg)return;m.addEventListener("scroll",function(){var t=m.scrollTop,d=t-last;if(Math.abs(d)<8)return;sg.classList.toggle("away",d>0&&t>120);last=t},{passive:true})})();
+  on("mtoggle","click",function(){S.map=!S.map;if(window.innerWidth>900){try{window.localStorage.setItem("pi_map_pref",S.map?"1":"0")}catch(e){}}if(S.map){S.panel=false;ensureMap()}render();if(MAP)setTimeout(function(){MAP.resize();if(S.map){LASTSIG="";mapUpdate(true)}},60)});
   on("clear","click",function(){S.f={};S.loc="";render()});
   on("noteok","click",function(){try{window.localStorage.setItem("pi_map_note","1")}catch(e){}$("note").classList.remove("show")});
   
