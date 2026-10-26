@@ -103,11 +103,11 @@ button{cursor:pointer}
 .eye svg{width:20px;height:20px;fill:none;stroke:#fff;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .card:hover .ovt,.card:hover .eye,.card:focus-visible .ovt,.card:focus-visible .eye{opacity:1}
 @media (hover:none){.card::after,.ovt,.eye,.acts{opacity:1}}
-.acts{position:absolute;z-index:3;right:10px;bottom:10px;display:flex;gap:6px;opacity:0;transition:opacity .15s}
+.acts{position:absolute;z-index:3;right:8px;bottom:8px;display:flex;gap:2px;opacity:0;transition:opacity .15s}
 .card:hover .acts,.card:focus-visible .acts{opacity:1}
-.ib{width:30px;height:30px;border-radius:50%;border:1px solid #111;background:#fff;color:#111;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s,color .15s}
-.ib:hover,.ib.on{background:#111;color:#fff}
-.ib svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.ib{width:30px;height:30px;border:0;background:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;filter:drop-shadow(0 0 3px rgba(0,0,0,.55));transition:opacity .15s}
+.ib:hover,.ib.on{opacity:.7}
+.ib svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .ib.busy{opacity:.45;pointer-events:none}
 .insel{position:absolute;z-index:3;top:10px;right:10px;width:30px;height:30px;border-radius:50%;background:#111;color:#fff;border:1px solid #111;display:none;align-items:center;justify-content:center;cursor:pointer;transition:background .15s,color .15s}
 .card.in-sel .insel{display:flex}
