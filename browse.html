@@ -317,6 +317,13 @@ body.panel #mapcol{display:none}
  body.map #main{display:none}
 }
 </style>
+<style id="pi-desktop-fab">
+@media (min-width:901px){
+ #mfab{display:block;position:fixed;left:50%;transform:translateX(-50%);bottom:24px;z-index:9000;height:44px;padding:0 22px;border:0;border-radius:999px;background:#111;color:#fff;font:500 12px/1 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 4px 16px rgba(0,0,0,.28);cursor:pointer;white-space:nowrap}
+ body.panel #mfab,body.district #mfab{display:none}
+ #mtoggle,#mtoggle2{display:none!important}
+}
+</style>
 <style id="pi-mobile-polish">
 #siteask2,#totop{display:none}
 body.framed #totop{display:none !important}
