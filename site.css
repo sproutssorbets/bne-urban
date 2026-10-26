@@ -116,7 +116,7 @@ html body #component_menu span[class*="minicart" i] { padding-left: 8px !importa
 }
 
 /* ==================== LEWA KOLUMNA (ZDJĘCIE W STICKY VIEWPORT) ==================== */
-#ws_page.page-media #main_content > .row-12:has(> .col-4) > .first.col-6 {
+#ws_page.page-media #main_content > .row-12:has(> .col-4) > .first {
   grid-column: 1 !important;
   grid-row: 1 / 30 !important;
   display: flex !important;
@@ -306,7 +306,7 @@ html body #component_menu span[class*="minicart" i] { padding-left: 8px !importa
 @media (max-width: 900px) {
   #ws_page.page-media #main_content { display: flex !important; flex-direction: column !important; }
   #ws_page.page-media #main_content::after { display: none !important; }
-  #ws_page.page-media #main_content > .row-12:has(> .col-4) > .first.col-6 { position: static !important; height: auto !important; width: 100% !important; padding: 16px !important; }
+  #ws_page.page-media #main_content > .row-12:has(> .col-4) > .first { position: static !important; height: auto !important; width: 100% !important; padding: 16px !important; }
   
   /* Flex order replikuje grid layout */
   #ws_page.page-media .media_friendly_id { order: 1 !important; }
