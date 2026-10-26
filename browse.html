@@ -945,7 +945,7 @@ function showPinPopup(pl,coords){
   var n=DATA.filter(function(p){return p._place===pl}).length;
   var box=document.createElement("div");box.className="pinpop";
   var t=document.createElement("div");t.className="pp-t";t.textContent=pl.name;box.appendChild(t);
-  var where=[pl.street,pl.suburb].filter(function(x){return x&&x!==pl.name}).join(", ");
+  var where=[pl.street,pl.suburb].filter(function(x){return x&&pl.name.indexOf(x)<0}).join(", ");
   if(where){var w=document.createElement("div");w.className="pp-w";w.textContent=where;box.appendChild(w)}
   var c=document.createElement("button");c.type="button";c.className="pp-c";c.textContent="View "+n+(n===1?" photograph":" photographs")+" \u203A";c.addEventListener("click",function(){if(PINPOP){PINPOP.remove();PINPOP=null}if(window.innerWidth<900){if(S.map)$("mtoggle").click()}else{$("main").scrollTop=0}});box.appendChild(c);
   PINPOP=new window.mapboxgl.Popup({closeButton:false,closeOnClick:true,offset:16,maxWidth:"260px"}).setLngLat(coords).setDOMContent(box).addTo(MAP);
