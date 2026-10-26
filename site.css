@@ -1086,6 +1086,7 @@ form.new_message input[type=submit]{height:48px!important}
    ========================================================================== */
 #ws_page.page-media .media_wrap > form.pi-dl { display: none !important; }
 #ws_page.page-media #medias_slider { overflow-x: clip !important; overflow-y: visible !important; }
+#ws_page.page-media .pi-below { z-index: 0 !important; }
 #ws_page.page-media .media_detail_media .media_wrap { overflow: visible !important; }
 
 /* Rzad akcji pod zdjeciem: Download, Add to selection, Share. Dodaje PI_DL_SCRIPT. */
