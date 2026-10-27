@@ -1112,8 +1112,7 @@ html.pi-ready #ws_page.page-media .media_wrap > .pi-bar, html.pi-fb #ws_page.pag
 @media (max-width: 900px) {
   html body #ws_page.page-media #main_content > .pi-x { top: 60px !important; right: 6px !important; }
   html body #ws_page.page-media .media_wrap > .pi-bar,
-  html body #ws_page.page-media .media_wrap > form.pi-dl,
-  html body #ws_page.page-media .page_meta .media_detail_actions form:has(input.comp_download_icon) { display: none !important; }
+  html body #ws_page.page-media .media_wrap > form.pi-dl { display: none !important; }
 
   html body #component_logo, html body #component_logo a, html body #component_logo * { font-size: 13px !important; line-height: 1.2 !important; letter-spacing: 0.04em !important; }
   html body #ws_page.page-media input.price_icon,
@@ -1233,4 +1232,15 @@ html body #component_logo a::before { background-image: url("data:image/svg+xml,
 /* Photo page, mobile: grid column carries a stray left margin that pushes the photo right of centre */
 @media (max-width: 899px) {
   #ws_page.page-media .main_content .first.col-6 { margin-left: 0 !important; }
+}
+
+/* Photo page, mobile: low-res file as a quiet outline button, same shape as Add to selection */
+@media (max-width: 900px) {
+  html body #ws_page.page-media #main_content > .row-12:first-child .page_meta .media_detail_actions input.comp_download_icon {
+    display: block !important; width: 100% !important; min-height: 40px !important; box-sizing: border-box !important;
+    padding: 0 16px 0 36px !important; border: 1px solid #c9c9c9 !important; border-radius: 999px !important;
+    background-position: 18px center !important; background-size: 12px 12px !important;
+    color: #666 !important; text-align: center !important; text-decoration: none !important;
+  }
+  html body #ws_page.page-media #main_content > .row-12:first-child .page_meta .media_detail_actions input.comp_download_icon:hover { border-color: #111 !important; color: #111 !important; }
 }
