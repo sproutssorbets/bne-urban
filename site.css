@@ -1226,3 +1226,6 @@ html body #component_logo a::before { background-image: url("data:image/svg+xml,
   html body #ws_page.page-media #main_content > .pi-x { transition: opacity .2s ease; }
   html body #ws_page.page-media #main_content > .pi-x.pi-x-off { opacity: 0 !important; pointer-events: none !important; }
 }
+
+/* Photo page: "Published in" line only exists on gallery-context URLs (reached after swiping), hide it so both URLs look the same */
+.media_detail_published_in { display: none !important; }
