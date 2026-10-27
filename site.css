@@ -1229,3 +1229,8 @@ html body #component_logo a::before { background-image: url("data:image/svg+xml,
 
 /* Photo page: "Published in" line only exists on gallery-context URLs (reached after swiping), hide it so both URLs look the same */
 .media_detail_published_in { display: none !important; }
+
+/* Photo page, mobile: grid column carries a stray left margin that pushes the photo right of centre */
+@media (max-width: 899px) {
+  #ws_page.page-media .main_content .first.col-6 { margin-left: 0 !important; }
+}
