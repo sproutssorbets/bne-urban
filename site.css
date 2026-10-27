@@ -1234,3 +1234,9 @@ html body #component_logo a::before { background-image: url("data:image/svg+xml,
 @media (max-width: 899px) {
   #ws_page.page-media .main_content .first.col-6 { margin-left: 0 !important; }
 }
+
+/* Photo page, mobile: gallery-context URLs use col-5 and a different form rule, so cover both. */
+@media (max-width: 899px) {
+  html body #ws_page.page-media #main_content > .row-12 > .first[class*="col-"] { margin-left: 0 !important; }
+  html body #ws_page.page-media #main_content > .row-12:first-child .page_meta .media_detail_actions > form.button_to:has(input.comp_download_icon) { display: none !important; }
+}
