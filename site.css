@@ -68,6 +68,9 @@ html body .pi-popup img { border-radius: var(--pi-r-sm) !important; }
 html body #component_menu ul.component_menu_content li.menu_lightbox_item a span.client_minilightbox, html body #component_menu a[href*="/cart"], html body #component_menu a[href*="/cart"] * { border-radius: var(--pi-r-pill) !important; align-items: center !important; }
 html body #component_menu span[class*="minicart" i] { padding-left: 8px !important; padding-right: 9px !important; align-items: center !important; }
 
+/* Przeskok przy przejsciu z INDEX na inne zakladki: motyw dawal #block_main padding-top 21px na stronach tresci (about, method, licensing, contact), a INDEX i zdjecie maja 0. Jedna wartosc wszedzie. */
+html body #ws_page #block_main { padding-top: 0 !important; }
+
 /* ==========================================================================
    2. STRONA ZDJĘCIA (MEDIA PAGE) - DEFINITYWNY CSS GRID (OMINIĘCIE THEME/CUSTOM)
    ========================================================================== */
