@@ -1243,3 +1243,6 @@ html body #component_logo a::before { background-image: url("data:image/svg+xml,
   html body #ws_page.page-media #main_content > .row-12 > .first[class*="col-"] { margin-left: 0 !important; }
   html body #ws_page.page-media #main_content > .row-12:first-child .page_meta .media_detail_actions > form.button_to:has(input.comp_download_icon) { display: none !important; }
 }
+
+/* Contact form: focused fields keep the same 16px radius as resting and as the rest of the site */
+#ws_page.page-website_page-contact form.new_message :is(input[type="text"], input[type="email"], textarea, select):focus { border-radius: var(--pi-r-md, 16px) !important; }
