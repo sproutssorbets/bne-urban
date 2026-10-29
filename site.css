@@ -1312,3 +1312,48 @@ html body #add_to_cart_popup #minicart p:last-of-type::after { content: "GST is 
 
 /* Buttons never wrap their label (Add To Cart on phones) */
 html body :is(#ws_page, .pi-popup) :is(input.submit, input.submit_small, input.price_icon, input.btn, button.btn, a.btn, a.button, input[type="submit"]):not(.icon):not(.icon_only):not(.round_button):not(.comp_download_icon):not([class*="close" i]):not(.fi-search) { white-space: nowrap !important; flex: none !important; }
+/* ==========================================================================
+   LOGO LOCKUP wg zasady modulowej (sygnet 27x19, jednostka = H/19)
+   napis: wersaliki = 13 jednostek (wysokosc gornego rzedu), baseline na dolnej krawedzi znaku,
+   odstep 7 jednostek, Inter 600. Inter: cap-height 0.7275 em, baseline 0.1362 em nad dolem pola przy line-height 1.
+   Rozmiar zmienia sie jedna zmienna --ua-h.
+   ========================================================================== */
+html body #component_logo a {
+  --ua-h: 16px;
+  --ua-f: calc(var(--ua-h) * 13 / 19 / 0.7275);
+  display: inline-flex !important; align-items: flex-end !important;
+  gap: calc(var(--ua-h) * 7 / 19) !important;
+  font: 600 var(--ua-f)/1 Inter, sans-serif !important; letter-spacing: 0 !important; text-transform: none !important;
+}
+html body #component_logo a::before {
+  content: ""; flex: none; display: block !important;
+  height: var(--ua-h) !important; width: calc(var(--ua-h) * 27 / 19) !important;
+  margin: 0 0 calc(var(--ua-f) * 0.1362) 0 !important;
+  background-repeat: no-repeat !important; background-size: 100% 100% !important; background-position: 0 0 !important;
+}
+html body .pi-footer-m .pi-fm-brand b {
+  --ua-h: 24px; --ua-f: calc(var(--ua-h) * 13 / 19 / 0.7275);
+  align-items: flex-end !important; gap: calc(var(--ua-h) * 7 / 19) !important;
+  font: 600 var(--ua-f)/1 Inter, sans-serif !important;
+}
+html body .pi-footer-m .pi-fm-brand b::before {
+  height: var(--ua-h) !important; width: calc(var(--ua-h) * 27 / 19) !important;
+  margin: 0 0 calc(var(--ua-f) * 0.1362) 0 !important; background-size: 100% 100% !important;
+}
+@media (max-width: 900px) {
+  html body #component_logo, html body #component_logo a, html body #component_logo * { font-size: var(--ua-f, 15px) !important; line-height: 1 !important; letter-spacing: 0 !important; }
+}
+
+/* ==========================================================================
+   CART, mobile: miniatura nie nachodzi na opis, marginesy boczne, Clear cart pod paskiem logowania
+   ========================================================================== */
+@media (max-width: 700px) {
+  html body :is(#ws_page.page-quotation, #ws_page.page-order, #ws_page.page-cart) #main_content { padding-left: 16px !important; padding-right: 16px !important; box-sizing: border-box !important; }
+  html body :is(#ws_page.page-quotation, #ws_page.page-order, #ws_page.page-cart) .user-bar-greeting { padding: 14px 0 0 !important; text-align: left !important; }
+  html body :is(#ws_page.page-quotation, #ws_page.page-order, #ws_page.page-cart) form.clear_cart { top: 0 !important; margin: 16px 0 8px !important; }
+  html body :is(#ws_page.page-quotation, #ws_page.page-order, #ws_page.page-cart) #cart ul.articles li.ooc_item.ooc_item:not(.address) { display: grid !important; grid-template-columns: 96px minmax(0, 1fr) !important; column-gap: 16px !important; }
+  html body :is(#ws_page.page-quotation, #ws_page.page-order, #ws_page.page-cart) #cart ul.articles li.ooc_item.ooc_item:not(.address) .item_thumbnail { grid-area: 1 / 1 / 5 !important; width: 96px !important; }
+  html body :is(#ws_page.page-quotation, #ws_page.page-order, #ws_page.page-cart) #cart ul.articles li.ooc_item.ooc_item:not(.address) .item_description { grid-area: 1 / 2 !important; }
+  html body :is(#ws_page.page-quotation, #ws_page.page-order, #ws_page.page-cart) #cart ul.articles li.ooc_item.ooc_item:not(.address) .item_quantity_and_actions { grid-area: 2 / 2 !important; text-align: left !important; }
+  html body :is(#ws_page.page-quotation, #ws_page.page-order, #ws_page.page-cart) #cart ul.articles li.ooc_item.ooc_item:not(.address) .item_price_and_taxes { grid-area: 3 / 2 !important; text-align: left !important; justify-content: flex-start !important; }
+}
