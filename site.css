@@ -915,7 +915,7 @@ form.button_to[action="/quotations/new"] input[type=submit]:hover{background:#11
   line-height: 1.6;
   color: #666;
   margin: 12px 0 0;
-  content: "\2022  Campaigns, advertising, larger print runs, several photos, exclusivity\A \2022  We usually reply within 2 business days\A \2022  You pay only after you accept the quotation";
+  content: "\2022  Campaigns, advertising, larger print runs, several photos, exclusivity\A \2022  Replies usually within 2 business days\A \2022  You pay only after you accept the quotation";
 }
 
 /* no price, no cart */
@@ -957,7 +957,7 @@ form.button_to[action="/quotations/new"] input[type=submit]:hover{background:#11
 }
 .pi-qbox .pi-qb-hint::after {
   display: block;
-  content: "Please tell us in your message\A \2022  Use: Digital (website, social media, email, in-app) or Digital + print (brochures, reports, presentations, signage)\A \2022  Other uses: advertising campaign, cover, art print, several photos\A \2022  Where it will appear and for which project\A \2022  For how long\A \2022  Area: Australia or worldwide\A \2022  Exclusivity: needed or not\A \A Not sure? Describe the project in one or two lines and we will suggest the right licence.";
+  content: "Please include in your message\A \2022  Use: Digital (website, social media, email, in-app) or Digital + print (brochures, reports, presentations, signage)\A \2022  Other uses: advertising campaign, cover, art print, several photos\A \2022  Where it will appear and for which project\A \2022  For how long\A \2022  Area: Australia or worldwide\A \2022  Exclusivity: needed or not\A \A Not sure? Describe the project in one or two lines and the right licence will be suggested.";
   white-space: pre-line;
   font-size: 13px;
   line-height: 1.7;
