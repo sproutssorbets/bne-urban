@@ -899,7 +899,7 @@ form.button_to[action="/quotations/new"] input[type=submit]:hover{background:#11
 
 /* Single Property Listing, digital */
 .treepricingprofile_01a08ede-2421-7948-bcf9-78d543451086 form.calculator:has(select[name="pricing[use_type]"] option[value="fkgrnu"]:checked) p:has(select[name="pricing[use_type]"])::after {
-  content: "\2022  One property listing: portals, agent's website, organic social media\A \2022  Includes a paid listing upgrade on a property portal\A \2022  No credit required\A \2022  Ends when the property is sold, leased or withdrawn, or after 12 months\A \A Press or paid social ads, or several photos? Request a quote below.";
+  content: "\2022  One property listing: portals, agent's website, organic social media\A \2022  Also covers a featured listing on a property portal\A \2022  No credit required\A \2022  Ends when the property is sold, leased or withdrawn, or after 12 months\A \A Press or paid social ads, or several photos? Request a quote below.";
 }
 
 /* Single Property Listing, digital + print */
