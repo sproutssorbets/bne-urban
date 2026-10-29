@@ -433,25 +433,25 @@ body.district #dhead{display:block;padding:28px 0 24px;margin-bottom:20px;border
 </head>
 <body class="map">
 <button id="mfab" type="button" aria-label="Switch between map and grid"></button>
-<div id="mseg" class="away" role="group" aria-label="Switch between grid and map"><button type="button" id="msg-grid" aria-pressed="false" title="Photographs only (M)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5"/><rect x="13.5" y="4" width="6.5" height="6.5"/><rect x="4" y="13.5" width="6.5" height="6.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5"/></svg>Grid</button><button type="button" id="msg-map" aria-pressed="true" title="Photographs and map (M)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.6-6-10a6 6 0 0 1 12 0c0 4.4-6 10-6 10z"/><circle cx="12" cy="11" r="2.2"/></svg>Map<span class="n" id="msgn"></span></button></div>
+<div id="mseg" class="away" role="group" aria-label="Switch between grid and map"><button type="button" id="msg-grid" aria-pressed="false" data-tip="Photographs only" data-key="M"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5"/><rect x="13.5" y="4" width="6.5" height="6.5"/><rect x="4" y="13.5" width="6.5" height="6.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5"/></svg>Grid</button><button type="button" id="msg-map" aria-pressed="true" data-tip="Photographs and map" data-key="M"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.6-6-10a6 6 0 0 1 12 0c0 4.4-6 10-6 10z"/><circle cx="12" cy="11" r="2.2"/></svg>Map<span class="n" id="msgn"></span></button></div>
 <div id="app">
   <div id="bar">
-    <button class="tbtn" id="ftoggle" aria-expanded="false" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h9M16 7h5M3 17h5M12 17h9"/><circle cx="14" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>Filters</span><span class="badge" id="badge" hidden></span></button>
+    <button class="tbtn" id="ftoggle" data-tip="Filter by suburb, typology, style, materials and more" aria-expanded="false" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h9M16 7h5M3 17h5M12 17h9"/><circle cx="14" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>Filters</span><span class="badge" id="badge" hidden></span></button>
     <div id="chips"></div>
-    <button id="clear" type="button">Clear all</button>
+    <button id="clear" type="button" data-tip="Remove all filters and search">Clear all</button>
     <div class="qwrap"><svg class="qicon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="q" type="text" autocomplete="off" spellcheck="false" placeholder="Search addresses, places, keywords" aria-label="Search the archive"><div id="sug" role="listbox"></div></div>
-    <button class="tbtn" id="mtoggle" type="button" aria-pressed="true">Grid</button>
+    <button class="tbtn" id="mtoggle" type="button" data-tip="Switch between grid and map" data-key="M" aria-pressed="true">Grid</button>
   </div>
   <div id="sub">
     <div id="tabs" role="tablist"></div>
-    <div id="subr"><button class="tbtn" id="mtoggle2" type="button" aria-pressed="true">Grid</button><div id="sortw"><span class="l">Sort</span><button id="sortbtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="sortlist" aria-label="Sort photographs"></button><div id="sortlist" role="listbox" aria-label="Sort photographs"></div></div><div id="dens"><span class="l">Columns</span><button id="dm" type="button" aria-label="Fewer columns">&minus;</button><b id="dn">3</b><button id="dp" type="button" aria-label="More columns">+</button></div></div>
+    <div id="subr"><button class="tbtn" id="mtoggle2" type="button" data-tip="Switch between grid and map" data-key="M" aria-pressed="true">Grid</button><div id="sortw"><span class="l">Sort</span><button id="sortbtn" type="button" data-tip="Change the order of photographs" aria-haspopup="listbox" aria-expanded="false" aria-controls="sortlist" aria-label="Sort photographs"></button><div id="sortlist" role="listbox" aria-label="Sort photographs"></div></div><div id="dens"><span class="l">Columns</span><button id="dm" type="button" data-tip="Fewer columns, larger photos" aria-label="Fewer columns">&minus;</button><b id="dn">3</b><button id="dp" type="button" data-tip="More columns, smaller photos" aria-label="More columns">+</button></div></div>
   </div>
   <p id="intro">Systematic urban photography of Brisbane, licensed per image. Add photographs to your selection to continue.</p>
   <div id="split">
     <aside id="panel" aria-label="Filters">
       <div class="ph">
          <span class="pt">Archive Filters</span>
-         <button class="px" id="pclose" type="button" aria-label="Close filters">&times;</button>
+         <button class="px" id="pclose" type="button" data-tip="Close filters" aria-label="Close filters">&times;</button>
       </div>
       <div class="pf-search">
          <input type="text" id="fsearch" placeholder="Quick find tags..." aria-label="Filter options">
@@ -468,7 +468,7 @@ body.district #dhead{display:block;padding:28px 0 24px;margin-bottom:20px;border
     </main>
     <div id="mapcol"><div id="mapbox"></div></div>
   </div>
-  <button id="totop" type="button" aria-label="Back to top"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+  <button id="totop" type="button" data-tip="Back to top" aria-label="Back to top"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
   <div id="note"><span>Map by Mapbox. Loading it shares your IP address with Mapbox.</span><button id="noteok" type="button">OK</button></div>
 </div>
 <script>
@@ -833,7 +833,7 @@ function renderTabs(counts){
 
 /* ---------- selection: dodawanie i usuwanie z siatki ---------- */
 var SEL={},IC_PLUS='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',IC_BIN='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>',IC_CART='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L20 8H6"/><circle cx="9.5" cy="20" r="1.2"/><circle cx="17" cy="20" r="1.2"/></svg>',SELT=0,IC_CHK='<svg class="i-chk" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
-function selPaintBtn(b){var on=!!SEL[b.getAttribute("data-uuid")],t=on?"Remove from selection":"Add to selection";b.classList.toggle("on",on);b.innerHTML=on?IC_BIN:IC_PLUS;b.setAttribute("title",t);b.setAttribute("aria-label",t);b.setAttribute("aria-pressed",String(on))}
+function selPaintBtn(b){var on=!!SEL[b.getAttribute("data-uuid")],t=on?"Remove from selection":"Add to selection";b.classList.toggle("on",on);b.innerHTML=on?IC_BIN:IC_PLUS;b.setAttribute("data-tip",t);b.setAttribute("aria-label",t);b.setAttribute("aria-pressed",String(on))}
 function selPaint(){var l=document.querySelectorAll(".ib.sel");for(var i=0;i<l.length;i++)selPaintBtn(l[i]);var c=document.querySelectorAll(".card");for(var j=0;j<c.length;j++){if(c[j]._p)c[j].classList.toggle("in-sel",!!SEL[c[j]._p.uuid])}}
 function selNum(n){try{var pd=window.parent.document,c=pd.querySelector(".menu_lightbox_item");if(!c)return;var a=c.querySelector("a")||c,p=c.querySelector(".client_minilightbox");if(n>0){if(!p){p=pd.createElement("span");p.className="client_minilightbox";a.appendChild(p)}p.classList.add("present");var tn=null,w=pd.createTreeWalker(p,4,null,false),x;while((x=w.nextNode())){if(x.nodeValue.trim()!==""){tn=x;break}}if(tn)tn.nodeValue=String(n);else p.appendChild(pd.createTextNode(String(n)))}else if(p){p.classList.remove("present");while(p.firstChild)p.removeChild(p.firstChild)}}catch(e){}}
 function selSync(){SELT=Date.now();return fetch("/lightbox",{credentials:"same-origin",cache:"no-store"}).then(function(r){if(!r.ok)throw 0;return r.text()}).then(function(t){var o={},re=/id="media_([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})"/g,m;while((m=re.exec(t)))o[m[1]]=1;SEL=o;selPaint();selNum(Object.keys(o).length)}).catch(function(){})}
@@ -858,7 +858,7 @@ function cardEl(p){
   var img=document.createElement("img");img.src=p.thumb;img.alt=String(p.description||p.title||"").slice(0,160);img.loading="lazy";img.decoding="async";
   var ss=thumbSet(p);if(ss){img.sizes="300px";img.srcset=ss}
   a.appendChild(img);var ov=el("span","ovt");ov.appendChild(el("span","ovtt",p._name));a.appendChild(ov);
-  var acts=el("span","acts"),sb=el("span","ib sel");sb.setAttribute("role","button");sb.setAttribute("data-uuid",p.uuid);selPaintBtn(sb);acts.appendChild(sb);var lb=el("span","ib lic");lb.innerHTML=IC_CART;lb.setAttribute("title","License this photograph");lb.setAttribute("aria-hidden","true");acts.appendChild(lb);a.appendChild(acts);var ib=el("span","insel");ib.setAttribute("role","button");ib.setAttribute("title","In selection. Click to remove");ib.setAttribute("aria-label","In selection. Click to remove");ib.innerHTML=IC_CHK+IC_BIN.replace("<svg ","<svg class=\"i-bin\" ");a.appendChild(ib);a.classList.toggle("in-sel",!!SEL[p.uuid]);
+  var acts=el("span","acts"),sb=el("span","ib sel");sb.setAttribute("role","button");sb.setAttribute("data-uuid",p.uuid);selPaintBtn(sb);acts.appendChild(sb);var lb=el("span","ib lic");lb.innerHTML=IC_CART;lb.setAttribute("data-tip","License this photograph");lb.setAttribute("aria-hidden","true");acts.appendChild(lb);a.appendChild(acts);var ib=el("span","insel");ib.setAttribute("role","button");ib.setAttribute("data-tip","In selection. Click to remove");ib.setAttribute("aria-label","In selection. Click to remove");ib.innerHTML=IC_CHK+IC_BIN.replace("<svg ","<svg class=\"i-bin\" ");a.appendChild(ib);a.classList.toggle("in-sel",!!SEL[p.uuid]);
   a._p=p;return a}
 
 function layout(){
@@ -1360,5 +1360,19 @@ t.addEventListener("click",function(){[m,g].forEach(function(e){if(e&&e.scrollTo
   document.addEventListener("dragstart",function(e){if(guarded(e.target))e.preventDefault()},true);
 })();
 </script>
+<style>
+#uatip{position:fixed;left:0;top:0;z-index:99999;pointer-events:none;opacity:0;transition:opacity .12s ease;background:#111;color:#fff;font:500 11px/1.3 Inter,Arial,sans-serif;letter-spacing:.03em;padding:7px 10px;border-radius:6px;white-space:nowrap;max-width:calc(100vw - 16px)}
+#uatip.on{opacity:1}
+#uatip kbd{font:inherit;margin-left:8px;padding:1px 5px;border:1px solid rgba(255,255,255,.4);border-radius:3px;opacity:.85}
+@media (prefers-reduced-motion:reduce){#uatip{transition:none}}
+</style>
+<script>(function(){if(!window.matchMedia||!matchMedia("(hover:hover)").matches)return;var tip=document.createElement("div"),T=0,cur=null;tip.id="uatip";tip.setAttribute("aria-hidden","true");document.body.appendChild(tip);
+function place(el){var r=el.getBoundingClientRect(),w=tip.offsetWidth,h=tip.offsetHeight,x=Math.max(8,Math.min(innerWidth-w-8,r.left+r.width/2-w/2)),y=r.top>h+16?r.top-h-8:r.bottom+8;tip.style.transform="translate("+Math.round(x)+"px,"+Math.round(y)+"px)"}
+function show(el){var t=el.getAttribute("data-tip");if(!t||!document.contains(el))return;tip.textContent=t;var k=el.getAttribute("data-key");if(k){var s=document.createElement("kbd");s.textContent=k;tip.appendChild(s)}place(el);tip.classList.add("on")}
+function hide(){clearTimeout(T);cur=null;tip.classList.remove("on")}
+document.addEventListener("mouseover",function(e){var el=e.target.closest&&e.target.closest("[data-tip]");if(el===cur)return;hide();if(!el)return;cur=el;T=setTimeout(function(){show(el)},120)});
+document.addEventListener("focusin",function(e){var el=e.target;if(el.matches&&el.matches("[data-tip]:focus-visible")){hide();cur=el;show(el)}});
+document.addEventListener("focusout",hide);document.addEventListener("mousedown",hide);document.addEventListener("scroll",hide,true);window.addEventListener("blur",hide);
+document.addEventListener("keydown",function(e){if(e.key==="Escape")hide()})})();</script>
 </body>
 </html>
