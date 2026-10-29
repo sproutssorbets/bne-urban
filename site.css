@@ -1246,3 +1246,53 @@ html body #component_logo a::before { background-image: url("data:image/svg+xml,
 
 /* Contact form: focused fields keep the same 16px radius as resting and as the rest of the site */
 #ws_page.page-website_page-contact form.new_message :is(input[type="text"], input[type="email"], textarea, select):focus { border-radius: var(--pi-r-md, 16px) !important; }
+
+/* ===== Urban Archive design system (29 Oct 2026) =====
+   Skala zaokraglen: pigulka (przyciski, wyszukiwarki), 16px (pola, miniatury, kafelki), 0 (zdjecia, okna).
+   Przyciski: jedna geometria, roznia sie tylko wypelnieniem. Siatka 8px. */
+:root { --ua-btn-h: 40px; --ua-r-field: 16px; }
+
+/* --- Przyciski: jedna geometria --- */
+html body :is(#ws_page, .pi-popup) :is(input.submit, input.submit_small, input.price_icon, input.btn, button.btn, a.btn, a.button, input[type="submit"]):not(.icon):not(.icon_only):not(.round_button):not(.comp_download_icon):not([class*="close" i]):not(.fi-search) {
+  box-sizing: border-box !important; display: inline-flex !important; align-items: center !important; justify-content: center !important;
+  height: var(--ua-btn-h) !important; min-height: var(--ua-btn-h) !important; padding: 0 24px !important;
+  font: 500 11px/1 Inter, sans-serif !important; letter-spacing: 0.1em !important; text-transform: uppercase !important; text-align: center !important; text-decoration: none !important;
+  border: 1px solid #111111 !important; border-radius: var(--pi-r-pill, 999px) !important;
+}
+
+/* --- Pola formularzy: 16px --- */
+html body :is(#ws_page, .pi-popup) :is(input[type="text"], input[type="email"], input[type="password"], input[type="tel"], select, textarea):not(.fi-search):not(#fi-q) {
+  border-radius: var(--ua-r-field) !important;
+}
+
+/* --- Koszyk: siatka 100px | tekst | cena --- */
+html body #ws_page.page-cart #cart ul.articles li.ooc_item:not(.address) { display: grid !important; grid-template-columns: 100px minmax(0, 1fr) 100px !important; column-gap: 24px !important; row-gap: 0 !important; align-items: start !important; }
+html body #ws_page.page-cart #cart li.ooc_item .item_presentation { display: contents !important; }
+html body #ws_page.page-cart #cart ul.articles li.ooc_item:not(.address) .item_thumbnail { grid-column: 1 !important; grid-row: 1 / 4 !important; width: auto !important; }
+html body #ws_page.page-cart #cart ul.articles li.ooc_item:not(.address) .item_description { grid-column: 2 !important; grid-row: 1 !important; }
+html body #ws_page.page-cart #cart ul.articles li.ooc_item:not(.address) .item_meta { display: block !important; position: static !important; height: auto !important; margin: 8px 0 0 !important; }
+html body #ws_page.page-cart #cart ul.articles li.ooc_item:not(.address) .item_meta a { display: inline-block !important; margin: 0 !important; padding: 0 !important; }
+html body #ws_page.page-cart #cart ul.articles li.ooc_item:not(.address) .item_quantity_and_actions { position: static !important; grid-column: 2 !important; grid-row: 2 !important; display: block !important; margin: 4px 0 0 !important; padding: 0 !important; width: auto !important; flex: none !important; text-align: left !important; }
+html body #ws_page.page-cart #cart ul.articles li.ooc_item:not(.address) .item_meta > div { position: static !important; top: auto !important; bottom: auto !important; height: auto !important; margin: 0 !important; padding: 0 !important; }
+html body #ws_page.page-cart #cart ul.articles li.ooc_item:not(.address) .item_quantity_and_actions form { position: relative !important; display: inline-block !important; width: auto !important; height: auto !important; margin: 0 !important; padding: 0 !important; }
+html body #ws_page.page-cart #cart ul.articles li.ooc_item:not(.address) .item_quantity_and_actions form::after { position: static !important; display: inline-block !important; }
+html body #ws_page.page-cart #cart ul.articles li.ooc_item:not(.address) .item_quantity_and_actions form input.delete_icon { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; min-height: 0 !important; padding: 0 !important; opacity: 0 !important; }
+html body #ws_page .item_thumbnail img { border-radius: var(--ua-r-field) !important; }
+html body #ws_page.page-cart #cart li.ooc_item .item_price_and_taxes { grid-column: 3 !important; grid-row: 1 / 3 !important; flex: none !important; width: auto !important; margin: 0 !important; padding: 0 !important; justify-self: end !important; text-align: right !important; }
+
+/* adres: etykieta | wartosc | Change */
+html body #ws_page.page-cart #cart ul.articles li.ooc_item.address { display: grid !important; grid-template-columns: 100px minmax(0, 1fr) auto !important; column-gap: 24px !important; align-items: start !important; padding: 24px 0 !important; }
+html body #ws_page.page-cart #cart ul.articles li.ooc_item.address .item_title { grid-column: 1 !important; margin: 0 !important; padding: 0 !important; }
+html body #ws_page.page-cart #cart ul.articles li.ooc_item.address .item_description { grid-column: 2 !important; margin: 0 !important; padding: 0 !important; }
+html body #ws_page.page-cart #cart ul.articles li.ooc_item.address .item_description :is(p, div, b) { margin: 0 0 8px !important; padding: 0 !important; }
+html body #ws_page.page-cart #cart ul.articles li.ooc_item.address .item_quantity_and_actions { position: static !important; grid-column: 3 !important; margin: 0 !important; width: auto !important; flex: none !important; }
+
+/* sumy: jedna waga linii, cena w jednej kolumnie */
+html body #ws_page.page-cart #cart ul.totals li.ooc_item { display: grid !important; grid-template-columns: minmax(0, 1fr) 100px !important; column-gap: 24px !important; border-top: 0 !important; border-bottom: 1px solid #DADADA !important; padding: 16px 0 !important; }
+html body #ws_page.page-cart #cart ul.totals li.ooc_item.grand_total { border-bottom: 2px solid #111111 !important; }
+html body #ws_page.page-cart #cart ul.totals li.ooc_item .item_description { margin: 0 !important; padding: 0 !important; }
+html body #ws_page.page-cart #cart ul.totals li.ooc_item.grand_total b { font-weight: 500 !important; }
+
+/* GST notes: the licence window shows prices with GST, the cart popup shows the subtotal without it. */
+html body .popup .price_and_action .show_price::after { content: "Next, the cart shows your confirmed price before GST."; display: block; margin-top: 6px; font: 400 11px/1.4 Inter, sans-serif; letter-spacing: 0; text-transform: none; color: #6B6B6B; }
+html body #add_to_cart_popup #minicart p:last-of-type::after { content: "GST is added in the cart, where you see the final total."; display: block; margin-top: 6px; font: 400 11px/1.4 Inter, sans-serif; color: #6B6B6B; }
