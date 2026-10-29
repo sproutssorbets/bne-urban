@@ -1244,8 +1244,9 @@ html body #component_logo a::before { background-image: url("data:image/svg+xml,
   html body #ws_page.page-media #main_content > .row-12:first-child .page_meta .media_detail_actions > form.button_to:has(input.comp_download_icon) { display: none !important; }
 }
 
-/* Contact form: focused fields keep the same 16px radius as resting and as the rest of the site */
-#ws_page.page-website_page-contact form.new_message :is(input[type="text"], input[type="email"], textarea, select):focus { border-radius: var(--pi-r-md, 16px) !important; }
+/* Contact form: focused fields keep the same radius as resting (pill for single-line fields, 28px for the message box) */
+#ws_page.page-website_page-contact form.new_message :is(input[type="text"], input[type="email"], select):focus { border-radius: var(--pi-r-pill, 999px) !important; }
+#ws_page.page-website_page-contact form.new_message textarea:focus { border-radius: var(--pi-r-lg, 28px) !important; }
 
 /* ===== Urban Archive design system (29 Oct 2026) =====
    Skala zaokraglen: pigulka (przyciski, wyszukiwarki), 16px (pola, miniatury, kafelki), 0 (zdjecia, okna).
@@ -1260,9 +1261,12 @@ html body :is(#ws_page, .pi-popup) :is(input.submit, input.submit_small, input.p
   border: 1px solid #111111 !important; border-radius: var(--pi-r-pill, 999px) !important;
 }
 
-/* --- Pola formularzy: 16px --- */
-html body :is(#ws_page, .pi-popup) :is(input[type="text"], input[type="email"], input[type="password"], input[type="tel"], select, textarea):not(.fi-search):not(#fi-q) {
-  border-radius: var(--ua-r-field) !important;
+/* --- Pola formularzy: pill jak wyszukiwarka, pole wiadomosci 28px --- */
+html body :is(#ws_page, .pi-popup) :is(input[type="text"], input[type="email"], input[type="password"], input[type="tel"], select):not(.fi-search):not(#fi-q) {
+  border-radius: var(--pi-r-pill, 999px) !important;
+}
+html body :is(#ws_page, .pi-popup) textarea {
+  border-radius: var(--pi-r-lg, 28px) !important;
 }
 
 /* --- Koszyk: siatka 100px | tekst | cena --- */
@@ -1296,3 +1300,11 @@ html body #ws_page.page-cart #cart ul.totals li.ooc_item.grand_total b { font-we
 /* GST notes: the licence window shows prices with GST, the cart popup shows the subtotal without it. */
 html body .popup .price_and_action .show_price::after { content: "Next, the cart shows your confirmed price before GST."; display: block; margin-top: 6px; font: 400 11px/1.4 Inter, sans-serif; letter-spacing: 0; text-transform: none; color: #6B6B6B; }
 html body #add_to_cart_popup #minicart p:last-of-type::after { content: "GST is added in the cart, where you see the final total."; display: block; margin-top: 6px; font: 400 11px/1.4 Inter, sans-serif; color: #6B6B6B; }
+
+/* Full Index: header bar, search and radii match the home page (Index) */
+html body .fi-bar { display: flex !important; align-items: center !important; min-height: 72px !important; padding: 12px 24px !important; }
+html body .fi-bar .fi-sw { flex: 1 1 auto !important; width: 100% !important; }
+html body .fi-bar .fi-search { height: 44px !important; padding: 0 16px 0 42px !important; font-size: 14px !important; }
+html body .fi-bar .fi-sw svg { left: 16px !important; width: 16px !important; height: 16px !important; margin-top: -8px !important; }
+html body .fi-tile { border-radius: var(--pi-r-md, 16px) !important; }
+html body .fi-az :is(a, span) { border-radius: var(--pi-r-pill, 999px) !important; }
