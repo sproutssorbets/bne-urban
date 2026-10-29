@@ -1292,3 +1292,7 @@ html body #ws_page.page-cart #cart ul.totals li.ooc_item { display: grid !import
 html body #ws_page.page-cart #cart ul.totals li.ooc_item.grand_total { border-bottom: 2px solid #111111 !important; }
 html body #ws_page.page-cart #cart ul.totals li.ooc_item .item_description { margin: 0 !important; padding: 0 !important; }
 html body #ws_page.page-cart #cart ul.totals li.ooc_item.grand_total b { font-weight: 500 !important; }
+
+/* GST notes: the licence window shows prices with GST, the cart popup shows the subtotal without it. */
+html body .popup .price_and_action .show_price::after { content: "The cart shows the subtotal before GST, then adds it."; display: block; margin-top: 6px; font: 400 11px/1.4 Inter, sans-serif; letter-spacing: 0; text-transform: none; color: #6B6B6B; }
+html body #add_to_cart_popup #minicart p:last-of-type::after { content: "GST is added in the cart. The total is shown there."; display: block; margin-top: 6px; font: 400 11px/1.4 Inter, sans-serif; color: #6B6B6B; }
