@@ -881,27 +881,27 @@ form.button_to[action="/quotations/new"] input[type=submit]:hover{background:#11
 
 /* Digital */
 .treepricingprofile_01a08ede-2421-7948-bcf9-78d543451086 form.calculator:has(select[name="pricing[use_type]"] option[value="web_ad"]:checked) p:has(select[name="pricing[use_type]"])::after {
-  content: "\2022  For your business or organisation online: website, social media, blog, email, apps\A \2022  Promotes a company, product, service or project\A \2022  Online only, no print\A \2022  No time limit\A \A Print, advertising campaigns or several photos? Request a quote below.";
+  content: "\2022  One Project: website, blog, apps, organic social media, email, digital presentations and reports\A \2022  Worldwide, online only. No print, no paid advertising\A \2022  No end date\A \2022  Credit required in presentations and exhibitions\A \A Paid advertising, print or several photos? Request a quote below.";
 }
 
 /* Digital & Limited Print */
 .treepricingprofile_01a08ede-2421-7948-bcf9-78d543451086 form.calculator:has(select[name="pricing[use_type]"] option[value="newspaper"]:checked) p:has(select[name="pricing[use_type]"])::after {
-  content: "\2022  Everything in Digital, plus print\A \2022  Brochures, reports and presentations, up to 50,000 copies\A \2022  No time limit\A \A Larger print runs or several photos? Request a quote below.";
+  content: "\2022  Everything in Digital, plus up to 5,000 printed copies in Australia\A \2022  Brochures, reports and presentations\A \2022  No paid advertising or outdoor advertising\A \2022  No end date\A \A Larger print runs or several photos? Request a quote below.";
 }
 
 /* Publishing & Editorial */
 .treepricingprofile_01a08ede-2421-7948-bcf9-78d543451086 form.calculator:has(select[name="pricing[use_type]"] option[value="ytylvi"]:checked) p:has(select[name="pricing[use_type]"])::after {
-  content: "\2022  Illustrates a story or article: books and e-books, magazines, newspapers, news websites\A \2022  One edition, print or digital\A \2022  Editorial use only, not advertising\A \2022  Credit required\A \2022  No time limit\A \A Covers, advertising or several photos? Request a quote below.";
+  content: "\2022  One named article, issue or edition: books, e-books, magazines, newspapers, news websites\A \2022  Editorial use only: no advertising or sponsored content\A \2022  Credit required\A \2022  May stay in that publication and its online archive\A \A Covers, advertising or several photos? Request a quote below.";
 }
 
 /* Single Property Listing, digital */
 .treepricingprofile_01a08ede-2421-7948-bcf9-78d543451086 form.calculator:has(select[name="pricing[use_type]"] option[value="fkgrnu"]:checked) p:has(select[name="pricing[use_type]"])::after {
-  content: "\2022  One property: portals, agent's website, social media, email\A \2022  Paid online ads for that property\A \2022  No credit required\A \2022  Remove when the term ends\A \A Need several photos or a longer term? Request a quote below.";
+  content: "\2022  One property listing: portals, agent's website, organic social media\A \2022  Includes a paid listing upgrade on a property portal\A \2022  No credit required\A \2022  Ends when the property is sold, leased or withdrawn, or after 12 months\A \A Press or paid social ads, or several photos? Request a quote below.";
 }
 
 /* Single Property Listing, digital + print */
 .treepricingprofile_01a08ede-2421-7948-bcf9-78d543451086 form.calculator:has(select[name="pricing[use_type]"] option[value="mcligv"]:checked) p:has(select[name="pricing[use_type]"])::after {
-  content: "\2022  One property: everything in digital, plus print\A \2022  Brochures, flyers, window displays and press ads\A \2022  No credit required\A \2022  Printed copies may stay in use\A \A Need several photos or a longer term? Request a quote below.";
+  content: "\2022  Everything in digital, plus up to 2,000 printed copies in Australia\A \2022  Brochures, flyers and window displays\A \2022  No credit required\A \2022  Printed copies made during the licence may stay in use\A \A Press advertisements or several photos? Request a quote below.";
 }
 
 /* ---------- Part 2: quotation window ---------- */
