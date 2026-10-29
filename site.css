@@ -1296,3 +1296,12 @@ html body #ws_page.page-cart #cart ul.totals li.ooc_item.grand_total b { font-we
 /* GST notes: the licence window shows prices with GST, the cart popup shows the subtotal without it. */
 html body .popup .price_and_action .show_price::after { content: "Next, the cart shows your confirmed price before GST."; display: block; margin-top: 6px; font: 400 11px/1.4 Inter, sans-serif; letter-spacing: 0; text-transform: none; color: #6B6B6B; }
 html body #add_to_cart_popup #minicart p:last-of-type::after { content: "GST is added in the cart, where you see the final total."; display: block; margin-top: 6px; font: 400 11px/1.4 Inter, sans-serif; color: #6B6B6B; }
+
+/* Cart on phones: narrower thumbnail, price moves under the details so the text keeps its width */
+@media (max-width: 600px) {
+  html body #ws_page.page-cart #cart ul.articles li.ooc_item:not(.address) { grid-template-columns: 80px minmax(0, 1fr) !important; column-gap: 16px !important; }
+  html body #ws_page.page-cart #cart ul.articles li.ooc_item:not(.address) .item_price_and_taxes { grid-column: 2 !important; grid-row: 3 !important; justify-self: start !important; text-align: left !important; margin: 8px 0 0 !important; }
+  html body #ws_page.page-cart #cart ul.articles li.ooc_item.address { grid-template-columns: minmax(0, 1fr) auto !important; column-gap: 16px !important; }
+  html body #ws_page.page-cart #cart ul.articles li.ooc_item.address .item_description { grid-column: 1 !important; }
+  html body #ws_page.page-cart #cart ul.articles li.ooc_item.address .item_quantity_and_actions { grid-column: 2 !important; }
+}
