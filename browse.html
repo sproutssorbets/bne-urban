@@ -87,7 +87,7 @@ button{cursor:pointer}
 .opt .c{margin-left:auto;font-size:11px;color:var(--mute);padding-top:1px}
 #done{flex:none;margin:12px 16px 16px;height:48px;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:var(--r-pill);font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase}
 #done:hover{background:#fff;color:var(--ink)}
-#done{display:none!important}
+@media (min-width:901px){#done{display:none!important}}
 #main{flex:1 1 0;min-width:0;overflow-y:auto;padding:8px 24px 72px;scroll-behavior:smooth}
 #info{display:flex;justify-content:space-between;gap:12px;font-size:11px;letter-spacing:.02em;color:var(--mute);padding:14px 0 12px;min-height:32px}
 #siteask{flex:none;font-size:11px;letter-spacing:.02em;color:var(--mute);text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
@@ -392,17 +392,32 @@ body.framed #totop{display:none !important}
 .sb{padding:0 var(--pe)}
 .opt{margin:0;padding:4px 0;border-radius:0;font-size:13px}
 .opt .t{color:var(--mute)}
-.opt .c{color:#999}
+.opt .c{color:#6b6b6b}
 .opt:hover{background:transparent}
 .opt:hover .t{color:var(--ink)}
-.opt .t::before{display:none}
+/* znacznik zaznaczenia: kwadrat dla wielokrotnego wyboru, kolo dla Suburb (wybor wylaczny) */
+.opt .t::before{display:inline-block;width:12px;height:12px;box-sizing:border-box;margin-right:10px;vertical-align:-1px;border:1px solid #767676;border-radius:0;background:#fff}
+.opt.rad .t::before{border-radius:50%}
+.opt input:checked+.t::before{background:var(--ink);border-color:var(--ink);box-shadow:inset 0 0 0 2px #fff}
+.opt input:focus-visible+.t::before{outline:2px solid var(--ink);outline-offset:2px}
 .opt input:checked+.t{color:var(--ink);font-weight:500}
 .more{display:flex;align-items:center;padding:24px var(--pe) 16px;border-top:0;border-bottom:0;font-size:11px;font-weight:500;letter-spacing:.1em;color:var(--ink)}
 .more::after{content:"+";margin-left:auto;font-size:14px;font-weight:400}
 .more[aria-expanded=true]::after{content:"\2212"}
 .more:hover{color:var(--mute)}
 #fgrid{padding-bottom:88px}
+@media (max-width:900px){#fgrid{padding-bottom:16px}}
 #fgrid .empty{padding:8px var(--pe) 16px;max-width:none}
+/* Quick find: przycisk czyszczenia */
+.pf-search{position:relative}
+.pf-search input{padding-right:36px}
+#fclear{position:absolute;right:calc(var(--pe) - 10px);top:12px;width:36px;height:36px;border:0;background:transparent;font-size:18px;line-height:1;color:var(--mute);cursor:pointer}
+#fclear:hover{color:var(--ink)}
+#fclear:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+/* wieksze pola trafienia (WCAG 2.5.8) bez zmiany wygladu */
+.chip button{position:relative}
+.chip button::after{content:"";position:absolute;inset:-8px}
+.msw button{padding:8px 0}
 #done{margin:12px var(--pe) 16px;height:44px;border-radius:var(--r-pill)}
 #clear{text-transform:uppercase;letter-spacing:.1em}
 .chip{background:transparent;border:1px solid var(--line);letter-spacing:.1em}
@@ -454,13 +469,14 @@ body.district #dhead{display:block;padding:28px 0 24px;margin-bottom:20px;border
          <button class="px" id="pclose" type="button" data-tip="Close filters" aria-label="Close filters">&times;</button>
       </div>
       <div class="pf-search">
-         <input type="text" id="fsearch" placeholder="Quick find tags..." aria-label="Filter options">
+         <input type="text" id="fsearch" placeholder="Quick find tags..." aria-label="Filter options" autocomplete="off">
+         <button type="button" id="fclear" aria-label="Clear quick find" hidden>&times;</button>
       </div>
       <div id="fgrid"></div>
       <button id="done" type="button">Show photographs</button>
     </aside>
     <main id="main">
-      <div id="info"><span id="count">Loading archive&hellip;</span><a id="siteask" href="/report-a-site" target="_top">Missing a site? Request it</a></div>
+      <div id="info"><span id="count" role="status">Loading archive&hellip;</span><a id="siteask" href="/report-a-site" target="_top">Missing a site? Request it</a></div>
       <div id="locgrid" style="display:none"></div>
       <div id="wall"></div>
       <div id="empty"></div>
@@ -752,9 +768,15 @@ function optionsFor(F){
   return out}
 
 function renderPanel(){
-  var host=$("fgrid"),top=host.scrollTop;host.innerHTML="";
-  var nsel=0;FACETS.forEach(function(F){if(F.all)nsel+=selOf(F.key).length});
-  if(nsel>1){var sw=el("div","msw");sw.appendChild(el("span","ml","Match"));["any","all"].forEach(function(m){var b=el("button",m===S.match?"on":"",m==="any"?"Any (OR) "+matchCount("any"):"All (AND) "+matchCount("all"));b.type="button";b.setAttribute("data-match",m);b.setAttribute("aria-pressed",String(m===S.match));sw.appendChild(b)});host.appendChild(sw)}
+  var host=$("fgrid"),top=host.scrollTop;
+  /* zapamietaj element z fokusem, bo przebudowa listy go usuwa */
+  var ae=document.activeElement,fk=null;
+  if(ae&&ae!==document.body&&host.contains(ae)){fk={sec:ae.getAttribute("data-sec"),more:ae.getAttribute("data-more"),match:ae.getAttribute("data-match"),key:ae.getAttribute("data-key"),val:ae.getAttribute("data-val")}}
+  host.innerHTML="";
+  var rendered=0;
+  /* przelacznik Match ma sens tylko, gdy jakas kategoria ma 2+ zaznaczenia (dziala wewnatrz kategorii) */
+  var multiSel=FACETS.some(function(F){return F.all&&selOf(F.key).length>1});
+  if(multiSel){var sw=el("div","msw");sw.appendChild(el("span","ml","Match"));["any","all"].forEach(function(m){var b=el("button",m===S.match?"on":"",m==="any"?"Any (OR) "+matchCount("any"):"All (AND) "+matchCount("all"));b.type="button";b.setAttribute("data-match",m);b.setAttribute("aria-pressed",String(m===S.match));sw.appendChild(b)});host.appendChild(sw)}
   var fq = $("fsearch") ? $("fsearch").value.toLowerCase().trim() : "";
   
   var PRIMARY={suburb:1,typology:1,material:1,year:1},hidden=0;
@@ -798,25 +820,38 @@ function renderPanel(){
             body.appendChild(el("div","grp",last));
         }
         
-        var lab=el("label","opt"),inp=document.createElement("input");
+        var lab=el("label",F.radio?"opt rad":"opt"),inp=document.createElement("input");
         inp.type="checkbox";inp.checked=on;inp.setAttribute("data-key",F.key);inp.setAttribute("data-val",v);
         lab.appendChild(inp);lab.appendChild(el("span","t",canon(F.key,v)));lab.appendChild(el("span","c",String(n)));
         body.appendChild(lab);
         shown++;
       });
       if(!shown && !fq) body.appendChild(el("p","empty","Nothing in the current results"));
+      /* przy wyszukiwaniu nie pokazuj pustego naglowka (opcje z zerem wynikow sa ukryte) */
+      if(!shown && fq) return;
+      body.setAttribute("role","group");body.setAttribute("aria-label",F.label);
       sec.appendChild(body)
     }
-    host.appendChild(sec)
+    host.appendChild(sec);rendered++
   });
+  if(fq&&!rendered)host.appendChild(el("p","empty","Nothing matches \""+$("fsearch").value.trim()+"\" in the current results. Remove a filter to widen the search."));
   if(!fq&&(hidden||S.more)){var mb=el("button","more",S.more?"Fewer filters":"More filters ("+hidden+")");mb.type="button";mb.setAttribute("data-more","1");mb.setAttribute("aria-expanded",String(!!S.more));host.appendChild(mb)}
   host.scrollTop=top;
+  /* przywroc fokus na ten sam element po przebudowie */
+  if(fk){var els=host.querySelectorAll("button,input"),back=null,sh=null;
+    for(var q=0;q<els.length;q++){var x=els[q];
+      if(fk.sec!==null&&x.getAttribute("data-sec")===fk.sec){back=x;break}
+      if(fk.more!==null&&x.getAttribute("data-more")===fk.more){back=x;break}
+      if(fk.match!==null&&x.getAttribute("data-match")===fk.match){back=x;break}
+      if(fk.key!==null&&x.getAttribute("data-key")===fk.key){if(x.getAttribute("data-val")===fk.val){back=x;break}if(!sh)sh=host.querySelector('.sh[data-sec="'+fk.key+'"]')}}
+    if(!back)back=sh;
+    if(back)back.focus()}
 }
 
 /* ---------- chips / bar ---------- */
 function renderChips(){
   var host=$("chips");host.innerHTML="";
-  function chip(key,val,text){var c=el("span","chip");c.appendChild(document.createTextNode(text));var b=el("button",null,"\u00D7");b.type="button";b.setAttribute("data-key",key);b.setAttribute("data-val",val);b.setAttribute("aria-label","Remove filter");c.appendChild(b);host.appendChild(c)}
+  function chip(key,val,text){var c=el("span","chip");c.appendChild(document.createTextNode(text));var b=el("button",null,"\u00D7");b.type="button";b.setAttribute("data-key",key);b.setAttribute("data-val",val);b.setAttribute("aria-label","Remove filter: "+text);c.appendChild(b);host.appendChild(c)}
   if(S.loc)chip("loc",S.loc,S.loc);
   FACETS.forEach(function(F){selOf(F.key).forEach(function(v,i){if(i>0&&MULTI[F.key])host.appendChild(el("span","cj",isAll(F)?"and":"or"));chip(F.key,v,canon(F.key,v))})});
   var n=activeCount(),b=$("badge");b.hidden=!n;b.textContent=n;
@@ -1069,6 +1104,8 @@ function render(){
   var locs=groupBy(LIST,function(p){return p._loc}),subs=groupBy(LIST,function(p){return p.suburb});
   renderTabs({photo:LIST.length,location:locs.length,suburb:subs.length});
   renderChips();
+  /* wyczysc Quick find PRZED przebudowa panelu, inaczej lista zostaje przefiltrowana starym zapytaniem */
+  if($("fsearch"))$("fsearch").value="";if($("fclear"))$("fclear").hidden=true;
   if(S.panel)renderPanel();
   var wall=$("wall"),lg=$("locgrid"),em=$("empty");
   wall.innerHTML="";lg.innerHTML="";em.innerHTML="";
@@ -1095,10 +1132,6 @@ function render(){
   $("sortw").style.display=isGrid?"":"none";syncSort();
   document.body.classList.toggle("map",S.map);document.body.classList.toggle("panel",S.panel);
   $("panel").classList.toggle("open",S.panel);
-  
-  // Wyczyść wyszukiwarkę panelu po renderze
-  if($("fsearch")) $("fsearch").value = "";
-  
   layout();mapUpdate(true);save()}
 
 /* ---------- search suggestions ---------- */
@@ -1200,19 +1233,24 @@ function restore(){
 /* ---------- events ---------- */
 function on(id,ev,fn){if($(id))$(id).addEventListener(ev,fn)}
 function wire(){
-  on("ftoggle","click",function(){S.panel=!S.panel;render()});
-  on("pclose","click",function(){S.panel=false;render()});
-  on("done","click",function(){S.panel=false;render()});
+  /* fokus: otwarcie z klawiatury (detail 0) wchodzi do panelu, zamkniecie wraca na przycisk Filters */
+  on("ftoggle","click",function(e){S.panel=!S.panel;render();
+    if(S.panel&&e.detail===0){var t=window.innerWidth>900?$("fsearch"):$("pclose");if(t)t.focus()}});
+  on("pclose","click",function(){S.panel=false;render();$("ftoggle").focus()});
+  on("done","click",function(){S.panel=false;render();$("ftoggle").focus()});
   on("mfab","click",function(){$("mtoggle").click()});on("mtoggle2","click",function(){$("mtoggle").click()});
   on("msg-grid","click",function(){if(S.map)$("mtoggle").click()});on("msg-map","click",function(){if(!S.map)$("mtoggle").click()});
   var mk=function(e){if(e.key!=="m"&&e.key!=="M")return;if(e.metaKey||e.ctrlKey||e.altKey)return;var t=e.target,tg=t&&t.tagName;if(tg==="INPUT"||tg==="TEXTAREA"||tg==="SELECT"||(t&&t.isContentEditable))return;if(window.innerWidth<901||document.body.classList.contains("district"))return;e.preventDefault();$("mtoggle").click()};document.addEventListener("keydown",mk);try{if(window.parent!==window&&window.parent.document)window.parent.document.addEventListener("keydown",mk)}catch(x){}
   (function(){var m=$("main"),sg=$("mseg"),last=0,tm=0,hold=false;if(!m||!sg)return;function hide(){if(!hold)sg.classList.add("away")}function keep(){hold=true;clearTimeout(tm)}function free(){hold=false;clearTimeout(tm);tm=setTimeout(hide,2200)}sg.addEventListener("pointerenter",keep);sg.addEventListener("pointerleave",free);sg.addEventListener("focusin",keep);sg.addEventListener("focusout",free);m.addEventListener("scroll",function(){var t=m.scrollTop;if(Math.abs(t-last)<8)return;last=t;if(t>80){sg.classList.remove("away");clearTimeout(tm);tm=setTimeout(hide,2200)}else{sg.classList.add("away")}},{passive:true})})();
   on("mtoggle","click",function(){S.map=!S.map;if(window.innerWidth>900){try{window.localStorage.setItem("pi_map_pref",S.map?"1":"0")}catch(e){}}if(S.map){S.panel=false;ensureMap()}render();if(MAP)setTimeout(function(){MAP.resize();if(S.map){LASTSIG="";mapUpdate(true)}},60)});
-  on("clear","click",function(){S.f={};S.loc="";S.q="";$("q").value="";render()});
+  on("clear","click",function(){var had=document.activeElement===$("clear");S.f={};S.loc="";S.q="";$("q").value="";render();
+    /* przycisk znika po wyczyszczeniu, wiec przenies fokus w sensowne miejsce */
+    if(had){var t=S.panel?$("fsearch"):$("ftoggle");if(t)t.focus()}});
   on("noteok","click",function(){try{window.localStorage.setItem("pi_map_note","1")}catch(e){}$("note").classList.remove("show")});
   
   /* Filter Quick Search - calls renderPanel directly */
-  on("fsearch","input",function(){ renderPanel(); });
+  on("fsearch","input",function(){ $("fclear").hidden=!$("fsearch").value; renderPanel(); });
+  on("fclear","click",function(){ $("fsearch").value=""; $("fclear").hidden=true; renderPanel(); $("fsearch").focus(); });
 
   buildSortMenu();
   on("sortbtn","click",function(){sortOpen(!$("sortlist").classList.contains("open"))});
@@ -1249,7 +1287,7 @@ function wire(){
     else if(open&&e.key==="Enter"&&SGI>-1){e.preventDefault();pickSug(SG[SGI])}
     else if(e.key==="Escape"){closeSug()}});
   on("q","blur",function(){setTimeout(closeSug,150)});
-  document.addEventListener("keydown",function(e){if(e.key==="Escape"){if(S.panel){S.panel=false;render()}else if(S.loc){S.loc="";render()}}});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"){if(S.panel){var inPanel=$("panel").contains(document.activeElement);S.panel=false;render();if(inPanel)$("ftoggle").focus()}else if(S.loc){S.loc="";render()}}});
   var rt=null;window.addEventListener("resize",function(){clearTimeout(rt);rt=setTimeout(function(){layout();if(MAP)MAP.resize()},150)});
   window.addEventListener("pagehide",save);
   /* telefon: gorny panel (pasek + zakladki) chowa sie przy przewijaniu w dol i wraca przy przewijaniu w gore */
