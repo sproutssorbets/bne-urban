@@ -138,6 +138,9 @@ body.panel #mapcol{display:none}
 #note{display:none;align-items:center;justify-content:space-between;gap:16px;min-height:32px;padding:6px 16px 6px 24px;background:#fff;border-top:1px solid var(--line);font-size:11px;color:var(--mute);flex:none}
 #note button{border:none;background:transparent;font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;text-decoration:underline}
 #note.show{display:flex}
+#resume{display:none;align-items:center;flex-wrap:wrap;gap:6px 18px;padding:10px 0;border-bottom:1px solid var(--line);font-size:11px;letter-spacing:.02em;color:var(--mute)}
+#resume.show{display:flex}
+#resume button{border:none;background:transparent;padding:0;font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;text-decoration:underline;text-underline-offset:3px;color:var(--ink)}
 
 /* Mobile Bottom Sheet & UI overrides */
 @media (max-width:900px){
@@ -228,7 +231,7 @@ body.panel #mapcol{display:none}
  /* cele dotykowe 44px bez zmiany wygladu: niewidzialna strefa wokol przyciskow na kartach */
  .ib{position:relative}
  .ib::before,.insel::before{content:"";position:absolute;inset:-8px}
- #clear,#note button{min-height:44px;min-width:44px}
+ #clear,#note button,#resume button{min-height:44px;min-width:44px}
  .sg{min-height:44px;align-items:center}
  .empty .eb{height:44px}
 
@@ -337,7 +340,7 @@ body.panel #mapcol{display:none}
 body.framed #totop{display:none !important}
 #note,#note.show{display:none !important}
 @media (max-width:900px){
- .tbtn,.chip,#clear,.tab,.sh,.opt .c,#info,#siteask,#done,.empty .ec,#sortbtn,.so,#note button{font-size:12px}
+ .tbtn,.chip,#clear,.tab,.sh,.opt .c,#info,#siteask,#done,.empty .ec,#sortbtn,.so,#note button,#resume button{font-size:12px}
  .grp,.cj{font-size:11px}
  #siteask{display:none}
  #siteask2{display:block;margin:28px 0 8px;padding:12px 0;text-align:center;font-size:12px;letter-spacing:.02em;color:var(--mute);text-decoration:underline;text-underline-offset:3px}
@@ -476,6 +479,7 @@ body.district #dhead{display:block;padding:28px 0 24px;margin-bottom:20px;border
       <button id="done" type="button">Show photographs</button>
     </aside>
     <main id="main">
+      <div id="resume"><span id="resumet"></span><button id="resumeyes" type="button">Resume</button><button id="resumeno" type="button">Start fresh</button></div>
       <div id="info"><span id="count" role="status">Loading archive&hellip;</span><a id="siteask" href="/report-a-site" target="_top">Missing a site? Request it</a></div>
       <div id="locgrid" style="display:none"></div>
       <div id="wall"></div>
@@ -1191,8 +1195,48 @@ function syncUrl(){
 function save(){
   try{
     window.sessionStorage.setItem("pi_browse",JSON.stringify({tab:S.tab,q:S.q,loc:S.loc,f:S.f,match:S.match,sort:S.sort,cols:S.cols,map:S.map,y:$("main").scrollTop}));
+    if(piMeaningful({q:S.q,loc:S.loc,f:S.f})){window.sessionStorage.removeItem("pi_resume");piResumeHide()}
     syncUrl();
   }catch(e){}
+}
+
+/* Saved search: restored automatically only when coming back from a photo page or by history; otherwise offered as a visible choice. */
+function piMeaningful(r){if(!r)return false;if(r.q||r.loc)return true;var f=r.f||{};for(var k in f){if(f[k]&&f[k].length)return true}return false}
+function piAutoRestore(){
+  try{
+    var nt=(window.performance&&performance.getEntriesByType&&performance.getEntriesByType("navigation")[0]||{}).type;
+    if(nt==="back_forward")return true;
+    var ref="";try{ref=window.parent!==window?window.parent.document.referrer:document.referrer}catch(e){ref=document.referrer}
+    if(/\/medias?\/[0-9a-f]{8}-/i.test(ref||""))return true;
+  }catch(e){}
+  return false;
+}
+function piResumeRead(){try{return JSON.parse(window.sessionStorage.getItem("pi_resume")||"null")}catch(e){return null}}
+function piResumeHide(){var n=$("resume");if(n)n.classList.remove("show")}
+function piResumeText(r){
+  var parts=[];
+  if(r.q)parts.push("\u201c"+r.q+"\u201d");
+  if(r.loc)parts.push(r.loc);
+  FACETS.forEach(function(F){var v=(r.f||{})[F.key];if(v&&v.length)parts.push(F.label+": "+v.map(cap).join(", "))});
+  return "Your last search is saved: "+parts.join("; ")+".";
+}
+function piShowResume(){
+  if(DIST)return;
+  var r=piResumeRead();if(!r||!piMeaningful(r))return;
+  var n=$("resume");if(!n)return;
+  $("resumet").textContent=piResumeText(r);
+  n.classList.add("show");
+  on("resumeyes","click",function(){
+    var x=piResumeRead();try{window.sessionStorage.removeItem("pi_resume")}catch(e){}
+    piResumeHide();if(!x)return;
+    S.q=x.q||"";S.loc=x.loc||"";S.f=x.f||{};S.match=x.match==="any"?"any":"all";
+    if(x.tab)S.tab=x.tab;
+    $("q").value=S.q;render();
+  });
+  on("resumeno","click",function(){
+    try{window.sessionStorage.removeItem("pi_resume");window.sessionStorage.removeItem("pi_browse")}catch(e){}
+    piResumeHide();
+  });
 }
 
 function restore(){
@@ -1219,7 +1263,12 @@ function restore(){
       $("q").value=S.q;
       return 0;
     }
-    var r=JSON.parse(window.sessionStorage.getItem("pi_browse")||"null");if(!r)return 0;
+    var r=JSON.parse(window.sessionStorage.getItem("pi_browse")||"null");
+    if(!DIST&&!piAutoRestore()){
+      if(r&&piMeaningful(r)){try{window.sessionStorage.setItem("pi_resume",JSON.stringify(r))}catch(e){}}
+      return 0;
+    }
+    if(!r)return 0;
     S.tab=r.tab||"photo";S.q=r.q||"";S.loc=r.loc||"";S.f=r.f||{};S.match=r.match==="any"?"any":"all";S.sort=SORTS.indexOf(r.sort)>-1?r.sort:"featured";S.cols=r.cols||3;if(typeof r.map==="boolean")S.map=r.map;
     $("q").value=S.q;return r.y||0
   }catch(e){return 0}
@@ -1339,6 +1388,7 @@ function fail(msg){$("count").textContent=msg}
 function init(){
   wire();
   var y=restore();
+  piShowResume();
   if(DIST){S.map=false;S.tab="photo";S.sort="featured";S.panel=false;document.body.classList.add("district")}
   try{history.scrollRestoration="manual";if(window.parent!==window)window.parent.history.scrollRestoration="manual"}catch(e){}
   var RM=document.getElementById("main"),reveal=function(){if(RM){RM.style.opacity="";}};
