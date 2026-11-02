@@ -296,6 +296,16 @@ body.panel #mapcol{display:none}
 }
 </style>
 <style id="pi-mobile-map">
+.edpin{width:18px;height:18px;border-radius:50%;background:#ff3b1f;border:2px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,.45);cursor:grab;box-sizing:border-box}
+.edpin.moved{background:#111}
+.edpin:active{cursor:grabbing}
+#edpanel{position:fixed;left:12px;bottom:12px;z-index:9500;width:300px;max-width:calc(100vw - 24px);padding:12px;border-radius:14px;background:rgba(255,255,255,.97);box-shadow:0 2px 16px rgba(0,0,0,.25);font:400 12px/1.35 Inter,Arial,sans-serif;color:#111}
+#edpanel b{font-weight:500}
+#edpanel .edn{min-height:32px;margin:4px 0 8px;color:#666}
+#edpanel .edb{display:flex;gap:6px;flex-wrap:wrap}
+#edpanel button{min-height:36px;padding:0 12px;border:0;border-radius:999px;background:#111;color:#fff;font:500 11px/1 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+#edpanel button.g{background:#ececea;color:#111}
+#edpanel textarea{display:block;width:100%;height:64px;margin-top:8px;padding:6px;border:1px solid #ddd;border-radius:8px;font:11px/1.3 ui-monospace,Menlo,monospace;resize:none;box-sizing:border-box}
 .card.sel-on{outline:2px solid #ff3b1f;outline-offset:-2px}
 .card.sel-on::before{content:"Open photograph \203A";position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:3;max-width:calc(100% - 24px);padding:0 16px;height:36px;display:flex;align-items:center;border-radius:999px;background:#ff3b1f;color:#fff;font:500 11px/1 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;pointer-events:none;box-shadow:0 2px 10px rgba(0,0,0,.25);animation:fade .25s both}
 @media (prefers-reduced-motion:reduce){.card.sel-on::before{animation:none}}
@@ -1017,7 +1027,7 @@ function showPinPopup(pl,coords,ph){
   PINPOP=new window.mapboxgl.Popup({closeButton:false,closeOnClick:true,offset:16,maxWidth:"260px"}).setLngLat(coords).setDOMContent(box).addTo(MAP);
 }
 var SELC=null;
-function selId(){return SELC&&SELC.isConnected&&SELC._p&&SELC._p._place?SELC._p._place.id:""}
+function pickId(){return SELC&&SELC.isConnected&&SELC._p&&SELC._p._place?SELC._p._place.id:""}
 function pinGo(pl,ph){
   if(!MAP||!MAPREADY||!pl||pl.lat==null)return;
   mapHot(pl.id);
@@ -1061,6 +1071,43 @@ function clearPick(){
   if(SELC)SELC.classList.remove("sel-on");
   SELC=null;hideBar();mapHot("");
   if(PINPOP){PINPOP.remove();PINPOP=null}
+}
+var EDIT=/[?&]edit=1(&|$)/.test(window.location.search),EDM=[],EDE={};
+function editOut(){
+  var arr=Object.keys(EDE).map(function(k){return EDE[k]}),ta=$("edout"),n=$("edcount");
+  if(ta)ta.value=arr.length?JSON.stringify(arr):"";
+  if(n)n.textContent=arr.length+" moved";
+}
+function editInit(){
+  if(!EDIT||!MAP||!window.mapboxgl||$("edpanel"))return;
+  MAP.getStyle().layers.forEach(function(l){if(l.source==="places")MAP.setLayoutProperty(l.id,"visibility","none")});
+  MAP.addSource("ua-sat",{type:"raster",url:"mapbox://mapbox.satellite",tileSize:256});
+  MAP.addLayer({id:"ua-sat",type:"raster",source:"ua-sat",layout:{visibility:"none"}});
+  var P=document.createElement("div");P.id="edpanel";
+  P.innerHTML='<b>Edit pins</b> <span id="edcount">0 moved</span><div class="edn" id="edname">Drag a pin to move it. Hover a pin to see its name.</div><div class="edb"><button type="button" id="edsat" class="g">Satellite</button><button type="button" id="edcopy">Copy changes</button><button type="button" id="edreset" class="g">Reset</button></div><textarea id="edout" readonly placeholder="Moved pins appear here"></textarea>';
+  document.body.appendChild(P);
+  PLACES.forEach(function(pl){
+    if(pl.lat==null)return;
+    var el=document.createElement("div");el.className="edpin";el.title=pl.name;
+    var mk=new window.mapboxgl.Marker({element:el,draggable:true}).setLngLat([pl.lng,pl.lat]).addTo(MAP);
+    el.addEventListener("mouseenter",function(){$("edname").textContent=pl.name});
+    mk.on("dragstart",function(){$("edname").textContent=pl.name});
+    mk.on("dragend",function(){
+      var ll=mk.getLngLat();
+      EDE[pl.id]={a:pl.name,lat:+ll.lat.toFixed(6),lng:+ll.lng.toFixed(6)};
+      el.classList.add("moved");editOut();
+    });
+    EDM.push({mk:mk,el:el,pl:pl});
+  });
+  var sat=false;
+  $("edsat").addEventListener("click",function(){sat=!sat;MAP.setLayoutProperty("ua-sat","visibility",sat?"visible":"none");this.textContent=sat?"Map":"Satellite"});
+  $("edreset").addEventListener("click",function(){
+    EDM.forEach(function(m){m.mk.setLngLat([m.pl.lng,m.pl.lat]);m.el.classList.remove("moved")});
+    EDE={};editOut()});
+  $("edcopy").addEventListener("click",function(){
+    var ta=$("edout");if(!ta.value)return;ta.focus();ta.select();
+    var b=this,ok=false;try{ok=document.execCommand("copy")}catch(e){}
+    b.textContent=ok?"Copied":"Select and copy";setTimeout(function(){b.textContent="Copy changes"},1800)});
 }
 function initMap(){
   var box=$("mapbox");if(!box||!window.mapboxgl||MAP)return;
@@ -1144,7 +1191,7 @@ function initMap(){
     MAP.on('mouseenter', 'clusters', function () { MAP.getCanvas().style.cursor = 'pointer'; });
     MAP.on('mouseleave', 'clusters', function () { MAP.getCanvas().style.cursor = ''; });
 
-    mapUpdate(true)})}
+    mapUpdate(true);if(EDIT)editInit()})}
 
 function selId(){var pl=S.loc&&PLACEBYNAME[S.loc];return pl?pl.id:""}
 function mapUpdate(fit){
@@ -1381,9 +1428,9 @@ function wire(){
   wall.addEventListener("mouseover",function(e){
     var c=e.target.closest&&e.target.closest(".card");
     var id = c&&c._p&&c._p._place?c._p._place.id:"";
-    mapHot(id||selId());
+    mapHot(id||pickId());
   });
-  wall.addEventListener("mouseleave",function(){mapHot(selId())});
+  wall.addEventListener("mouseleave",function(){mapHot(pickId())});
   wall.addEventListener("click",function(){save()});
   wall.addEventListener("click",function(e){
     var c=e.target.closest&&e.target.closest(".card");
