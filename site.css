@@ -1373,7 +1373,7 @@ html body .pi-footer-m .pi-fm-brand b::before {
    SPOJNY UKLAD PODSTRON (about, method, licensing, contact, request-a-site, polityki, login, koszyk, selekcja)
    Jedna warstwa na koncu pliku. Zmieniaj wartosci tutaj, nie w regulach wyzej.
    ========================================================================== */
-:root { --pi-col: 640px; --pi-btn-h: 44px; --pi-field-bg: #F1F1EF; }
+:root { --pi-col: 720px; --pi-btn-h: 44px; --pi-field-bg: #F1F1EF; }
 
 /* 1. Tytul strony: ten sam rozmiar wszedzie */
 .pi-content-page > :first-child > .pi-label:first-child,
@@ -1389,6 +1389,7 @@ html body .pi-footer-m .pi-fm-brand b::before {
 
 /* 3. Przyciski: jedna wysokosc, jedna typografia, szerokosc tekstu na komputerze */
 .pi-content-page .pi-btn,
+.pi-content-page .pi-content-cta,
 :is(.page-website_page-contact, .page-website_page-request-a-site) input.submit,
 #ws_page.page-login input.submit,
 #ws_page.page-lightbox .page_actions input.submit_small,
@@ -1427,3 +1428,13 @@ html body .pi-footer-m .pi-fm-brand b::before {
 :is(#ws_page.page-website_page, #ws_page.page-login) label:has(input[type="checkbox"]) {
   display: flex !important; align-items: center !important; gap: 10px !important; font: 400 13px/1.4 Inter, sans-serif !important; letter-spacing: 0 !important; text-transform: none !important; margin: 8px 0 24px !important;
 }
+
+/* poprawki: odstep miedzy przyciskami, tytuly polityk, gorny odstep Contact */
+.pi-content-page .pi-btn + .pi-btn { margin-left: 12px !important; }
+:is(.page-website_page-contact, .page-website_page-request-a-site) .main_content { padding-top: 85px !important; }
+.pi-content-intro::before {
+  display: block; font: 400 21px/1.3 Inter, sans-serif; letter-spacing: 0; text-transform: uppercase; color: #111111; margin: 0 0 24px;
+}
+.page-website_page-image-policy .pi-content-intro::before { content: "Image Policy"; }
+.page-website_page-privacy-policy .pi-content-intro::before { content: "Privacy Policy"; }
+.page-website_page-terms-and-conditions .pi-content-intro::before { content: "Terms and Conditions"; }
