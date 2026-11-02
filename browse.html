@@ -1014,7 +1014,6 @@ function showPinPopup(pl,coords,ph){
   var where=[pl.street,pl.suburb].filter(function(x){return x&&pl.name.indexOf(x)<0}).join(", ");
   if(where){var w=document.createElement("div");w.className="pp-w";w.textContent=where;box.appendChild(w)}
   var c=document.createElement("button");c.type="button";c.className="pp-c";c.textContent="View "+n+(n===1?" photograph":" photographs")+" \u203A";c.addEventListener("click",function(){if(PINPOP){PINPOP.remove();PINPOP=null}if(window.innerWidth<900){if(S.map)$("mtoggle").click()}else{$("main").scrollTop=0}});box.appendChild(c);
-  if(ph&&ph.pageUrl){var o=document.createElement("a");o.className="pp-o";o.href=ph.pageUrl;o.target=CFG.linkTarget;o.textContent="Open photograph \u203A";box.appendChild(o)}
   PINPOP=new window.mapboxgl.Popup({closeButton:false,closeOnClick:true,offset:16,maxWidth:"260px"}).setLngLat(coords).setDOMContent(box).addTo(MAP);
 }
 var SELC=null;
@@ -1022,7 +1021,7 @@ function selId(){return SELC&&SELC.isConnected&&SELC._p&&SELC._p._place?SELC._p.
 function pinGo(pl,ph){
   if(!MAP||!MAPREADY||!pl||pl.lat==null)return;
   mapHot(pl.id);
-  MAP.flyTo({center:[pl.lng,pl.lat],zoom:Math.max(MAP.getZoom(),15),duration:700});
+  MAP.flyTo({center:[pl.lng,pl.lat],zoom:Math.max(MAP.getZoom(),17),duration:900});
   showPinPopup(pl,[pl.lng,pl.lat],ph);
 }
 function pbar(){
