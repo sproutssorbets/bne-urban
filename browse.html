@@ -118,12 +118,14 @@ button{cursor:pointer}
 #cardmenu .cm-i:hover,#cardmenu .cm-i:focus-visible{background:rgba(255,255,255,.12);outline:0}
 #cardmenu .cm-i svg{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 #uatoast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:99999;background:#111;color:#fff;font:400 11px/1.4 Inter,Arial,sans-serif;letter-spacing:.03em;padding:8px 12px;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.18);opacity:0;pointer-events:none;transition:opacity .15s}#uatoast.on{opacity:1}
-/* w selekcji: czerwona ramka na karcie, plus zmienia sie w bialy ptaszek, po najechaniu w kosz. Widoczny zawsze, reszta ikon tylko po najechaniu */
-.ib.sel.on{opacity:1}
-.card.in-sel{outline:2px solid #FF3B1F;outline-offset:-2px}
-.ib.sel .i-bin,.ib.sel.on:hover .i-chk{display:none}
-.ib.sel.on:hover .i-bin{display:block}
-.card.in-sel .ib.sel{opacity:1}
+/* w selekcji: czarna zakladka w prawym gornym rogu, zawsze widoczna. Po najechaniu zmienia tekst na Remove, szerokosc dopasowuje sie sama */
+.insel{position:absolute;z-index:3;top:0;right:0;display:none;align-items:center;gap:7px;height:30px;padding:0 12px 0 11px;background:#111;color:#fff;border-radius:0 0 0 var(--r-md);font:500 10px/1 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;cursor:pointer}
+.card.in-sel .insel{display:flex}
+.card.in-sel .ib.sel{display:none}
+.insel svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.insel .i-bin,.insel .t2,.insel:hover .i-chk,.insel:hover .t1{display:none}
+.insel:hover .i-bin{display:block}.insel:hover .t2{display:inline}
+.insel.busy{opacity:.45;pointer-events:none}
 #locgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;padding:8px 0 40px}
 .lc{position:relative;display:block;aspect-ratio:4/3;overflow:hidden;background:#ececea;border-radius:var(--r-md);border:none;padding:0;text-align:left;color:#fff;isolation:isolate}
 .lc img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -308,7 +310,6 @@ body.panel #mapcol{display:none}
 .edpin.moved{background:#111}
 .edpin.on{background:#16a34a;width:28px;height:28px;border-width:3px;cursor:grab;z-index:5;box-shadow:0 0 0 5px rgba(22,163,74,.28),0 1px 8px rgba(0,0,0,.5)}
 .edpin.on:active{cursor:grabbing}
-.card.sel-on::before{content:"Click again to open \203A";position:absolute;left:12px;bottom:52px;z-index:3;padding:8px 12px;border-radius:10px;background:#111;color:#fff;font:500 10px/1.4 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;pointer-events:none;box-shadow:0 6px 24px rgba(0,0,0,.18)}
 .card.ed-on{box-shadow:0 0 0 3px #16a34a}
 #edpanel{position:fixed;left:12px;bottom:12px;z-index:9500;width:310px;max-width:calc(100vw - 24px);padding:12px;border-radius:14px;background:rgba(255,255,255,.97);box-shadow:0 2px 16px rgba(0,0,0,.25);font:400 12px/1.35 Inter,Arial,sans-serif;color:#111}
 #edpanel b{font-weight:500}
@@ -909,7 +910,7 @@ document.addEventListener("click",function(e){if(CM&&!(e.target.closest&&e.targe
 document.addEventListener("keydown",function(e){if(e.key==="Escape")cmClose()});
 window.addEventListener("scroll",cmClose,true);window.addEventListener("resize",cmClose);
 var SEL={},IC_PLUS='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',IC_BIN='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>',IC_CART='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 4.5h2.2l2 9.6h9.1l1.7-7H6.3"/><circle cx="9.5" cy="18.6" r="1.2"/><circle cx="16.5" cy="18.6" r="1.2"/></svg>',SELT=0,IC_CHK='<svg class="i-chk" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
-function selPaintBtn(b){var on=!!SEL[b.getAttribute("data-uuid")],t=on?"Remove from selection":"Add to selection";b.classList.toggle("on",on);b.innerHTML=on?IC_CHK+IC_BIN.replace("<svg ","<svg class=\"i-bin\" "):IC_PLUS;b.setAttribute("data-tip",on?"Remove":"Select");b.setAttribute("aria-label",t);b.setAttribute("aria-pressed",String(on))}
+function selPaintBtn(b){var on=!!SEL[b.getAttribute("data-uuid")],t=on?"Remove from selection":"Add to selection";b.classList.toggle("on",on);b.innerHTML=on?IC_BIN:IC_PLUS;b.setAttribute("data-tip",on?"Remove":"Select");b.setAttribute("aria-label",t);b.setAttribute("aria-pressed",String(on))}
 function selPaint(){var l=document.querySelectorAll(".ib.sel");for(var i=0;i<l.length;i++)selPaintBtn(l[i]);var c=document.querySelectorAll(".card");for(var j=0;j<c.length;j++){if(c[j]._p)c[j].classList.toggle("in-sel",!!SEL[c[j]._p.uuid])}}
 function selNum(n){try{var pd=window.parent.document,c=pd.querySelector(".menu_lightbox_item");if(!c)return;var a=c.querySelector("a")||c,p=c.querySelector(".client_minilightbox");if(n>0){if(!p){p=pd.createElement("span");p.className="client_minilightbox";a.appendChild(p)}p.classList.add("present");var tn=null,w=pd.createTreeWalker(p,4,null,false),x;while((x=w.nextNode())){if(x.nodeValue.trim()!==""){tn=x;break}}if(tn)tn.nodeValue=String(n);else p.appendChild(pd.createTextNode(String(n)))}else if(p){p.classList.remove("present");while(p.firstChild)p.removeChild(p.firstChild)}}catch(e){}}
 function selSync(){SELT=Date.now();return fetch("/lightbox",{credentials:"same-origin",cache:"no-store"}).then(function(r){if(!r.ok)throw 0;return r.text()}).then(function(t){var o={},re=/id="media_([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})"/g,m;while((m=re.exec(t)))o[m[1]]=1;SEL=o;selPaint();selNum(Object.keys(o).length)}).catch(function(){})}
@@ -934,7 +935,7 @@ function cardEl(p){
   var img=document.createElement("img");img.src=p.thumb;img.alt=String(p.description||p.title||"").slice(0,160);img.loading="lazy";img.decoding="async";
   var ss=thumbSet(p);if(ss){img.sizes="300px";img.srcset=ss}
   a.appendChild(img);var ov=el("span","ovt");ov.appendChild(el("span","ovtt",p._name));a.appendChild(ov);
-  var acts=el("span","acts"),sb=el("span","ib sel");sb.setAttribute("role","button");sb.setAttribute("data-uuid",p.uuid);selPaintBtn(sb);acts.appendChild(sb);var lb=el("span","ib lic");lb.innerHTML=IC_CART;lb.setAttribute("data-tip","License");lb.setAttribute("aria-hidden","true");acts.appendChild(lb);var mb=el("span","ib mor");mb.innerHTML=IC_MORE;mb.setAttribute("data-tip","More");mb.setAttribute("aria-hidden","true");acts.appendChild(mb);a.appendChild(acts);a.classList.toggle("in-sel",!!SEL[p.uuid]);
+  var acts=el("span","acts"),sb=el("span","ib sel");sb.setAttribute("role","button");sb.setAttribute("data-uuid",p.uuid);selPaintBtn(sb);acts.appendChild(sb);var lb=el("span","ib lic");lb.innerHTML=IC_CART;lb.setAttribute("data-tip","License");lb.setAttribute("aria-hidden","true");acts.appendChild(lb);var mb=el("span","ib mor");mb.innerHTML=IC_MORE;mb.setAttribute("data-tip","More");mb.setAttribute("aria-hidden","true");acts.appendChild(mb);a.appendChild(acts);var ib=el("span","insel");ib.setAttribute("role","button");ib.setAttribute("aria-label","Selected. Click to remove");ib.innerHTML=IC_CHK+"<span class=\"t1\">Selected</span>"+IC_BIN.replace("<svg ","<svg class=\"i-bin\" ")+"<span class=\"t2\">Remove</span>";a.appendChild(ib);a.classList.toggle("in-sel",!!SEL[p.uuid]);
   a._p=p;return a}
 
 function layout(){
