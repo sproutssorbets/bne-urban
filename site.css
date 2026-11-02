@@ -1118,6 +1118,8 @@ html.pi-ready #ws_page.page-media .media_wrap > .pi-bar, html.pi-fb #ws_page.pag
 #ws_page.page-media .pi-bar button:hover { opacity: .55; }
 #ws_page.page-media .pi-bar button:focus-visible { outline: 2px solid #111; outline-offset: 3px; }
 #ws_page.page-media .pi-bar svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+/* Share, Download | Add to selection, License: odstep miedzy grupami */
+#ws_page.page-media .pi-bar .pi-sep { margin-left: 18px; }
 
 /* ==========================================================================
    MOBILE: X w oknie zdjecia, bez pobierania, spojna skala fontow
