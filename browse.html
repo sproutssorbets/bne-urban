@@ -324,10 +324,7 @@ body.panel #mapcol{display:none}
 .pinpop .pp-o{display:block;margin-top:8px;font:500 11px/1 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#111;text-decoration:underline;text-underline-offset:3px}
 .pinpop .pp-t{font:500 13px/1.3 Inter,Arial,sans-serif;color:#fff}
 .pinpop .pp-w{font:400 11px/1.3 Inter,Arial,sans-serif;letter-spacing:.02em;color:rgba(255,255,255,.65);margin-top:2px}
-.pinpop .pp-n{margin-top:8px;font:500 10px/1 Inter,Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.65)}
-@media (max-width:900px){.pinpop .pp-n{display:none}}
 .pinpop .pp-c{display:block;width:100%;min-height:44px;margin-top:8px;padding:0 14px;border:0;border-radius:999px;background:#fff;color:#111;font:500 11px/1 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
-@media (min-width:901px){.pinpop .pp-c{display:none}}
 @media (max-width:900px){.mapboxgl-popup{padding-bottom:0}}
 /* telefon: mapa na cala ramke, przelacznik Mapa/Lista jako pigulka u dolu; desktop bez zmian */
 #mfab{display:none}
@@ -599,7 +596,7 @@ var FBY={};FACETS.forEach(function(f){FBY[f.key]=f});
 
 var S={tab:"photo",q:"",loc:"",f:{},match:"all",sort:"featured",cols:3,map:true,panel:false,open:{suburb:true}};
 var DIST=new URLSearchParams(location.search).get("district")==="1";
-var DATA=[],PLACES=[],PLACEBYNAME={},LIST=[],MAP=null,MAPREADY=false,MAPLOAD=false,FITTED=false,LASTSIG="",TQ=null;
+var HOLDFIT=false,DATA=[],PLACES=[],PLACEBYNAME={},LIST=[],MAP=null,MAPREADY=false,MAPLOAD=false,FITTED=false,LASTSIG="",TQ=null;
 var $=function(id){return document.getElementById(id)};
 var lc=function(s){return String(s==null?"":s).toLowerCase().trim()};
 function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
@@ -1030,8 +1027,20 @@ function showPinPopup(pl,coords,ph){
   var t=document.createElement("div");t.className="pp-t";t.textContent=pl.name;box.appendChild(t);
   var where=[pl.street,pl.suburb].filter(function(x){return x&&pl.name.indexOf(x)<0}).join(", ");
   if(where){var w=document.createElement("div");w.className="pp-w";w.textContent=where;box.appendChild(w)}
-  var cn=document.createElement("div");cn.className="pp-n";cn.textContent=n+(n===1?" photograph":" photographs");box.appendChild(cn);
-  var c=document.createElement("button");c.type="button";c.className="pp-c";c.textContent="View "+n+(n===1?" photograph":" photographs")+" \u203A";c.addEventListener("click",function(){if(PINPOP){PINPOP.remove();PINPOP=null}if(window.innerWidth<900){if(S.map)$("mtoggle").click()}else{$("main").scrollTop=0}});box.appendChild(c);
+  if(!EDIT){
+    var narrow=window.innerWidth<900,on=S.loc===pl.name;
+    var c=document.createElement("button");c.type="button";c.className="pp-c";
+    c.textContent=(!narrow&&on)?"Show all photographs":(narrow?"View ":"Show ")+n+(n===1?" photograph":" photographs")+" \u203A";
+    c.addEventListener("click",function(){
+      if(PINPOP){PINPOP.remove();PINPOP=null}
+      if(narrow){
+        if(S.loc!==pl.name){S.loc=pl.name;S.tab="photo";render()}
+        if(S.map)$("mtoggle").click();
+      }else if(on){S.loc="";render()}
+      else{HOLDFIT=true;S.loc=pl.name;S.tab="photo";render();$("main").scrollTop=0}
+    });
+    box.appendChild(c);
+  }
   PINPOP=new window.mapboxgl.Popup({closeButton:false,closeOnClick:true,offset:EDIT?19:12,maxWidth:"260px"}).setLngLat(coords).setDOMContent(box).addTo(MAP);
 }
 var SELC=null;
@@ -1231,6 +1240,7 @@ function mapUpdate(fit){
   var src=MAP.getSource("places");if(src)src.setData({type:"FeatureCollection",features:feats});
   MAP.setFilter("sel",["==",["get","id"],selId()]);MAP.setFilter("sel-glow",["==",["get","id"],selId()]);
   var sig=feats.map(function(f){return f.properties.id}).sort().join(",");
+  if(HOLDFIT){HOLDFIT=false;LASTSIG=sig}
   if(fit&&feats.length&&sig!==LASTSIG){var first=!FITTED;FITTED=true;LASTSIG=sig;MAP.fitBounds([[minLng,minLat],[maxLng,maxLat]],{padding:60,duration:first?0:600,maxZoom:15})}}
 function mapHot(id){if(MAP&&MAPREADY){MAP.setFilter("hot",["==",["get","id"],id||""]);MAP.setFilter("hot-glow",["==",["get","id"],id||""])}}
 
