@@ -113,13 +113,13 @@ button{cursor:pointer}
 .ib.busy{opacity:.45;pointer-events:none}
 /* na karcie: Select, License i menu "..." (Share, Download preview), tak samo przy kazdej liczbie kolumn */
 .ib svg .d{fill:currentColor;stroke:none}
-#cardmenu{position:fixed;z-index:99998;min-width:176px;background:#111;color:#fff;border-radius:10px;padding:4px;box-shadow:0 6px 24px rgba(0,0,0,.18);font:400 11px/1.4 Inter,Arial,sans-serif;letter-spacing:.03em}
+#cardmenu{position:fixed;z-index:99998;min-width:176px;background:rgba(17,17,17,.86);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#fff;border-radius:10px;padding:4px;box-shadow:0 6px 24px rgba(0,0,0,.18);font:400 11px/1.4 Inter,Arial,sans-serif;letter-spacing:.03em}
 #cardmenu .cm-i{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;color:inherit;font:inherit;letter-spacing:inherit;text-align:left;padding:9px 10px;border-radius:7px;cursor:pointer}
 #cardmenu .cm-i:hover,#cardmenu .cm-i:focus-visible{background:rgba(255,255,255,.12);outline:0}
 #cardmenu .cm-i svg{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 #uatoast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:99999;background:#111;color:#fff;font:400 11px/1.4 Inter,Arial,sans-serif;letter-spacing:.03em;padding:8px 12px;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.18);opacity:0;pointer-events:none;transition:opacity .15s}#uatoast.on{opacity:1}
 /* w selekcji: czarna zakladka w prawym gornym rogu, zawsze widoczna. Po najechaniu zmienia tekst na Remove, szerokosc dopasowuje sie sama */
-.insel{position:absolute;z-index:3;top:0;right:0;display:none;align-items:center;gap:7px;height:30px;padding:0 12px 0 11px;background:#111;color:#fff;border-radius:0 0 0 var(--r-md);font:500 10px/1 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;cursor:pointer}
+.insel{position:absolute;z-index:3;top:0;right:0;display:none;align-items:center;gap:7px;height:30px;padding:0 12px 0 11px;background:rgba(17,17,17,.6);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#fff;border-radius:0 0 0 var(--r-md);font:500 10px/1 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;cursor:pointer}
 .card.in-sel .insel{display:flex}
 .card.in-sel .ib.sel{display:none}
 .insel svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
@@ -324,11 +324,12 @@ body.panel #mapcol{display:none}
 #edpanel button.g{background:#ececea;color:#111}
 #edpanel button.ok{background:#16a34a}
 #edpanel textarea{display:block;width:100%;height:64px;margin-top:4px;padding:6px;border:1px solid #ddd;border-radius:8px;font:11px/1.3 ui-monospace,Menlo,monospace;resize:none;box-sizing:border-box}
-.card.sel-on{box-shadow:0 0 0 3px #ff3b1f}
-.pinpop .pp-o{display:block;margin-top:8px;font:500 11px/1 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#111;text-decoration:underline;text-underline-offset:3px}
+.card.sel-on{box-shadow:0 0 0 1px rgba(255,59,31,.8)}
+.pinpop .pp-o{display:block;margin-top:8px;font:500 11px/1 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#111;text-decoration:none}
 .pinpop .pp-t{font:500 11px/1.4 Inter,Arial,sans-serif;letter-spacing:.03em;color:#fff}
 .pinpop .pp-w{display:none}
-.pinpop .pp-c{display:block;margin-top:6px;padding:0;border:0;background:none;color:#fff;font:500 10px/1.4 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.pinpop .pp-c:hover{opacity:.7}
+.pinpop .pp-c{display:block;margin-top:6px;padding:0;border:0;background:none;color:#fff;font:500 10px/1.4 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;cursor:pointer}
 @media (max-width:900px){.mapboxgl-popup{padding-bottom:0}}
 /* telefon: mapa na cala ramke, przelacznik Mapa/Lista jako pigulka u dolu; desktop bez zmian */
 #mfab{display:none}
