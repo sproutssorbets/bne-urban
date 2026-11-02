@@ -1061,7 +1061,7 @@ function pickId(){return SELC&&SELC.isConnected&&SELC._p&&SELC._p._place?SELC._p
 function pinGo(pl,ph){
   if(!MAP||!MAPREADY||!pl||pl.lat==null)return;
   mapHot(pl.id);
-  MAP.flyTo({center:[pl.lng,pl.lat],zoom:Math.max(MAP.getZoom(),17),duration:900});
+  MAP.flyTo({center:[pl.lng,pl.lat],zoom:Math.max(MAP.getZoom(),18),duration:900});
   showPinPopup(pl,[pl.lng,pl.lat],ph);
 }
 function pickCard(c){
