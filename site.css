@@ -1424,3 +1424,6 @@ html body .pi-footer-m .pi-fm-brand b::before {
   display: block !important; font: 500 11px/1.4 Inter, sans-serif !important; letter-spacing: 0.1em !important; text-transform: uppercase !important; color: #111111 !important; margin: 0 0 8px !important;
 }
 .label_help { display: block !important; max-width: none !important; text-align: left !important; font: 400 11px/1.5 Inter, sans-serif !important; letter-spacing: 0 !important; color: #666666 !important; margin: -2px 0 8px !important; }
+:is(#ws_page.page-website_page, #ws_page.page-login) label:has(input[type="checkbox"]) {
+  display: flex !important; align-items: center !important; gap: 10px !important; font: 400 13px/1.4 Inter, sans-serif !important; letter-spacing: 0 !important; text-transform: none !important; margin: 8px 0 24px !important;
+}
