@@ -296,6 +296,15 @@ body.panel #mapcol{display:none}
 }
 </style>
 <style id="pi-mobile-map">
+.card.sel-on{outline:2px solid #ff3b1f;outline-offset:-2px}
+.pinpop .pp-o{display:block;margin-top:8px;font:500 11px/1 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#111;text-decoration:underline;text-underline-offset:3px}
+#pbar{position:fixed;left:12px;right:12px;bottom:calc(64px + env(safe-area-inset-bottom));z-index:9001;display:none;gap:10px;align-items:center;padding:10px 10px 10px 14px;border-radius:16px;background:rgba(255,255,255,.96);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 2px 14px rgba(0,0,0,.18);font:400 12px/1.3 Inter,Arial,sans-serif;color:#111}
+#pbar.on{display:flex}
+#pbar .pb-t{flex:1;min-width:0}
+#pbar .pb-t b{display:block;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pbar .pb-t span{display:block;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pbar button,#pbar a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 14px;border:0;border-radius:999px;background:#111;color:#fff;font:500 11px/1 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;cursor:pointer;white-space:nowrap}
+#pbar a{background:#ececea;color:#111}
 .pinpop .pp-t{font:500 13px/1.3 Inter,Arial,sans-serif;color:#111}
 .pinpop .pp-w{font:400 12px/1.3 Inter,Arial,sans-serif;color:#666;margin-top:2px}
 .pinpop .pp-c{display:block;width:100%;min-height:44px;margin-top:8px;padding:0 14px;border:0;border-radius:999px;background:#111;color:#fff;font:500 11px/1 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
@@ -994,7 +1003,7 @@ function topBtn(){
   }catch(e){}
 }
 var PINPOP=null;
-function showPinPopup(pl,coords){
+function showPinPopup(pl,coords,ph){
   if(PINPOP){PINPOP.remove();PINPOP=null}
   if(!pl||!MAP||!window.mapboxgl)return;
   var n=DATA.filter(function(p){return p._place===pl}).length;
@@ -1003,7 +1012,54 @@ function showPinPopup(pl,coords){
   var where=[pl.street,pl.suburb].filter(function(x){return x&&pl.name.indexOf(x)<0}).join(", ");
   if(where){var w=document.createElement("div");w.className="pp-w";w.textContent=where;box.appendChild(w)}
   var c=document.createElement("button");c.type="button";c.className="pp-c";c.textContent="View "+n+(n===1?" photograph":" photographs")+" \u203A";c.addEventListener("click",function(){if(PINPOP){PINPOP.remove();PINPOP=null}if(window.innerWidth<900){if(S.map)$("mtoggle").click()}else{$("main").scrollTop=0}});box.appendChild(c);
+  if(ph&&ph.pageUrl){var o=document.createElement("a");o.className="pp-o";o.href=ph.pageUrl;o.target=CFG.linkTarget;o.textContent="Open photograph \u203A";box.appendChild(o)}
   PINPOP=new window.mapboxgl.Popup({closeButton:false,closeOnClick:true,offset:16,maxWidth:"260px"}).setLngLat(coords).setDOMContent(box).addTo(MAP);
+}
+var SELC=null;
+function selId(){return SELC&&SELC.isConnected&&SELC._p&&SELC._p._place?SELC._p._place.id:""}
+function pinGo(pl,ph){
+  if(!MAP||!MAPREADY||!pl||pl.lat==null)return;
+  mapHot(pl.id);
+  MAP.flyTo({center:[pl.lng,pl.lat],zoom:Math.max(MAP.getZoom(),15),duration:700});
+  showPinPopup(pl,[pl.lng,pl.lat],ph);
+}
+function pbar(){
+  var b=$("pbar");if(b)return b;
+  b=document.createElement("div");b.id="pbar";b.setAttribute("role","group");b.setAttribute("aria-label","Photograph location");
+  document.body.appendChild(b);return b;
+}
+function pickCard(c){
+  if(SELC)SELC.classList.remove("sel-on");
+  SELC=c;c.classList.add("sel-on");
+  var p=c._p,pl=p._place;
+  if(S.map){hideBar();pinGo(pl,p);return}
+  mapHot(pl.id);
+  var b=pbar();b.innerHTML="";
+  var t=el("div","pb-t"),n=document.createElement("b");n.textContent=pl.name;t.appendChild(n);
+  var where=[pl.street,pl.suburb].filter(function(x){return x&&pl.name.indexOf(x)<0}).join(", ");
+  if(where){var w=document.createElement("span");w.textContent=where;t.appendChild(w)}
+  b.appendChild(t);
+  var m=document.createElement("button");m.type="button";m.textContent="Show on map";
+  m.addEventListener("click",function(){
+    hideBar();
+    if(!S.map)$("mtoggle").click();
+    var tries=0,iv=setInterval(function(){
+      tries++;
+      if(MAPREADY){clearInterval(iv);setTimeout(function(){pinGo(pl,p)},350)}
+      else if(tries>40)clearInterval(iv);
+    },100);
+  });
+  b.appendChild(m);
+  var o=document.createElement("a");o.href=p.pageUrl||"#";o.target=CFG.linkTarget;o.textContent="Open";
+  o.addEventListener("click",function(){save()});
+  b.appendChild(o);
+  b.classList.add("on");
+}
+function hideBar(){var b=$("pbar");if(b)b.classList.remove("on")}
+function clearPick(){
+  if(SELC)SELC.classList.remove("sel-on");
+  SELC=null;hideBar();mapHot("");
+  if(PINPOP){PINPOP.remove();PINPOP=null}
 }
 function initMap(){
   var box=$("mapbox");if(!box||!window.mapboxgl||MAP)return;
@@ -1324,10 +1380,25 @@ function wire(){
   wall.addEventListener("mouseover",function(e){
     var c=e.target.closest&&e.target.closest(".card");
     var id = c&&c._p&&c._p._place?c._p._place.id:"";
-    mapHot(id);
+    mapHot(id||selId());
   });
-  wall.addEventListener("mouseleave",function(){mapHot("")});
+  wall.addEventListener("mouseleave",function(){mapHot(selId())});
   wall.addEventListener("click",function(){save()});
+  wall.addEventListener("click",function(e){
+    var c=e.target.closest&&e.target.closest(".card");
+    if(!c||!c._p||!c._p._place)return;
+    if(e.defaultPrevented||e.detail===0||e.button||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;
+    if(e.target.closest(".ib,.insel"))return;
+    if(c.classList.contains("sel-on"))return;
+    e.preventDefault();e.stopPropagation();
+    pickCard(c);
+  },true);
+  document.addEventListener("click",function(e){
+    if(!SELC)return;
+    var t=e.target;
+    if(t.closest&&t.closest(".card,#pbar,.mapboxgl-popup,#mapbox"))return;
+    clearPick();
+  });
   on("q","input",function(){var v=this.value.trim();clearTimeout(TQ);TQ=setTimeout(function(){S.q=v;render()},120);
     if(v.length<2){closeSug();return}SG=buildSuggestions(v);SGI=-1;showSug()});
   on("q","keydown",function(e){var open=$("sug").classList.contains("open");
