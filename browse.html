@@ -1637,7 +1637,7 @@ t.addEventListener("click",function(){[m,g].forEach(function(e){if(e&&e.scrollTo
 @media (prefers-reduced-motion:reduce){#uatip{transition:none}}
 </style>
 <script>(function(){if(!window.matchMedia||!matchMedia("(hover:hover)").matches)return;var tip=document.createElement("div"),T=0,cur=null;tip.id="uatip";tip.setAttribute("aria-hidden","true");document.body.appendChild(tip);
-function place(el){var r=el.getBoundingClientRect(),w=tip.offsetWidth,h=tip.offsetHeight,x=Math.max(8,Math.min(innerWidth-w-8,r.left+r.width/2-w/2)),y=r.top>h+16?r.top-h-8:r.bottom+8;tip.style.transform="translate("+Math.round(x)+"px,"+Math.round(y)+"px)"}
+function place(el){var r=el.getBoundingClientRect();if(el.classList&&el.classList.contains("card")){tip.style.maxWidth=Math.max(120,Math.min(300,r.width-24))+"px";var cw=tip.offsetWidth,ch=tip.offsetHeight,cy=Math.max(r.top+12,8);cy=Math.min(cy,Math.max(8,r.bottom-ch-8));tip.style.transform="translate("+Math.round(Math.max(8,r.right-cw-12))+"px,"+Math.round(cy)+"px)";return}tip.style.maxWidth="";var w=tip.offsetWidth,h=tip.offsetHeight,x=Math.max(8,Math.min(innerWidth-w-8,r.left+r.width/2-w/2)),y=r.top>h+16?r.top-h-8:r.bottom+8;tip.style.transform="translate("+Math.round(x)+"px,"+Math.round(y)+"px)"}
 function show(el){var t=el.getAttribute("data-tip");if(!t||!document.contains(el))return;tip.textContent=t;var k=el.getAttribute("data-key");if(k){var s=document.createElement("kbd");s.textContent=k;tip.appendChild(s)}place(el);tip.classList.add("on")}
 function hide(){clearTimeout(T);cur=null;tip.classList.remove("on")}
 document.addEventListener("mouseover",function(e){var el=e.target.closest&&e.target.closest("[data-tip]");if(el===cur)return;hide();if(!el)return;cur=el;T=setTimeout(function(){show(el)},120)});
