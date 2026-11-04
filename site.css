@@ -1478,3 +1478,7 @@ html body .pi-footer-m .pi-fm-brand b::before {
   #ws_page.page-gallery .galleries.thumbs_wall:not(.medias-list) { grid-template-columns: minmax(0, 1fr) !important; }
   #ws_page.page-gallery .medias-list.thumbs_wall { column-count: 1 !important; }
 }
+#ws_page.front-page .text_block.custom .elem {
+  min-height: 0 !important;
+  height: auto !important;
+}
