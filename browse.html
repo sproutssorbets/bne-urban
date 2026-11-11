@@ -327,6 +327,7 @@ body.panel #mapcol{display:none}
 .pinpop .pp-o{display:block;margin-top:8px;font:500 11px/1 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#111;text-decoration:none}
 .pinpop .pp-t{font:500 11px/1.4 Inter,Arial,sans-serif;letter-spacing:.03em;color:#fff}
 .pinpop .pp-w{display:none}
+.pinpop .pp-n{font:500 10px/1.4 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#fff;opacity:.7;margin-top:4px}
 .pinpop .pp-c:hover{opacity:.7}
 .pinpop .pp-c{display:block;margin-top:6px;padding:0;border:0;background:none;color:#fff;font:500 10px/1.4 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;cursor:pointer}
 @media (max-width:900px){.mapboxgl-popup{padding-bottom:0}}
@@ -1040,7 +1041,7 @@ function showPinPopup(pl,coords,ph){
   var t=document.createElement("div");t.className="pp-t";t.textContent=pl.name;box.appendChild(t);
   var where=[pl.street,pl.suburb].filter(function(x){return x&&pl.name.indexOf(x)<0}).join(", ");
   if(where){var w=document.createElement("div");w.className="pp-w";w.textContent=where;box.appendChild(w)}
-  var cn=document.createElement("div");cn.className="pp-w";cn.textContent=n+(n===1?" photograph":" photographs");box.appendChild(cn);
+  var cn=document.createElement("div");cn.className="pp-n";cn.textContent=n+(n===1?" photograph":" photographs");box.appendChild(cn);
   if(!EDIT){
     var narrow=window.innerWidth<900,on=S.loc===pl.name;
     var c=document.createElement("button");c.type="button";c.className="pp-c";
