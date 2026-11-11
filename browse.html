@@ -1040,10 +1040,11 @@ function showPinPopup(pl,coords,ph){
   var t=document.createElement("div");t.className="pp-t";t.textContent=pl.name;box.appendChild(t);
   var where=[pl.street,pl.suburb].filter(function(x){return x&&pl.name.indexOf(x)<0}).join(", ");
   if(where){var w=document.createElement("div");w.className="pp-w";w.textContent=where;box.appendChild(w)}
+  var cn=document.createElement("div");cn.className="pp-w";cn.textContent=n+(n===1?" photograph":" photographs");box.appendChild(cn);
   if(!EDIT){
     var narrow=window.innerWidth<900,on=S.loc===pl.name;
     var c=document.createElement("button");c.type="button";c.className="pp-c";
-    c.textContent=(!narrow&&on)?"Show all photographs":(narrow?"View ":"Show ")+n+(n===1?" photograph":" photographs")+" \u203A";
+    c.textContent=(!narrow&&on)?"Show all photographs":(narrow?"View":"Show")+" photographs \u203A";
     c.addEventListener("click",function(){
       if(PINPOP){PINPOP.remove();PINPOP=null}
       if(narrow){
