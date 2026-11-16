@@ -1482,3 +1482,26 @@ html body .pi-footer-m .pi-fm-brand b::before {
   min-height: 0 !important;
   height: auto !important;
 }
+
+/* ===== More-from cards: same hover as home grid ===== */
+.pi-more a { isolation: isolate; color: #fff; text-decoration: none; }
+.pi-more a img { transition: transform .8s cubic-bezier(.4,0,.2,1); }
+.pi-more a:hover img { transform: scale(1.025); }
+.pi-more a::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; background: linear-gradient(to top, rgba(0,0,0,.58) 0, rgba(0,0,0,.42) 14px, rgba(0,0,0,.24) 28px, rgba(0,0,0,.1) 40px, rgba(0,0,0,.03) 50px, rgba(0,0,0,0) 58px); transition: opacity .15s; }
+.pi-more a:hover::after, .pi-more a:focus-visible::after { opacity: 1; }
+.pi-ov { position: absolute; z-index: 2; left: 14px; right: 100px; bottom: 14px; font: 500 11px/1.3 Inter, Arial, sans-serif; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0; transition: opacity .15s; }
+.pi-more a:hover .pi-ov, .pi-more a:focus-visible .pi-ov { opacity: 1; }
+.pi-more a.menu-open .pi-acts { opacity: 1; }
+.pi-ib svg .d { fill: currentColor; stroke: none; }
+@media (hover: none) { .pi-more a::after, .pi-ov { opacity: 1; } }
+.pi-insel { position: absolute; z-index: 3; top: 0; right: 0; display: none; align-items: center; gap: 7px; height: 30px; padding: 0 12px 0 11px; background: rgba(17,17,17,.6); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: #fff; border-radius: 0 0 0 var(--pi-r-md, 16px); font: 500 10px/1 Inter, Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; cursor: pointer; }
+.pi-more a.in-sel .pi-insel { display: flex; }
+.pi-more a.in-sel .pi-ib.sel { display: none; }
+.pi-insel svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.pi-insel .i-bin, .pi-insel .t2, .pi-insel:hover .i-chk, .pi-insel:hover .t1 { display: none; }
+.pi-insel:hover .i-bin { display: block; }
+.pi-insel:hover .t2 { display: inline; }
+#cardmenu { position: fixed; z-index: 99998; min-width: 176px; background: rgba(17,17,17,.86); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: #fff; border-radius: 10px; padding: 4px; box-shadow: 0 6px 24px rgba(0,0,0,.18); font: 400 11px/1.4 Inter, Arial, sans-serif; letter-spacing: .03em; }
+#cardmenu .cm-i { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-align: left; padding: 9px 10px; border-radius: 7px; cursor: pointer; }
+#cardmenu .cm-i:hover, #cardmenu .cm-i:focus-visible { background: rgba(255,255,255,.12); outline: 0; }
+#cardmenu .cm-i svg { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
