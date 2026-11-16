@@ -511,7 +511,7 @@ body.district #dhead{display:block;padding:28px 0 24px;margin-bottom:20px;border
 .pill{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 14px;border:1px solid var(--ink);border-radius:var(--r-pill);background:#fff;color:var(--ink);font-size:11px;letter-spacing:1.1px;text-transform:uppercase;cursor:pointer}
 .pill:hover{background:var(--ink);color:#fff}
 .pill svg{width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:1.5}
-@media (max-width:900px){#home,#pills{display:none!important}}
+  h.hidden=!show;   document.body.classList.toggle("home",show);   var sub=$("sub"),m=$("main"),r=$("resume"),info=$("info");   if(show){if(r)m.insertBefore(r,h);if(sub&&sub.parentNode!==m)m.insertBefore(sub,info)}   else if(sub&&sub.parentNode===m){$("app").insertBefore(sub,$("intro"))}}
 /* ===== /DEMO ===== */
 </style>
 </head>
