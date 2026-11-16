@@ -1137,7 +1137,9 @@ function clearPick(){
   SELC=null;mapHot("");
   if(PINPOP){PINPOP.remove();PINPOP=null}
 }
-var EDIT=/[?&]edit=1(&|$)/.test(window.location.search),EDM={},EDE={},EDA=null,EDDRAG=false,EDKEY="ua_edpins_v1";
+var EDIT=false;try{EDIT=window.sessionStorage.getItem("ua_edit")==="1"}catch(x){}
+(function(){var dn={};function ok(e){var t=e.target,tg=t&&t.tagName;return !(e.metaKey||e.ctrlKey||e.altKey||tg==="INPUT"||tg==="TEXTAREA"||tg==="SELECT"||(t&&t.isContentEditable))}document.addEventListener("keydown",function(e){if(!ok(e)||!e.key)return;dn[e.key.toLowerCase()]=1;if(dn.e&&dn.d&&dn.i&&dn.t){dn={};try{window.sessionStorage.setItem("ua_edit",EDIT?"0":"1")}catch(x){}window.location.reload()}});document.addEventListener("keyup",function(e){if(e.key)delete dn[e.key.toLowerCase()]});window.addEventListener("blur",function(){dn={}})})();
+var EDM={},EDE={},EDA=null,EDDRAG=false,EDKEY="ua_edpins_v1";
 function edStore(){try{window.localStorage.setItem(EDKEY,JSON.stringify(EDE))}catch(e){}}
 function editOut(){
   var arr=Object.keys(EDE).map(function(k){var e=EDE[k];return{a:e.a,lat:e.lat,lng:e.lng}}),ta=$("edout"),n=$("edcount");
