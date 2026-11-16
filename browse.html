@@ -477,6 +477,44 @@ body.district #dhead{display:block;padding:28px 0 24px;margin-bottom:20px;border
 #dhead td:first-child{color:var(--mute)}
 #dhead td:last-child{text-align:right;white-space:nowrap}
 @media (max-width:900px){#dhead .dcols{grid-template-columns:minmax(0,1fr);row-gap:20px}}
+
+/* ===== DEMO: strona glowna (dodatki) ===== */
+#home{padding:8px 0 0}
+#home[hidden]{display:none}
+#home .hm{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;font-size:11px;line-height:16px;color:var(--mute);padding:16px 0 24px}
+#home .hm span:first-child{grid-column:span 2}
+#home .hg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:0 0 40px;align-items:start}
+#home .hl{grid-column:span 2}
+#home h1{margin:-4px 0 0;font-size:40px;line-height:44px;font-weight:500;letter-spacing:-.01em}
+#home .hs{margin:16px 0 0;font-size:11px;line-height:16px;color:var(--mute);max-width:46ch}
+#home .hlk{display:block;margin-top:24px;font-size:11px;letter-spacing:1.1px;text-transform:uppercase;color:var(--ink);text-decoration:none}
+#home .hlk:hover{color:var(--mute)}
+#home .hk{font-size:11px;letter-spacing:1.1px;text-transform:uppercase;color:var(--mute);margin:0;padding-bottom:8px;line-height:16px}
+#home .sw{display:flex;align-items:center;justify-content:space-between;width:100%;height:32px;padding:0;border:none;border-top:1px solid var(--line);background:transparent;font:inherit;font-size:12px;color:var(--ink);text-align:left;cursor:pointer}
+#home .sw:last-child{border-bottom:1px solid var(--line)}
+#home .sw:hover{color:var(--mute)}
+#home .fh{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--ink);padding:8px 0 16px}
+#home .fh span{font-size:11px;letter-spacing:1.1px;text-transform:uppercase}
+#home .fh button{border:none;background:transparent;padding:0;font:inherit;font-size:11px;letter-spacing:1.1px;text-transform:uppercase;color:var(--ink);cursor:pointer}
+#home .fv{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;cursor:grab}
+#home .fv::-webkit-scrollbar{display:none}
+#home .fv.dg{cursor:grabbing}
+#home .tr{display:flex;gap:16px;width:max-content}
+#home .fc{display:block;flex:none;color:var(--ink);text-decoration:none}
+#home .fc img{display:block;height:300px;width:auto;border-radius:12px;background:var(--chip);-webkit-user-drag:none;user-select:none}
+#home .fc b{display:block;margin-top:10px;font-size:11px;font-weight:500;line-height:15px}
+#home .fc i{display:block;font-style:normal;font-size:11px;line-height:15px;color:var(--mute)}
+#home .fw{padding-bottom:40px}
+#home .fw.off .fv{display:none}
+#home .fw.off .fh{padding-bottom:10px}
+#pills{display:flex;gap:8px;flex:none}
+.pill{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 14px;border:1px solid var(--ink);border-radius:var(--r-pill);background:#fff;color:var(--ink);font-size:11px;letter-spacing:1.1px;text-transform:uppercase;cursor:pointer}
+.pill:hover{background:var(--ink);color:#fff}
+.pill svg{width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:1.5}
+body.home #intro{display:none}
+#main #sub{padding:0;margin-top:8px}
+@media (max-width:900px){#home,#pills{display:none!important}}
+/* ===== /DEMO ===== */
 </style>
 </head>
 <body class="map">
@@ -509,6 +547,29 @@ body.district #dhead{display:block;padding:28px 0 24px;margin-bottom:20px;border
       <button id="done" type="button">Show photographs</button>
     </aside>
     <main id="main">
+      <section id="home" hidden aria-label="Archive introduction">
+        <div class="hm"><span>Brisbane &middot; Archive 2026</span><span id="hupd"></span></div>
+        <div class="hg">
+          <div class="hl">
+            <div>
+              <h1>Dated photographs of Brisbane sites.</h1>
+              <p class="hs">See how a site looked on a given day. Every photograph has an address, a date and a permanent ID. Licensed per image from AU$120.</p>
+            </div>
+            <a class="hlk" href="/licensing" target="_top">See licences &rarr;</a>
+          </div>
+          <div>
+            <p class="hk">Start with</p>
+            <button class="sw" type="button" data-k="suburb" data-v="Brisbane City"><span>Brisbane City</span><span aria-hidden="true">&rarr;</span></button>
+            <button class="sw" type="button" data-k="suburb" data-v="Fortitude Valley"><span>Fortitude Valley</span><span aria-hidden="true">&rarr;</span></button>
+            <button class="sw" type="button" data-k="typology" data-v="Heritage"><span>Heritage</span><span aria-hidden="true">&rarr;</span></button>
+            <button class="sw" type="button" data-k="typology" data-v="Highrise"><span>Highrise</span><span aria-hidden="true">&rarr;</span></button>
+          </div>
+        </div>
+        <div class="fw" id="fw" hidden>
+          <div class="fh"><span>Featured</span><button id="fx" type="button" aria-expanded="true">Close &times;</button></div>
+          <div class="fv" id="fv"><div class="tr" id="ftr"></div></div>
+        </div>
+      </section>
       <div id="resume"><span id="resumet"></span><button id="resumeyes" type="button">Resume</button><button id="resumeno" type="button">Start fresh</button></div>
       <div id="info"><span id="count" role="status">Loading archive&hellip;</span><a id="siteask" href="/report-a-site" target="_top">Missing a site? Request it</a></div>
       <div id="locgrid" style="display:none"></div>
@@ -1293,7 +1354,7 @@ function render(){
   $("sortw").style.display=isGrid?"":"none";syncSort();
   document.body.classList.toggle("map",S.map);document.body.classList.toggle("panel",S.panel);
   $("panel").classList.toggle("open",S.panel);
-  layout();mapUpdate(true);save()}
+  homeUpdate();layout();mapUpdate(true);save()}
 
 /* ---------- search suggestions ---------- */
 var SG=[],SGI=-1;
@@ -1395,6 +1456,68 @@ function piShowResume(){
     piResumeHide();
   });
 }
+
+
+/* ===== DEMO: strona glowna (dodatki) ===== */
+var HOMEBUILT=false,FEATTIMER=null;
+function homeOpen(k,v){
+  S.tab="photo";S.q="";S.loc="";var qi=$("q");if(qi)qi.value="";
+  if(v){S.f[k]=[lc(v)]}
+  S.open[k]=true;S.panel=true;render();
+  var m=$("main");if(m)m.scrollTop=0}
+function homeFeatured(){
+  var items=DATA.filter(function(p){return p.isFeatured&&p.thumb}).slice(0,12);
+  var fw=$("fw");
+  if(!items.length){fw.hidden=true;return}
+  fw.hidden=false;
+  var tr=$("ftr"),loop=items.length>=4,copies=loop?3:1;
+  for(var c=0;c<copies;c++)items.forEach(function(p){
+    var a=document.createElement("a");a.className="fc";a.href=p.pageUrl||"#";a.target="_top";if(c>0)a.setAttribute("aria-hidden","true"),a.tabIndex=-1;
+    var im=document.createElement("img");im.src=p.thumb;im.alt=p._name+", "+(p.date||"");im.loading="lazy";im.draggable=false;
+    im.style.width=Math.round(300/(p._ratio||.667))+"px";
+    var b=document.createElement("b");b.textContent=p._name;
+    var d=document.createElement("i");d.textContent=(p.date?p.date+" · ":"")+p.photoId;
+    a.appendChild(im);a.appendChild(b);a.appendChild(d);tr.appendChild(a)});
+  var fv=$("fv"),paused=false,tick=0,reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches;
+  function one(){return tr.scrollWidth/copies}
+  function wrap(){if(!loop)return;var w=one();if(fv.scrollLeft>=2*w)fv.scrollLeft-=w;else if(fv.scrollLeft<=0)fv.scrollLeft+=w}
+  if(loop)setTimeout(function(){fv.scrollLeft=one()},50);
+  function step(){if(!paused&&!reduce&&loop&&$("home")&&!$("home").hidden&&!$("fw").classList.contains("off")){tick++;if(tick%2===0){fv.scrollLeft+=1;wrap()}}FEATTIMER=requestAnimationFrame(step)}
+  FEATTIMER=requestAnimationFrame(step);
+  fv.addEventListener("mouseenter",function(){paused=true});
+  fv.addEventListener("mouseleave",function(){paused=false;fv.classList.remove("dg")});
+  fv.addEventListener("touchstart",function(){paused=true},{passive:true});
+  fv.addEventListener("touchend",function(){setTimeout(function(){paused=false},1500)},{passive:true});
+  fv.addEventListener("wheel",function(e){var dx=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY;if(!dx)return;e.preventDefault();fv.scrollLeft+=dx*1.2;wrap()},{passive:false});
+  fv.addEventListener("scroll",wrap);
+  var down=false,sx=0,sl=0,moved=false;
+  fv.addEventListener("pointerdown",function(e){if(e.pointerType==="touch")return;down=true;moved=false;sx=e.clientX;sl=fv.scrollLeft});
+  window.addEventListener("pointermove",function(e){if(!down)return;var dx=e.clientX-sx;if(Math.abs(dx)>4){moved=true;fv.classList.add("dg")}fv.scrollLeft=sl-dx;wrap()});
+  window.addEventListener("pointerup",function(){down=false;fv.classList.remove("dg")});
+  fv.addEventListener("click",function(e){if(moved){e.preventDefault();e.stopPropagation();moved=false}},true);
+  var closed=false;try{closed=sessionStorage.getItem("pi_feat_closed")==="1"}catch(e){}
+  setFeat(closed)}
+function setFeat(off){
+  var fw=$("fw"),b=$("fx");fw.classList.toggle("off",off);
+  b.innerHTML=off?"Show &rarr;":"Close &times;";b.setAttribute("aria-expanded",String(!off));
+  try{sessionStorage.setItem("pi_feat_closed",off?"1":"0")}catch(e){}}
+function homeLastUpdate(){
+  var mx=0;DATA.forEach(function(p){var t=parseInt(String(p.uuid||"").replace(/-/g,"").slice(0,12),16);if(t>mx&&t<4102444800000)mx=t});
+  if(!mx)return"Updated weekly";
+  var d=new Date(mx);return"Updated weekly · Last update "+d.getDate()+" "+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()]+" "+d.getFullYear()}
+function homeUpdate(){
+  var h=$("home");if(!h)return;
+  var show=!DIST&&DATA.length>0&&S.tab==="photo"&&!S.q&&activeCount()===0;
+  if(show&&!HOMEBUILT){HOMEBUILT=true;$("hupd").textContent=homeLastUpdate();homeFeatured()}
+  h.hidden=!show;
+  document.body.classList.toggle("home",show);
+  var sub=$("sub"),m=$("main"),r=$("resume"),info=$("info");
+  if(show){if(r)m.insertBefore(r,h);if(sub&&sub.parentNode!==m)m.insertBefore(sub,info)}
+  else if(sub&&sub.parentNode===m){$("app").insertBefore(sub,$("intro"))}}
+document.addEventListener("click",function(e){
+  var s=e.target.closest&&e.target.closest("#home .sw");if(s){homeOpen(s.getAttribute("data-k"),s.getAttribute("data-v"));return}
+  if(e.target.id==="fx"){setFeat(!$("fw").classList.contains("off"))}});
+/* ===== /DEMO ===== */
 
 function restore(){
   try{
