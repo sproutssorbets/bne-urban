@@ -526,7 +526,7 @@ body.home #intro{display:none}
     <div id="chips"></div>
     <button id="clear" type="button" data-tip="Remove all filters and search">Clear all</button>
     <div class="qwrap"><svg class="qicon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="q" type="text" autocomplete="off" spellcheck="false" placeholder="Search addresses, places, keywords" aria-label="Search the archive"><div id="sug" role="listbox"></div></div>
-    <div id="pills"><button class="pill" type="button" data-pk="suburb">Suburb <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3l4 4 4-4"/></svg></button><button class="pill" type="button" data-pk="typology">Subject <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3l4 4 4-4"/></svg></button></div>
+    
     <button class="tbtn" id="mtoggle" type="button" data-tip="Switch between grid and map" data-key="M" aria-pressed="true">Grid</button>
   </div>
   <div id="sub">
@@ -1517,7 +1517,7 @@ function homeUpdate(){
   else if(sub&&sub.parentNode===m){$("app").insertBefore(sub,$("intro"))}}
 document.addEventListener("click",function(e){
   var s=e.target.closest&&e.target.closest("#home .sw");if(s){homeOpen(s.getAttribute("data-k"),s.getAttribute("data-v"));return}
-  var p=e.target.closest&&e.target.closest("#pills .pill");if(p){homeOpen(p.getAttribute("data-pk"),null);return}
+
   if(e.target.id==="fx"){setFeat(!$("fw").classList.contains("off"))}});
 /* ===== /DEMO ===== */
 
