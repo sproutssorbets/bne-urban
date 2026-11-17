@@ -1164,6 +1164,40 @@ function editOut(){
   if(n)n.textContent=arr.length+" moved";
   edStore();
 }
+var GHREPO="sproutssorbets/bne-urban",GHTK="ua_ghtoken_v1";
+function csvHead(line,n){var out=[],i=0;for(var f=0;f<n;f++){var st=i,v="";if(line.charAt(i)==='"'){i++;while(i<line.length){if(line.charAt(i)==='"'){if(line.charAt(i+1)==='"'){v+='"';i+=2}else{i++;break}}else v+=line.charAt(i++)}}else{while(i<line.length&&line.charAt(i)!==","){v+=line.charAt(i++)}}out.push({v:v,s:st,e:i});if(line.charAt(i)===",")i++}return out}
+function ghApi(tk,path,opt){
+  opt=opt||{};opt.headers={Authorization:"Bearer "+tk,Accept:"application/vnd.github+json","Content-Type":"application/json"};
+  return fetch("https://api.github.com/repos/"+GHREPO+path,opt).then(function(r){
+    if(r.status===401||r.status===403){try{window.localStorage.removeItem(GHTK)}catch(e){}throw new Error("GitHub rejected the token. Press Save to enter a new one.")}
+    if(!r.ok)throw new Error("GitHub error "+r.status);return r.json()})}
+function edSave(btn){
+  var items=Object.keys(EDE).map(function(k){return EDE[k]}),msg=$("edcur");
+  if(!items.length){if(msg)msg.textContent="Nothing to save.";return}
+  var tk="";try{tk=window.localStorage.getItem(GHTK)||""}catch(e){}
+  if(!tk){tk=(window.prompt("GitHub token (fine-grained, only repo bne-urban, Contents and Pull requests: read and write). It stays in this browser.")||"").trim();
+    if(!tk)return;try{window.localStorage.setItem(GHTK,tk)}catch(e){}}
+  btn.disabled=true;btn.textContent="Saving...";
+  var fsha="",bsha="",missing=[],branch="pins-"+new Date().toISOString().slice(0,16).replace(/[-:T]/g,"");
+  ghApi(tk,"/contents/locations.csv?ref=main").then(function(f){
+    fsha=f.sha;
+    var txt=decodeURIComponent(escape(atob(f.content.replace(/\n/g,""))));
+    var lines=txt.split("\n"),done={};
+    for(var i=1;i<lines.length;i++){
+      var h=csvHead(lines[i],4);if(h.length<4)continue;
+      for(var j=0;j<items.length;j++){if(h[0].v===items[j].a){
+        lines[i]=lines[i].slice(0,h[2].s)+items[j].lat+","+items[j].lng+lines[i].slice(h[3].e);done[j]=1}}}
+    items.forEach(function(it,j){if(!done[j])missing.push(it.a)});
+    if(Object.keys(done).length===0)throw new Error("No matching rows found in locations.csv.");
+    return lines.join("\n")}).then(function(newTxt){
+    return ghApi(tk,"/git/ref/heads/main").then(function(r){bsha=r.object.sha;
+      return ghApi(tk,"/git/refs",{method:"POST",body:JSON.stringify({ref:"refs/heads/"+branch,sha:bsha})})}).then(function(){
+      return ghApi(tk,"/contents/locations.csv",{method:"PUT",body:JSON.stringify({message:"Map: correct "+items.length+" pin positions",content:btoa(unescape(encodeURIComponent(newTxt))),sha:fsha,branch:branch})})}).then(function(){
+      return ghApi(tk,"/pulls",{method:"POST",body:JSON.stringify({title:"Map: correct "+items.length+" pin positions",head:branch,base:"main",body:"Saved from the pin editor. Only locations.csv, photo GPS unchanged."+(missing.length?"\n\nNot found: "+missing.join(", "):"")})})})}).then(function(pr){
+    btn.textContent="Saved";
+    if(msg){msg.innerHTML="";var a=document.createElement("a");a.href=pr.html_url;a.target="_blank";a.rel="noopener";a.textContent="Open pull request to merge";msg.appendChild(a);if(missing.length)msg.appendChild(document.createTextNode(" ("+missing.length+" not found)"))}
+    setTimeout(function(){btn.textContent="Save";btn.disabled=false},2500)}).catch(function(e){
+    if(msg)msg.textContent=e.message||"Save failed.";btn.textContent="Save";btn.disabled=false})}
 function edMarkCards(pl){
   var c=document.querySelectorAll(".card");
   for(var i=0;i<c.length;i++)c[i].classList.toggle("ed-on",!!(pl&&c[i]._p&&c[i]._p._place===pl));
@@ -1197,7 +1231,7 @@ function editInit(){
   MAP.addSource("ua-sat",{type:"raster",url:"mapbox://mapbox.satellite",tileSize:256});
   MAP.addLayer({id:"ua-sat",type:"raster",source:"ua-sat",layout:{visibility:"none"}});
   var P=document.createElement("div");P.id="edpanel";
-  P.innerHTML='<b>Edit pins</b> <span id="edcount">0 moved</span><div class="edn" id="edcur"></div><div class="edk"><span><i style="background:#ff3b1f"></i>not touched</span><span><i style="background:#16a34a"></i>unlocked</span><span><i style="background:#111"></i>moved</span></div><div id="edthumbs"></div><div class="edb"><button type="button" id="eddone" class="ok" hidden>Done, lock</button><button type="button" id="edundo" class="g" hidden>Undo this pin</button></div><div class="edb"><button type="button" id="edsat" class="g">Satellite</button><button type="button" id="edcopy">Copy changes</button><button type="button" id="edreset" class="g">Reset all</button></div><textarea id="edout" readonly placeholder="Moved pins appear here"></textarea>';
+  P.innerHTML='<b>Edit pins</b> <span id="edcount">0 moved</span><div class="edn" id="edcur"></div><div class="edk"><span><i style="background:#ff3b1f"></i>not touched</span><span><i style="background:#16a34a"></i>unlocked</span><span><i style="background:#111"></i>moved</span></div><div id="edthumbs"></div><div class="edb"><button type="button" id="eddone" class="ok" hidden>Done, lock</button><button type="button" id="edundo" class="g" hidden>Undo this pin</button></div><div class="edb"><button type="button" id="edsat" class="g">Satellite</button><button type="button" id="edsave">Save</button><button type="button" id="edcopy" class="g">Copy changes</button><button type="button" id="edreset" class="g">Reset all</button></div><textarea id="edout" readonly placeholder="Moved pins appear here"></textarea>';
   document.body.appendChild(P);
   var saved={};try{saved=JSON.parse(window.localStorage.getItem(EDKEY)||"{}")}catch(e){}
   PLACES.forEach(function(pl){
@@ -1236,6 +1270,7 @@ function editInit(){
     edDeselect();
     Object.keys(EDM).forEach(function(k){var m=EDM[k];m.mk.setLngLat([m.pl.lng,m.pl.lat]);m.el.classList.remove("moved")});
     EDE={};editOut();edPanel()});
+  $("edsave").addEventListener("click",function(){edSave(this)});
   $("edcopy").addEventListener("click",function(){
     var ta=$("edout");if(!ta.value)return;ta.focus();ta.select();
     var b=this,ok=false;try{ok=document.execCommand("copy")}catch(e){}
