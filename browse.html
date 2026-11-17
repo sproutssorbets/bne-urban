@@ -580,7 +580,7 @@ body.home #intro{display:none}
           </div>
         </div>
         <div class="fw" id="fw" hidden>
-          <div class="fh"><span>Featured</span><button id="fx" type="button" aria-expanded="true">Close &times;</button></div>
+          <div class="fh"><span>Recently added</span><button id="fx" type="button" aria-expanded="true">Close &times;</button></div>
           <div class="fv" id="fv"><div class="tr" id="ftr"></div></div>
         </div>
       </section>
@@ -1482,33 +1482,21 @@ function homeOpen(k,v){
   S.open[k]=true;S.panel=true;render();
   var m=$("main");if(m)m.scrollTop=0}
 function homeFeatured(){
-  var items=DATA.filter(function(p){return p.isFeatured&&p.thumb}).slice(0,12);
+  var items=DATA.filter(function(p){return p.thumb}).sort(newer).slice(0,12);
   var fw=$("fw");
   if(!items.length){fw.hidden=true;return}
   fw.hidden=false;
-  var tr=$("ftr"),loop=items.length>=4,copies=loop?3:1;
-  for(var c=0;c<copies;c++)items.forEach(function(p){
-    var a=document.createElement("a");a.className="fc";a.href=p.pageUrl||"#";a.target="_top";if(c>0)a.setAttribute("aria-hidden","true"),a.tabIndex=-1;
+  var tr=$("ftr");
+  items.forEach(function(p){
+    var a=document.createElement("a");a.className="fc";a.href=p.pageUrl||"#";a.target="_top";
     var im=document.createElement("img");im.src=p.thumb;im.alt=p._name+", "+(p.date||"");im.loading="lazy";im.draggable=false;
     im.style.width=Math.round(300/(p._ratio||.667))+"px";
     var b=document.createElement("b");b.textContent=p._name;
     var d=document.createElement("i");d.textContent=(p.date?p.date+" · ":"")+p.photoId;
     a.appendChild(im);a.appendChild(b);a.appendChild(d);tr.appendChild(a)});
-  var fv=$("fv"),paused=false,tick=0,reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches;
-  function one(){return tr.scrollWidth/copies}
-  function wrap(){if(!loop)return;var w=one();if(fv.scrollLeft>=2*w)fv.scrollLeft-=w;else if(fv.scrollLeft<=0)fv.scrollLeft+=w}
-  if(loop)setTimeout(function(){fv.scrollLeft=one()},50);
-  function step(){if(!paused&&!reduce&&loop&&$("home")&&!$("home").hidden&&!$("fw").classList.contains("off")){tick++;if(tick%2===0){fv.scrollLeft+=1;wrap()}}FEATTIMER=requestAnimationFrame(step)}
-  FEATTIMER=requestAnimationFrame(step);
-  fv.addEventListener("mouseenter",function(){paused=true});
-  fv.addEventListener("mouseleave",function(){paused=false;fv.classList.remove("dg")});
-  fv.addEventListener("touchstart",function(){paused=true},{passive:true});
-  fv.addEventListener("touchend",function(){setTimeout(function(){paused=false},1500)},{passive:true});
-  fv.addEventListener("wheel",function(e){var dx=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY;if(!dx)return;e.preventDefault();fv.scrollLeft+=dx*1.2;wrap()},{passive:false});
-  fv.addEventListener("scroll",wrap);
-  var down=false,sx=0,sl=0,moved=false;
+  var fv=$("fv"),down=false,sx=0,sl=0,moved=false;
   fv.addEventListener("pointerdown",function(e){if(e.pointerType==="touch")return;down=true;moved=false;sx=e.clientX;sl=fv.scrollLeft});
-  window.addEventListener("pointermove",function(e){if(!down)return;var dx=e.clientX-sx;if(Math.abs(dx)>4){moved=true;fv.classList.add("dg")}fv.scrollLeft=sl-dx;wrap()});
+  window.addEventListener("pointermove",function(e){if(!down)return;var dx=e.clientX-sx;if(Math.abs(dx)>4){moved=true;fv.classList.add("dg")}fv.scrollLeft=sl-dx});
   window.addEventListener("pointerup",function(){down=false;fv.classList.remove("dg")});
   fv.addEventListener("click",function(e){if(moved){e.preventDefault();e.stopPropagation();moved=false}},true);
   var closed=false;try{closed=sessionStorage.getItem("pi_feat_closed")==="1"}catch(e){}
