@@ -484,8 +484,9 @@ body.district #dhead{display:block;padding:28px 0 24px;margin-bottom:20px;border
 #home .hm{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;font-size:11px;line-height:16px;color:var(--mute);padding:16px 0 24px}
 #home .hm span:first-child{grid-column:span 2}
 #home .hg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:0 0 40px;align-items:start}
-#home .hl{grid-column:span 2}
-#home h1{margin:-4px 0 0;font-size:40px;line-height:44px;font-weight:500;letter-spacing:-.01em}
+#home h1{margin:-4px 0 40px;font-size:40px;line-height:44px;font-weight:500;letter-spacing:-.01em}
+#home .ha{border-top:1px solid var(--line);padding-top:8px}
+#home .ha .hs:first-child{margin-top:0}
 #home .hs{margin:16px 0 0;font-size:11px;line-height:16px;color:var(--mute);max-width:46ch}
 #home .hs+.hs{margin-top:8px}
 #home .hlk{display:block;margin-top:24px;font-size:11px;letter-spacing:1.1px;text-transform:uppercase;color:var(--ink);text-decoration:none}
@@ -493,6 +494,9 @@ body.district #dhead{display:block;padding:28px 0 24px;margin-bottom:20px;border
 #home .hk{font-size:11px;letter-spacing:1.1px;text-transform:uppercase;color:var(--mute);margin:0;padding-bottom:8px;line-height:16px}
 #home .sw{display:flex;align-items:center;justify-content:space-between;width:100%;height:32px;padding:0;border:none;border-top:1px solid var(--line);background:transparent;font:inherit;font-size:12px;color:var(--ink);text-align:left;cursor:pointer}
 #home .sw:last-child{border-bottom:1px solid var(--line)}
+#home .fr{display:flex;align-items:center;justify-content:space-between;height:32px;border-top:1px solid var(--line);font-size:12px;color:var(--ink)}
+#home .fr:last-child{border-bottom:1px solid var(--line)}
+#home .fr b{font-weight:400;font-variant-numeric:tabular-nums}
 #home .sw:hover{color:var(--mute)}
 #home .fh{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--ink);padding:8px 0 16px}
 #home .fh span{font-size:11px;letter-spacing:1.1px;text-transform:uppercase}
@@ -549,20 +553,28 @@ body.home #intro{display:none}
     </aside>
     <main id="main">
       <section id="home" hidden aria-label="Archive introduction">
-        <div class="hm"><span>Brisbane &middot; Archive 2026</span><span id="hupd"></span></div>
+        <div class="hm"><span>Brisbane &middot; Public since 2026</span><span>Updated weekly</span></div>
+        <h1>Real photographs of Brisbane, as it changes.</h1>
         <div class="hg">
-          <div class="hl">
-            <div>
-              <h1>Real photographs of Brisbane, as it changes.</h1>
+          <div>
+            <p class="hk" aria-hidden="true">&nbsp;</p>
+            <div class="ha">
               <p class="hs">Buildings, streets and details, recorded as they stood in front of the camera. Nothing added, nothing removed. No generative AI.</p>
               <p class="hs">Every photograph is filed by address and date, with a permanent ID and Content Credentials. Licensed per image from AU$120.</p>
+              <a class="hlk" href="/licensing" target="_top">See licences &rarr;</a>
             </div>
-            <a class="hlk" href="/licensing" target="_top">See licences &rarr;</a>
+          </div>
+          <div>
+            <p class="hk">In the archive</p>
+            <div class="fr"><span>Photographs</span><b id="hfp"></b></div>
+            <div class="fr"><span>Locations</span><b id="hfl"></b></div>
+            <div class="fr"><span>Suburbs</span><b id="hfs"></b></div>
+            <div class="fr"><span>Last update</span><b id="hfu"></b></div>
           </div>
           <div>
             <p class="hk">Start with</p>
             <button class="sw" type="button" data-k="suburb" data-v="Brisbane City"><span>Brisbane City</span><span aria-hidden="true">&rarr;</span></button>
-            <button class="sw" type="button" data-k="suburb" data-v="Fortitude Valley"><span>Fortitude Valley</span><span aria-hidden="true">&rarr;</span></button>
+            <button class="sw" type="button" data-k="condition" data-v="Construction site"><span>Construction</span><span aria-hidden="true">&rarr;</span></button>
             <button class="sw" type="button" data-k="typology" data-v="Heritage"><span>Heritage</span><span aria-hidden="true">&rarr;</span></button>
             <button class="sw" type="button" data-k="typology" data-v="Highrise"><span>Highrise</span><span aria-hidden="true">&rarr;</span></button>
           </div>
@@ -1507,12 +1519,16 @@ function setFeat(off){
   try{sessionStorage.setItem("pi_feat_closed",off?"1":"0")}catch(e){}}
 function homeLastUpdate(){
   var mx=0;DATA.forEach(function(p){var t=parseInt(String(p.uuid||"").replace(/-/g,"").slice(0,12),16);if(t>mx&&t<4102444800000)mx=t});
-  if(!mx)return"Updated weekly";
-  var d=new Date(mx);return"Updated weekly · Last update "+d.getDate()+" "+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()]+" "+d.getFullYear()}
+  if(!mx)return"";
+  var d=new Date(mx);return d.getDate()+" "+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()]+" "+d.getFullYear()}
+function homeFacts(){
+  var L={},B={};DATA.forEach(function(p){if(p._loc)L[p._loc]=1;if(p.suburb)B[p.suburb]=1});
+  var v={hfp:DATA.length,hfl:Object.keys(L).length,hfs:Object.keys(B).length,hfu:homeLastUpdate()||"-"};
+  Object.keys(v).forEach(function(k){var e=$(k);if(e)e.textContent=v[k]})}
 function homeUpdate(){
   var h=$("home");if(!h)return;
   var show=!DIST&&DATA.length>0&&S.tab==="photo"&&!S.q&&activeCount()===0;
-  if(show&&!HOMEBUILT){HOMEBUILT=true;$("hupd").textContent=homeLastUpdate();homeFeatured()}
+  if(show&&!HOMEBUILT){HOMEBUILT=true;homeFacts();homeFeatured()}
   h.hidden=!show;
   document.body.classList.toggle("home",show);
   var sub=$("sub"),m=$("main"),r=$("resume"),info=$("info");
