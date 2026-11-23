@@ -13,7 +13,7 @@ html{-webkit-text-size-adjust:100%}
 @media (min-width:900px){:root{--c:12;--m:20px;--g:32px}}
 body{margin:0;background:#fff;color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;font-weight:400}
 a{color:inherit;text-decoration:none}
-.g{display:grid;grid-template-columns:repeat(var(--c),minmax(0,1fr));column-gap:var(--g);width:calc(100% - 2*var(--m));margin:0 auto}
+.g{display:grid;grid-template-columns:repeat(var(--c),minmax(0,1fr));column-gap:var(--g);width:calc(100% - 2*var(--m));max-width:1240px;margin:0 auto}
 .bar{height:52px;border-bottom:1px solid var(--ink)}
 .bar .g{height:52px;align-items:center}
 .bar a{grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500}
@@ -31,10 +31,13 @@ h1{grid-column:1/-1;margin:0 0 40px;font-weight:700;font-size:clamp(28px,8vw,72p
 .sw.p{font-weight:700}
 .sw:hover{color:var(--mute)}
 @media (min-width:900px){
- .txt{grid-column:1/5}
- .list{grid-column:5/9}
- .sw{height:32px}
- .txt,.list{margin-top:0}
+ .meta{grid-row:1;margin:40px 0 32px}
+ h1{grid-column:1/8;grid-row:2;margin:0;font-size:clamp(44px,4.6vw,64px)}
+ .list{grid-column:8/13;grid-row:2/4;margin:0;align-self:start;padding-top:4px}
+ .txt{grid-column:1/6;grid-row:3;margin:32px 0 0}
+ .sw{height:40px;font-size:13px}
+ .hk{padding-bottom:10px}
+ main{padding-bottom:96px}
 }
 .gridview{position:fixed;inset:0;pointer-events:none;display:none}
 .gridview i{background:rgba(255,0,0,.08);height:100%}
