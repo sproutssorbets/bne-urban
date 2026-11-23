@@ -496,8 +496,9 @@ body.district #dhead{display:block;padding:28px 0 24px;margin-bottom:20px;border
 #home .sw:last-child{border-bottom:1px solid var(--line)}
 #home .fr,#home .sw.ft{display:grid;grid-template-columns:minmax(0,1fr) auto 28px;align-items:center;height:32px;border-top:1px solid var(--line);font-size:12px;color:var(--ink)}
 #home .fr:last-child{border-bottom:1px solid var(--line)}
-#home .fr b,#home .sw.ft b{font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
+#home .fr b,#home .sw.ft b{font-weight:400;font-variant-numeric:tabular-nums;text-align:right}
 #home .fr span:last-child,#home .sw.ft span:last-child{text-align:right}
+#home .fr:has(#hfu){font-weight:700}#home .fr:has(#hfu) b{font-weight:700}
 #home .sw:hover{color:var(--mute)}
 #home .fh{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--ink);padding:8px 0 16px}
 #home .fh span{font-size:11px;letter-spacing:1.1px;text-transform:uppercase}
