@@ -589,11 +589,11 @@ body.home #intro{display:none}
         </div>
       </section>
       <div id="resume"><span id="resumet"></span><button id="resumeyes" type="button">Resume</button><button id="resumeno" type="button">Start fresh</button></div>
-      <div id="info"><span id="count" role="status">Loading archive&hellip;</span><a id="siteask" href="/report-a-site" target="_top">Missing a site? Request it</a></div>
+      <div id="info"><span id="count" role="status">Loading archive&hellip;</span><a id="siteask" href="/request-a-site" target="_top">Missing a site? Request it</a></div>
       <div id="locgrid" style="display:none"></div>
       <div id="wall"></div>
       <div id="empty"></div>
-      <a id="siteask2" href="/report-a-site" target="_top">Missing a site? Request it</a>
+      <a id="siteask2" href="/request-a-site" target="_top">Missing a site? Request it</a>
     </main>
     <div id="mapcol"><div id="mapbox"></div></div>
   </div>
@@ -854,7 +854,7 @@ function emptyState(host){
   else d.appendChild(document.createTextNode("Clear a filter or change the search."));
   var cl=el("button","ec","Clear all");cl.type="button";cl.addEventListener("click",function(){$("clear").click()});d.appendChild(cl);
   var ask=el("div","ek");ask.appendChild(document.createTextNode("Not in the archive yet? "));
-  var ak=el("a",null,"Send the address.");ak.href="/report-a-site";ak.target=CFG.linkTarget;ask.appendChild(ak);d.appendChild(ask);
+  var ak=el("a",null,"Send the address.");ak.href="/request-a-site";ak.target=CFG.linkTarget;ask.appendChild(ak);d.appendChild(ask);
   host.appendChild(d)}
 function pass(p,except){
   if(except!=="loc"&&S.loc&&p._loc!==S.loc)return false;
