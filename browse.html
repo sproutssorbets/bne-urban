@@ -521,8 +521,19 @@ body.district #dhead{display:block;padding:28px 0 24px;margin-bottom:20px;border
 .pill svg{width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:1.5}
 body.home #intro{display:none}
 #main #sub{padding:0;margin-top:8px}
-@media (max-width:900px){#home,#pills{display:none!important}}
-@media (min-width:901px){body.home #tabs,body.home #info{display:none}body.home #subr{margin-left:auto}body.home #sub #siteask{align-self:center}}
+@media (max-width:900px){#pills{display:none!important}}
+body.home #tabs,body.home #info{display:none}body.home #subr{margin-left:auto}body.home #sub #siteask{align-self:center}
+/* home na telefonie: ten sam blok co na desktopie, jedna kolumna; wiersze 44px pod palec */
+@media (max-width:900px){
+ #home{padding:0}
+ #home .hm{padding:12px 0 16px}
+ #home h1{margin:0 0 24px;font-size:34px}
+ #home .hg{grid-template-columns:minmax(0,1fr);gap:24px;padding:0 0 24px}
+ #home .hg>div:first-child>.hk{display:none}
+ #home .sw,#home .fr,#home .sw.ft{height:44px}
+ #home .fc img{height:200px}
+ #home .fw{padding-bottom:24px}
+}
 /* ===== /DEMO ===== */
 </style>
 </head>
