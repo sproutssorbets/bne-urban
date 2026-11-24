@@ -1226,9 +1226,10 @@ html body #block_navib #toggable_nav #component_menu :is(.client_minilightbox, .
 /* menu desktop: stale odstepy 32px zamiast rozciagania; HOME na osi 58%, SELECTION/ACCOUNT/CART do prawej krawedzi */
 @media (min-width: 1200px) {
   html body #block_navib #toggable_nav #component_menu ul.component_menu_content { justify-content: flex-start !important; }
+  /* numery nth-child licza pozycje menu razem z ukrytym "Request a site" (stoi pod Contact) */
   html body #block_navib #toggable_nav #component_menu ul.component_menu_content > li.menu_item { margin: 0 32px 0 0 !important; }
-  html body #block_navib #toggable_nav #component_menu ul.component_menu_content > li.menu_item:nth-child(7) { margin-left: auto !important; }
-  html body #block_navib #toggable_nav #component_menu ul.component_menu_content > li.menu_item:nth-child(9) { margin-right: 0 !important; }
+  html body #block_navib #toggable_nav #component_menu ul.component_menu_content > li.menu_item:nth-child(8) { margin-left: auto !important; }
+  html body #block_navib #toggable_nav #component_menu ul.component_menu_content > li.menu_item:nth-child(10) { margin-right: 0 !important; }
 }
 
 /* /login: przycisk jak reszta (wersaliki 11px, .1em, 44px) */
