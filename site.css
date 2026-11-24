@@ -1505,3 +1505,8 @@ html body .pi-footer-m .pi-fm-brand b::before {
 #cardmenu .cm-i { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-align: left; padding: 9px 10px; border-radius: 7px; cursor: pointer; }
 #cardmenu .cm-i:hover, #cardmenu .cm-i:focus-visible { background: rgba(255,255,255,.12); outline: 0; }
 #cardmenu .cm-i svg { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+/* menu: pozycja "Request a site" tylko na telefonie (na desktopie link jest nad lista i w stopce). Dodawac na koncu menu, zeby nie przesunac regul nth-child */
+@media (min-width: 901px) {
+  html body #block_navib #toggable_nav #component_menu ul.component_menu_content > li.menu_item:has(> a[href$="/request-a-site"]) { display: none !important; }
+}
