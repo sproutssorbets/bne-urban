@@ -92,6 +92,7 @@ button{cursor:pointer}
 #info{display:flex;justify-content:space-between;gap:12px;font-size:11px;letter-spacing:.02em;color:var(--mute);padding:14px 0 12px;min-height:32px}
 #siteask{flex:none;font-size:11px;letter-spacing:.02em;color:var(--mute);text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
 #siteask:hover{color:var(--ink)}
+#siteask .sm{display:none}
 #wall{position:relative;width:100%}
 .card{position:absolute;left:0;top:0;display:block;overflow:hidden;background:#ececea;border-radius:var(--r-md);isolation:isolate;color:#fff;text-decoration:none}
 .card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;animation:fade .5s both;transition:transform .8s cubic-bezier(.4,0,.2,1)}
@@ -372,8 +373,12 @@ body.framed #totop{display:none !important}
 @media (max-width:900px){
  .tbtn,.chip,#clear,.tab,.sh,.opt .c,#info,#siteask,#done,.empty .ec,#sortbtn,.so,#note button,#resume button{font-size:12px}
  .grp,.cj{font-size:11px}
- #siteask{display:inline-block}
+ #siteask{display:inline-flex;align-items:center;min-height:44px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);text-decoration:none}
+ #siteask .sd{display:none}#siteask .sm{display:inline}#siteask .sm i{font-style:normal}
  #siteask2{display:none}
+ body.home #main #sub{flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0 12px;margin-top:0;border-bottom:1px solid var(--line)}
+ body.home #main #home.open ~ #sub{border-top:1px solid var(--line)}
+ body.home #sub #siteask{align-self:center}
  #totop{display:flex;align-items:center;justify-content:center;position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:8000;width:44px;height:44px;padding:0;border:0;border-radius:50%;background:#111;color:#fff;box-shadow:0 4px 16px rgba(0,0,0,.28);opacity:0;pointer-events:none;transition:opacity .2s;-webkit-tap-highlight-color:transparent}
  #totop svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
  body.showtop #totop{opacity:1;pointer-events:auto}
@@ -534,7 +539,7 @@ body.home #tabs,body.home #info{display:none}body.home #subr{margin-left:auto}bo
  #home .fc img{height:200px}
  #home .fw{padding-bottom:24px}
  #home:not(.open) .hg,#home:not(.open) .fw{display:none}
- #home .hmb{display:flex;align-items:center;justify-content:space-between;width:100%;height:44px;margin:0 0 8px;padding:0;border:none;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:transparent;font:inherit;font-size:11px;letter-spacing:1.1px;text-transform:uppercase;color:var(--ink);text-align:left;cursor:pointer}
+ #home .hmb{display:flex;align-items:center;justify-content:space-between;width:100%;height:44px;margin:0;padding:0;border:none;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:transparent;font:inherit;font-size:11px;letter-spacing:1.1px;text-transform:uppercase;color:var(--ink);text-align:left;cursor:pointer}
  #home .hmb span:last-child{transition:transform .2s}
  #home.open .hmb span:last-child{transform:rotate(180deg)}
  #home.open .hmb{margin-bottom:24px}
@@ -607,7 +612,7 @@ body.home #tabs,body.home #info{display:none}body.home #subr{margin-left:auto}bo
         </div>
       </section>
       <div id="resume"><span id="resumet"></span><button id="resumeyes" type="button">Resume</button><button id="resumeno" type="button">Start fresh</button></div>
-      <div id="info"><span id="count" role="status">Loading archive&hellip;</span><a id="siteask" href="/request-a-site" target="_top">Missing a site? Request it</a></div>
+      <div id="info"><span id="count" role="status">Loading archive&hellip;</span><a id="siteask" href="/request-a-site" target="_top"><span class="sd">Missing a site? Request it</span><span class="sm">Request a site<i aria-hidden="true"> &rarr;</i></span></a></div>
       <div id="locgrid" style="display:none"></div>
       <div id="wall"></div>
       <div id="empty"></div>
