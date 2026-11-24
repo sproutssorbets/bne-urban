@@ -542,6 +542,16 @@ body.home #tabs,body.home #info{display:none}body.home #subr{margin-left:auto}bo
 @media (min-width:901px){#home .hmb{display:none}}
 /* ===== /DEMO ===== */
 </style>
+<style>
+/* ===== filter chips inside the search field ===== */
+.qwrap{padding-left:42px;flex-wrap:nowrap;min-height:44px}
+.qwrap #chips{order:0;flex:0 1 auto;max-width:65%;min-width:0;margin:0;padding:0;gap:6px;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;max-height:none}
+.qwrap .chip{background:#fff;border:1px solid var(--line);padding:0 4px 0 10px;height:30px;gap:6px;font-size:11px;font-weight:500;letter-spacing:.06em;color:var(--ink)}
+.qwrap .chip button{color:var(--mute);font-size:14px;padding:0 4px}
+.qwrap .cj{font-size:10px;color:var(--mute);text-transform:uppercase;letter-spacing:.1em;flex:none}
+.qwrap #q{order:1;flex:1 1 80px;width:auto;min-width:80px;padding-left:10px}
+.qwrap #clear{order:2;margin:0 14px 0 8px;flex:none;white-space:nowrap}
+</style>
 </head>
 <body class="map">
 <button id="mfab" type="button" aria-label="Switch between map and grid"></button>
@@ -549,9 +559,7 @@ body.home #tabs,body.home #info{display:none}body.home #subr{margin-left:auto}bo
 <div id="app">
   <div id="bar">
     <button class="tbtn" id="ftoggle" data-tip="Filter by suburb, typology, style, materials and more" aria-expanded="false" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h9M16 7h5M3 17h5M12 17h9"/><circle cx="14" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>Filters</span><span class="badge" id="badge" hidden></span></button>
-    <div id="chips"></div>
-    <button id="clear" type="button" data-tip="Remove all filters and search">Clear all</button>
-    <div class="qwrap"><svg class="qicon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="q" type="text" autocomplete="off" spellcheck="false" placeholder="Search addresses, places, keywords" aria-label="Search the archive"><div id="sug" role="listbox"></div></div>
+    <div class="qwrap"><svg class="qicon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><div id="chips"></div><input id="q" type="text" autocomplete="off" spellcheck="false" placeholder="Search addresses, places, keywords" aria-label="Search the archive"><button id="clear" type="button" data-tip="Remove all filters and search">Clear all</button><div id="sug" role="listbox"></div></div>
     <button class="tbtn" id="mtoggle" type="button" data-tip="Switch between grid and map" data-key="M" aria-pressed="true">Grid</button>
   </div>
   <div id="sub">
@@ -985,7 +993,8 @@ function renderChips(){
   if(S.loc)chip("loc",S.loc,S.loc);
   FACETS.forEach(function(F){selOf(F.key).forEach(function(v,i){if(i>0&&MULTI[F.key])host.appendChild(el("span","cj",isAll(F)?"and":"or"));chip(F.key,v,canon(F.key,v))})});
   var n=activeCount(),b=$("badge");b.hidden=!n;b.textContent=n;
-  $("clear").style.display=(n||S.q)?"inline":"none";
+  $("clear").style.display=(n||S.q||S.loc)?"inline":"none";
+  var qi0=$("q");if(qi0){if(!qi0.getAttribute("data-ph"))qi0.setAttribute("data-ph",qi0.placeholder);qi0.placeholder=host.children.length?"":qi0.getAttribute("data-ph")}
   var it=$("intro");if(it)it.hidden=!!(n||S.q)}
 
 /* ---------- tabs ---------- */
@@ -1417,7 +1426,7 @@ function render(){
     word=S.tab==="location"?(groups.length===1?"location":"locations"):(groups.length===1?"suburb":"suburbs");num=groups.length}
   if(!num)emptyState(em);
   var missing=DATA.filter(function(p){return !p._place&&pass(p,null)}).length;
-  $("count").textContent=num+" "+word+(missing&&isGrid&&S.map?" \u00B7 "+missing+" not on the map":"");
+  $("count").textContent=num+" "+word+(isGrid&&S.loc?" in "+S.loc:"")+(missing&&isGrid&&S.map?" \u00B7 "+missing+" not on the map":"");
   distHead();
   $("done").textContent="Show "+LIST.length+(LIST.length===1?" photograph":" photographs");
   $("ftoggle").setAttribute("aria-expanded",String(S.panel));
@@ -1724,6 +1733,7 @@ function wire(){
     if(open&&e.key==="ArrowDown"){e.preventDefault();SGI=Math.min(SGI+1,SG.length-1);showSug()}
     else if(open&&e.key==="ArrowUp"){e.preventDefault();SGI=Math.max(SGI-1,0);showSug()}
     else if(open&&e.key==="Enter"&&SGI>-1){e.preventDefault();pickSug(SG[SGI])}
+    else if(e.key==="Backspace"&&!$("q").value){var cb=$("chips").querySelectorAll(".chip button");if(cb.length){e.preventDefault();cb[cb.length-1].click()}}
     else if(e.key==="Escape"){closeSug()}});
   on("q","blur",function(){setTimeout(closeSug,150)});
   document.addEventListener("keydown",function(e){if(e.key==="Escape"){if(S.panel){var inPanel=$("panel").contains(document.activeElement);S.panel=false;render();if(inPanel)$("ftoggle").focus()}else if(S.loc){S.loc="";render()}}});
