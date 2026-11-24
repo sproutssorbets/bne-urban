@@ -527,13 +527,19 @@ body.home #tabs,body.home #info{display:none}body.home #subr{margin-left:auto}bo
 @media (max-width:900px){
  #home{padding:0}
  #home .hm{padding:12px 0 16px}
- #home h1{margin:0 0 24px;font-size:34px}
+ #home h1{margin:0 0 16px;font-size:26px}
  #home .hg{grid-template-columns:minmax(0,1fr);gap:24px;padding:0 0 24px}
  #home .hg>div:first-child>.hk{display:none}
  #home .sw,#home .fr,#home .sw.ft{height:44px}
  #home .fc img{height:200px}
  #home .fw{padding-bottom:24px}
+ #home:not(.open) .hg,#home:not(.open) .fw{display:none}
+ #home .hmb{display:flex;align-items:center;justify-content:space-between;width:100%;height:44px;margin:0 0 8px;padding:0;border:none;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:transparent;font:inherit;font-size:11px;letter-spacing:1.1px;text-transform:uppercase;color:var(--ink);text-align:left;cursor:pointer}
+ #home .hmb span:last-child{transition:transform .2s}
+ #home.open .hmb span:last-child{transform:rotate(180deg)}
+ #home.open .hmb{margin-bottom:24px}
 }
+@media (min-width:901px){#home .hmb{display:none}}
 /* ===== /DEMO ===== */
 </style>
 </head>
@@ -570,7 +576,8 @@ body.home #tabs,body.home #info{display:none}body.home #subr{margin-left:auto}bo
       <section id="home" hidden aria-label="Archive introduction">
         <div class="hm"><span>Brisbane &middot; Public since 2026</span></div>
         <h1>Real photographs of Brisbane, as it changes.</h1>
-        <div class="hg">
+        <button class="hmb" id="hmb" type="button" aria-expanded="false" aria-controls="hg"><span>About the archive</span><span aria-hidden="true">&darr;</span></button>
+        <div class="hg" id="hg">
           <div>
             <p class="hk" aria-hidden="true">&nbsp;</p>
             <div class="ha">
@@ -1586,6 +1593,7 @@ function homeFacts(){
     var d=new Date(mx),e=$("hfu");
     if(e)e.textContent=d.getDate()+" "+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()]+" "+d.getFullYear()
   }).catch(function(){})}catch(e){}}
+document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("#hmb");if(!b)return;var h=$("home"),o=!h.classList.contains("open");h.classList.toggle("open",o);b.setAttribute("aria-expanded",o?"true":"false")});
 function homeTab(t){
   if(t==="photo"){var w=$("sub");if(w)w.scrollIntoView({behavior:"smooth",block:"start"});return}
   S.tab=t;S.q="";S.loc="";render();var m=$("main");if(m)m.scrollTop=0}
